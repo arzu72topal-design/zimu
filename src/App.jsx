@@ -946,41 +946,55 @@ export default function App() {
   const phoneContent = (
     <div style={{
       position:"relative",
-      width:"100%",height:"100%",minHeight:isMobile?"100dvh":"100%",
+      width:"100%",height:"100%",
+      minHeight:isMobile?"100dvh":"100%",
       background:"#0f0f1a",color:"#e0e0e0",
       fontFamily:"'SF Pro Display',-apple-system,'Segoe UI',sans-serif",
-      overflow:"hidden",display:"flex",flexDirection:"column",
+      display:"flex",flexDirection:"column",
     }}>
-      {/* Scrollable content */}
+      {/* Scrollable content area */}
       <div style={{
-        flex:1,overflow:"auto",
-        padding:"16px 16px 90px",
+        flex:1,
+        overflow:"auto",
+        overflowX:"hidden",
+        paddingTop:16,
+        paddingLeft:16,
+        paddingRight:16,
+        paddingBottom:isMobile?140:100,
         WebkitOverflowScrolling:"touch",
       }}>
         {content()}
       </div>
 
-      {/* Bottom nav - always visible */}
+      {/* Bottom nav bar */}
       <div style={{
-        position:"absolute",bottom:0,left:0,right:0,
-        background:"rgba(21,21,37,0.97)",
-        backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",
-        borderTop:"1px solid rgba(255,255,255,0.08)",
-        display:"flex",justifyContent:"space-around",alignItems:"center",
-        padding:isMobile?"4px 0 env(safe-area-inset-bottom, 10px)":"6px 0 10px",
+        position:isMobile?"fixed":"absolute",
+        bottom:0,left:isMobile?0:undefined,right:isMobile?0:undefined,
+        width:"100%",
+        background:"rgba(12,12,22,0.98)",
+        backdropFilter:"blur(24px)",WebkitBackdropFilter:"blur(24px)",
+        borderTop:"1px solid rgba(255,255,255,0.1)",
+        display:"flex",justifyContent:"space-around",alignItems:"stretch",
+        paddingTop:isMobile?8:6,
+        paddingBottom:isMobile?"max(env(safe-area-inset-bottom, 16px), 16px)":"10px",
+        paddingLeft:4,paddingRight:4,
         zIndex:1000,
       }}>
         {allTabs.map(t=>(
           <button key={t.id} onClick={()=>setTab(t.id)} style={{
-            background:tab===t.id?"rgba(59,130,246,0.15)":"none",
+            background:tab===t.id?"rgba(59,130,246,0.18)":"none",
             border:"none",cursor:"pointer",
-            display:"flex",flexDirection:"column",alignItems:"center",gap:2,
-            padding:"8px 5px",minWidth:40,borderRadius:12,
-            color:tab===t.id?"#3b82f6":"#555",
+            display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",
+            gap:isMobile?4:3,
+            padding:isMobile?"10px 6px":"8px 5px",
+            minWidth:isMobile?52:40,
+            borderRadius:14,
+            color:tab===t.id?"#3b82f6":"#666",
             transition:"all .15s",
+            flex:1,
           }}>
-            <span style={{fontSize:17,lineHeight:1}}>{t.icon}</span>
-            <span style={{fontSize:8,fontWeight:tab===t.id?700:400,letterSpacing:-.2}}>{t.label}</span>
+            <span style={{fontSize:isMobile?24:17,lineHeight:1}}>{t.icon}</span>
+            <span style={{fontSize:isMobile?11:8,fontWeight:tab===t.id?700:500,letterSpacing:-.2}}>{t.label}</span>
           </button>
         ))}
       </div>
@@ -997,8 +1011,12 @@ export default function App() {
         ::-webkit-scrollbar { width:4px; }
         ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1);border-radius:4px; }
         input[type="date"]::-webkit-calendar-picker-indicator { filter:invert(0.7); }
-        body { margin:0; overscroll-behavior:none; background:#080810; }
-        @media(display-mode:standalone){ body { padding-top: env(safe-area-inset-top); background:#0f0f1a; } }
+        html, body { margin:0; padding:0; overscroll-behavior:none; background:#080810; height:100%; overflow:hidden; }
+        #root { height:100%; }
+        @media(display-mode:standalone){ 
+          html, body { background:#0f0f1a; }
+          body { padding-top: env(safe-area-inset-top); } 
+        }
       `}</style>
 
       <Toast {...toast} />
