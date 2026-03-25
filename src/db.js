@@ -1,4 +1,5 @@
 import { openDB } from 'idb';
+import { saveUserData, loadUserData } from './firebase.js';
 
 const DB_NAME = 'zimu';
 const DB_VERSION = 1;
@@ -31,7 +32,10 @@ const DEFAULT_DATA = {
   },
 };
 
-export async function loadData() {
+export { DEFAULT_DATA };
+
+// Local Storage
+export async function loadLocalData() {
   try {
     const db = await getDB();
     const data = await db.get(STORE, 'main');
@@ -39,7 +43,6 @@ export async function loadData() {
     return { ...DEFAULT_DATA, ...data };
   } catch (err) {
     console.error('DB load error:', err);
-    // Fallback to localStorage
     try {
       const ls = localStorage.getItem('zimu-backup');
       if (ls) return { ...DEFAULT_DATA, ...JSON.parse(ls) };
@@ -48,22 +51,60 @@ export async function loadData() {
   }
 }
 
-export async function saveData(data) {
+export async function saveLocalData(data) {
   try {
     const db = await getDB();
     await db.put(STORE, data, 'main');
-    // Also save to localStorage as backup
     try { localStorage.setItem('zimu-backup', JSON.stringify(data)); } catch {}
   } catch (err) {
     console.error('DB save error:', err);
-    // Fallback to localStorage
     try { localStorage.setItem('zimu-backup', JSON.stringify(data)); } catch {}
   }
 }
 
-export async function exportData() {
-  const data = await loadData();
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+// Combined: Load (local + cloud)
+export async function loadData(userId) {
+  const localData = await loadLocalData();
+  if (!userId) return localData;
+  try {
+    const cloudData = await loadUserData(userId);
+    if (cloudData) {
+      const localTime = localData._updatedAt || 0;
+      const cloudTime = cloudData.updatedAt || 0;
+      if (cloudTime > localTime) {
+        const merged = { ...DEFAULT_DATA, ...cloudData };
+        delete merged.updatedAt;
+        await saveLocalData(merged);
+        return merged;
+      }
+    }
+  } catch (err) {
+    console.error('Cloud load error:', err);
+  }
+  return localData;
+}
+
+// Combined: Save (local + cloud)
+export async function saveData(data, userId) {
+  const dataWithTime = { ...data, _updatedAt: Date.now() };
+  await saveLocalData(dataWithTime);
+  if (userId) {
+    try {
+      const cloudData = { ...data };
+      delete cloudData._updatedAt;
+      await saveUserData(userId, cloudData);
+    } catch (err) {
+      console.error('Cloud save error:', err);
+    }
+  }
+}
+
+// Export / Import
+export async function exportData(userId) {
+  const data = await loadData(userId);
+  const cleanData = { ...data };
+  delete cleanData._updatedAt;
+  const blob = new Blob([JSON.stringify(cleanData, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -80,17 +121,15 @@ export async function importData(file) {
     reader.onload = async (e) => {
       try {
         const imported = JSON.parse(e.target.result);
-        // Validate structure
         const valid = imported.tasks && imported.events && imported.sports && imported.projects && imported.notes;
-        if (!valid) throw new Error('Geçersiz dosya formatı');
+        if (!valid) throw new Error('Gecersiz dosya formati');
         const merged = { ...DEFAULT_DATA, ...imported };
-        await saveData(merged);
         resolve(merged);
       } catch (err) {
-        reject(new Error('Dosya okunamadı: ' + err.message));
+        reject(new Error('Dosya okunamadi: ' + err.message));
       }
     };
-    reader.onerror = () => reject(new Error('Dosya okunamadı'));
+    reader.onerror = () => reject(new Error('Dosya okunamadi'));
     reader.readAsText(file);
   });
 }
