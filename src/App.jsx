@@ -791,8 +791,52 @@ export default function App() {
     }
   };
 
+  const phoneContent = (
+    <div style={{
+      position:"relative",
+      width:"100%",height:"100%",minHeight:isMobile?"100dvh":"100%",
+      background:"#0f0f1a",color:"#e0e0e0",
+      fontFamily:"'SF Pro Display',-apple-system,'Segoe UI',sans-serif",
+      overflow:"hidden",display:"flex",flexDirection:"column",
+    }}>
+      {/* Scrollable content */}
+      <div style={{
+        flex:1,overflow:"auto",
+        padding:"16px 16px 90px",
+        WebkitOverflowScrolling:"touch",
+      }}>
+        {content()}
+      </div>
+
+      {/* Bottom nav - always visible */}
+      <div style={{
+        position:"absolute",bottom:0,left:0,right:0,
+        background:"rgba(21,21,37,0.97)",
+        backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",
+        borderTop:"1px solid rgba(255,255,255,0.08)",
+        display:"flex",justifyContent:"space-around",alignItems:"center",
+        padding:isMobile?"4px 0 env(safe-area-inset-bottom, 10px)":"6px 0 10px",
+        zIndex:1000,
+      }}>
+        {allTabs.map(t=>(
+          <button key={t.id} onClick={()=>setTab(t.id)} style={{
+            background:tab===t.id?"rgba(59,130,246,0.15)":"none",
+            border:"none",cursor:"pointer",
+            display:"flex",flexDirection:"column",alignItems:"center",gap:2,
+            padding:"8px 5px",minWidth:40,borderRadius:12,
+            color:tab===t.id?"#3b82f6":"#555",
+            transition:"all .15s",
+          }}>
+            <span style={{fontSize:17,lineHeight:1}}>{t.icon}</span>
+            <span style={{fontSize:8,fontWeight:tab===t.id?700:400,letterSpacing:-.2}}>{t.label}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
-    <div style={{minHeight:"100vh",minHeight:"100dvh",background:"#0f0f1a",color:"#e0e0e0",fontFamily:"'SF Pro Display',-apple-system,'Segoe UI',sans-serif"}}>
+    <>
       <style>{`
         @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
         @keyframes slideDown { from{transform:translateY(-20px);opacity:0} to{transform:translateY(0);opacity:1} }
@@ -801,74 +845,73 @@ export default function App() {
         ::-webkit-scrollbar { width:4px; }
         ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1);border-radius:4px; }
         input[type="date"]::-webkit-calendar-picker-indicator { filter:invert(0.7); }
-        body { margin:0; overscroll-behavior:none; }
-        @media(display-mode:standalone){ body { padding-top: env(safe-area-inset-top); } }
+        body { margin:0; overscroll-behavior:none; background:#080810; }
+        @media(display-mode:standalone){ body { padding-top: env(safe-area-inset-top); background:#0f0f1a; } }
       `}</style>
 
       <Toast {...toast} />
 
-      {/* Desktop sidebar */}
-      {!isMobile && (
-        <div style={{position:"fixed",left:0,top:0,bottom:0,width:200,background:"#151525",borderRight:"1px solid rgba(255,255,255,0.06)",display:"flex",flexDirection:"column",zIndex:100}}>
-          <div style={{padding:"20px 16px",borderBottom:"1px solid rgba(255,255,255,0.06)"}}>
-            <div style={{display:"flex",alignItems:"center",gap:8}}>
-              <span style={{fontSize:20}}>◉</span>
-              <span style={{fontWeight:800,fontSize:15,letterSpacing:-.5}}>Zimu</span>
+      {isMobile ? (
+        /* Mobile: full screen */
+        phoneContent
+      ) : (
+        /* Desktop: phone frame centered */
+        <div style={{
+          minHeight:"100vh",background:"#080810",
+          display:"flex",alignItems:"center",justifyContent:"center",
+          padding:"20px",
+        }}>
+          {/* Phone label */}
+          <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:12}}>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
+              <span style={{fontSize:18}}>◉</span>
+              <span style={{fontWeight:800,fontSize:18,color:"#e0e0e0",letterSpacing:-.5}}>Zimu</span>
+            </div>
+            {/* Phone frame */}
+            <div style={{
+              width:390,height:760,
+              borderRadius:40,
+              border:"4px solid #2a2a3e",
+              background:"#0f0f1a",
+              overflow:"hidden",
+              boxShadow:"0 0 60px rgba(59,130,246,0.08), 0 0 120px rgba(0,0,0,0.5)",
+              position:"relative",
+            }}>
+              {/* Notch */}
+              <div style={{
+                position:"absolute",top:0,left:"50%",transform:"translateX(-50%)",
+                width:120,height:28,background:"#080810",
+                borderRadius:"0 0 18px 18px",zIndex:100,
+                display:"flex",alignItems:"center",justifyContent:"center",
+              }}>
+                <div style={{width:60,height:5,borderRadius:3,background:"#1a1a2e"}}/>
+              </div>
+              {/* Status bar */}
+              <div style={{
+                position:"absolute",top:0,left:0,right:0,height:44,
+                display:"flex",justifyContent:"space-between",alignItems:"flex-end",
+                padding:"0 24px 4px",fontSize:12,fontWeight:600,color:"#aaa",zIndex:99,
+                background:"linear-gradient(to bottom, rgba(15,15,26,0.9), transparent)",
+              }}>
+                <span>9:41</span>
+                <span style={{display:"flex",gap:4,alignItems:"center"}}>
+                  <span style={{fontSize:10}}>5G</span>
+                  <span style={{display:"inline-block",width:22,height:10,border:"1.5px solid #aaa",borderRadius:3,position:"relative"}}>
+                    <span style={{position:"absolute",left:1.5,top:1.5,bottom:1.5,width:14,background:"#22c55e",borderRadius:1.5}}/>
+                  </span>
+                </span>
+              </div>
+              {/* App content */}
+              <div style={{paddingTop:44,height:"100%",boxSizing:"border-box"}}>
+                {phoneContent}
+              </div>
+            </div>
+            <div style={{fontSize:11,opacity:.25,color:"#888",marginTop:4}}>
+              Telefonundan aç → Ana ekrana ekle
             </div>
           </div>
-          <nav style={{padding:"10px 8px",flex:1}}>
-            {allTabs.map(t=>(
-              <button key={t.id} onClick={()=>setTab(t.id)} style={{
-                display:"flex",alignItems:"center",gap:10,width:"100%",padding:"10px 14px",
-                border:"none",borderRadius:10,marginBottom:2,cursor:"pointer",fontSize:13,textAlign:"left",
-                background:tab===t.id?"rgba(59,130,246,0.12)":"transparent",
-                color:tab===t.id?"#3b82f6":"#888",fontWeight:tab===t.id?600:400,
-              }}>
-                <span style={{fontSize:16,width:22,textAlign:"center"}}>{t.icon}</span>
-                {t.label}
-              </button>
-            ))}
-          </nav>
-          <div style={{padding:16,borderTop:"1px solid rgba(255,255,255,0.06)",fontSize:10,opacity:.25}}>
-            v1.0 · Veriler telefonunuzda
-          </div>
         </div>
       )}
-
-      {/* Main content */}
-      <div style={{
-        marginLeft:isMobile?0:200,
-        padding:isMobile?"16px 16px 100px":"24px 28px 24px",
-        maxWidth:700,
-      }}>
-        {content()}
-      </div>
-
-      {/* Mobile bottom nav */}
-      {isMobile && (
-        <div style={{
-          position:"fixed",bottom:0,left:0,right:0,
-          background:"rgba(21,21,37,0.95)",
-          backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",
-          borderTop:"1px solid rgba(255,255,255,0.08)",
-          display:"flex",justifyContent:"space-around",alignItems:"center",
-          padding:"4px 0 env(safe-area-inset-bottom, 10px)",
-          zIndex:1000,
-        }}>
-          {allTabs.map(t=>(
-            <button key={t.id} onClick={()=>setTab(t.id)} style={{
-              background:tab===t.id?"rgba(59,130,246,0.15)":"none",
-              border:"none",cursor:"pointer",
-              display:"flex",flexDirection:"column",alignItems:"center",gap:2,
-              padding:"8px 5px",minWidth:40,borderRadius:12,
-              color:tab===t.id?"#3b82f6":"#555",
-            }}>
-              <span style={{fontSize:17,lineHeight:1}}>{t.icon}</span>
-              <span style={{fontSize:8,fontWeight:tab===t.id?700:400,letterSpacing:-.2}}>{t.label}</span>
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
+    </>
   );
 }
