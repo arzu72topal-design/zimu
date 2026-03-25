@@ -843,11 +843,15 @@ export default function App() {
   const [tab, setTab] = useState("dashboard");
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [splash, setSplash] = useState(true);
   const [toast, setToast] = useState({ visible: false, message: "" });
   const isMobile = useIsMobile();
 
   useEffect(() => {
     loadData().then(d => { setData(d); setLoading(false); });
+    // Splash screen for 2.5 seconds
+    const timer = setTimeout(() => setSplash(false), 2500);
+    return () => clearTimeout(timer);
   }, []);
 
   // Schedule notifications when data changes
@@ -869,11 +873,29 @@ export default function App() {
     setTimeout(() => setToast({ visible: false, message: "" }), 2000);
   };
 
-  if (loading || !data) return (
-    <div style={{minHeight:"100vh",minHeight:"100dvh",background:"#0f0f1a",display:"flex",alignItems:"center",justifyContent:"center",color:"#e0e0e0",fontFamily:"'SF Pro Display',-apple-system,sans-serif"}}>
-      <div style={{textAlign:"center"}}>
-        <div style={{fontSize:36,marginBottom:10,animation:"pulse 1.5s infinite"}}>◉</div>
-        <div style={{fontSize:14,opacity:.5}}>Yükleniyor...</div>
+  if (splash || loading || !data) return (
+    <div style={{
+      minHeight:"100vh",minHeight:"100dvh",background:"#0f0f1a",
+      display:"flex",alignItems:"center",justifyContent:"center",
+      color:"#e0e0e0",fontFamily:"'SF Pro Display',-apple-system,sans-serif",
+      flexDirection:"column",gap:16,
+    }}>
+      <style>{`
+        @keyframes fadeInUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+        @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+        @keyframes shimmer { 0%{opacity:.5} 50%{opacity:1} 100%{opacity:.5} }
+      `}</style>
+      <div style={{animation:"fadeInUp 0.8s ease",textAlign:"center"}}>
+        <img src="/zimu-mascot.png" alt="Zimu" style={{
+          width:180,height:180,objectFit:"contain",
+          animation:"bounce 2s ease-in-out infinite",
+          filter:"drop-shadow(0 8px 24px rgba(59,130,246,0.2))",
+        }}/>
+      </div>
+      <div style={{animation:"fadeInUp 0.8s ease 0.3s both",textAlign:"center"}}>
+        <div style={{fontSize:28,fontWeight:800,letterSpacing:-1,marginBottom:4}}>Zimu</div>
+        <div style={{fontSize:13,opacity:.4,animation:"shimmer 2s ease-in-out infinite"}}>Hayatını yönet...</div>
       </div>
     </div>
   );
