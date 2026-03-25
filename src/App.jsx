@@ -850,7 +850,7 @@ export default function App() {
   useEffect(() => {
     loadData().then(d => { setData(d); setLoading(false); });
     // Splash screen for 2.5 seconds
-    const timer = setTimeout(() => setSplash(false), 2500);
+    const timer = setTimeout(() => setSplash(false), 4000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -878,24 +878,53 @@ export default function App() {
       minHeight:"100vh",minHeight:"100dvh",background:"#0f0f1a",
       display:"flex",alignItems:"center",justifyContent:"center",
       color:"#e0e0e0",fontFamily:"'SF Pro Display',-apple-system,sans-serif",
-      flexDirection:"column",gap:16,
+      flexDirection:"column",overflow:"hidden",position:"relative",
     }}>
       <style>{`
+        @keyframes walkAcross { 
+          0% { transform: translateX(-120px) scaleX(1); }
+          45% { transform: translateX(40px) scaleX(1); }
+          50% { transform: translateX(40px) scaleX(-1); }
+          95% { transform: translateX(-40px) scaleX(-1); }
+          100% { transform: translateX(-40px) scaleX(1); }
+        }
+        @keyframes bobWalk {
+          0%,100% { transform: translateY(0) rotate(-3deg); }
+          25% { transform: translateY(-12px) rotate(3deg); }
+          50% { transform: translateY(0) rotate(-3deg); }
+          75% { transform: translateY(-12px) rotate(3deg); }
+        }
         @keyframes fadeInUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
-        @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-        @keyframes shimmer { 0%{opacity:.5} 50%{opacity:1} 100%{opacity:.5} }
+        @keyframes shimmer { 0%{opacity:.4} 50%{opacity:1} 100%{opacity:.4} }
+        @keyframes groundDraw { from{width:0} to{width:80%} }
       `}</style>
-      <div style={{animation:"fadeInUp 0.8s ease",textAlign:"center"}}>
-        <img src="/zimu-mascot.png" alt="Zimu" style={{
-          width:180,height:180,objectFit:"contain",
-          animation:"bounce 2s ease-in-out infinite",
-          filter:"drop-shadow(0 8px 24px rgba(59,130,246,0.2))",
-        }}/>
+
+      {/* Walking mascot */}
+      <div style={{
+        animation:"walkAcross 4s ease-in-out infinite",
+        marginBottom:8,
+      }}>
+        <div style={{animation:"bobWalk 0.6s ease-in-out infinite"}}>
+          <img src="/zimu-mascot.png" alt="Zimu" style={{
+            width:280,height:280,objectFit:"contain",
+            filter:"drop-shadow(0 12px 32px rgba(59,130,246,0.25))",
+          }}/>
+        </div>
       </div>
+
+      {/* Ground line */}
+      <div style={{
+        width:"80%",maxWidth:360,height:2,
+        background:"linear-gradient(90deg, transparent, rgba(59,130,246,0.3), rgba(59,130,246,0.5), rgba(59,130,246,0.3), transparent)",
+        borderRadius:1,marginBottom:24,
+        animation:"groundDraw 1s ease-out",
+      }}/>
+
+      {/* Text */}
       <div style={{animation:"fadeInUp 0.8s ease 0.3s both",textAlign:"center"}}>
-        <div style={{fontSize:28,fontWeight:800,letterSpacing:-1,marginBottom:4}}>Zimu</div>
-        <div style={{fontSize:13,opacity:.4,animation:"shimmer 2s ease-in-out infinite"}}>Hayatını yönet...</div>
+        <div style={{fontSize:32,fontWeight:800,letterSpacing:-1,marginBottom:6}}>Zimu</div>
+        <div style={{fontSize:14,opacity:.4,animation:"shimmer 2s ease-in-out infinite"}}>Hayatını yönet...</div>
       </div>
     </div>
   );
