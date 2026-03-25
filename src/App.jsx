@@ -87,8 +87,10 @@ function Modal({ open, onClose, title, children }) {
       alignItems:"flex-end",justifyContent:"center",zIndex:9999,
     }}>
       <div onClick={e=>e.stopPropagation()} style={{
-        background:"#1c1c2e",width:"100%",maxWidth:480,maxHeight:"85vh",
+        background:"#1c1c2e",width:"100%",maxWidth:480,maxHeight:"90vh",
         borderRadius:"20px 20px 0 0",overflow:"auto",animation:"slideUp .25s ease",
+        paddingBottom:20,
+        marginBottom:0,
       }}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",
           padding:"16px 20px",borderBottom:"1px solid rgba(255,255,255,0.07)",
@@ -101,7 +103,7 @@ function Modal({ open, onClose, title, children }) {
             display:"flex",alignItems:"center",justifyContent:"center",
           }}>✕</button>
         </div>
-        <div style={{padding:"16px 20px 28px"}}>{children}</div>
+        <div style={{padding:"16px 20px 40px"}}>{children}</div>
       </div>
     </div>
   );
@@ -960,8 +962,9 @@ export default function App() {
         paddingTop:16,
         paddingLeft:16,
         paddingRight:16,
-        paddingBottom:isMobile?140:100,
+        paddingBottom:isMobile?160:100,
         WebkitOverflowScrolling:"touch",
+        minHeight:0,
       }}>
         {content()}
       </div>
