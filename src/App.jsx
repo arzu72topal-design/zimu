@@ -1,6 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { loadData, saveData, exportData, importData } from "./db.js";
 import {
+  signInWithGoogle,
+  signInWithEmail,
+  registerWithEmail,
+  logOut,
+  onAuthChange,
+} from "./firebase.js";
+import {
   requestNotificationPermission,
   isNotificationSupported,
   getNotificationPermission,
@@ -723,7 +730,7 @@ function Notes({ data, update }) {
 }
 
 /* ═══════════ SETTINGS ═══════════ */
-function Settings({ data, update, onImport }) {
+function Settings({ data, update, onImport, user, onLogout }) {
   const fileRef = useRef(null);
   const [notifStatus, setNotifStatus] = useState(getNotificationPermission());
   const [importing, setImporting] = useState(false);
@@ -778,6 +785,47 @@ function Settings({ data, update, onImport }) {
       <h3 style={{margin:"0 0 16px",fontSize:20,fontWeight:800}}>Ayarlar</h3>
 
       {msg && <div style={{background:"rgba(59,130,246,0.15)",border:"1px solid rgba(59,130,246,0.3)",borderRadius:12,padding:"10px 14px",marginBottom:12,fontSize:13,color:"#3b82f6"}}>{msg}</div>}
+
+      {/* User info */}
+      <div style={{background:"#1c1c2e",borderRadius:14,padding:16,marginBottom:12}}>
+        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>👤 Hesap</h4>
+        {user ? (
+          <div>
+            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
+              {user.photoURL ? (
+                <img src={user.photoURL} alt="" style={{width:40,height:40,borderRadius:"50%"}}/>
+              ) : (
+                <div style={{width:40,height:40,borderRadius:"50%",background:"rgba(59,130,246,0.2)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,color:"#3b82f6",fontWeight:700}}>
+                  {(user.displayName||user.email||"?")[0].toUpperCase()}
+                </div>
+              )}
+              <div>
+                {user.displayName && <div style={{fontSize:14,fontWeight:600}}>{user.displayName}</div>}
+                <div style={{fontSize:12,opacity:.5}}>{user.email}</div>
+              </div>
+            </div>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+              <span style={{width:8,height:8,borderRadius:"50%",background:"#22c55e"}}/>
+              <span style={{fontSize:12,color:"#22c55e"}}>Bulut senkronizasyon aktif</span>
+            </div>
+            <p style={{fontSize:11,opacity:.4,margin:"0 0 12px"}}>Veriler tüm cihazlarında otomatik senkronize edilir</p>
+            <button onClick={onLogout} style={{...btnPrimary,marginTop:0,background:"rgba(239,68,68,0.15)",color:"#ef4444",border:"1px solid rgba(239,68,68,0.2)"}}>
+              Çıkış Yap
+            </button>
+          </div>
+        ) : (
+          <div>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+              <span style={{width:8,height:8,borderRadius:"50%",background:"#f59e0b"}}/>
+              <span style={{fontSize:12,color:"#f59e0b"}}>Misafir modu</span>
+            </div>
+            <p style={{fontSize:11,opacity:.4,margin:"0 0 12px"}}>Veriler sadece bu cihazda saklanıyor. Giriş yaparak tüm cihazlarında senkronize edebilirsin.</p>
+            <button onClick={onLogout} style={{...btnPrimary,marginTop:0,background:"#3b82f6"}}>
+              Giriş Yap / Kayıt Ol
+            </button>
+          </div>
+        )}
+      </div>
 
       {/* Notifications */}
       <div style={{background:"#1c1c2e",borderRadius:14,padding:16,marginBottom:12}}>
@@ -840,18 +888,151 @@ function Settings({ data, update, onImport }) {
   );
 }
 
+/* ═══════════ LOGIN SCREEN ═══════════ */
+function LoginScreen({ onLogin }) {
+  const [mode, setMode] = useState("login"); // login, register
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleGoogle = async () => {
+    setLoading(true); setError("");
+    const { user, error } = await signInWithGoogle();
+    if (error) setError(error);
+    setLoading(false);
+  };
+
+  const handleEmail = async () => {
+    if (!email.trim() || !password.trim()) { setError("Email ve şifre gerekli"); return; }
+    setLoading(true); setError("");
+    const fn = mode === "register" ? registerWithEmail : signInWithEmail;
+    const { user, error } = await fn(email, password);
+    if (error) setError(error);
+    setLoading(false);
+  };
+
+  const handleSkip = () => { onLogin(null); };
+
+  return (
+    <div style={{
+      minHeight:"100vh",minHeight:"100dvh",background:"#0f0f1a",
+      display:"flex",alignItems:"center",justifyContent:"center",
+      color:"#e0e0e0",fontFamily:"'SF Pro Display',-apple-system,sans-serif",
+      padding:16,
+    }}>
+      <div style={{width:"100%",maxWidth:360}}>
+        {/* Logo */}
+        <div style={{textAlign:"center",marginBottom:32}}>
+          <img src="/zimu-mascot.png" alt="Zimu" style={{width:120,height:120,objectFit:"contain",marginBottom:12}} />
+          <div style={{fontSize:28,fontWeight:800,letterSpacing:-1}}>Zimu</div>
+          <div style={{fontSize:13,opacity:.4,marginTop:4}}>Hayatını yönet</div>
+        </div>
+
+        {/* Error */}
+        {error && (
+          <div style={{background:"rgba(239,68,68,0.1)",border:"1px solid rgba(239,68,68,0.2)",
+            borderRadius:12,padding:"10px 14px",marginBottom:12,fontSize:13,color:"#ef4444",textAlign:"center"}}>
+            {error}
+          </div>
+        )}
+
+        {/* Google Sign In */}
+        <button onClick={handleGoogle} disabled={loading} style={{
+          width:"100%",padding:"14px",borderRadius:12,border:"1px solid rgba(255,255,255,0.1)",
+          background:"#1c1c2e",color:"#e0e0e0",fontSize:15,fontWeight:600,cursor:"pointer",
+          display:"flex",alignItems:"center",justifyContent:"center",gap:10,marginBottom:16,
+          opacity:loading?.6:1,
+        }}>
+          <span style={{fontSize:18}}>G</span>
+          Google ile Giriş Yap
+        </button>
+
+        {/* Divider */}
+        <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:16}}>
+          <div style={{flex:1,height:1,background:"rgba(255,255,255,0.08)"}}/>
+          <span style={{fontSize:12,opacity:.4}}>veya</span>
+          <div style={{flex:1,height:1,background:"rgba(255,255,255,0.08)"}}/>
+        </div>
+
+        {/* Email/Password */}
+        <input type="email" placeholder="Email adresi" value={email}
+          onChange={e=>setEmail(e.target.value)}
+          style={{...inp,marginBottom:8}} />
+        <input type="password" placeholder="Şifre (en az 6 karakter)" value={password}
+          onChange={e=>setPassword(e.target.value)}
+          onKeyDown={e=>e.key==="Enter"&&handleEmail()}
+          style={inp} />
+
+        <button onClick={handleEmail} disabled={loading} style={{
+          ...btnPrimary,opacity:loading?.6:1,marginBottom:12,
+        }}>
+          {loading ? "Bekleyin..." : mode === "register" ? "Kayıt Ol" : "Giriş Yap"}
+        </button>
+
+        {/* Toggle mode */}
+        <div style={{textAlign:"center",marginBottom:20}}>
+          <button onClick={()=>{setMode(mode==="login"?"register":"login");setError("");}} style={{
+            background:"none",border:"none",color:"#3b82f6",fontSize:13,cursor:"pointer",
+          }}>
+            {mode === "login" ? "Hesabın yok mu? Kayıt ol" : "Zaten hesabın var mı? Giriş yap"}
+          </button>
+        </div>
+
+        {/* Skip - use without login */}
+        <div style={{textAlign:"center"}}>
+          <button onClick={handleSkip} style={{
+            background:"none",border:"none",color:"#666",fontSize:12,cursor:"pointer",
+          }}>
+            Giriş yapmadan devam et →
+          </button>
+          <div style={{fontSize:10,opacity:.3,marginTop:4}}>
+            Veriler sadece bu cihazda kalır
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ═══════════════════ MAIN APP ═══════════════════ */
 export default function App() {
   const [tab, setTab] = useState("dashboard");
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [splash, setSplash] = useState(true);
+  const [user, setUser] = useState(undefined); // undefined=checking, null=guest, object=logged in
   const [toast, setToast] = useState({ visible: false, message: "" });
   const isMobile = useIsMobile();
 
+  // Listen to auth state
   useEffect(() => {
-    loadData().then(d => { setData(d); setLoading(false); });
-    // Splash screen for 2.5 seconds
+    const unsubscribe = onAuthChange((firebaseUser) => {
+      if (firebaseUser) {
+        setUser(firebaseUser);
+      } else {
+        // Check if user previously chose to skip login
+        const skipped = localStorage.getItem('zimu-skip-login');
+        if (skipped) {
+          setUser(null);
+        } else {
+          setUser(undefined);
+          setLoading(false);
+        }
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // Load data when user is determined
+  useEffect(() => {
+    if (user === undefined) return;
+    const userId = user?.uid || null;
+    loadData(userId).then(d => { setData(d); setLoading(false); });
+  }, [user]);
+
+  // Splash screen
+  useEffect(() => {
     const timer = setTimeout(() => setSplash(false), 4000);
     return () => clearTimeout(timer);
   }, []);
@@ -867,13 +1048,34 @@ export default function App() {
 
   const update = useCallback(async (newData) => {
     setData(newData);
-    await saveData(newData);
-  }, []);
+    const userId = user?.uid || null;
+    await saveData(newData, userId);
+  }, [user]);
 
   const showToast = (message) => {
     setToast({ visible: true, message });
     setTimeout(() => setToast({ visible: false, message: "" }), 2000);
   };
+
+  const handleLogin = (firebaseUser) => {
+    if (firebaseUser === null) {
+      // Skip login - guest mode
+      localStorage.setItem('zimu-skip-login', 'true');
+      setUser(null);
+    }
+  };
+
+  const handleLogout = async () => {
+    await logOut();
+    localStorage.removeItem('zimu-skip-login');
+    setUser(undefined);
+    setData(null);
+  };
+
+  // Show login screen (after splash, when not authenticated)
+  if (!splash && user === undefined && !loading) {
+    return <LoginScreen onLogin={handleLogin} />;
+  }
 
   if (splash || loading || !data) return (
     <div style={{
@@ -941,7 +1143,7 @@ export default function App() {
       case "sports": return <Sports data={data} update={update}/>;
       case "projects": return <Projects data={data} update={update}/>;
       case "notes": return <Notes data={data} update={update}/>;
-      case "settings": return <Settings data={data} update={update} onImport={d=>{setData(d);showToast("Veriler aktarıldı!")}}/>;
+      case "settings": return <Settings data={data} update={update} onImport={d=>{setData(d);showToast("Veriler aktarıldı!")}} user={user} onLogout={handleLogout}/>;
     }
   };
 
