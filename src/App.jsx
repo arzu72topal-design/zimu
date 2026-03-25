@@ -206,15 +206,29 @@ function Dashboard({ data, setTab }) {
 function Tasks({ data, update }) {
   const [modal,setModal]=useState(false);
   const [filter,setFilter]=useState("all");
-  const [form,setForm]=useState({title:"",priority:"medium",dueDate:"",category:""});
+  const [editingId,setEditingId]=useState(null);
+  const [detail,setDetail]=useState(null);
+  const emptyForm = {title:"",priority:"medium",dueDate:"",category:"",description:""};
+  const [form,setForm]=useState(emptyForm);
 
-  const add=()=>{
+  const openNew=()=>{setEditingId(null);setForm(emptyForm);setModal(true);};
+  const openEdit=(task)=>{
+    setEditingId(task.id);
+    setForm({title:task.title,priority:task.priority,dueDate:task.dueDate||"",category:task.category||"",description:task.description||""});
+    setModal(true);setDetail(null);
+  };
+
+  const save=()=>{
     if(!form.title.trim())return;
-    update({...data,tasks:[{id:uid(),...form,done:false,createdAt:today()},...data.tasks]});
-    setModal(false);setForm({title:"",priority:"medium",dueDate:"",category:""});
+    if(editingId){
+      update({...data,tasks:data.tasks.map(t=>t.id===editingId?{...t,...form}:t)});
+    } else {
+      update({...data,tasks:[{id:uid(),...form,done:false,createdAt:today()},...data.tasks]});
+    }
+    setModal(false);setForm(emptyForm);setEditingId(null);
   };
   const toggle=id=>update({...data,tasks:data.tasks.map(t=>t.id===id?{...t,done:!t.done}:t)});
-  const del=id=>update({...data,tasks:data.tasks.filter(t=>t.id!==id)});
+  const del=id=>{update({...data,tasks:data.tasks.filter(t=>t.id!==id)});setDetail(null);};
 
   const t = today();
   const list = data.tasks.filter(task=>{
@@ -225,11 +239,32 @@ function Tasks({ data, update }) {
     return true;
   });
 
+  // Quick date helpers
+  const todayStr = today();
+  const tomorrow = ()=>{ const d=new Date(); d.setDate(d.getDate()+1); return d.toISOString().split("T")[0]; };
+  const nextWeek = ()=>{ const d=new Date(); d.setDate(d.getDate()+7); return d.toISOString().split("T")[0]; };
+  const nextMonth = ()=>{ const d=new Date(); d.setMonth(d.getMonth()+1); return d.toISOString().split("T")[0]; };
+
+  const quickDates = [
+    {label:"Bugün",val:todayStr,icon:"📌"},
+    {label:"Yarın",val:tomorrow(),icon:"⏭"},
+    {label:"1 Hafta",val:nextWeek(),icon:"📅"},
+    {label:"1 Ay",val:nextMonth(),icon:"🗓"},
+  ];
+
+  const formatDate = (d) => {
+    if(!d) return "";
+    if(d===todayStr) return "Bugün";
+    if(d===tomorrow()) return "Yarın";
+    const dt = new Date(d);
+    return dt.toLocaleDateString("tr-TR",{day:"numeric",month:"short"});
+  };
+
   return (
     <div>
       <div style={sectionHeader}>
         <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Görevler</h3>
-        <button onClick={()=>setModal(true)} style={addBtnStyle}>+ Yeni</button>
+        <button onClick={openNew} style={addBtnStyle}>+ Yeni</button>
       </div>
       <div style={{display:"flex",gap:6,marginBottom:14,overflowX:"auto",paddingBottom:4,WebkitOverflowScrolling:"touch"}}>
         {[["all","Tümü"],["pending","Bekleyen"],["done","Bitti"],["high","Öncelikli"],["overdue","Gecikmiş"]].map(([k,v])=>(
@@ -240,27 +275,93 @@ function Tasks({ data, update }) {
       {list.map(task=>(
         <div key={task.id} style={{...cardStyle,display:"flex",alignItems:"center",gap:12,opacity:task.done?.5:1}}>
           <button onClick={()=>toggle(task.id)} style={checkBtnStyle(task.done)}>{task.done&&"✓"}</button>
-          <div style={{flex:1,minWidth:0}}>
+          <div style={{flex:1,minWidth:0,cursor:"pointer"}} onClick={()=>setDetail(detail===task.id?null:task.id)}>
             <div style={{fontSize:15,fontWeight:500,textDecoration:task.done?"line-through":"none",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{task.title}</div>
             <div style={{fontSize:11,opacity:.5,marginTop:2,display:"flex",gap:6,flexWrap:"wrap",alignItems:"center"}}>
               {task.category&&<span style={{background:"rgba(59,130,246,0.12)",color:"#3b82f6",padding:"1px 8px",borderRadius:6,fontSize:10}}>{task.category}</span>}
-              {task.dueDate&&<span style={{color:!task.done&&task.dueDate<today()?"#ef4444":"inherit"}}>📅 {task.dueDate}</span>}
+              {task.dueDate&&<span style={{color:!task.done&&task.dueDate<today()?"#ef4444":"inherit"}}>📅 {formatDate(task.dueDate)}</span>}
+              {task.description&&<span style={{opacity:.4}}>📝</span>}
             </div>
           </div>
           <span style={{width:10,height:10,borderRadius:"50%",background:PCOL[task.priority],flexShrink:0}}/>
           <button onClick={()=>del(task.id)} style={delBtnStyle}>✕</button>
         </div>
       ))}
-      <Modal open={modal} onClose={()=>setModal(false)} title="Yeni Görev">
+
+      {/* Task Detail View */}
+      {detail && (() => {
+        const task = data.tasks.find(t=>t.id===detail);
+        if(!task) return null;
+        return (
+          <div style={{background:"#1c1c2e",borderRadius:14,padding:16,marginTop:8,border:"1px solid rgba(59,130,246,0.2)"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+              <h4 style={{margin:0,fontSize:16,fontWeight:700}}>{task.title}</h4>
+              <div style={{display:"flex",gap:6}}>
+                <button onClick={()=>openEdit(task)} style={{background:"rgba(59,130,246,0.15)",color:"#3b82f6",border:"none",borderRadius:8,padding:"6px 12px",fontSize:12,cursor:"pointer",fontWeight:600}}>Düzenle</button>
+                <button onClick={()=>setDetail(null)} style={{background:"rgba(255,255,255,0.06)",color:"#888",border:"none",borderRadius:8,padding:"6px 10px",fontSize:14,cursor:"pointer"}}>✕</button>
+              </div>
+            </div>
+            {task.description&&<p style={{fontSize:13,opacity:.7,margin:"0 0 10px",whiteSpace:"pre-wrap",lineHeight:1.5}}>{task.description}</p>}
+            <div style={{display:"flex",flexWrap:"wrap",gap:8,fontSize:12,opacity:.6}}>
+              {task.category&&<span>🏷 {task.category}</span>}
+              {task.dueDate&&<span style={{color:!task.done&&task.dueDate<today()?"#ef4444":"inherit"}}>📅 {task.dueDate}</span>}
+              <span>⚡ {PRIORITIES[task.priority]}</span>
+              <span>{task.done?"✅ Tamamlandı":"⏳ Bekliyor"}</span>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* Add / Edit Modal */}
+      <Modal open={modal} onClose={()=>{setModal(false);setEditingId(null);}} title={editingId?"Görevi Düzenle":"Yeni Görev"}>
         <input style={inp} placeholder="Görev başlığı..." value={form.title} onChange={e=>setForm({...form,title:e.target.value})} autoFocus/>
+        <textarea style={{...inp,minHeight:80,resize:"vertical",fontFamily:"inherit",lineHeight:1.5}} placeholder="Açıklama (opsiyonel)..." value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/>
         <input style={inp} placeholder="Kategori (opsiyonel)" value={form.category} onChange={e=>setForm({...form,category:e.target.value})}/>
-        <div style={{display:"flex",gap:8}}>
-          <input style={{...inp,flex:1}} type="date" value={form.dueDate} onChange={e=>setForm({...form,dueDate:e.target.value})}/>
-          <select style={{...inp,flex:1}} value={form.priority} onChange={e=>setForm({...form,priority:e.target.value})}>
-            {Object.entries(PRIORITIES).map(([k,v])=><option key={k} value={k}>{v}</option>)}
-          </select>
+
+        {/* Quick date buttons */}
+        <div style={{marginBottom:10}}>
+          <div style={{fontSize:12,opacity:.5,marginBottom:6}}>Tarih seç:</div>
+          <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:8}}>
+            {quickDates.map(q=>(
+              <button key={q.label} onClick={()=>setForm({...form,dueDate:q.val})} style={{
+                background:form.dueDate===q.val?"rgba(59,130,246,0.2)":"rgba(255,255,255,0.04)",
+                color:form.dueDate===q.val?"#3b82f6":"#aaa",
+                border:form.dueDate===q.val?"1px solid rgba(59,130,246,0.3)":"1px solid rgba(255,255,255,0.06)",
+                padding:"8px 12px",borderRadius:10,fontSize:13,cursor:"pointer",
+              }}>{q.icon} {q.label}</button>
+            ))}
+            {form.dueDate&&<button onClick={()=>setForm({...form,dueDate:""})} style={{
+              background:"rgba(239,68,68,0.1)",color:"#ef4444",
+              border:"1px solid rgba(239,68,68,0.2)",
+              padding:"8px 12px",borderRadius:10,fontSize:13,cursor:"pointer",
+            }}>✕ Temizle</button>}
+          </div>
+          <div style={{display:"flex",gap:8,alignItems:"center"}}>
+            <input style={{...inp,flex:1,marginBottom:0}} type="date" value={form.dueDate} onChange={e=>setForm({...form,dueDate:e.target.value})}/>
+            {form.dueDate&&<span style={{fontSize:13,color:"#3b82f6",fontWeight:600,whiteSpace:"nowrap"}}>{formatDate(form.dueDate)}</span>}
+          </div>
         </div>
-        <button style={btnPrimary} onClick={add}>Ekle</button>
+
+        {/* Priority */}
+        <div style={{marginBottom:12}}>
+          <div style={{fontSize:12,opacity:.5,marginBottom:6}}>Öncelik:</div>
+          <div style={{display:"flex",gap:6}}>
+            {Object.entries(PRIORITIES).map(([k,v])=>(
+              <button key={k} onClick={()=>setForm({...form,priority:k})} style={{
+                flex:1,padding:"10px",borderRadius:10,fontSize:13,cursor:"pointer",textAlign:"center",fontWeight:600,
+                background:form.priority===k?`${PCOL[k]}20`:"rgba(255,255,255,0.04)",
+                color:form.priority===k?PCOL[k]:"#888",
+                border:`1px solid ${form.priority===k?PCOL[k]+"40":"rgba(255,255,255,0.06)"}`,
+              }}>
+                <span style={{display:"block",width:8,height:8,borderRadius:"50%",background:PCOL[k],margin:"0 auto 4px"}}/>
+                {v}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <button style={btnPrimary} onClick={save}>{editingId?"Kaydet":"Ekle"}</button>
+        {editingId&&<button onClick={()=>{del(editingId);setModal(false);setEditingId(null);}} style={{...btnPrimary,background:"#ef4444",marginTop:8}}>Görevi Sil</button>}
       </Modal>
     </div>
   );
