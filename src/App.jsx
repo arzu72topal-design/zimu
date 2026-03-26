@@ -38,9 +38,10 @@ const COLORS = ["#3b82f6","#ef4444","#22c55e","#f59e0b","#a855f7","#f97316","#14
 
 const DEFAULT_ROOMS = [
   { id: "projects", name: "Projeler", icon: "📂", color: "#3b82f6", type: "project" },
+  { id: "news", name: "Haberler", icon: "📰", color: "#ef4444", type: "news" },
   { id: "music", name: "Müziklerim", icon: "🎵", color: "#a855f7", type: "collection" },
   { id: "clothes", name: "Kıyafetlerim", icon: "👗", color: "#f97316", type: "collection" },
-  { id: "memories", name: "Anılar", icon: "📸", color: "#ef4444", type: "collection" },
+  { id: "memories", name: "Anılar", icon: "📸", color: "#22c55e", type: "collection" },
 ];
 
 const COMMON_FOODS = {
@@ -1220,17 +1221,313 @@ function Sports({ data, update }) {
 }
 
 
+
+/* ═══════════ NEWS ROOM ═══════════ */
+const NEWS_SOURCES = {
+  teknoloji: [
+    { name:"BBC Technology", url:"https://feeds.bbci.co.uk/news/technology/rss.xml", lang:"EN", color:"#bb1919" },
+    { name:"The Verge", url:"https://www.theverge.com/rss/index.xml", lang:"EN", color:"#e5127d" },
+    { name:"TRT Haber", url:"https://www.trthaber.com/sondakika.rss", lang:"TR", color:"#c8102e" },
+  ],
+  sanat: [
+    { name:"BBC Culture", url:"https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml", lang:"EN", color:"#bb1919" },
+    { name:"The Guardian Arts", url:"https://www.theguardian.com/artanddesign/rss", lang:"EN", color:"#052962" },
+    { name:"Al Jazeera Arts", url:"https://www.aljazeera.com/xml/rss/all.xml", lang:"EN", color:"#e8a020" },
+  ],
+  saglik: [
+    { name:"BBC Health", url:"https://feeds.bbci.co.uk/news/health/rss.xml", lang:"EN", color:"#bb1919" },
+    { name:"Reuters Health", url:"https://feeds.reuters.com/reuters/healthNews", lang:"EN", color:"#ff8000" },
+    { name:"WHO News", url:"https://www.who.int/rss-feeds/news-english.xml", lang:"EN", color:"#009edb" },
+  ],
+  ekonomi: [
+    { name:"Reuters Business", url:"https://feeds.reuters.com/reuters/businessNews", lang:"EN", color:"#ff8000" },
+    { name:"BBC Business", url:"https://feeds.bbci.co.uk/news/business/rss.xml", lang:"EN", color:"#bb1919" },
+    { name:"BBC Türkçe", url:"https://feeds.bbci.co.uk/turkce/rss.xml", lang:"TR", color:"#bb1919" },
+  ],
+  politika: [
+    { name:"Reuters World", url:"https://feeds.reuters.com/Reuters/worldNews", lang:"EN", color:"#ff8000" },
+    { name:"BBC World", url:"https://feeds.bbci.co.uk/news/world/rss.xml", lang:"EN", color:"#bb1919" },
+    { name:"BBC Türkçe", url:"https://feeds.bbci.co.uk/turkce/rss.xml", lang:"TR", color:"#bb1919" },
+  ],
+};
+
+const NEWS_CATS = [
+  { id:"teknoloji", label:"Teknoloji", icon:"💻", color:"#3b82f6" },
+  { id:"sanat",     label:"Sanat",     icon:"🎨", color:"#a855f7" },
+  { id:"saglik",    label:"Sağlık",    icon:"🏥", color:"#22c55e" },
+  { id:"ekonomi",   label:"Ekonomi",   icon:"📈", color:"#f59e0b" },
+  { id:"politika",  label:"Politika",  icon:"🌐", color:"#ef4444" },
+];
+
+function NewsRoom({ room, onBack }) {
+  const [cat, setCat] = useState("teknoloji");
+  const [langFilter, setLangFilter] = useState("all"); // all | TR | EN
+  const [articles, setArticles] = useState({});   // { catId: [{...}] }
+  const [loading, setLoading] = useState({});
+  const [loaded, setLoaded] = useState({});
+
+  const timeAgo = (dateStr) => {
+    if(!dateStr) return "";
+    try {
+      const diff = (Date.now() - new Date(dateStr).getTime()) / 1000;
+      if(diff < 60) return "az önce";
+      if(diff < 3600) return Math.floor(diff/60)+"dk önce";
+      if(diff < 86400) return Math.floor(diff/3600)+"sa önce";
+      return Math.floor(diff/86400)+"g önce";
+    } catch { return ""; }
+  };
+
+  const fetchCategory = async (catId, force=false) => {
+    if(loaded[catId] && !force) return;
+    setLoading(l=>({...l,[catId]:true}));
+    const sources = NEWS_SOURCES[catId] || [];
+    const R2J = "https://api.rss2json.com/v1/api.json?rss_url=";
+    const results = await Promise.allSettled(
+      sources.map(src =>
+        fetch(R2J + encodeURIComponent(src.url) + "&count=8")
+          .then(r=>r.json())
+          .then(json=>(json.items||[]).map(item=>({
+            id: item.guid || item.link,
+            title: item.title?.replace(/<[^>]+>/g,"")?.trim() || "",
+            summary: item.description?.replace(/<[^>]+>/g,"")?.slice(0,120)?.trim() || "",
+            link: item.link || "",
+            thumb: item.thumbnail || item.enclosure?.link || "",
+            pubDate: item.pubDate || "",
+            source: src.name,
+            sourceColor: src.color,
+            lang: src.lang,
+          })))
+          .catch(()=>[])
+      )
+    );
+    // Merge + sort by date, deduplicate by title
+    const seen = new Set();
+    const merged = results
+      .flatMap(r => r.status==="fulfilled" ? r.value : [])
+      .filter(a => {
+        if(!a.title || seen.has(a.title)) return false;
+        seen.add(a.title); return true;
+      })
+      .sort((a,b)=>new Date(b.pubDate)-new Date(a.pubDate))
+      .slice(0,30);
+    setArticles(prev=>({...prev,[catId]:merged}));
+    setLoaded(prev=>({...prev,[catId]:true}));
+    setLoading(l=>({...l,[catId]:false}));
+  };
+
+  useEffect(()=>{ fetchCategory(cat); }, [cat]);
+
+  const catInfo = NEWS_CATS.find(c=>c.id===cat);
+  const rawList = articles[cat] || [];
+  const list = langFilter==="all" ? rawList : rawList.filter(a=>a.lang===langFilter);
+  const isLoading = loading[cat];
+
+  return (
+    <div>
+      <StickyHeader>
+        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
+          <button onClick={onBack} style={{background:"rgba(255,255,255,0.07)",border:"none",color:"#aaa",width:34,height:34,borderRadius:10,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>◀</button>
+          <span style={{fontSize:22}}>📰</span>
+          <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>Haberler</h3>
+          <button onClick={()=>fetchCategory(cat,true)} style={{
+            background:"rgba(255,255,255,0.07)",border:"none",color:"#aaa",
+            width:34,height:34,borderRadius:10,fontSize:14,cursor:"pointer",
+            display:"flex",alignItems:"center",justifyContent:"center",
+          }} title="Yenile">↻</button>
+        </div>
+
+        {/* Category tabs — horizontal scroll */}
+        <div style={{display:"flex",gap:6,overflowX:"auto",paddingBottom:2,WebkitOverflowScrolling:"touch",marginBottom:8}}>
+          {NEWS_CATS.map(c=>(
+            <button key={c.id} onClick={()=>setCat(c.id)} style={{
+              display:"flex",alignItems:"center",gap:5,
+              padding:"7px 14px",borderRadius:20,border:"none",cursor:"pointer",
+              whiteSpace:"nowrap",fontSize:12,fontWeight:cat===c.id?700:500,
+              background:cat===c.id?`${c.color}25`:"rgba(255,255,255,0.05)",
+              color:cat===c.id?c.color:"#666",
+              transition:"all .2s",
+            }}>
+              <span>{c.icon}</span>{c.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Language filter */}
+        <div style={{display:"flex",gap:5}}>
+          {[["all","🌍 Tümü"],["TR","🇹🇷 Türkçe"],["EN","🌐 İngilizce"]].map(([k,v])=>(
+            <button key={k} onClick={()=>setLangFilter(k)} style={{
+              padding:"5px 12px",borderRadius:10,border:"none",cursor:"pointer",
+              fontSize:11,fontWeight:langFilter===k?700:400,
+              background:langFilter===k?"rgba(255,255,255,0.12)":"rgba(255,255,255,0.04)",
+              color:langFilter===k?"#e0e0e0":"#555",
+            }}>{v}</button>
+          ))}
+        </div>
+      </StickyHeader>
+
+      {/* Loading */}
+      {isLoading&&(
+        <div style={{textAlign:"center",padding:"40px 0"}}>
+          <div style={{fontSize:32,marginBottom:8,animation:"pulse 1.5s ease-in-out infinite"}}>📰</div>
+          <div style={{fontSize:13,opacity:.4}}>Haberler yükleniyor...</div>
+          <div style={{fontSize:11,opacity:.25,marginTop:4}}>{NEWS_SOURCES[cat]?.map(s=>s.name).join(", ")}</div>
+        </div>
+      )}
+
+      {/* Articles */}
+      {!isLoading&&list.length>0&&(
+        <div>
+          <div style={{fontSize:11,opacity:.35,marginBottom:10,display:"flex",alignItems:"center",gap:6}}>
+            <span style={{width:6,height:6,borderRadius:"50%",background:catInfo?.color,display:"inline-block"}}/>
+            <span>{list.length} haber · {NEWS_SOURCES[cat]?.filter(s=>langFilter==="all"||s.lang===langFilter).map(s=>s.name).join(", ")}</span>
+          </div>
+          {list.map((article,i)=>(
+            <a key={article.id||i} href={article.link} target="_blank" rel="noopener noreferrer" style={{textDecoration:"none",color:"inherit",display:"block"}}>
+              <div style={{
+                background:"#1c1c2e",borderRadius:16,padding:"12px 14px",marginBottom:8,
+                display:"flex",gap:12,alignItems:"flex-start",minHeight:72,
+                borderLeft:`3px solid ${article.sourceColor}`,
+              }}>
+                {/* Thumbnail */}
+                {article.thumb&&(
+                  <div style={{
+                    width:64,height:64,borderRadius:10,overflow:"hidden",flexShrink:0,
+                    background:"#111",
+                  }}>
+                    <img src={article.thumb} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}
+                      onError={e=>{e.target.style.display="none";}}/>
+                  </div>
+                )}
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontSize:13,fontWeight:700,lineHeight:1.4,marginBottom:4,
+                    display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",overflow:"hidden",
+                  }}>{article.title}</div>
+                  {article.summary&&(
+                    <div style={{fontSize:11,opacity:.45,lineHeight:1.4,marginBottom:5,
+                      display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",overflow:"hidden",
+                    }}>{article.summary}</div>
+                  )}
+                  <div style={{display:"flex",alignItems:"center",gap:6}}>
+                    <span style={{
+                      fontSize:10,fontWeight:700,color:article.sourceColor,
+                      background:`${article.sourceColor}18`,
+                      padding:"2px 7px",borderRadius:5,
+                    }}>{article.source}</span>
+                    <span style={{fontSize:10,opacity:.35}}>{article.lang}</span>
+                    {article.pubDate&&<span style={{fontSize:10,opacity:.3}}>{timeAgo(article.pubDate)}</span>}
+                    <span style={{fontSize:10,opacity:.25,marginLeft:"auto"}}>↗</span>
+                  </div>
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+      )}
+
+      {/* Empty state */}
+      {!isLoading&&list.length===0&&loaded[cat]&&(
+        <div style={{textAlign:"center",padding:"40px 20px"}}>
+          <div style={{fontSize:40,marginBottom:10}}>📡</div>
+          <div style={{fontSize:14,fontWeight:600,opacity:.4,marginBottom:6}}>Haber yüklenemedi</div>
+          <div style={{fontSize:12,opacity:.25,marginBottom:16}}>İnternet bağlantını kontrol et</div>
+          <button onClick={()=>fetchCategory(cat,true)} style={{
+            background:"rgba(239,68,68,0.15)",color:"#ef4444",
+            border:"1px solid rgba(239,68,68,0.3)",borderRadius:10,
+            padding:"8px 20px",fontSize:12,cursor:"pointer",fontWeight:600,
+          }}>↻ Tekrar Dene</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ═══════════ MUSIC ROOM ═══════════ */
 function MusicRoom({ room, items, onBack, onAdd, onDel }) {
-  const [tab, setTab] = useState("collection"); // collection | search | link
+  const [tab, setTab] = useState("collection"); // collection | search | link | charts
   const [searchQ, setSearchQ] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
-  const [preview, setPreview] = useState(null); // currently playing preview
+  const [preview, setPreview] = useState(null);
   const [linkInput, setLinkInput] = useState("");
   const [linkFetching, setLinkFetching] = useState(false);
   const [linkPreview, setLinkPreview] = useState(null);
   const audioRef = useRef(null);
+
+  // Charts state
+  const [chartSource, setChartSource] = useState("tr"); // tr | global | genre
+  const [chartGenre, setChartGenre] = useState("pop");
+  const [chartTracks, setChartTracks] = useState([]);
+  const [chartLoading, setChartLoading] = useState(false);
+  const [chartLoaded, setChartLoaded] = useState("");
+
+  const GENRE_IDS = {pop:132,hiphop:116,rock:152,elektronik:106,rnb:165,latin:195,kpop:113};
+  const GENRE_LABELS = {pop:"Pop",hiphop:"Hip-Hop",rock:"Rock",elektronik:"Elektronik",rnb:"R&B",latin:"Latin",kpop:"K-Pop"};
+
+  const fetchCharts = async (source, genre) => {
+    const key = source+genre;
+    if(chartLoaded===key && chartTracks.length>0) return;
+    setChartLoading(true);
+    setChartTracks([]);
+    try {
+      let url;
+      if(source==="tr") {
+        // iTunes Turkey Top 25 — no CORS needed
+        url = "https://itunes.apple.com/tr/rss/topsongs/limit=25/json";
+        const res = await fetch(url);
+        const json = await res.json();
+        const tracks = (json.feed?.entry||[]).map((e,i)=>({
+          id: "itunes_"+i,
+          title: e["im:name"]?.label||"",
+          artist: e["im:artist"]?.label||"",
+          albumArt: e["im:image"]?.[2]?.label||e["im:image"]?.[0]?.label||"",
+          link: e.link?.attributes?.href||"",
+          preview: "",
+          source: "itunes",
+          rank: i+1,
+        }));
+        setChartTracks(tracks);
+      } else if(source==="global") {
+        // Deezer Global Top via proxy
+        url = "https://corsproxy.io/?"+encodeURIComponent("https://api.deezer.com/chart/0/tracks?limit=25");
+        const res = await fetch(url);
+        const json = await res.json();
+        setChartTracks((json.data||[]).map((t,i)=>({
+          id: t.id,
+          title: t.title,
+          artist: t.artist?.name||"",
+          albumArt: t.album?.cover_medium||"",
+          link: t.link||"",
+          preview: t.preview||"",
+          source: "deezer",
+          rank: i+1,
+        })));
+      } else if(source==="genre") {
+        // Deezer Genre Chart via proxy
+        const gid = GENRE_IDS[genre]||132;
+        url = "https://corsproxy.io/?"+encodeURIComponent("https://api.deezer.com/chart/"+gid+"/tracks?limit=20");
+        const res = await fetch(url);
+        const json = await res.json();
+        setChartTracks((json.data||[]).map((t,i)=>({
+          id: t.id,
+          title: t.title,
+          artist: t.artist?.name||"",
+          albumArt: t.album?.cover_medium||"",
+          link: t.link||"",
+          preview: t.preview||"",
+          source: "deezer",
+          rank: i+1,
+        })));
+      }
+      setChartLoaded(key);
+    } catch(e) {
+      console.error("Chart fetch error:", e);
+    }
+    setChartLoading(false);
+  };
+
+  useEffect(()=>{
+    if(tab==="charts") fetchCharts(chartSource, chartGenre);
+  }, [tab, chartSource, chartGenre]);
 
   /* ── Deezer search (CORS proxy via public API) ── */
   const searchMusic = async (q) => {
@@ -1361,12 +1658,12 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
           <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{room.name}</h3>
           <span style={{fontSize:12,opacity:.4}}>{items.length} parça</span>
         </div>
-        {/* Tab switcher */}
-        <div style={{background:"rgba(255,255,255,0.05)",borderRadius:12,padding:3,display:"flex"}}>
-          {[["collection","Koleksiyonum"],["search","Ara 🔍"],["link","Link + 🔗"]].map(([k,v])=>(
+        {/* Tab switcher — 4 tabs */}
+        <div style={{background:"rgba(255,255,255,0.05)",borderRadius:12,padding:3,display:"flex",gap:1}}>
+          {[["collection","Benim"],["charts","Top 🏆"],["search","Ara"],["link","Link"]].map(([k,v])=>(
             <button key={k} onClick={()=>setTab(k)} style={{
-              flex:1,padding:"8px 4px",borderRadius:9,border:"none",cursor:"pointer",
-              fontSize:12,fontWeight:tab===k?700:500,
+              flex:1,padding:"8px 2px",borderRadius:9,border:"none",cursor:"pointer",
+              fontSize:11,fontWeight:tab===k?700:500,
               background:tab===k?"#2a2a45":"transparent",
               color:tab===k?"#e0e0e0":"#666",transition:"all .2s",
             }}>{v}</button>
@@ -1569,6 +1866,141 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
           </div>
         </div>
       )}
+
+      {/* ── CHARTS ── */}
+      {tab==="charts"&&(
+        <div>
+          {/* Source selector */}
+          <div style={{display:"flex",gap:6,marginBottom:12}}>
+            {[["tr","🇹🇷 Türkiye"],["global","🌍 Global"],["genre","🎸 Tür"]].map(([k,v])=>(
+              <button key={k} onClick={()=>setChartSource(k)} style={{
+                flex:1,padding:"9px 4px",borderRadius:12,border:"none",cursor:"pointer",
+                fontSize:12,fontWeight:chartSource===k?700:500,
+                background:chartSource===k?"rgba(162,56,255,0.25)":"rgba(255,255,255,0.05)",
+                color:chartSource===k?"#c084fc":"#666",
+                transition:"all .2s",
+              }}>{v}</button>
+            ))}
+          </div>
+
+          {/* Genre picker — only when source=genre */}
+          {chartSource==="genre"&&(
+            <div style={{display:"flex",gap:5,marginBottom:12,overflowX:"auto",paddingBottom:2,WebkitOverflowScrolling:"touch"}}>
+              {Object.entries(GENRE_LABELS).map(([k,v])=>(
+                <button key={k} onClick={()=>setChartGenre(k)} style={{
+                  padding:"6px 14px",borderRadius:20,border:"none",cursor:"pointer",whiteSpace:"nowrap",
+                  fontSize:12,fontWeight:chartGenre===k?700:400,
+                  background:chartGenre===k?"rgba(162,56,255,0.25)":"rgba(255,255,255,0.05)",
+                  color:chartGenre===k?"#c084fc":"#666",
+                }}>{v}</button>
+              ))}
+            </div>
+          )}
+
+          {/* Source label */}
+          <div style={{fontSize:11,opacity:.4,marginBottom:10,display:"flex",alignItems:"center",gap:6}}>
+            <span>
+              {chartSource==="tr"&&"🍎 Apple Music Türkiye · Güncel Top 25"}
+              {chartSource==="global"&&"🟣 Deezer Global · Top 25 · 30sn önizleme"}
+              {chartSource==="genre"&&`🟣 Deezer ${GENRE_LABELS[chartGenre]} Listesi · 30sn önizleme`}
+            </span>
+          </div>
+
+          {/* Loading */}
+          {chartLoading&&(
+            <div style={{textAlign:"center",padding:"30px 0"}}>
+              <div style={{fontSize:32,marginBottom:8,animation:"pulse 1.5s ease-in-out infinite"}}>🎵</div>
+              <div style={{fontSize:13,opacity:.4}}>Liste yükleniyor...</div>
+            </div>
+          )}
+
+          {/* Track list */}
+          {!chartLoading&&chartTracks.map((track,i)=>{
+            const inColl = items.some(it=>it.link===track.link||it.title===track.title);
+            return (
+              <div key={track.id||i} style={{
+                background:"#1c1c2e",borderRadius:16,padding:"10px 12px",marginBottom:6,
+                display:"flex",alignItems:"center",gap:10,minHeight:60,
+              }}>
+                {/* Rank */}
+                <div style={{
+                  width:26,height:26,borderRadius:8,flexShrink:0,
+                  background:i<3?"rgba(162,56,255,0.2)":"rgba(255,255,255,0.04)",
+                  display:"flex",alignItems:"center",justifyContent:"center",
+                  fontSize:11,fontWeight:700,
+                  color:i<3?"#c084fc":"#666",
+                }}>{i+1}</div>
+                {/* Album art */}
+                <div style={{width:42,height:42,borderRadius:8,overflow:"hidden",flexShrink:0,background:"#111"}}>
+                  {track.albumArt
+                    ? <img src={track.albumArt} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                    : <div style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16}}>🎵</div>
+                  }
+                </div>
+                {/* Info */}
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontSize:13,fontWeight:700,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{track.title}</div>
+                  <div style={{fontSize:11,opacity:.5,marginTop:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{track.artist}</div>
+                  {track.preview&&<div style={{fontSize:10,color:"#a238ff",opacity:.7,marginTop:1}}>▶ önizleme</div>}
+                </div>
+                {/* Preview button */}
+                {track.preview&&(
+                  <button onClick={()=>togglePreview(track)} style={{
+                    width:32,height:32,borderRadius:"50%",flexShrink:0,
+                    background:preview?.id===track.id?"#a238ff":"rgba(162,56,255,0.15)",
+                    border:"1px solid rgba(162,56,255,0.3)",
+                    color:preview?.id===track.id?"#fff":"#a238ff",
+                    fontSize:12,cursor:"pointer",
+                    display:"flex",alignItems:"center",justifyContent:"center",
+                  }}>{preview?.id===track.id?"⏸":"▶"}</button>
+                )}
+                {/* Open link (iTunes tracks) */}
+                {track.link&&!track.preview&&(
+                  <a href={track.link} target="_blank" rel="noopener noreferrer" style={{
+                    width:32,height:32,borderRadius:"50%",flexShrink:0,
+                    background:"rgba(255,255,255,0.05)",
+                    display:"flex",alignItems:"center",justifyContent:"center",
+                    textDecoration:"none",fontSize:13,color:"#aaa",
+                  }}>↗</a>
+                )}
+                {/* Add to collection */}
+                <button onClick={()=>{
+                  if(!inColl) onAdd({
+                    id:uid(),type:"music",
+                    title:track.title,artist:track.artist,
+                    albumArt:track.albumArt,link:track.link,
+                    preview:track.preview,
+                    source:track.source==="itunes"?"itunes":"deezer",
+                    platform:track.source==="itunes"?"Apple Music":"Deezer",
+                    platformColor:track.source==="itunes"?"#FC3C44":"#A238FF",
+                    createdAt:today(),
+                  });
+                }} style={{
+                  width:32,height:32,borderRadius:"50%",flexShrink:0,
+                  background:inColl?"rgba(34,197,94,0.15)":"rgba(162,56,255,0.15)",
+                  border:inColl?"1px solid rgba(34,197,94,0.3)":"1px solid rgba(162,56,255,0.3)",
+                  color:inColl?"#22c55e":"#a238ff",
+                  fontSize:inColl?13:18,cursor:inColl?"default":"pointer",
+                  display:"flex",alignItems:"center",justifyContent:"center",
+                }}>{inColl?"✓":"+"}</button>
+              </div>
+            );
+          })}
+
+          {!chartLoading&&chartTracks.length===0&&(
+            <div style={{textAlign:"center",padding:"30px 0"}}>
+              <div style={{fontSize:32,marginBottom:8}}>📡</div>
+              <div style={{fontSize:13,opacity:.4}}>Liste yüklenemedi</div>
+              <div style={{fontSize:11,opacity:.25,marginTop:4}}>İnternet bağlantını kontrol et</div>
+              <button onClick={()=>{setChartLoaded("");fetchCharts(chartSource,chartGenre);}} style={{
+                marginTop:12,background:"rgba(162,56,255,0.15)",color:"#a238ff",
+                border:"1px solid rgba(162,56,255,0.3)",borderRadius:10,
+                padding:"8px 20px",fontSize:12,cursor:"pointer",fontWeight:600,
+              }}>Tekrar Dene</button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -1751,7 +2183,8 @@ function Projects({ data, update }) {
 
   const items=roomItems[activeRoom]||[];
 
-  /* ── MUSIC ROOM ── special renderer */
+  /* ── SPECIAL ROOM RENDERERS ── */
+  if(activeRoom==="news" || room.type==="news") return <NewsRoom room={room} onBack={()=>setActiveRoom(null)} />;
   if(activeRoom==="music" || room.name==="Müziklerim") return <MusicRoom room={room} items={items} onBack={()=>setActiveRoom(null)} onAdd={(item)=>{const cur=roomItems[activeRoom]||[];update({...data,roomItems:{...roomItems,[activeRoom]:[item,...cur]}});}} onDel={(id)=>delItem(activeRoom,id)} />;
 
   return (
