@@ -1219,6 +1219,360 @@ function Sports({ data, update }) {
   );
 }
 
+
+/* ═══════════ MUSIC ROOM ═══════════ */
+function MusicRoom({ room, items, onBack, onAdd, onDel }) {
+  const [tab, setTab] = useState("collection"); // collection | search | link
+  const [searchQ, setSearchQ] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [searching, setSearching] = useState(false);
+  const [preview, setPreview] = useState(null); // currently playing preview
+  const [linkInput, setLinkInput] = useState("");
+  const [linkFetching, setLinkFetching] = useState(false);
+  const [linkPreview, setLinkPreview] = useState(null);
+  const audioRef = useRef(null);
+
+  /* ── Deezer search (CORS proxy via public API) ── */
+  const searchMusic = async (q) => {
+    if(!q.trim()) { setSearchResults([]); return; }
+    setSearching(true);
+    try {
+      const res = await fetch(`https://api.deezer.com/search?q=${encodeURIComponent(q)}&limit=15&output=jsonp`, {mode:"cors"});
+      // Deezer doesn't allow direct browser CORS, use a simple public proxy approach
+      // Fallback: try cors-anywhere or noCors approach with a workaround
+      throw new Error("use_proxy");
+    } catch {
+      // Use Deezer via a reliable public CORS proxy
+      try {
+        const res = await fetch(`https://corsproxy.io/?${encodeURIComponent("https://api.deezer.com/search?q="+encodeURIComponent(q)+"&limit=12")}`);
+        const json = await res.json();
+        setSearchResults(json.data || []);
+      } catch(e) {
+        // If proxy fails, show fallback message
+        setSearchResults([]);
+      }
+    }
+    setSearching(false);
+  };
+
+  const togglePreview = (track) => {
+    if(!track.preview) return;
+    if(preview?.id===track.id) {
+      audioRef.current?.pause();
+      setPreview(null);
+    } else {
+      if(audioRef.current) { audioRef.current.pause(); audioRef.current.src=track.preview; audioRef.current.play().catch(()=>{}); }
+      setPreview(track);
+    }
+  };
+
+  const addFromDeezer = (track) => {
+    onAdd({
+      id: uid(),
+      type: "music",
+      title: track.title,
+      artist: track.artist?.name || "",
+      albumArt: track.album?.cover_medium || track.album?.cover || "",
+      link: track.link || "",
+      preview: track.preview || "",
+      source: "deezer",
+      createdAt: today(),
+    });
+  };
+
+  /* ── Link metadata fetch ── */
+  const fetchLinkMeta = async (url) => {
+    if(!url.trim()) return;
+    setLinkFetching(true);
+    setLinkPreview(null);
+    try {
+      // Detect platform & extract info from URL patterns
+      const meta = parseMusicLink(url);
+      setLinkPreview(meta);
+    } catch(e) {}
+    setLinkFetching(false);
+  };
+
+  const parseMusicLink = (url) => {
+    const u = url.toLowerCase();
+    let platform = "Müzik";
+    let icon = "🎵";
+    let color = "#1DB954";
+
+    if(u.includes("spotify.com")) { platform="Spotify"; icon="🟢"; color="#1DB954"; }
+    else if(u.includes("youtube.com")||u.includes("youtu.be")) { platform="YouTube"; icon="🔴"; color="#FF0000"; }
+    else if(u.includes("soundcloud.com")) { platform="SoundCloud"; icon="🟠"; color="#FF5500"; }
+    else if(u.includes("apple.com/music")||u.includes("music.apple")) { platform="Apple Music"; icon="⚪"; color="#FC3C44"; }
+    else if(u.includes("deezer.com")) { platform="Deezer"; icon="🟣"; color="#A238FF"; }
+    else if(u.includes("tidal.com")) { platform="Tidal"; icon="🔵"; color="#00FEEE"; }
+
+    // Try to extract title from URL path
+    let title = url.split("/").filter(Boolean).pop()?.replace(/-/g," ")?.replace(/\?.*/,"") || "Yeni parça";
+    title = title.charAt(0).toUpperCase() + title.slice(1);
+
+    return { url, platform, icon, color, title };
+  };
+
+  const addFromLink = () => {
+    if(!linkPreview && !linkInput.trim()) return;
+    const meta = linkPreview || parseMusicLink(linkInput);
+    onAdd({
+      id: uid(),
+      type: "music",
+      title: meta.title,
+      artist: "",
+      albumArt: "",
+      link: linkInput || meta.url,
+      preview: "",
+      source: "link",
+      platform: meta.platform,
+      platformColor: meta.color,
+      createdAt: today(),
+    });
+    setLinkInput("");
+    setLinkPreview(null);
+    setTab("collection");
+  };
+
+  const isInCollection = (deezerTrackId) => items.some(i=>i.deezerTrackId===String(deezerTrackId));
+
+  const platformColor = (item) => {
+    if(item.source==="deezer") return "#A238FF";
+    return item.platformColor || "#1DB954";
+  };
+
+  const platformIcon = (item) => {
+    if(item.source==="deezer") return "🎵";
+    const u=(item.link||"").toLowerCase();
+    if(u.includes("spotify"))return "🟢";
+    if(u.includes("youtube")||u.includes("youtu.be"))return "🔴";
+    if(u.includes("soundcloud"))return "🟠";
+    if(u.includes("apple"))return "⚪";
+    return "🎵";
+  };
+
+  return (
+    <div>
+      <audio ref={audioRef} onEnded={()=>setPreview(null)} style={{display:"none"}}/>
+      <StickyHeader>
+        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
+          <button onClick={onBack} style={{background:"rgba(255,255,255,0.07)",border:"none",color:"#aaa",width:34,height:34,borderRadius:10,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>◀</button>
+          <span style={{fontSize:22}}>🎵</span>
+          <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{room.name}</h3>
+          <span style={{fontSize:12,opacity:.4}}>{items.length} parça</span>
+        </div>
+        {/* Tab switcher */}
+        <div style={{background:"rgba(255,255,255,0.05)",borderRadius:12,padding:3,display:"flex"}}>
+          {[["collection","Koleksiyonum"],["search","Ara 🔍"],["link","Link + 🔗"]].map(([k,v])=>(
+            <button key={k} onClick={()=>setTab(k)} style={{
+              flex:1,padding:"8px 4px",borderRadius:9,border:"none",cursor:"pointer",
+              fontSize:12,fontWeight:tab===k?700:500,
+              background:tab===k?"#2a2a45":"transparent",
+              color:tab===k?"#e0e0e0":"#666",transition:"all .2s",
+            }}>{v}</button>
+          ))}
+        </div>
+      </StickyHeader>
+
+      {/* ── COLLECTION ── */}
+      {tab==="collection"&&(
+        items.length===0 ? (
+          <div style={{textAlign:"center",padding:"40px 20px"}}>
+            <div style={{fontSize:44,marginBottom:10}}>🎵</div>
+            <div style={{fontSize:15,fontWeight:700,opacity:.5,marginBottom:6}}>Koleksiyonun boş</div>
+            <div style={{fontSize:12,opacity:.3,marginBottom:20}}>Deezer'dan ara veya link yapıştır</div>
+            <div style={{display:"flex",gap:8,justifyContent:"center"}}>
+              <button onClick={()=>setTab("search")} style={{background:"rgba(162,56,255,0.15)",color:"#a238ff",border:"1px solid rgba(162,56,255,0.3)",borderRadius:12,padding:"10px 20px",fontSize:13,fontWeight:700,cursor:"pointer"}}>🔍 Deezer'da Ara</button>
+              <button onClick={()=>setTab("link")} style={{background:"rgba(59,130,246,0.15)",color:"#3b82f6",border:"1px solid rgba(59,130,246,0.3)",borderRadius:12,padding:"10px 20px",fontSize:13,fontWeight:700,cursor:"pointer"}}>🔗 Link Ekle</button>
+            </div>
+          </div>
+        ) : (
+          items.map(item=>(
+            <div key={item.id} style={{
+              background:"#1c1c2e",borderRadius:16,padding:"12px 14px",marginBottom:8,
+              display:"flex",alignItems:"center",gap:12,minHeight:64,
+            }}>
+              {/* Album art or placeholder */}
+              <div style={{
+                width:48,height:48,borderRadius:10,flexShrink:0,overflow:"hidden",
+                background:item.albumArt?"#000":"rgba(162,56,255,0.15)",
+                display:"flex",alignItems:"center",justifyContent:"center",
+              }}>
+                {item.albumArt
+                  ? <img src={item.albumArt} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                  : <span style={{fontSize:22}}>🎵</span>
+                }
+              </div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:14,fontWeight:700,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.title}</div>
+                {item.artist&&<div style={{fontSize:12,opacity:.5,marginTop:2}}>{item.artist}</div>}
+                <div style={{fontSize:11,opacity:.35,marginTop:2,display:"flex",alignItems:"center",gap:4}}>
+                  <span>{platformIcon(item)}</span>
+                  <span>{item.platform||item.source||"Müzik"}</span>
+                </div>
+              </div>
+              {/* Preview play button (Deezer tracks) */}
+              {item.preview&&(
+                <button onClick={()=>togglePreview(item)} style={{
+                  width:36,height:36,borderRadius:"50%",
+                  background:preview?.id===item.id?"rgba(162,56,255,0.9)":"rgba(255,255,255,0.08)",
+                  border:"none",color:"#fff",fontSize:14,cursor:"pointer",
+                  display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,
+                }}>
+                  {preview?.id===item.id?"⏸":"▶"}
+                </button>
+              )}
+              {/* Open link button */}
+              {item.link&&(
+                <a href={item.link} target="_blank" rel="noopener noreferrer" style={{
+                  width:36,height:36,borderRadius:"50%",
+                  background:"rgba(255,255,255,0.05)",
+                  display:"flex",alignItems:"center",justifyContent:"center",
+                  textDecoration:"none",fontSize:14,flexShrink:0,
+                }}>↗</a>
+              )}
+              <button onClick={()=>onDel(item.id)} style={delBtnStyle}>✕</button>
+            </div>
+          ))
+        )
+      )}
+
+      {/* ── SEARCH (Deezer) ── */}
+      {tab==="search"&&(
+        <div>
+          <input
+            style={{...inp,marginBottom:12}}
+            placeholder="🔍 Şarkı, sanatçı veya albüm ara..."
+            value={searchQ}
+            onChange={e=>setSearchQ(e.target.value)}
+            onKeyDown={e=>e.key==="Enter"&&searchMusic(searchQ)}
+          />
+          <button onClick={()=>searchMusic(searchQ)} style={{...btnPrimary,marginTop:0,marginBottom:16,background:"#a238ff"}}>
+            {searching?"Aranıyor...":"Deezer'da Ara"}
+          </button>
+          {searching&&(
+            <div style={{textAlign:"center",padding:20,opacity:.4,fontSize:13}}>🎵 Aranıyor...</div>
+          )}
+          {!searching&&searchResults.length===0&&searchQ&&(
+            <div style={{textAlign:"center",padding:"20px 0",opacity:.4,fontSize:13}}>Sonuç bulunamadı</div>
+          )}
+          {!searching&&searchResults.length===0&&!searchQ&&(
+            <div style={{textAlign:"center",padding:"20px 0"}}>
+              <div style={{fontSize:32,marginBottom:8}}>🎧</div>
+              <div style={{fontSize:13,opacity:.4}}>Deezer veritabanında 90M+ parça</div>
+              <div style={{fontSize:11,opacity:.25,marginTop:4}}>Arama yap → 30 sn önizleme dinle → Ekle</div>
+            </div>
+          )}
+          {searchResults.map(track=>{
+            const inColl = items.some(i=>i.link===track.link);
+            return (
+              <div key={track.id} style={{
+                background:"#1c1c2e",borderRadius:16,padding:"10px 12px",marginBottom:6,
+                display:"flex",alignItems:"center",gap:10,minHeight:60,
+                opacity:inColl?.6:1,
+              }}>
+                <div style={{width:44,height:44,borderRadius:8,overflow:"hidden",flexShrink:0,background:"#111"}}>
+                  {track.album?.cover_medium
+                    ? <img src={track.album.cover_medium} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                    : <div style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>🎵</div>
+                  }
+                </div>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontSize:13,fontWeight:700,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{track.title}</div>
+                  <div style={{fontSize:11,opacity:.5,marginTop:1}}>{track.artist?.name}</div>
+                  {track.preview&&(
+                    <div style={{fontSize:10,color:"#a238ff",marginTop:1,opacity:.7}}>▶ 30sn önizleme var</div>
+                  )}
+                </div>
+                {track.preview&&(
+                  <button onClick={()=>togglePreview(track)} style={{
+                    width:34,height:34,borderRadius:"50%",flexShrink:0,
+                    background:preview?.id===track.id?"#a238ff":"rgba(162,56,255,0.15)",
+                    border:"1px solid rgba(162,56,255,0.3)",
+                    color:preview?.id===track.id?"#fff":"#a238ff",
+                    fontSize:13,cursor:"pointer",
+                    display:"flex",alignItems:"center",justifyContent:"center",
+                  }}>{preview?.id===track.id?"⏸":"▶"}</button>
+                )}
+                <button onClick={()=>{if(!inColl)addFromDeezer(track);}} style={{
+                  width:34,height:34,borderRadius:"50%",flexShrink:0,
+                  background:inColl?"rgba(34,197,94,0.15)":"rgba(162,56,255,0.15)",
+                  border:inColl?"1px solid rgba(34,197,94,0.3)":"1px solid rgba(162,56,255,0.3)",
+                  color:inColl?"#22c55e":"#a238ff",
+                  fontSize:inColl?14:18,cursor:inColl?"default":"pointer",
+                  display:"flex",alignItems:"center",justifyContent:"center",
+                }}>{inColl?"✓":"+"}</button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* ── LINK ── */}
+      {tab==="link"&&(
+        <div>
+          <div style={{fontSize:12,opacity:.5,marginBottom:8,lineHeight:1.5}}>
+            Spotify, YouTube, SoundCloud, Apple Music veya herhangi bir müzik linkini yapıştır.
+          </div>
+          <input
+            style={inp}
+            placeholder="https://open.spotify.com/track/..."
+            value={linkInput}
+            onChange={e=>{setLinkInput(e.target.value);setLinkPreview(null);}}
+            onBlur={()=>linkInput&&fetchLinkMeta(linkInput)}
+          />
+          {/* Platform icons */}
+          <div style={{display:"flex",gap:8,marginBottom:16,flexWrap:"wrap"}}>
+            {[
+              {name:"Spotify",color:"#1DB954",icon:"🟢"},
+              {name:"YouTube",color:"#FF0000",icon:"🔴"},
+              {name:"SoundCloud",color:"#FF5500",icon:"🟠"},
+              {name:"Apple Music",color:"#FC3C44",icon:"⚪"},
+              {name:"Deezer",color:"#A238FF",icon:"🟣"},
+            ].map(p=>(
+              <div key={p.name} style={{display:"flex",alignItems:"center",gap:4,background:"rgba(255,255,255,0.04)",borderRadius:8,padding:"4px 10px",fontSize:11,opacity:.6}}>
+                <span>{p.icon}</span><span>{p.name}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Link preview card */}
+          {linkFetching&&<div style={{textAlign:"center",opacity:.4,fontSize:13,padding:12}}>Kontrol ediliyor...</div>}
+          {linkPreview&&(
+            <div style={{background:"rgba(59,130,246,0.08)",border:"1px solid rgba(59,130,246,0.2)",borderRadius:14,padding:14,marginBottom:12}}>
+              <div style={{fontSize:11,opacity:.5,marginBottom:4}}>{linkPreview.icon} {linkPreview.platform}</div>
+              <div style={{fontSize:14,fontWeight:700}}>{linkPreview.title}</div>
+            </div>
+          )}
+
+          {/* Title override */}
+          <input
+            style={inp}
+            placeholder="Parça adı (opsiyonel, otomatik doldurulamadıysa)"
+            value={linkPreview?.title||""}
+            onChange={e=>setLinkPreview(lp=>lp?{...lp,title:e.target.value}:{title:e.target.value,url:linkInput,platform:"Müzik",color:"#888"})}
+          />
+
+          <button onClick={addFromLink} disabled={!linkInput.trim()} style={{
+            ...btnPrimary,marginTop:0,
+            background:linkInput.trim()?"#3b82f6":"#333",
+            opacity:linkInput.trim()?1:.5,
+          }}>Koleksiyona Ekle</button>
+
+          <div style={{marginTop:16,background:"rgba(255,255,255,0.03)",borderRadius:12,padding:12}}>
+            <div style={{fontSize:11,fontWeight:700,opacity:.4,marginBottom:6,textTransform:"uppercase",letterSpacing:".05em"}}>Nasıl kullanılır?</div>
+            <div style={{fontSize:11,opacity:.4,lineHeight:1.7}}>
+              1. Spotify'dan bir parça aç → 3 nokta → "Paylaş" → "Linki kopyala"<br/>
+              2. Yukarıdaki kutuya yapıştır<br/>
+              3. "Koleksiyona Ekle" ye bas
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ═══════════ TARZIM ═══════════ */
 function Projects({ data, update }) {
   const [activeRoom,setActiveRoom]=useState(null);
@@ -1396,6 +1750,10 @@ function Projects({ data, update }) {
   );
 
   const items=roomItems[activeRoom]||[];
+
+  /* ── MUSIC ROOM ── special renderer */
+  if(activeRoom==="music" || room.name==="Müziklerim") return <MusicRoom room={room} items={items} onBack={()=>setActiveRoom(null)} onAdd={(item)=>{const cur=roomItems[activeRoom]||[];update({...data,roomItems:{...roomItems,[activeRoom]:[item,...cur]}});}} onDel={(id)=>delItem(activeRoom,id)} />;
+
   return (
     <div>
       <StickyHeader>
@@ -1406,11 +1764,17 @@ function Projects({ data, update }) {
           <button onClick={()=>delRoom(activeRoom)} style={{background:"none",border:"none",color:"#ef4444",fontSize:11,cursor:"pointer",opacity:.5}}>Sil</button>
         </div>
       </StickyHeader>
-      {items.length===0&&<p style={{textAlign:"center",opacity:.3,fontSize:14,padding:40}}>Bu oda boş — öğe ekle!</p>}
+      {items.length===0&&(
+        <div style={{textAlign:"center",padding:"40px 20px"}}>
+          <div style={{fontSize:40,marginBottom:8}}>📦</div>
+          <div style={{fontSize:14,fontWeight:600,opacity:.4,marginBottom:4}}>Bu oda boş</div>
+          <div style={{fontSize:12,opacity:.25}}>+ ile öğe ekle</div>
+        </div>
+      )}
       {items.map(item=>(
-        <div key={item.id} style={{background:"#1c1c2e",borderRadius:14,padding:14,marginBottom:6,borderLeft:`3px solid ${room.color}`}}>
+        <div key={item.id} style={{background:"#1c1c2e",borderRadius:16,padding:14,marginBottom:8,borderLeft:`3px solid ${room.color}`}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"start"}}>
-            <div>
+            <div style={{flex:1,minWidth:0}}>
               <div style={{fontSize:15,fontWeight:600}}>{item.title}</div>
               {item.description&&<div style={{fontSize:12,opacity:.5,marginTop:4,lineHeight:1.4}}>{item.description}</div>}
               {item.tags?.length>0&&(<div style={{display:"flex",gap:4,marginTop:6,flexWrap:"wrap"}}>
