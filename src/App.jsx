@@ -1001,9 +1001,13 @@ export default function App() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [splash, setSplash] = useState(true);
-  const [user, setUser] = useState(undefined); // undefined=checking, null=guest, object=logged in
+  const [user, setUser] = useState(undefined);
   const [toast, setToast] = useState({ visible: false, message: "" });
+  const [showScrollTop, setShowScrollTop] = useState(false);
   const isMobile = useIsMobile();
+  const touchStart = useRef(null);
+  const touchEnd = useRef(null);
+  const scrollRef = useRef(null);
 
   // Listen to auth state
   useEffect(() => {
@@ -1011,7 +1015,6 @@ export default function App() {
       if (firebaseUser) {
         setUser(firebaseUser);
       } else {
-        // Check if user previously chose to skip login
         const skipped = localStorage.getItem('zimu-skip-login');
         if (skipped) {
           setUser(null);
@@ -1037,7 +1040,7 @@ export default function App() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Schedule notifications when data changes
+  // Schedule notifications
   useEffect(() => {
     if (!data) return;
     if (getNotificationPermission() === "granted") {
@@ -1045,6 +1048,11 @@ export default function App() {
       scheduleTaskReminders(data.tasks);
     }
   }, [data?.events, data?.tasks]);
+
+  // Scroll to top when tab changes
+  useEffect(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
+  }, [tab]);
 
   const update = useCallback(async (newData) => {
     setData(newData);
@@ -1059,7 +1067,6 @@ export default function App() {
 
   const handleLogin = (firebaseUser) => {
     if (firebaseUser === null) {
-      // Skip login - guest mode
       localStorage.setItem('zimu-skip-login', 'true');
       setUser(null);
     }
@@ -1071,6 +1078,8 @@ export default function App() {
     setUser(undefined);
     setData(null);
   };
+
+  const allTabs = [...TABS, { id: "settings", label: "Ayarlar", icon: "⚙" }];
 
   // Show login screen (after splash, when not authenticated)
   if (!splash && user === undefined && !loading) {
@@ -1133,8 +1142,6 @@ export default function App() {
     </div>
   );
 
-  const allTabs = [...TABS, { id: "settings", label: "Ayarlar", icon: "⚙" }];
-
   const content = () => {
     switch(tab) {
       case "dashboard": return <Dashboard data={data} setTab={setTab}/>;
@@ -1148,9 +1155,6 @@ export default function App() {
   };
 
   // Swipe navigation
-  const touchStart = useRef(null);
-  const touchEnd = useRef(null);
-  const scrollRef = useRef(null);
   const tabOrder = allTabs.map(t => t.id);
 
   const handleTouchStart = (e) => {
@@ -1175,12 +1179,6 @@ export default function App() {
     touchEnd.current = null;
   };
 
-  // Scroll to top when tab changes
-  useEffect(() => {
-    if (scrollRef.current) scrollRef.current.scrollTop = 0;
-  }, [tab]);
-
-  const [showScrollTop, setShowScrollTop] = useState(false);
   const handleScroll = (e) => {
     setShowScrollTop(e.target.scrollTop > 300);
   };
