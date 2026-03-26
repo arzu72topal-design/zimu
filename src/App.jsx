@@ -1496,31 +1496,47 @@ function NewsRoom({ room, onBack }) {
   );
 }
 
-/* shared proxy fetch — tries multiple free proxies in order */
+/* shared proxy fetch — uses Vercel /api/proxy, falls back to public proxies */
 async function proxyFetch(url) {
-  const proxies = [
-    (u) => `https://api.allorigins.win/get?url=${encodeURIComponent(u)}`,
-    (u) => `https://corsproxy.io/?${encodeURIComponent(u)}`,
-    (u) => `https://thingproxy.freeboard.io/fetch/${u}`,
-  ];
-  for (const makeUrl of proxies) {
-    try {
-      const res = await fetch(makeUrl(url), { signal: AbortSignal.timeout(7000) });
-      if (!res.ok) continue;
+  // 1. Try Vercel serverless proxy (same origin, no CORS, cached)
+  try {
+    const res = await fetch(`/api/proxy?url=${encodeURIComponent(url)}`, {
+      signal: AbortSignal.timeout(8000),
+    });
+    if (res.ok) {
       const ct = res.headers.get("content-type") || "";
-      // allorigins wraps in { contents: "..." }
-      if (ct.includes("json")) {
-        const j = await res.json();
-        if (j.contents !== undefined) {
-          // allorigins: parse contents as JSON if possible, else return text
-          try { return JSON.parse(j.contents); }
-          catch { return j.contents; } // return as string for XML
-        }
-        return j; // direct JSON (corsproxy)
+      if (ct.includes("json")) return res.json();
+      return res.text();
+    }
+  } catch (e) { /* fall through */ }
+
+  // 2. Fallback: allorigins (free public proxy)
+  try {
+    const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`, {
+      signal: AbortSignal.timeout(8000),
+    });
+    if (res.ok) {
+      const j = await res.json();
+      if (j.contents !== undefined) {
+        try { return JSON.parse(j.contents); }
+        catch { return j.contents; }
       }
-      return res.text(); // raw text
-    } catch (e) { /* try next */ }
-  }
+      return j;
+    }
+  } catch (e) { /* fall through */ }
+
+  // 3. Last resort: corsproxy.io
+  try {
+    const res = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`, {
+      signal: AbortSignal.timeout(8000),
+    });
+    if (res.ok) {
+      const ct = res.headers.get("content-type") || "";
+      if (ct.includes("json")) return res.json();
+      return res.text();
+    }
+  } catch (e) { /* fall through */ }
+
   throw new Error("All proxies failed for: " + url);
 }
 
