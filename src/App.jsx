@@ -111,18 +111,20 @@ function Modal({ open, onClose, title, children }) {
   if (!open) return null;
   return (
     <div onClick={onClose} style={{
-      position:"fixed",inset:0,background:"rgba(0,0,0,0.75)",display:"flex",
+      position:"fixed",inset:0,background:"rgba(0,0,0,0.8)",display:"flex",
       alignItems:"flex-end",justifyContent:"center",zIndex:9999,
+      padding:0,
     }}>
       <div onClick={e=>e.stopPropagation()} style={{
-        background:"#1c1c2e",width:"100%",maxWidth:480,maxHeight:"90vh",
-        borderRadius:"20px 20px 0 0",overflow:"auto",animation:"slideUp .25s ease",
-        paddingBottom:20,
-        marginBottom:0,
+        background:"#1c1c2e",width:"100%",maxWidth:480,
+        maxHeight:"85dvh",
+        borderRadius:"20px 20px 0 0",
+        display:"flex",flexDirection:"column",
+        animation:"slideUp .25s ease",
       }}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",
-          padding:"16px 20px",borderBottom:"1px solid rgba(255,255,255,0.07)",
-          position:"sticky",top:0,background:"#1c1c2e",zIndex:1,
+          padding:"14px 20px",borderBottom:"1px solid rgba(255,255,255,0.07)",
+          flexShrink:0,
         }}>
           <h3 style={{margin:0,fontSize:16,fontWeight:700}}>{title}</h3>
           <button onClick={onClose} style={{
@@ -131,7 +133,12 @@ function Modal({ open, onClose, title, children }) {
             display:"flex",alignItems:"center",justifyContent:"center",
           }}>✕</button>
         </div>
-        <div style={{padding:"16px 20px 40px"}}>{children}</div>
+        <div style={{
+          padding:"16px 20px 32px",
+          overflow:"auto",
+          WebkitOverflowScrolling:"touch",
+          flex:1,
+        }}>{children}</div>
       </div>
     </div>
   );
@@ -764,13 +771,59 @@ function Sports({ data, update }) {
   const addFood=()=>{
     if(!foodForm.name.trim()||!foodForm.calories)return;
     const nf={id:uid(),...foodForm,calories:+foodForm.calories};
-    update({...data,foods:[nf,...foods]});
+    // Auto-save to personal food database
+    const myFoods = data.myFoods || {};
+    const key = foodForm.name.trim();
+    const newMyFoods = {...myFoods,[key]:+foodForm.calories};
+    update({...data,foods:[nf,...foods],myFoods:newMyFoods});
     setFoodModal(false);setFoodForm({name:"",calories:"",meal:"Öğle",date:today()});setFoodSearch("");
   };
   const delFood=id=>update({...data,foods:foods.filter(f=>f.id!==id)});
+  const delMyFood=name=>{const mf={...(data.myFoods||{})};delete mf[name];update({...data,myFoods:mf});};
 
   const selectCommonFood=(name,cal)=>{
     setFoodForm({...foodForm,name,calories:String(cal)});
+    setFoodSearch("");
+  };
+
+  // AI text-based calorie lookup
+  const [aiLookup,setAiLookup]=useState(false);
+  const askAiCalorie = async (foodName) => {
+    if(!hasAI||!foodName.trim()) return;
+    setAiLookup(true);
+    try {
+      const prompt = `"${foodName}" yemeğinin 1 porsiyon kalori değerini söyle. SADECE sayı olarak cevap ver, başka hiçbir şey yazma. Örnek: 250`;
+      let cal = null;
+      if(aiProvider==="gemini") {
+        const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${aiKey}`, {
+          method:"POST",headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})
+        });
+        const d = await resp.json();
+        const text = d.candidates?.[0]?.content?.parts?.[0]?.text||"";
+        cal = parseInt(text.match(/\d+/)?.[0]);
+      } else if(aiProvider==="claude") {
+        const resp = await fetch("https://api.anthropic.com/v1/messages", {
+          method:"POST",
+          headers:{"Content-Type":"application/json","x-api-key":aiKey,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+          body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:50,messages:[{role:"user",content:prompt}]})
+        });
+        const d = await resp.json();
+        const text = d.content?.[0]?.text||"";
+        cal = parseInt(text.match(/\d+/)?.[0]);
+      } else if(aiProvider==="openai") {
+        const resp = await fetch("https://api.openai.com/v1/chat/completions", {
+          method:"POST",
+          headers:{"Content-Type":"application/json","Authorization":`Bearer ${aiKey}`},
+          body:JSON.stringify({model:"gpt-4o-mini",max_tokens:50,messages:[{role:"user",content:prompt}]})
+        });
+        const d = await resp.json();
+        const text = d.choices?.[0]?.message?.content||"";
+        cal = parseInt(text.match(/\d+/)?.[0]);
+      }
+      if(cal && cal > 0) setFoodForm(f=>({...f,calories:String(cal)}));
+    } catch(err) { console.error("AI lookup error:",err); }
+    setAiLookup(false);
   };
 
   const t=today();
@@ -797,7 +850,18 @@ function Sports({ data, update }) {
   };
   const tip=getCoachTip();
 
-  const filteredFoods = foodSearch ? Object.entries(COMMON_FOODS).filter(([k])=>k.toLowerCase().includes(foodSearch.toLowerCase())) : Object.entries(COMMON_FOODS).slice(0,12);
+  // Smart search: COMMON_FOODS + myFoods + recent history
+  const myFoods = data.myFoods || {};
+  const recentFoodNames = {};
+  foods.slice(0,50).forEach(f=>{ if(f.name && f.calories && !recentFoodNames[f.name]) recentFoodNames[f.name]=f.calories; });
+  const allFoodDB = {...COMMON_FOODS,...recentFoodNames,...myFoods};
+  const filteredFoods = foodSearch
+    ? Object.entries(allFoodDB).filter(([k])=>k.toLowerCase().includes(foodSearch.toLowerCase())).slice(0,15)
+    : [
+        ...Object.entries(myFoods).slice(0,6).map(([k,v])=>[k,v,"my"]),
+        ...Object.entries(COMMON_FOODS).slice(0,8),
+      ].slice(0,12);
+  const noResults = foodSearch && filteredFoods.length === 0;
 
   const mealGroups = ["Kahvaltı","Öğle","Akşam","Atıştırma"];
 
@@ -980,7 +1044,7 @@ function Sports({ data, update }) {
       </Modal>
 
       {/* Food Modal */}
-      <Modal open={foodModal} onClose={()=>{setFoodModal(false);setFoodSearch("");}} title="Yemek Ekle">
+      <Modal open={foodModal} onClose={()=>{setFoodModal(false);setFoodSearch("");setAiLookup(false);}} title="Yemek Ekle">
         <div style={{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap"}}>
           {mealGroups.map(m=>(
             <button key={m} onClick={()=>setFoodForm({...foodForm,meal:m})} style={{
@@ -991,26 +1055,94 @@ function Sports({ data, update }) {
             }}>{m}</button>
           ))}
         </div>
-        <input style={inp} placeholder="🔍 Yemek ara veya yaz..." value={foodSearch||foodForm.name} onChange={e=>{setFoodSearch(e.target.value);setFoodForm({...foodForm,name:e.target.value,calories:""});}}/>
-        {foodSearch&&(
-          <div style={{maxHeight:160,overflow:"auto",marginBottom:10}}>
-            {filteredFoods.map(([name,cal])=>(
-              <div key={name} onClick={()=>{selectCommonFood(name,cal);setFoodSearch("");}} style={{
-                display:"flex",justifyContent:"space-between",padding:"8px 10px",cursor:"pointer",
+
+        {/* Smart search input */}
+        <input style={inp} placeholder="🔍 Yemek ara (pancake, pilav, salata...)" value={foodSearch||foodForm.name}
+          onChange={e=>{
+            const v=e.target.value;
+            setFoodSearch(v);
+            // Auto-fill calories if exact match found
+            const exactMatch = allFoodDB[v];
+            setFoodForm({...foodForm,name:v,calories:exactMatch?String(exactMatch):""});
+          }}/>
+
+        {/* Search results */}
+        {(foodSearch||!foodForm.name)&&(
+          <div style={{maxHeight:180,overflow:"auto",marginBottom:10}}>
+            {/* Personal foods section */}
+            {!foodSearch&&Object.keys(myFoods).length>0&&(
+              <div style={{fontSize:10,opacity:.4,padding:"4px 8px",fontWeight:700}}>⭐ Benim Yemeklerim</div>
+            )}
+            {filteredFoods.map(([name,cal,source])=>(
+              <div key={name} onClick={()=>selectCommonFood(name,cal)} style={{
+                display:"flex",justifyContent:"space-between",alignItems:"center",padding:"9px 10px",cursor:"pointer",
                 borderRadius:8,background:"rgba(255,255,255,0.03)",marginBottom:2,
               }}>
-                <span style={{fontSize:13}}>{name}</span>
+                <div style={{display:"flex",alignItems:"center",gap:6}}>
+                  {(source==="my"||myFoods[name])&&<span style={{fontSize:10,color:"#f59e0b"}}>⭐</span>}
+                  <span style={{fontSize:13}}>{name}</span>
+                </div>
                 <span style={{fontSize:12,color:"#f97316",fontWeight:600}}>{cal} kcal</span>
               </div>
             ))}
+            {/* No results + AI button */}
+            {noResults&&(
+              <div style={{textAlign:"center",padding:12}}>
+                <p style={{fontSize:12,opacity:.4,margin:"0 0 8px"}}>"{foodSearch}" bulunamadı</p>
+                {hasAI?(
+                  <button onClick={()=>askAiCalorie(foodSearch)} disabled={aiLookup} style={{
+                    background:"rgba(34,197,94,0.15)",color:"#22c55e",border:"1px solid rgba(34,197,94,0.3)",
+                    padding:"8px 16px",borderRadius:10,fontSize:13,cursor:"pointer",fontWeight:600,
+                  }}>{aiLookup?"🔄 AI hesaplıyor...":"🤖 AI'a Kaloriyi Sor"}</button>
+                ):(
+                  <p style={{fontSize:11,opacity:.3}}>Kaloriyi elle gir veya Ayarlar'dan AI aç</p>
+                )}
+              </div>
+            )}
           </div>
         )}
+
+        {/* Name + calorie inputs */}
         <div style={{display:"flex",gap:8}}>
           <input style={{...inp,flex:2}} placeholder="Yemek adı" value={foodForm.name} onChange={e=>setFoodForm({...foodForm,name:e.target.value})}/>
-          <input style={{...inp,flex:1}} type="number" placeholder="kcal" value={foodForm.calories} onChange={e=>setFoodForm({...foodForm,calories:e.target.value})}/>
+          <div style={{flex:1,position:"relative"}}>
+            <input style={{...inp,paddingRight:hasAI?36:14}} type="number" placeholder="kcal" value={foodForm.calories} onChange={e=>setFoodForm({...foodForm,calories:e.target.value})}/>
+            {hasAI&&foodForm.name&&!foodForm.calories&&(
+              <button onClick={()=>askAiCalorie(foodForm.name)} disabled={aiLookup} style={{
+                position:"absolute",right:8,top:8,background:"none",border:"none",
+                fontSize:16,cursor:"pointer",opacity:aiLookup?.4:.8,
+              }} title="AI'a sor">{aiLookup?"⏳":"🤖"}</button>
+            )}
+          </div>
         </div>
+
+        {/* Auto-save info */}
+        {foodForm.name&&foodForm.calories&&!allFoodDB[foodForm.name.trim()]&&(
+          <div style={{fontSize:10,opacity:.4,marginBottom:8,display:"flex",alignItems:"center",gap:4}}>
+            <span>⭐</span> Ekledikten sonra "{foodForm.name}" kişisel listene kaydedilecek
+          </div>
+        )}
+
         <input style={inp} type="date" value={foodForm.date} onChange={e=>setFoodForm({...foodForm,date:e.target.value})}/>
         <button style={btnPrimary} onClick={addFood}>Ekle</button>
+
+        {/* Personal food list management */}
+        {Object.keys(myFoods).length>0&&(
+          <div style={{marginTop:16,borderTop:"1px solid rgba(255,255,255,0.06)",paddingTop:12}}>
+            <div style={{fontSize:12,fontWeight:700,opacity:.5,marginBottom:8}}>⭐ Kişisel Yemek Listen ({Object.keys(myFoods).length})</div>
+            <div style={{maxHeight:120,overflow:"auto"}}>
+              {Object.entries(myFoods).map(([name,cal])=>(
+                <div key={name} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"4px 0",fontSize:12}}>
+                  <span style={{opacity:.6}}>{name}</span>
+                  <div style={{display:"flex",alignItems:"center",gap:8}}>
+                    <span style={{color:"#f97316",fontWeight:600}}>{cal} kcal</span>
+                    <button onClick={()=>delMyFood(name)} style={{background:"none",border:"none",color:"#555",fontSize:12,cursor:"pointer"}}>✕</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </Modal>
     </div>
   );
@@ -1818,7 +1950,9 @@ export default function App() {
     }
   };
 
-  const NAV_HEIGHT = isMobile ? 72 : 56;
+  const NAV_HEIGHT = isMobile ? 80 : 56;
+  const SAFE_BOTTOM = isMobile ? 20 : 10;
+  const CONTENT_PAD_BOTTOM = NAV_HEIGHT + SAFE_BOTTOM + 30;
 
   const phoneContent = (
     <div style={{
@@ -1838,14 +1972,12 @@ export default function App() {
         onTouchEnd={handleTouchEnd}
         onScroll={isMobile?undefined:handleScroll}
         style={isMobile ? {
-          /* Mobile: normal flow, padding at bottom for fixed nav */
-          padding:"16px 16px 100px",
+          padding:`16px 16px ${CONTENT_PAD_BOTTOM}px`,
           minHeight:"100dvh",
         } : {
-          /* Desktop frame: absolute positioned scroll area */
           position:"absolute",
           top:0,left:0,right:0,
-          bottom:NAV_HEIGHT + 10,
+          bottom:NAV_HEIGHT + SAFE_BOTTOM,
           overflow:"auto",
           overflowX:"hidden",
           padding:"16px 16px 20px",
@@ -1860,7 +1992,7 @@ export default function App() {
         <button onClick={scrollToTop} style={{
           position:"fixed",
           right:16,
-          bottom:NAV_HEIGHT + 28,
+          bottom:NAV_HEIGHT + SAFE_BOTTOM + 10,
           width:44,height:44,
           borderRadius:"50%",
           background:"rgba(59,130,246,0.9)",
@@ -1876,14 +2008,13 @@ export default function App() {
       <div style={{
         position:isMobile?"fixed":"absolute",
         bottom:0,
-        left:isMobile?0:0,
-        right:isMobile?0:0,
-        width:isMobile?undefined:"100%",
+        left:0,right:0,
         background:"#0c0c16",
         borderTop:"1px solid rgba(255,255,255,0.1)",
         display:"flex",justifyContent:"space-around",alignItems:"center",
-        paddingTop:8,
-        paddingBottom:isMobile?"max(env(safe-area-inset-bottom, 14px), 14px)":"8px",
+        height:NAV_HEIGHT,
+        paddingTop:4,
+        paddingBottom:isMobile?"env(safe-area-inset-bottom, 8px)":"6px",
         paddingLeft:4,paddingRight:4,
         zIndex:1000,
       }}>
@@ -1900,8 +2031,8 @@ export default function App() {
             transition:"all .15s",
             flex:1,
           }}>
-            <span style={{fontSize:isMobile?24:17,lineHeight:1}}>{t.icon}</span>
-            <span style={{fontSize:isMobile?11:8,fontWeight:tab===t.id?700:500,letterSpacing:-.2}}>{t.label}</span>
+            <span style={{fontSize:isMobile?22:17,lineHeight:1}}>{t.icon}</span>
+            <span style={{fontSize:isMobile?10:8,fontWeight:tab===t.id?700:500,letterSpacing:-.2}}>{t.label}</span>
           </button>
         ))}
       </div>
