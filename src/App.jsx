@@ -153,80 +153,221 @@ function Toast({ message, visible }) {
 /* ═══════════ DASHBOARD ═══════════ */
 function Dashboard({ data, setTab }) {
   const t = today();
+  const foods = data.foods || [];
+  const rooms = data.rooms || [...DEFAULT_ROOMS];
+  const roomItems = data.roomItems || {};
+
   const pending = data.tasks.filter(x=>!x.done).length;
   const done = data.tasks.filter(x=>x.done).length;
-  const todayEv = data.events.filter(e=>e.date===t);
-  const wkSport = data.sports.filter(s=>{ const d=(new Date()-new Date(s.date))/(864e5); return d>=0&&d<=7; });
-  const active = data.projects.filter(p=>p.status!=="Tamamlandı");
-
-  const cards = [
-    { icon:"⏳",val:pending,label:"Bekleyen",color:"#ef4444",tap:()=>setTab("tasks") },
-    { icon:"✓",val:done,label:"Tamamlanan",color:"#22c55e",tap:()=>setTab("tasks") },
-    { icon:"📅",val:todayEv.length,label:"Bugün",color:"#3b82f6",tap:()=>setTab("calendar") },
-    { icon:"🏃",val:wkSport.length,label:"Haftalık Spor",color:"#f97316",tap:()=>setTab("sports") },
-    { icon:"📂",val:active.length,label:"Aktif Proje",color:"#a855f7",tap:()=>setTab("projects") },
-    { icon:"📝",val:data.notes.length,label:"Not",color:"#14b8a6",tap:()=>setTab("notes") },
-  ];
-
-  const upcoming = data.events.filter(e=>e.date>=t).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,4);
+  const total = data.tasks.length;
+  const overdue = data.tasks.filter(x=>!x.done && x.dueDate && x.dueDate < t).length;
+  const taskScore = total > 0 ? Math.round(done/total*100) : 0;
   const urgentTasks = data.tasks.filter(x=>!x.done).sort((a,b)=>{
-    const po = {high:0,medium:1,low:2};
-    return (po[a.priority]||1) - (po[b.priority]||1);
-  }).slice(0,4);
+    const po={high:0,medium:1,low:2}; return (po[a.priority]||1)-(po[b.priority]||1);
+  }).slice(0,3);
 
-  // Overdue indicator
-  const overdue = data.tasks.filter(x=>!x.done && x.dueDate && x.dueDate < t);
+  const todayEv = data.events.filter(e=>e.date===t);
+  const upcoming = data.events.filter(e=>e.date>=t).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,3);
+
+  const wkSport = data.sports.filter(s=>{const d=(new Date()-new Date(s.date))/864e5;return d>=0&&d<=7;});
+  const wkMin = wkSport.reduce((a,s)=>a+(s.duration||0),0);
+  const wkBurned = wkSport.reduce((a,s)=>a+(s.calories||0),0);
+  const todayFoods = foods.filter(f=>f.date===t);
+  const todayCalIn = todayFoods.reduce((a,f)=>a+(f.calories||0),0);
+  const todayCalOut = data.sports.filter(s=>s.date===t).reduce((a,s)=>a+(s.calories||0),0);
+  const netCal = todayCalIn - todayCalOut;
+  const healthGoal = 2000;
+  const healthScore = todayCalIn>0 ? (netCal<=healthGoal ? "Dengeli" : "Fazla") : "Kay\u0131t yok";
+
+  const totalRoomItems = rooms.reduce((a,r)=> a + (r.type==="project" ? data.projects.length : (roomItems[r.id]||[]).length), 0);
+  const activeProjects = data.projects.filter(p=>p.status!=="Tamamland\u0131").length;
+
+  const hour = new Date().getHours();
+  const greeting = hour<12 ? "G\u00fcnayd\u0131n" : hour<18 ? "\u0130yi g\u00fcnler" : "\u0130yi ak\u015famlar";
 
   return (
     <div>
-      <div style={{marginBottom:20}}>
-        <h2 style={{margin:0,fontSize:24,fontWeight:800,letterSpacing:-.5}}>Merhaba! 👋</h2>
-        <p style={{margin:"4px 0 0",opacity:.5,fontSize:14}}>
+      <div style={{marginBottom:16}}>
+        <h2 style={{margin:0,fontSize:22,fontWeight:800,letterSpacing:-.5}}>{greeting}! \ud83d\udc4b</h2>
+        <p style={{margin:"4px 0 0",opacity:.5,fontSize:13}}>
           {new Date().toLocaleDateString("tr-TR",{weekday:"long",day:"numeric",month:"long"})}
         </p>
       </div>
 
-      {overdue.length > 0 && (
-        <div style={{background:"rgba(239,68,68,0.1)",border:"1px solid rgba(239,68,68,0.2)",
-          borderRadius:12,padding:"10px 14px",marginBottom:12,display:"flex",alignItems:"center",gap:8,
-        }}>
-          <span style={{fontSize:16}}>🚨</span>
-          <span style={{fontSize:13,color:"#ef4444",fontWeight:600}}>{overdue.length} gecikmiş görev var!</span>
+      {overdue > 0 && (
+        <div onClick={()=>setTab("tasks")} style={{background:"rgba(239,68,68,0.1)",border:"1px solid rgba(239,68,68,0.2)",
+          borderRadius:14,padding:"12px 14px",marginBottom:12,display:"flex",alignItems:"center",gap:10,cursor:"pointer"}}>
+          <span style={{fontSize:20}}>\ud83d\udea8</span>
+          <div style={{flex:1}}>
+            <div style={{fontSize:14,fontWeight:700,color:"#ef4444"}}>{overdue} gecikmi\u015f g\u00f6rev!</div>
+            <div style={{fontSize:11,opacity:.5}}>Hemen kontrol et</div>
+          </div>
+          <span style={{fontSize:14,opacity:.3}}>\u25b6</span>
         </div>
       )}
 
-      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:20}}>
-        {cards.map((c,i)=>(
-          <div key={i} onClick={c.tap} style={{background:"#1c1c2e",borderRadius:14,padding:"14px 10px",textAlign:"center",cursor:"pointer",borderBottom:`3px solid ${c.color}`}}>
-            <div style={{fontSize:22,marginBottom:4}}>{c.icon}</div>
-            <div style={{fontSize:22,fontWeight:800,color:c.color}}>{c.val}</div>
-            <div style={{fontSize:10,opacity:.5,marginTop:2}}>{c.label}</div>
+      {/* G\u00d6REVLER */}
+      <div onClick={()=>setTab("tasks")} style={{
+        background:"#1c1c2e",borderRadius:16,padding:16,marginBottom:10,cursor:"pointer",borderLeft:"4px solid #3b82f6",
+      }}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+          <div style={{display:"flex",alignItems:"center",gap:8}}>
+            <span style={{fontSize:18}}>\u2713</span>
+            <span style={{fontSize:15,fontWeight:700}}>G\u00f6revler</span>
+          </div>
+          <div style={{display:"flex",alignItems:"center",gap:6}}>
+            <div style={{
+              background:taskScore>=70?"rgba(34,197,94,0.15)":taskScore>=40?"rgba(245,158,11,0.15)":"rgba(239,68,68,0.15)",
+              color:taskScore>=70?"#22c55e":taskScore>=40?"#f59e0b":"#ef4444",
+              padding:"3px 10px",borderRadius:8,fontSize:12,fontWeight:700,
+            }}>%{taskScore}</div>
+            <span style={{fontSize:12,opacity:.3}}>\u25b6</span>
+          </div>
+        </div>
+        <div style={{display:"flex",gap:12,marginBottom:10}}>
+          <div style={{textAlign:"center",flex:1}}>
+            <div style={{fontSize:20,fontWeight:800,color:"#ef4444"}}>{pending}</div>
+            <div style={{fontSize:9,opacity:.4}}>Bekleyen</div>
+          </div>
+          <div style={{textAlign:"center",flex:1}}>
+            <div style={{fontSize:20,fontWeight:800,color:"#22c55e"}}>{done}</div>
+            <div style={{fontSize:9,opacity:.4}}>Tamamlanan</div>
+          </div>
+          <div style={{textAlign:"center",flex:1}}>
+            <div style={{fontSize:20,fontWeight:800,color:"#f59e0b"}}>{overdue}</div>
+            <div style={{fontSize:9,opacity:.4}}>Gecikmi\u015f</div>
+          </div>
+        </div>
+        {urgentTasks.length>0&&(
+          <div style={{borderTop:"1px solid rgba(255,255,255,0.04)",paddingTop:8}}>
+            {urgentTasks.map(task=>(
+              <div key={task.id} style={{display:"flex",alignItems:"center",gap:8,padding:"4px 0"}}>
+                <span style={{width:6,height:6,borderRadius:"50%",background:PCOL[task.priority],flexShrink:0}}/>
+                <span style={{fontSize:12,opacity:.7,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{task.title}</span>
+                {task.dueDate&&<span style={{fontSize:10,opacity:.3}}>{task.dueDate.slice(5)}</span>}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* TAKV\u0130M */}
+      <div onClick={()=>setTab("calendar")} style={{
+        background:"#1c1c2e",borderRadius:16,padding:16,marginBottom:10,cursor:"pointer",borderLeft:"4px solid #a855f7",
+      }}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+          <div style={{display:"flex",alignItems:"center",gap:8}}>
+            <span style={{fontSize:18}}>\u25eb</span>
+            <span style={{fontSize:15,fontWeight:700}}>Takvim</span>
+          </div>
+          <div style={{display:"flex",alignItems:"center",gap:6}}>
+            <div style={{background:"rgba(168,85,247,0.15)",color:"#a855f7",padding:"3px 10px",borderRadius:8,fontSize:12,fontWeight:700}}>{todayEv.length} bug\u00fcn</div>
+            <span style={{fontSize:12,opacity:.3}}>\u25b6</span>
+          </div>
+        </div>
+        {upcoming.length===0 ? (
+          <p style={{opacity:.3,fontSize:12,margin:0}}>Yakla\u015fan etkinlik yok</p>
+        ) : upcoming.map(e=>(
+          <div key={e.id} style={{display:"flex",alignItems:"center",gap:8,padding:"4px 0"}}>
+            <span style={{width:6,height:6,borderRadius:"50%",background:e.color||"#a855f7",flexShrink:0}}/>
+            <span style={{fontSize:12,opacity:.7,flex:1}}>{e.title}</span>
+            <span style={{fontSize:10,opacity:.3}}>{e.time||""} {e.date.slice(5)}</span>
           </div>
         ))}
       </div>
 
-      <div style={{background:"#1c1c2e",borderRadius:14,padding:16,marginBottom:12}}>
-        <h4 style={{margin:"0 0 10px",fontSize:14,fontWeight:700}}>⏳ Yaklaşan Görevler</h4>
-        {urgentTasks.length===0 && <p style={{opacity:.3,fontSize:13,margin:0}}>Harika, görev yok!</p>}
-        {urgentTasks.map(t=>(
-          <div key={t.id} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 0",borderBottom:"1px solid rgba(255,255,255,0.04)"}}>
-            <span style={{width:8,height:8,borderRadius:"50%",background:PCOL[t.priority],flexShrink:0}}/>
-            <span style={{fontSize:14,flex:1}}>{t.title}</span>
-            {t.dueDate && <span style={{fontSize:11,opacity:.4,color:t.dueDate<today()?"#ef4444":"inherit"}}>{t.dueDate.slice(5)}</span>}
+      {/* SA\u011eLIK */}
+      <div onClick={()=>setTab("sports")} style={{
+        background:"#1c1c2e",borderRadius:16,padding:16,marginBottom:10,cursor:"pointer",borderLeft:"4px solid #22c55e",
+      }}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+          <div style={{display:"flex",alignItems:"center",gap:8}}>
+            <span style={{fontSize:18}}>\u2666</span>
+            <span style={{fontSize:15,fontWeight:700}}>Sa\u011fl\u0131k Ko\u00e7u</span>
           </div>
-        ))}
+          <div style={{display:"flex",alignItems:"center",gap:6}}>
+            <div style={{
+              background:healthScore==="Dengeli"?"rgba(34,197,94,0.15)":healthScore==="Fazla"?"rgba(239,68,68,0.15)":"rgba(59,130,246,0.15)",
+              color:healthScore==="Dengeli"?"#22c55e":healthScore==="Fazla"?"#ef4444":"#3b82f6",
+              padding:"3px 10px",borderRadius:8,fontSize:12,fontWeight:700,
+            }}>{healthScore}</div>
+            <span style={{fontSize:12,opacity:.3}}>\u25b6</span>
+          </div>
+        </div>
+        <div style={{display:"flex",gap:8,marginBottom:8}}>
+          <div style={{flex:1,background:"rgba(249,115,22,0.08)",borderRadius:10,padding:"8px 10px",textAlign:"center"}}>
+            <div style={{fontSize:16,fontWeight:800,color:"#f97316"}}>{todayCalIn}</div>
+            <div style={{fontSize:9,opacity:.4}}>Al\u0131nan kcal</div>
+          </div>
+          <div style={{flex:1,background:"rgba(34,197,94,0.08)",borderRadius:10,padding:"8px 10px",textAlign:"center"}}>
+            <div style={{fontSize:16,fontWeight:800,color:"#22c55e"}}>{todayCalOut}</div>
+            <div style={{fontSize:9,opacity:.4}}>Yak\u0131lan kcal</div>
+          </div>
+          <div style={{flex:1,background:"rgba(59,130,246,0.08)",borderRadius:10,padding:"8px 10px",textAlign:"center"}}>
+            <div style={{fontSize:16,fontWeight:800,color:netCal>healthGoal?"#ef4444":"#3b82f6"}}>{netCal}</div>
+            <div style={{fontSize:9,opacity:.4}}>Net kcal</div>
+          </div>
+        </div>
+        <div style={{display:"flex",gap:12}}>
+          <span style={{fontSize:11,opacity:.4}}>\ud83d\udcaa {wkSport.length} antrenman</span>
+          <span style={{fontSize:11,opacity:.4}}>\u23f1 {wkMin} dk</span>
+          <span style={{fontSize:11,opacity:.4}}>\ud83d\udd25 {wkBurned} kcal</span>
+        </div>
       </div>
 
-      <div style={{background:"#1c1c2e",borderRadius:14,padding:16}}>
-        <h4 style={{margin:"0 0 10px",fontSize:14,fontWeight:700}}>📅 Yaklaşan Etkinlikler</h4>
-        {upcoming.length===0 && <p style={{opacity:.3,fontSize:13,margin:0}}>Etkinlik yok</p>}
-        {upcoming.map(e=>(
-          <div key={e.id} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 0",borderBottom:"1px solid rgba(255,255,255,0.04)"}}>
-            <span style={{width:8,height:8,borderRadius:"50%",background:e.color||"#3b82f6",flexShrink:0}}/>
-            <span style={{fontSize:14,flex:1}}>{e.title}</span>
-            <span style={{fontSize:11,opacity:.4}}>{e.time || ""} {e.date.slice(5)}</span>
+      {/* TARZIM */}
+      <div onClick={()=>setTab("projects")} style={{
+        background:"#1c1c2e",borderRadius:16,padding:16,marginBottom:10,cursor:"pointer",borderLeft:"4px solid #f97316",
+      }}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+          <div style={{display:"flex",alignItems:"center",gap:8}}>
+            <span style={{fontSize:18}}>\u25c8</span>
+            <span style={{fontSize:15,fontWeight:700}}>Tarz\u0131m</span>
           </div>
-        ))}
+          <div style={{display:"flex",alignItems:"center",gap:6}}>
+            <div style={{background:"rgba(249,115,22,0.15)",color:"#f97316",padding:"3px 10px",borderRadius:8,fontSize:12,fontWeight:700}}>{totalRoomItems} \u00f6\u011fe</div>
+            <span style={{fontSize:12,opacity:.3}}>\u25b6</span>
+          </div>
+        </div>
+        <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+          {rooms.slice(0,4).map(room=>{
+            const count=room.type==="project"?data.projects.length:(roomItems[room.id]||[]).length;
+            return (
+              <div key={room.id} style={{display:"flex",alignItems:"center",gap:6,background:"rgba(255,255,255,0.03)",borderRadius:8,padding:"6px 10px"}}>
+                <span style={{fontSize:16}}>{room.icon}</span>
+                <span style={{fontSize:11,opacity:.6}}>{room.name}</span>
+                <span style={{fontSize:11,fontWeight:700,color:room.color}}>{count}</span>
+              </div>
+            );
+          })}
+        </div>
+        {activeProjects>0&&<div style={{fontSize:11,opacity:.4,marginTop:8}}>\ud83d\udcc2 {activeProjects} aktif proje devam ediyor</div>}
+      </div>
+
+      {/* NOTLAR */}
+      <div onClick={()=>setTab("notes")} style={{
+        background:"#1c1c2e",borderRadius:16,padding:16,marginBottom:10,cursor:"pointer",borderLeft:"4px solid #14b8a6",
+      }}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+          <div style={{display:"flex",alignItems:"center",gap:8}}>
+            <span style={{fontSize:18}}>\u2630</span>
+            <span style={{fontSize:15,fontWeight:700}}>Notlar</span>
+          </div>
+          <div style={{display:"flex",alignItems:"center",gap:6}}>
+            <div style={{background:"rgba(20,184,166,0.15)",color:"#14b8a6",padding:"3px 10px",borderRadius:8,fontSize:12,fontWeight:700}}>{data.notes.length} not</div>
+            <span style={{fontSize:12,opacity:.3}}>\u25b6</span>
+          </div>
+        </div>
+        {data.notes.length>0&&(
+          <div style={{marginTop:8,display:"flex",gap:6,flexWrap:"wrap"}}>
+            {data.notes.slice(0,3).map(n=>(
+              <div key={n.id} style={{background:"rgba(255,255,255,0.03)",borderRadius:8,padding:"4px 10px",borderTop:`2px solid ${n.color||"#14b8a6"}`}}>
+                <span style={{fontSize:11,opacity:.6}}>{n.title}</span>
+              </div>
+            ))}
+            {data.notes.length>3&&<span style={{fontSize:11,opacity:.3,alignSelf:"center"}}>+{data.notes.length-3}</span>}
+          </div>
+        )}
       </div>
     </div>
   );
