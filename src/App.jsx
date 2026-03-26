@@ -76,13 +76,19 @@ function useIsMobile() {
 
 /* ── Styles ── */
 const inp = {
-  width:"100%",background:"#13132a",border:"1px solid rgba(255,255,255,0.08)",
+  width:"100%",
+  background:"rgba(255,255,255,0.06)",
+  backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)",
+  border:"1px solid rgba(255,255,255,0.1)",
   borderRadius:12,padding:"12px 14px",color:"#e0e0e0",fontSize:15,
   marginBottom:10,outline:"none",boxSizing:"border-box",WebkitAppearance:"none",
 };
 const btnPrimary = {
-  width:"100%",background:"#3b82f6",color:"#fff",border:"none",borderRadius:12,
+  width:"100%",background:"linear-gradient(135deg,#3b82f6,#6366f1)",
+  color:"#fff",border:"none",borderRadius:12,
   padding:"14px",cursor:"pointer",fontSize:15,fontWeight:600,marginTop:4,
+  boxShadow:"0 4px 20px rgba(99,102,241,0.4)",
+  transition:"box-shadow .2s, transform .1s",
 };
 const addBtnStyle = {
   background:"#3b82f6",color:"#fff",border:"none",borderRadius:10,
@@ -96,12 +102,25 @@ const filterBtnStyle = (active) => ({
   fontWeight: active ? 600 : 400,
 });
 const cardStyle = {
-  background:"#1c1c2e",borderRadius:16,padding:"14px 16px",marginBottom:8,
+  background:"rgba(255,255,255,0.04)",
+  backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",
+  borderRadius:16,padding:"14px 16px",marginBottom:8,
+  border:"1px solid rgba(255,255,255,0.07)",
+  boxShadow:"0 4px 24px rgba(0,0,0,0.3)",
 };
+/* Glow card helper: cardStyle + colored glow border */
+const glowCard = (color) => ({
+  ...cardStyle,
+  border:`1px solid ${color}40`,
+  boxShadow:`0 0 20px ${color}22, 0 4px 24px rgba(0,0,0,0.35), inset 0 0 20px ${color}08`,
+});
 const delBtnStyle = {
-  background:"rgba(255,255,255,0.05)",border:"none",color:"#666",fontSize:14,
+  background:"rgba(255,255,255,0.06)",
+  border:"1px solid rgba(255,255,255,0.08)",
+  color:"#666",fontSize:14,
   cursor:"pointer",padding:0,width:32,height:32,borderRadius:8,
   display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,
+  backdropFilter:"blur(4px)",
 };
 const sectionHeader = {
   display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14,
@@ -124,7 +143,7 @@ function Modal({ open, onClose, title, children }) {
       padding:0,
     }}>
       <div onClick={e=>e.stopPropagation()} style={{
-        background:"#1c1c2e",width:"100%",maxWidth:480,
+        background:"rgba(255,255,255,0.04)",width:"100%",maxWidth:480,
         maxHeight:"85dvh",
         borderRadius:"20px 20px 0 0",
         display:"flex",flexDirection:"column",
@@ -172,11 +191,12 @@ function StickyHeader({ children }) {
   return (
     <div style={{
       position:"sticky",top:0,zIndex:50,
-      background:"rgba(15,15,26,0.97)",
-      backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",
+      background:"rgba(6,6,17,0.85)",
+      backdropFilter:"blur(20px) saturate(180%)",
+      WebkitBackdropFilter:"blur(20px) saturate(180%)",
       marginLeft:-16,marginRight:-16,
       padding:"14px 16px 12px",
-      borderBottom:"1px solid rgba(255,255,255,0.07)",
+      borderBottom:"1px solid rgba(255,255,255,0.08)",
       marginBottom:14,
     }}>
       {children}
@@ -206,11 +226,11 @@ function FAB({ onClick, color="#3b82f6" }) {
       style={{
         position:"fixed",right:20,bottom:100,
         width:56,height:56,borderRadius:"50%",
-        background:color,color:"#fff",border:"none",
+        background:`linear-gradient(135deg,${color}dd,${color}88)`,color:"#fff",border:`1px solid ${color}55`,
         fontSize:28,fontWeight:300,lineHeight:1,cursor:"pointer",
         display:"flex",alignItems:"center",justifyContent:"center",
-        boxShadow:`0 4px 24px ${color}55`,
-        zIndex:900,transition:"transform .1s",
+        boxShadow:`0 0 0 1px ${color}30, 0 4px 24px ${color}66, 0 0 50px ${color}33`,
+        zIndex:900,transition:"transform .1s, box-shadow .2s",
       }}
       onMouseDown={e=>e.currentTarget.style.transform="scale(0.93)"}
       onMouseUp={e=>e.currentTarget.style.transform="scale(1)"}
@@ -258,9 +278,11 @@ function Dashboard({ data, setTab }) {
     <div>
       {/* HERO */}
       <div style={{
-        background:"linear-gradient(135deg,#1a2448 0%,#1c1c2e 60%,#1f1a2e 100%)",
+        background:"linear-gradient(135deg,rgba(26,36,72,0.9) 0%,rgba(28,28,46,0.7) 60%,rgba(31,26,46,0.9) 100%)",
+        backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",
         borderRadius:20,padding:"20px 18px 18px",marginBottom:14,
-        border:"1px solid rgba(255,255,255,0.06)",
+        border:"1px solid rgba(255,255,255,0.1)",
+        boxShadow:"0 0 40px rgba(59,130,246,0.08), 0 8px 32px rgba(0,0,0,0.4)",
       }}>
         <h2 style={{margin:0,fontSize:23,fontWeight:800,letterSpacing:-.5}}>{greeting}! 👋</h2>
         <p style={{margin:"4px 0 16px",opacity:.45,fontSize:13}}>
@@ -274,8 +296,12 @@ function Dashboard({ data, setTab }) {
             {label:"Aktif proje",val:activeProjects,color:"#22c55e",tab:"projects"},
           ].map(s=>(
             <div key={s.tab} onClick={()=>setTab(s.tab)} style={{
-              background:`${s.color}18`,borderRadius:14,padding:"12px 14px",cursor:"pointer",
-              border:`1px solid ${s.color}25`,
+              background:`linear-gradient(135deg,${s.color}18,${s.color}08)`,
+              backdropFilter:"blur(8px)",
+              borderRadius:14,padding:"12px 14px",cursor:"pointer",
+              border:`1px solid ${s.color}40`,
+              boxShadow:`0 0 20px ${s.color}15, inset 0 1px 0 ${s.color}20`,
+              transition:"transform .15s, box-shadow .15s",
             }}>
               <div style={{fontSize:24,fontWeight:800,color:s.color,letterSpacing:-.5}}>{s.val}</div>
               <div style={{fontSize:11,color:s.color,opacity:.8,marginTop:2}}>{s.label}</div>
@@ -292,17 +318,19 @@ function Dashboard({ data, setTab }) {
           {label:"+ Spor",tab:"sports",color:"#22c55e"},
         ].map(a=>(
           <button key={a.label} onClick={()=>setTab(a.tab)} style={{
-            flex:1,background:`${a.color}15`,color:a.color,border:`1px solid ${a.color}25`,
+            flex:1,background:`${a.color}12`,backdropFilter:"blur(8px)",color:a.color,border:`1px solid ${a.color}40`,
             borderRadius:12,padding:"10px 4px",fontSize:12,fontWeight:700,cursor:"pointer",
+            boxShadow:`0 0 16px ${a.color}15`,
           }}>{a.label}</button>
         ))}
       </div>
 
       {overdue>0&&(
         <div onClick={()=>setTab("tasks")} style={{
-          background:"rgba(239,68,68,0.1)",border:"1px solid rgba(239,68,68,0.2)",
+          background:"rgba(239,68,68,0.1)",backdropFilter:"blur(8px)",border:"1px solid rgba(239,68,68,0.3)",
           borderRadius:14,padding:"12px 14px",marginBottom:12,
           display:"flex",alignItems:"center",gap:10,cursor:"pointer",
+          boxShadow:"0 0 20px rgba(239,68,68,0.1)",
         }}>
           <span style={{fontSize:20}}>🚨</span>
           <div style={{flex:1}}>
@@ -318,8 +346,9 @@ function Dashboard({ data, setTab }) {
           <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em",marginBottom:8}}>Bugünün Programı</div>
           {scheduleItems.map(item=>(
             <div key={item.id} onClick={()=>setTab(item.type==="task"?"tasks":"calendar")} style={{
-              background:"#1c1c2e",borderRadius:16,padding:"13px 14px",marginBottom:6,
+              ...cardStyle,padding:"13px 14px",marginBottom:6,
               display:"flex",alignItems:"center",gap:12,cursor:"pointer",minHeight:54,
+              border:`1px solid ${item.color}25`,boxShadow:`0 0 16px ${item.color}10`,
             }}>
               <div style={{width:3,height:36,background:item.color,borderRadius:2,flexShrink:0}}/>
               <div style={{flex:1,minWidth:0}}>
@@ -340,7 +369,7 @@ function Dashboard({ data, setTab }) {
             {val:wkBurned,label:"kcal yakıldı",color:"#ef4444"},
             {val:done,label:"Görev bitti",color:"#22c55e"},
           ].map((s,i)=>(
-            <div key={i} style={{background:"#1c1c2e",borderRadius:14,padding:"12px 10px",textAlign:"center"}}>
+            <div key={i} style={{background:"rgba(255,255,255,0.04)",backdropFilter:"blur(8px)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:14,padding:"12px 10px",textAlign:"center",boxShadow:"0 4px 16px rgba(0,0,0,0.2)"}}>
               <div style={{fontSize:20,fontWeight:800,color:s.color,letterSpacing:-.5}}>{s.val}</div>
               <div style={{fontSize:10,opacity:.4,marginTop:3,lineHeight:1.2}}>{s.label}</div>
             </div>
@@ -357,7 +386,7 @@ function Dashboard({ data, setTab }) {
           <div style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:4,WebkitOverflowScrolling:"touch"}}>
             {data.notes.slice(0,5).map(n=>(
               <div key={n.id} onClick={()=>setTab("notes")} style={{
-                background:"#1c1c2e",borderRadius:14,padding:"10px 12px",
+                background:"rgba(255,255,255,0.04)",backdropFilter:"blur(8px)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:14,padding:"10px 12px",
                 minWidth:130,maxWidth:160,cursor:"pointer",flexShrink:0,
                 borderTop:`3px solid ${n.color||"#14b8a6"}`,
               }}>
@@ -439,7 +468,10 @@ function Tasks({ data, update }) {
   ].filter(g=>g.tasks.length>0) : null;
 
   const TaskCard = ({ task }) => (
-    <div style={{...cardStyle,display:"flex",alignItems:"center",gap:12,minHeight:52,opacity:task.done?.5:1}}>
+    <div style={{...cardStyle,display:"flex",alignItems:"center",gap:12,minHeight:52,opacity:task.done?.5:1,
+      border:`1px solid ${task.done?"rgba(34,197,94,0.15)":PCOL[task.priority]+"20"}`,
+      boxShadow:task.done?"none":`0 0 16px ${PCOL[task.priority]}12`,
+    }}>
       <button onClick={()=>toggle(task.id)} style={checkBtnStyle(task.done)}>{task.done&&"✓"}</button>
       <div style={{flex:1,minWidth:0,cursor:"pointer"}} onClick={()=>setDetail(detail===task.id?null:task.id)}>
         <div style={{fontSize:15,fontWeight:600,textDecoration:task.done?"line-through":"none",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{task.title}</div>
@@ -498,7 +530,7 @@ function Tasks({ data, update }) {
         const task = data.tasks.find(tk=>tk.id===detail);
         if(!task) return null;
         return (
-          <div style={{background:"#1c1c2e",borderRadius:16,padding:16,marginTop:8,border:"1px solid rgba(59,130,246,0.2)"}}>
+          <div style={{background:"rgba(255,255,255,0.04)",borderRadius:16,padding:16,marginTop:8,border:"1px solid rgba(59,130,246,0.2)"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
               <h4 style={{margin:0,fontSize:16,fontWeight:700}}>{task.title}</h4>
               <div style={{display:"flex",gap:6}}>
@@ -616,9 +648,9 @@ function CalendarView({ data, update }) {
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
           <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Takvim</h3>
           <div style={{display:"flex",alignItems:"center",gap:6}}>
-            <button onClick={()=>setVd(new Date(y,m-1))} style={{background:"rgba(255,255,255,0.07)",border:"none",color:"#aaa",width:32,height:32,borderRadius:10,fontSize:16,cursor:"pointer"}}>◀</button>
+            <button onClick={()=>setVd(new Date(y,m-1))} style={{background:"rgba(255,255,255,0.08)",backdropFilter:"blur(4px)",border:"1px solid rgba(255,255,255,0.1)",color:"#aaa",width:32,height:32,borderRadius:10,fontSize:16,cursor:"pointer"}}>◀</button>
             <span style={{fontWeight:700,fontSize:14,minWidth:105,textAlign:"center"}}>{MN[m]} {y}</span>
-            <button onClick={()=>setVd(new Date(y,m+1))} style={{background:"rgba(255,255,255,0.07)",border:"none",color:"#aaa",width:32,height:32,borderRadius:10,fontSize:16,cursor:"pointer"}}>▶</button>
+            <button onClick={()=>setVd(new Date(y,m+1))} style={{background:"rgba(255,255,255,0.08)",backdropFilter:"blur(4px)",border:"1px solid rgba(255,255,255,0.1)",color:"#aaa",width:32,height:32,borderRadius:10,fontSize:16,cursor:"pointer"}}>▶</button>
           </div>
         </div>
       </StickyHeader>
@@ -630,7 +662,7 @@ function CalendarView({ data, update }) {
           const isSel=d&&selDay===d;
           return (
             <div key={i} onClick={()=>d&&setSelDay(selDay===d?null:d)} style={{
-              background:isToday?"rgba(59,130,246,0.2)":isSel?"rgba(59,130,246,0.1)":"#1c1c2e",
+              background:isToday?"rgba(59,130,246,0.2)":isSel?"rgba(59,130,246,0.1)":"rgba(255,255,255,0.03)",
               borderRadius:10,minHeight:48,padding:4,cursor:d?"pointer":"default",
               display:"flex",flexDirection:"column",alignItems:"center",gap:2,
               border:isToday?"1.5px solid #3b82f6":isSel?"1.5px solid rgba(59,130,246,0.3)":"1.5px solid transparent",
@@ -646,7 +678,7 @@ function CalendarView({ data, update }) {
         })}
       </div>
       {selDay&&(
-        <div style={{background:"#1c1c2e",borderRadius:14,padding:16,marginTop:12}}>
+        <div style={{background:"rgba(255,255,255,0.04)",borderRadius:14,padding:16,marginTop:12}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
             <h4 style={{margin:0,fontSize:15,fontWeight:700}}>{selDay} {MN[m]}</h4>
             <button onClick={openAdd} style={{background:"rgba(59,130,246,0.15)",color:"#3b82f6",border:"none",borderRadius:8,padding:"6px 14px",fontSize:12,cursor:"pointer",fontWeight:600}}>+ Ekle</button>
@@ -920,12 +952,12 @@ function Sports({ data, update }) {
     <div>
       <StickyHeader>
         <h3 style={{margin:"0 0 12px",fontSize:20,fontWeight:800}}>Sağlık Koçu</h3>
-        <div style={{background:"rgba(255,255,255,0.05)",borderRadius:12,padding:3,display:"flex"}}>
+        <div style={{background:"rgba(255,255,255,0.06)",backdropFilter:"blur(8px)",borderRadius:12,padding:3,display:"flex"}}>
           {[["overview","Özet"],["sport","Spor"],["food","Beslenme"]].map(([k,v])=>(
             <button key={k} onClick={()=>setView(k)} style={{
               flex:1,padding:"9px 6px",borderRadius:9,border:"none",cursor:"pointer",
               fontSize:13,fontWeight:view===k?700:500,letterSpacing:-.2,
-              background:view===k?"#2a2a45":"transparent",
+              background:view===k?"rgba(255,255,255,0.12)":"transparent",
               color:view===k?"#e0e0e0":"#666",transition:"all .2s",
             }}>{v}</button>
           ))}
@@ -944,7 +976,7 @@ function Sports({ data, update }) {
         </div>
 
         {/* Today's balance */}
-        <div style={{background:"#1c1c2e",borderRadius:14,padding:16,marginBottom:12}}>
+        <div style={{background:"rgba(255,255,255,0.04)",borderRadius:14,padding:16,marginBottom:12}}>
           <h4 style={{margin:"0 0 10px",fontSize:14,fontWeight:700}}>Bugünkü Denge</h4>
           <div style={{display:"flex",justifyContent:"space-around",textAlign:"center",marginBottom:10}}>
             <div>
@@ -962,7 +994,7 @@ function Sports({ data, update }) {
               <div style={{fontSize:10,opacity:.5}}>Net kcal</div>
             </div>
           </div>
-          <div style={{height:8,background:"rgba(255,255,255,0.06)",borderRadius:4,overflow:"hidden"}}>
+          <div style={{height:8,background:"rgba(255,255,255,0.08)",backdropFilter:"blur(2px)",borderRadius:4,overflow:"hidden"}}>
             <div style={{height:"100%",background:netCal>dailyGoal?"#ef4444":"#3b82f6",borderRadius:4,width:`${Math.min(100,netCal/dailyGoal*100)}%`,transition:"width .3s"}}/>
           </div>
           <div style={{fontSize:10,opacity:.4,marginTop:4,textAlign:"center"}}>Günlük hedef: {dailyGoal} kcal</div>
@@ -976,7 +1008,7 @@ function Sports({ data, update }) {
             {icon:"📏",val:`${tDist.toFixed(1)} km`,label:"Mesafe",color:"#22c55e"},
             {icon:"💪",val:wk.length,label:"Antrenman",color:"#f97316"},
           ].map((s,i)=>(
-            <div key={i} style={{background:"#1c1c2e",borderRadius:14,padding:"14px",borderLeft:`3px solid ${s.color}`}}>
+            <div key={i} style={{...cardStyle,padding:"14px",borderLeft:`3px solid ${s.color}`,boxShadow:`0 0 16px ${s.color}18`}}>
               <div style={{fontSize:11,opacity:.5}}>{s.icon} {s.label}</div>
               <div style={{fontSize:20,fontWeight:800,color:s.color,marginTop:4}}>{s.val}</div>
             </div>
@@ -1225,29 +1257,29 @@ function Sports({ data, update }) {
 /* ═══════════ NEWS ROOM ═══════════ */
 const NEWS_SOURCES = {
   teknoloji: [
-    { name:"BBC Technology", url:"https://feeds.bbci.co.uk/news/technology/rss.xml", lang:"EN", color:"#bb1919" },
-    { name:"The Verge", url:"https://www.theverge.com/rss/index.xml", lang:"EN", color:"#e5127d" },
-    { name:"TRT Haber", url:"https://www.trthaber.com/sondakika.rss", lang:"TR", color:"#c8102e" },
+    { name:"BBC Tech",      url:"https://feeds.bbci.co.uk/news/technology/rss.xml",        lang:"EN", color:"#bb1919" },
+    { name:"Ars Technica",  url:"https://feeds.arstechnica.com/arstechnica/index",          lang:"EN", color:"#f60" },
+    { name:"Hacker News",   url:"https://hnrss.org/frontpage?count=15",                    lang:"EN", color:"#ff6600" },
   ],
   sanat: [
-    { name:"BBC Culture", url:"https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml", lang:"EN", color:"#bb1919" },
-    { name:"The Guardian Arts", url:"https://www.theguardian.com/artanddesign/rss", lang:"EN", color:"#052962" },
-    { name:"Al Jazeera Arts", url:"https://www.aljazeera.com/xml/rss/all.xml", lang:"EN", color:"#e8a020" },
+    { name:"BBC Arts",      url:"https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml", lang:"EN", color:"#bb1919" },
+    { name:"NPR Arts",      url:"https://feeds.npr.org/1008/rss.xml",                      lang:"EN", color:"#225490" },
+    { name:"Smithsonian",   url:"https://www.smithsonianmag.com/rss/arts-culture/",        lang:"EN", color:"#004165" },
   ],
   saglik: [
-    { name:"BBC Health", url:"https://feeds.bbci.co.uk/news/health/rss.xml", lang:"EN", color:"#bb1919" },
-    { name:"Reuters Health", url:"https://feeds.reuters.com/reuters/healthNews", lang:"EN", color:"#ff8000" },
-    { name:"WHO News", url:"https://www.who.int/rss-feeds/news-english.xml", lang:"EN", color:"#009edb" },
+    { name:"BBC Health",    url:"https://feeds.bbci.co.uk/news/health/rss.xml",            lang:"EN", color:"#bb1919" },
+    { name:"NPR Health",    url:"https://feeds.npr.org/1128/rss.xml",                      lang:"EN", color:"#225490" },
+    { name:"Science Daily", url:"https://www.sciencedaily.com/rss/health_medicine.xml",    lang:"EN", color:"#0066cc" },
   ],
   ekonomi: [
-    { name:"Reuters Business", url:"https://feeds.reuters.com/reuters/businessNews", lang:"EN", color:"#ff8000" },
-    { name:"BBC Business", url:"https://feeds.bbci.co.uk/news/business/rss.xml", lang:"EN", color:"#bb1919" },
-    { name:"BBC Türkçe", url:"https://feeds.bbci.co.uk/turkce/rss.xml", lang:"TR", color:"#bb1919" },
+    { name:"BBC Business",  url:"https://feeds.bbci.co.uk/news/business/rss.xml",          lang:"EN", color:"#bb1919" },
+    { name:"NPR Economy",   url:"https://feeds.npr.org/1006/rss.xml",                      lang:"EN", color:"#225490" },
+    { name:"MarketWatch",   url:"https://feeds.content.dowjones.io/public/rss/mw_realtimeheadlines", lang:"EN", color:"#003087" },
   ],
   politika: [
-    { name:"Reuters World", url:"https://feeds.reuters.com/Reuters/worldNews", lang:"EN", color:"#ff8000" },
-    { name:"BBC World", url:"https://feeds.bbci.co.uk/news/world/rss.xml", lang:"EN", color:"#bb1919" },
-    { name:"BBC Türkçe", url:"https://feeds.bbci.co.uk/turkce/rss.xml", lang:"TR", color:"#bb1919" },
+    { name:"BBC World",     url:"https://feeds.bbci.co.uk/news/world/rss.xml",             lang:"EN", color:"#bb1919" },
+    { name:"BBC Türkçe",    url:"https://www.bbc.com/turkce/index.xml",                   lang:"TR", color:"#bb1919" },
+    { name:"NPR Politics",  url:"https://feeds.npr.org/1014/rss.xml",                      lang:"EN", color:"#225490" },
   ],
 };
 
@@ -1277,30 +1309,52 @@ function NewsRoom({ room, onBack }) {
     } catch { return ""; }
   };
 
+  /* Parse a single RSS feed URL via multi-proxy → DOMParser */
+  const fetchOneFeed = async (src) => {
+    const raw = await proxyFetch(src.url);
+    const text = typeof raw === "string" ? raw : (raw.contents || JSON.stringify(raw));
+    const xml = new DOMParser().parseFromString(text, "text/xml");
+    const items = [...xml.querySelectorAll("item, entry")].slice(0,10);
+    return items.map(item => {
+      const txt = (sel) => item.querySelector(sel)?.textContent?.replace(/<[^>]+>/g,"")?.trim() || "";
+      const attr = (sel, a) => item.querySelector(sel)?.getAttribute(a) || "";
+      // Get thumbnail from media:thumbnail, enclosure, or og image in description
+      let thumb = "";
+      try {
+        const enc = item.querySelector("enclosure");
+        if(enc && /image/i.test(enc.getAttribute("type")||"")) thumb = enc.getAttribute("url")||"";
+        if(!thumb) {
+          const mrss = "http://search.yahoo.com/mrss/";
+          const mt = item.getElementsByTagNameNS(mrss,"thumbnail")[0]||item.getElementsByTagNameNS(mrss,"content")[0];
+          if(mt) thumb = mt.getAttribute("url")||"";
+        }
+        if(!thumb) {
+          const raw = item.querySelector("description,summary")?.textContent||"";
+          const m = raw.match(/src=["']([^"']+[.](jpg|jpeg|png|webp|gif)[^"']*)/i);
+          if(m) thumb = m[1];
+        }
+      } catch(e) {}
+            const link = txt("link") || attr("link","href") || attr("guid","");
+      const pubDate = txt("pubDate") || txt("published") || txt("updated") || "";
+      return {
+        id: link || txt("guid") || Math.random().toString(36),
+        title: txt("title"),
+        summary: (txt("description")||txt("summary")).slice(0,140),
+        link,
+        thumb,
+        pubDate,
+        source: src.name,
+        sourceColor: src.color,
+        lang: src.lang,
+      };
+    }).filter(a=>a.title && a.link);
+  };
+
   const fetchCategory = async (catId, force=false) => {
     if(loaded[catId] && !force) return;
     setLoading(l=>({...l,[catId]:true}));
     const sources = NEWS_SOURCES[catId] || [];
-    const R2J = "https://api.rss2json.com/v1/api.json?rss_url=";
-    const results = await Promise.allSettled(
-      sources.map(src =>
-        fetch(R2J + encodeURIComponent(src.url) + "&count=8")
-          .then(r=>r.json())
-          .then(json=>(json.items||[]).map(item=>({
-            id: item.guid || item.link,
-            title: item.title?.replace(/<[^>]+>/g,"")?.trim() || "",
-            summary: item.description?.replace(/<[^>]+>/g,"")?.slice(0,120)?.trim() || "",
-            link: item.link || "",
-            thumb: item.thumbnail || item.enclosure?.link || "",
-            pubDate: item.pubDate || "",
-            source: src.name,
-            sourceColor: src.color,
-            lang: src.lang,
-          })))
-          .catch(()=>[])
-      )
-    );
-    // Merge + sort by date, deduplicate by title
+    const results = await Promise.allSettled(sources.map(fetchOneFeed));
     const seen = new Set();
     const merged = results
       .flatMap(r => r.status==="fulfilled" ? r.value : [])
@@ -1326,7 +1380,7 @@ function NewsRoom({ room, onBack }) {
     <div>
       <StickyHeader>
         <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
-          <button onClick={onBack} style={{background:"rgba(255,255,255,0.07)",border:"none",color:"#aaa",width:34,height:34,borderRadius:10,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>◀</button>
+          <button onClick={onBack} style={{background:"rgba(255,255,255,0.08)",backdropFilter:"blur(4px)",border:"1px solid rgba(255,255,255,0.1)",color:"#ccc",width:34,height:34,borderRadius:10,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>◀</button>
           <span style={{fontSize:22}}>📰</span>
           <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>Haberler</h3>
           <button onClick={()=>fetchCategory(cat,true)} style={{
@@ -1384,9 +1438,10 @@ function NewsRoom({ room, onBack }) {
           {list.map((article,i)=>(
             <a key={article.id||i} href={article.link} target="_blank" rel="noopener noreferrer" style={{textDecoration:"none",color:"inherit",display:"block"}}>
               <div style={{
-                background:"#1c1c2e",borderRadius:16,padding:"12px 14px",marginBottom:8,
+                ...cardStyle,padding:"12px 14px",marginBottom:8,
                 display:"flex",gap:12,alignItems:"flex-start",minHeight:72,
                 borderLeft:`3px solid ${article.sourceColor}`,
+                boxShadow:`0 0 16px ${article.sourceColor}12`,
               }}>
                 {/* Thumbnail */}
                 {article.thumb&&(
@@ -1441,6 +1496,34 @@ function NewsRoom({ room, onBack }) {
   );
 }
 
+/* shared proxy fetch — tries multiple free proxies in order */
+async function proxyFetch(url) {
+  const proxies = [
+    (u) => `https://api.allorigins.win/get?url=${encodeURIComponent(u)}`,
+    (u) => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+    (u) => `https://thingproxy.freeboard.io/fetch/${u}`,
+  ];
+  for (const makeUrl of proxies) {
+    try {
+      const res = await fetch(makeUrl(url), { signal: AbortSignal.timeout(7000) });
+      if (!res.ok) continue;
+      const ct = res.headers.get("content-type") || "";
+      // allorigins wraps in { contents: "..." }
+      if (ct.includes("json")) {
+        const j = await res.json();
+        if (j.contents !== undefined) {
+          // allorigins: parse contents as JSON if possible, else return text
+          try { return JSON.parse(j.contents); }
+          catch { return j.contents; } // return as string for XML
+        }
+        return j; // direct JSON (corsproxy)
+      }
+      return res.text(); // raw text
+    } catch (e) { /* try next */ }
+  }
+  throw new Error("All proxies failed for: " + url);
+}
+
 /* ═══════════ MUSIC ROOM ═══════════ */
 function MusicRoom({ room, items, onBack, onAdd, onDel }) {
   const [tab, setTab] = useState("collection"); // collection | search | link | charts
@@ -1469,53 +1552,34 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
     setChartLoading(true);
     setChartTracks([]);
     try {
-      let url;
       if(source==="tr") {
-        // iTunes Turkey Top 25 — no CORS needed
-        url = "https://itunes.apple.com/tr/rss/topsongs/limit=25/json";
-        const res = await fetch(url);
-        const json = await res.json();
-        const tracks = (json.feed?.entry||[]).map((e,i)=>({
-          id: "itunes_"+i,
-          title: e["im:name"]?.label||"",
-          artist: e["im:artist"]?.label||"",
-          albumArt: e["im:image"]?.[2]?.label||e["im:image"]?.[0]?.label||"",
-          link: e.link?.attributes?.href||"",
-          preview: "",
-          source: "itunes",
-          rank: i+1,
-        }));
-        setChartTracks(tracks);
-      } else if(source==="global") {
-        // Deezer Global Top via proxy
-        url = "https://corsproxy.io/?"+encodeURIComponent("https://api.deezer.com/chart/0/tracks?limit=25");
-        const res = await fetch(url);
-        const json = await res.json();
-        setChartTracks((json.data||[]).map((t,i)=>({
-          id: t.id,
-          title: t.title,
-          artist: t.artist?.name||"",
-          albumArt: t.album?.cover_medium||"",
-          link: t.link||"",
-          preview: t.preview||"",
-          source: "deezer",
-          rank: i+1,
+        // iTunes Turkey — direct fetch, no CORS needed
+        const json = await fetch("https://itunes.apple.com/tr/rss/topsongs/limit=25/json")
+          .then(r=>r.json());
+        setChartTracks((json.feed?.entry||[]).map((e,i)=>({
+          id:"itunes_"+i,
+          title:e["im:name"]?.label||"",
+          artist:e["im:artist"]?.label||"",
+          albumArt:e["im:image"]?.[2]?.label||e["im:image"]?.[0]?.label||"",
+          link:e.link?.attributes?.href||"",
+          preview:"",
+          source:"itunes",
+          rank:i+1,
         })));
-      } else if(source==="genre") {
-        // Deezer Genre Chart via proxy
-        const gid = GENRE_IDS[genre]||132;
-        url = "https://corsproxy.io/?"+encodeURIComponent("https://api.deezer.com/chart/"+gid+"/tracks?limit=20");
-        const res = await fetch(url);
-        const json = await res.json();
-        setChartTracks((json.data||[]).map((t,i)=>({
-          id: t.id,
-          title: t.title,
-          artist: t.artist?.name||"",
-          albumArt: t.album?.cover_medium||"",
-          link: t.link||"",
-          preview: t.preview||"",
-          source: "deezer",
-          rank: i+1,
+      } else {
+        // Deezer via multi-proxy fallback
+        const deezerUrl = source==="global"
+          ? "https://api.deezer.com/chart/0/tracks?limit=25"
+          : `https://api.deezer.com/chart/${GENRE_IDS[genre]||132}/tracks?limit=20`;
+        const json = await proxyFetch(deezerUrl);
+        const data = (typeof json === "string" ? JSON.parse(json) : json);
+        setChartTracks((data.data||[]).map((t,i)=>({
+          id:t.id, title:t.title,
+          artist:t.artist?.name||"",
+          albumArt:t.album?.cover_medium||"",
+          link:t.link||"",
+          preview:t.preview||"",
+          source:"deezer", rank:i+1,
         })));
       }
       setChartLoaded(key);
@@ -1529,25 +1593,18 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
     if(tab==="charts") fetchCharts(chartSource, chartGenre);
   }, [tab, chartSource, chartGenre]);
 
-  /* ── Deezer search (CORS proxy via public API) ── */
+  /* ── Deezer search via multi-proxy fallback ── */
   const searchMusic = async (q) => {
     if(!q.trim()) { setSearchResults([]); return; }
     setSearching(true);
     try {
-      const res = await fetch(`https://api.deezer.com/search?q=${encodeURIComponent(q)}&limit=15&output=jsonp`, {mode:"cors"});
-      // Deezer doesn't allow direct browser CORS, use a simple public proxy approach
-      // Fallback: try cors-anywhere or noCors approach with a workaround
-      throw new Error("use_proxy");
-    } catch {
-      // Use Deezer via a reliable public CORS proxy
-      try {
-        const res = await fetch(`https://corsproxy.io/?${encodeURIComponent("https://api.deezer.com/search?q="+encodeURIComponent(q)+"&limit=12")}`);
-        const json = await res.json();
-        setSearchResults(json.data || []);
-      } catch(e) {
-        // If proxy fails, show fallback message
-        setSearchResults([]);
-      }
+      const deezerUrl = `https://api.deezer.com/search?q=${encodeURIComponent(q)}&limit=15`;
+      const json = await proxyFetch(deezerUrl);
+      const data = typeof json === "string" ? JSON.parse(json) : json;
+      setSearchResults(data.data || []);
+    } catch(e) {
+      console.error("Music search error:", e);
+      setSearchResults([]);
     }
     setSearching(false);
   };
@@ -1653,18 +1710,18 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
       <audio ref={audioRef} onEnded={()=>setPreview(null)} style={{display:"none"}}/>
       <StickyHeader>
         <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
-          <button onClick={onBack} style={{background:"rgba(255,255,255,0.07)",border:"none",color:"#aaa",width:34,height:34,borderRadius:10,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>◀</button>
+          <button onClick={onBack} style={{background:"rgba(255,255,255,0.08)",backdropFilter:"blur(4px)",border:"1px solid rgba(255,255,255,0.1)",color:"#ccc",width:34,height:34,borderRadius:10,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>◀</button>
           <span style={{fontSize:22}}>🎵</span>
           <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{room.name}</h3>
           <span style={{fontSize:12,opacity:.4}}>{items.length} parça</span>
         </div>
         {/* Tab switcher — 4 tabs */}
-        <div style={{background:"rgba(255,255,255,0.05)",borderRadius:12,padding:3,display:"flex",gap:1}}>
+        <div style={{background:"rgba(255,255,255,0.06)",backdropFilter:"blur(8px)",borderRadius:12,padding:3,display:"flex",gap:1}}>
           {[["collection","Benim"],["charts","Top 🏆"],["search","Ara"],["link","Link"]].map(([k,v])=>(
             <button key={k} onClick={()=>setTab(k)} style={{
               flex:1,padding:"8px 2px",borderRadius:9,border:"none",cursor:"pointer",
               fontSize:11,fontWeight:tab===k?700:500,
-              background:tab===k?"#2a2a45":"transparent",
+              background:tab===k?"rgba(255,255,255,0.12)":"transparent",
               color:tab===k?"#e0e0e0":"#666",transition:"all .2s",
             }}>{v}</button>
           ))}
@@ -1686,7 +1743,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
         ) : (
           items.map(item=>(
             <div key={item.id} style={{
-              background:"#1c1c2e",borderRadius:16,padding:"12px 14px",marginBottom:8,
+              ...cardStyle,padding:"12px 14px",marginBottom:8,
               display:"flex",alignItems:"center",gap:12,minHeight:64,
             }}>
               {/* Album art or placeholder */}
@@ -1764,7 +1821,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
             const inColl = items.some(i=>i.link===track.link);
             return (
               <div key={track.id} style={{
-                background:"#1c1c2e",borderRadius:16,padding:"10px 12px",marginBottom:6,
+                background:"rgba(255,255,255,0.04)",borderRadius:16,padding:"10px 12px",marginBottom:6,
                 display:"flex",alignItems:"center",gap:10,minHeight:60,
                 opacity:inColl?.6:1,
               }}>
@@ -1919,7 +1976,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
             const inColl = items.some(it=>it.link===track.link||it.title===track.title);
             return (
               <div key={track.id||i} style={{
-                background:"#1c1c2e",borderRadius:16,padding:"10px 12px",marginBottom:6,
+                background:"rgba(255,255,255,0.04)",borderRadius:16,padding:"10px 12px",marginBottom:6,
                 display:"flex",alignItems:"center",gap:10,minHeight:60,
               }}>
                 {/* Rank */}
@@ -2077,13 +2134,23 @@ function Projects({ data, update }) {
           const count=room.type==="project"?data.projects.length:(roomItems[room.id]||[]).length;
           return (
             <div key={room.id} onClick={()=>setActiveRoom(room.id)} style={{
-              background:"#1c1c2e",borderRadius:18,padding:20,cursor:"pointer",
-              borderTop:`3px solid ${room.color}`,textAlign:"center",minHeight:110,
+              background:`linear-gradient(145deg,rgba(255,255,255,0.06) 0%,rgba(255,255,255,0.02) 100%)`,
+              backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",
+              borderRadius:20,padding:20,cursor:"pointer",
+              border:`1px solid ${room.color}50`,
+              boxShadow:`0 0 30px ${room.color}25, 0 0 60px ${room.color}10, inset 0 1px 0 rgba(255,255,255,0.08)`,
+              textAlign:"center",minHeight:110,
               display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:6,
-            }}>
-              <div style={{fontSize:34}}>{room.icon}</div>
-              <div style={{fontSize:14,fontWeight:700}}>{room.name}</div>
-              <div style={{fontSize:11,opacity:.4}}>{count} öğe</div>
+              transition:"box-shadow .2s, transform .15s",
+            }}
+            onMouseEnter={e=>{e.currentTarget.style.boxShadow=`0 0 40px ${room.color}45, 0 0 80px ${room.color}20, inset 0 1px 0 rgba(255,255,255,0.1)`;e.currentTarget.style.transform="scale(1.02)";}}
+            onMouseLeave={e=>{e.currentTarget.style.boxShadow=`0 0 30px ${room.color}25, 0 0 60px ${room.color}10, inset 0 1px 0 rgba(255,255,255,0.08)`;e.currentTarget.style.transform="scale(1)";}}
+            onTouchStart={e=>{e.currentTarget.style.transform="scale(0.97)";}}
+            onTouchEnd={e=>{e.currentTarget.style.transform="scale(1)";}}
+            >
+              <div style={{fontSize:36,filter:`drop-shadow(0 0 8px ${room.color}66)`}}>{room.icon}</div>
+              <div style={{fontSize:14,fontWeight:700,color:"#fff"}}>{room.name}</div>
+              <div style={{fontSize:11,color:`${room.color}cc`,fontWeight:500}}>{count} öğe</div>
             </div>
           );
         })}
@@ -2120,7 +2187,7 @@ function Projects({ data, update }) {
     <div>
       <StickyHeader>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
-          <button onClick={()=>setActiveRoom(null)} style={{background:"rgba(255,255,255,0.07)",border:"none",color:"#aaa",width:34,height:34,borderRadius:10,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>◀</button>
+          <button onClick={()=>setActiveRoom(null)} style={{background:"rgba(255,255,255,0.08)",backdropFilter:"blur(4px)",border:"1px solid rgba(255,255,255,0.1)",color:"#ccc",width:34,height:34,borderRadius:10,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>◀</button>
           <span style={{fontSize:22}}>{room.icon}</span>
           <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{room.name}</h3>
         </div>
@@ -2130,7 +2197,7 @@ function Projects({ data, update }) {
         const tasks=p.tasks||[];const d=tasks.filter(t=>t.done).length;
         const pct=tasks.length?Math.round(d/tasks.length*100):0;const open=exp===p.id;
         return (
-          <div key={p.id} style={{background:"#1c1c2e",borderRadius:14,padding:16,marginBottom:8}}>
+          <div key={p.id} style={{background:"rgba(255,255,255,0.04)",borderRadius:14,padding:16,marginBottom:8}}>
             <div onClick={()=>setExp(open?null:p.id)} style={{cursor:"pointer"}}>
               <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8}}>
                 <div style={{flex:1,minWidth:0}}>
@@ -2143,7 +2210,7 @@ function Projects({ data, update }) {
                 <span style={{fontSize:11,fontWeight:600,color:stCol(p.status),background:`${stCol(p.status)}20`,padding:"4px 10px",borderRadius:8}}>{p.status}</span>
               </div>
               {tasks.length>0&&(<div style={{marginTop:10}}>
-                <div style={{height:6,background:"rgba(255,255,255,0.06)",borderRadius:3,overflow:"hidden"}}>
+                <div style={{height:6,background:"rgba(255,255,255,0.08)",borderRadius:3,overflow:"hidden"}}>
                   <div style={{height:"100%",background:"#3b82f6",borderRadius:3,width:`${pct}%`,transition:"width .3s"}}/>
                 </div>
                 <div style={{fontSize:11,opacity:.4,marginTop:4}}>{d}/{tasks.length} — %{pct}</div>
@@ -2191,7 +2258,7 @@ function Projects({ data, update }) {
     <div>
       <StickyHeader>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
-          <button onClick={()=>setActiveRoom(null)} style={{background:"rgba(255,255,255,0.07)",border:"none",color:"#aaa",width:34,height:34,borderRadius:10,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>◀</button>
+          <button onClick={()=>setActiveRoom(null)} style={{background:"rgba(255,255,255,0.08)",backdropFilter:"blur(4px)",border:"1px solid rgba(255,255,255,0.1)",color:"#ccc",width:34,height:34,borderRadius:10,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>◀</button>
           <span style={{fontSize:22}}>{room.icon}</span>
           <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{room.name}</h3>
           <button onClick={()=>delRoom(activeRoom)} style={{background:"none",border:"none",color:"#ef4444",fontSize:11,cursor:"pointer",opacity:.5}}>Sil</button>
@@ -2205,7 +2272,7 @@ function Projects({ data, update }) {
         </div>
       )}
       {items.map(item=>(
-        <div key={item.id} style={{background:"#1c1c2e",borderRadius:16,padding:14,marginBottom:8,borderLeft:`3px solid ${room.color}`}}>
+        <div key={item.id} style={{background:"rgba(255,255,255,0.04)",borderRadius:16,padding:14,marginBottom:8,borderLeft:`3px solid ${room.color}`}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"start"}}>
             <div style={{flex:1,minWidth:0}}>
               <div style={{fontSize:15,fontWeight:600}}>{item.title}</div>
@@ -2274,7 +2341,7 @@ function Notes({ data, update }) {
           </div>
         )}
         {filtered.map(n=>(
-          <div key={n.id} onClick={()=>edit(n)} style={{background:"#1c1c2e",borderRadius:16,padding:14,cursor:"pointer",borderTop:`3px solid ${n.color||"#3b82f6"}`,minHeight:100}}>
+          <div key={n.id} onClick={()=>edit(n)} style={{...cardStyle,padding:14,cursor:"pointer",borderTop:`3px solid ${n.color||"#3b82f6"}`,minHeight:100,boxShadow:`0 0 20px ${n.color||"#3b82f6"}18`}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"start"}}>
               <h4 style={{margin:0,fontSize:14,fontWeight:700,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{n.title}</h4>
               <button onClick={e=>{e.stopPropagation();del(n.id);}} style={{...delBtnStyle,fontSize:14,marginLeft:4}}>✕</button>
@@ -2359,7 +2426,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
       {msg && <div style={{background:"rgba(59,130,246,0.15)",border:"1px solid rgba(59,130,246,0.3)",borderRadius:12,padding:"10px 14px",marginBottom:12,fontSize:13,color:"#3b82f6"}}>{msg}</div>}
 
       {/* User info */}
-      <div style={{background:"#1c1c2e",borderRadius:14,padding:16,marginBottom:12}}>
+      <div style={{background:"rgba(255,255,255,0.04)",borderRadius:14,padding:16,marginBottom:12}}>
         <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>👤 Hesap</h4>
         {user ? (
           <div>
@@ -2400,7 +2467,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
       </div>
 
       {/* Notifications */}
-      <div style={{background:"#1c1c2e",borderRadius:14,padding:16,marginBottom:12}}>
+      <div style={{background:"rgba(255,255,255,0.04)",borderRadius:14,padding:16,marginBottom:12}}>
         <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>🔔 Bildirimler</h4>
         {!isNotificationSupported() ? (
           <p style={{fontSize:13,opacity:.5}}>Bu tarayıcı bildirimleri desteklemiyor</p>
@@ -2420,7 +2487,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
       </div>
 
       {/* Data Stats */}
-      <div style={{background:"#1c1c2e",borderRadius:14,padding:16,marginBottom:12}}>
+      <div style={{background:"rgba(255,255,255,0.04)",borderRadius:14,padding:16,marginBottom:12}}>
         <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>📊 Veri Özeti</h4>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
           {[
@@ -2437,7 +2504,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
       </div>
 
       {/* Import / Export */}
-      <div style={{background:"#1c1c2e",borderRadius:14,padding:16,marginBottom:12}}>
+      <div style={{background:"rgba(255,255,255,0.04)",borderRadius:14,padding:16,marginBottom:12}}>
         <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>💾 Veri Yönetimi</h4>
         <p style={{fontSize:12,opacity:.5,margin:"0 0 12px"}}>Bilgisayarınızdan veri aktarabilir veya yedeğinizi indirebilirsiniz</p>
         <button onClick={handleExport} style={{...btnPrimary,marginTop:0,marginBottom:8,background:"#14b8a6"}}>
@@ -2450,7 +2517,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
       </div>
 
       {/* AI Kalori Asistanı */}
-      <div style={{background:"#1c1c2e",borderRadius:14,padding:16,marginBottom:12}}>
+      <div style={{background:"rgba(255,255,255,0.04)",borderRadius:14,padding:16,marginBottom:12}}>
         <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>🤖 AI Kalori Asistanı</h4>
         <p style={{fontSize:12,opacity:.5,margin:"0 0 12px"}}>Yemek fotoğrafı çekerek kalori hesaplatabilirsin. Kendi AI hesabını seç ve API anahtarını gir.</p>
 
@@ -2513,7 +2580,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
       </div>
 
       {/* Danger zone */}
-      <div style={{background:"#1c1c2e",borderRadius:14,padding:16}}>
+      <div style={{background:"rgba(255,255,255,0.04)",borderRadius:14,padding:16}}>
         <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700,color:"#ef4444"}}>⚠️ Tehlikeli Bölge</h4>
         <button onClick={clearAll} style={{...btnPrimary,marginTop:0,background:"#ef4444"}}>
           Tüm Verileri Sil
@@ -2575,7 +2642,7 @@ function LoginScreen({ onLogin }) {
         {/* Google Sign In */}
         <button onClick={handleGoogle} disabled={loading} style={{
           width:"100%",padding:"14px",borderRadius:12,border:"1px solid rgba(255,255,255,0.1)",
-          background:"#1c1c2e",color:"#e0e0e0",fontSize:15,fontWeight:600,cursor:"pointer",
+          background:"rgba(255,255,255,0.04)",color:"#e0e0e0",fontSize:15,fontWeight:600,cursor:"pointer",
           display:"flex",alignItems:"center",justifyContent:"center",gap:10,marginBottom:16,
           opacity:loading?.6:1,
         }}>
@@ -2737,7 +2804,7 @@ export default function App() {
 
   if (splash || loading || !data) return (
     <div style={{
-      minHeight:"100vh",minHeight:"100dvh",background:"#0f0f1a",
+      minHeight:"100vh",minHeight:"100dvh",background:"#060611",
       display:"flex",alignItems:"center",justifyContent:"center",
       color:"#e0e0e0",fontFamily:"'SF Pro Display',-apple-system,sans-serif",
       flexDirection:"column",overflow:"hidden",position:"relative",
@@ -2850,11 +2917,23 @@ export default function App() {
       width:"100%",
       height:isMobile?"auto":"100%",
       minHeight:isMobile?"100dvh":"100%",
-      background:"#0f0f1a",color:"#e0e0e0",
+      background:"#060611",color:"#e0e0e0",
       fontFamily:"'SF Pro Display',-apple-system,'Segoe UI',sans-serif",
       position:isMobile?"static":"relative",
       overflow:isMobile?"visible":"hidden",
     }}>
+      {/* Nebula ambient orbs — fixed position, behind content */}
+      <div style={{position:"fixed",inset:0,pointerEvents:"none",zIndex:0,overflow:"hidden"}}>
+        <div style={{position:"absolute",width:300,height:300,borderRadius:"50%",
+          background:"radial-gradient(circle,rgba(59,130,246,0.12) 0%,transparent 70%)",
+          top:"-80px",left:"-60px",animation:"orb1 12s ease-in-out infinite"}}/>
+        <div style={{position:"absolute",width:250,height:250,borderRadius:"50%",
+          background:"radial-gradient(circle,rgba(168,85,247,0.10) 0%,transparent 70%)",
+          bottom:"20%",right:"-50px",animation:"orb2 15s ease-in-out infinite"}}/>
+        <div style={{position:"absolute",width:200,height:200,borderRadius:"50%",
+          background:"radial-gradient(circle,rgba(34,197,94,0.07) 0%,transparent 70%)",
+          bottom:"-40px",left:"20%"}}/>
+      </div>
       {/* Content area */}
       <div
         ref={isMobile?null:scrollRef}
@@ -2900,9 +2979,10 @@ export default function App() {
         position:isMobile?"fixed":"absolute",
         bottom:0,
         left:0,right:0,
-        background:"rgba(12,12,22,0.97)",
-        backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",
-        borderTop:"1px solid rgba(255,255,255,0.08)",
+        background:"rgba(4,4,14,0.92)",
+        backdropFilter:"blur(24px) saturate(180%)",
+        WebkitBackdropFilter:"blur(24px) saturate(180%)",
+        borderTop:"1px solid rgba(255,255,255,0.1)",
         display:"flex",justifyContent:"space-around",alignItems:"center",
         height:NAV_HEIGHT,
         paddingTop:4,
@@ -2912,7 +2992,8 @@ export default function App() {
       }}>
         {allTabs.map(t=>(
           <button key={t.id} onClick={()=>setTab(t.id)} style={{
-            background:tab===t.id?"rgba(59,130,246,0.18)":"none",
+            background:tab===t.id?"rgba(59,130,246,0.15)":"none",
+            boxShadow:tab===t.id?"0 0 20px rgba(59,130,246,0.25)":undefined,
             border:"none",cursor:"pointer",
             display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",
             gap:isMobile?4:3,
@@ -2938,14 +3019,19 @@ export default function App() {
         @keyframes slideDown { from{transform:translateY(-20px);opacity:0} to{transform:translateY(0);opacity:1} }
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
         @keyframes checkPop { 0%{transform:scale(1)} 40%{transform:scale(1.25)} 70%{transform:scale(0.9)} 100%{transform:scale(1)} }
+        @keyframes glowPulse { 0%,100%{opacity:0.6} 50%{opacity:1} }
+        @keyframes orb1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(30px,-20px)} }
+        @keyframes orb2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-20px,30px)} }
         .task-check-done { animation: checkPop .3s ease; }
         * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
         ::-webkit-scrollbar { width:4px; }
-        ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1);border-radius:4px; }
+        ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.12);border-radius:4px; }
+        ::-webkit-scrollbar-track { background:transparent; }
         input[type="date"]::-webkit-calendar-picker-indicator { filter:invert(0.7); }
-        html, body { margin:0; padding:0; overscroll-behavior:none; background:#080810; }
+        html, body { margin:0; padding:0; overscroll-behavior:none; background:#060611; }
+        select option { background:#1a1a2e; color:#e0e0e0; }
         @media (max-width: 639px) {
-          html, body { overflow:auto; height:auto; background:#0f0f1a; }
+          html, body { overflow:auto; height:auto; background:#060611; }
           #root { height:auto; }
         }
         @media (min-width: 640px) {
@@ -2953,7 +3039,7 @@ export default function App() {
           #root { height:100%; }
         }
         @media(display-mode:standalone){ 
-          html, body { background:#0f0f1a; overflow:auto; height:auto; }
+          html, body { background:#060611; overflow:auto; height:auto; }
           #root { height:auto; }
           body { padding-top: env(safe-area-inset-top); } 
         }
