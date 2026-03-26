@@ -21,8 +21,8 @@ const TABS = [
   { id: "dashboard", label: "Ana Sayfa", icon: "⌂" },
   { id: "tasks", label: "Görevler", icon: "✓" },
   { id: "calendar", label: "Takvim", icon: "◫" },
-  { id: "sports", label: "Spor", icon: "♦" },
-  { id: "projects", label: "Projeler", icon: "◈" },
+  { id: "sports", label: "Sağlık", icon: "♦" },
+  { id: "projects", label: "Tarzım", icon: "◈" },
   { id: "notes", label: "Notlar", icon: "☰" },
 ];
 
@@ -32,6 +32,27 @@ const PRIORITIES = { high: "Yüksek", medium: "Orta", low: "Düşük" };
 const PCOL = { high: "#ef4444", medium: "#f59e0b", low: "#22c55e" };
 const PROJECT_STATUSES = ["Planlama","Devam Ediyor","Test","Tamamlandı"];
 const COLORS = ["#3b82f6","#ef4444","#22c55e","#f59e0b","#a855f7","#f97316","#14b8a6"];
+
+const DEFAULT_ROOMS = [
+  { id: "projects", name: "Projeler", icon: "📂", color: "#3b82f6", type: "project" },
+  { id: "music", name: "Müziklerim", icon: "🎵", color: "#a855f7", type: "collection" },
+  { id: "clothes", name: "Kıyafetlerim", icon: "👗", color: "#f97316", type: "collection" },
+  { id: "memories", name: "Anılar", icon: "📸", color: "#ef4444", type: "collection" },
+];
+
+const COMMON_FOODS = {
+  "Çay (şekerli)": 30, "Çay (şekersiz)": 2, "Türk kahvesi": 15, "Süt": 60,
+  "Ekmek (1 dilim)": 80, "Yumurta (haşlanmış)": 78, "Yumurta (sahanda)": 120,
+  "Peynir (1 dilim)": 80, "Zeytin (5 adet)": 40, "Bal (1 yk)": 64, "Tereyağı (1 yk)": 100,
+  "Pilav (1 porsiyon)": 200, "Makarna (1 porsiyon)": 220, "Tavuk göğsü": 165,
+  "Kıyma (100g)": 250, "Köfte (4 adet)": 300, "Balık (ızgara)": 200,
+  "Salata": 50, "Çorba": 120, "Mercimek çorbası": 150, "Kuru fasulye": 200,
+  "Dürüm": 450, "Lahmacun": 200, "Pizza (1 dilim)": 270, "Hamburger": 500,
+  "Elma": 52, "Muz": 90, "Portakal": 47, "Üzüm (1 avuç)": 60,
+  "Yoğurt": 60, "Ayran": 40, "Kola": 140, "Meyve suyu": 120,
+  "Baklava (1 dilim)": 250, "Sütlaç": 200, "Dondurma (1 top)": 140,
+  "Ceviz (5 adet)": 130, "Badem (10 adet)": 70, "Çikolata (1 bar)": 230,
+};
 const MN = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
 const DN = ["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"];
 
@@ -496,54 +517,178 @@ function CalendarView({ data, update }) {
 }
 
 /* ═══════════ SPORTS ═══════════ */
+/* ═══════════ SAĞLIK (Health Coach) ═══════════ */
 function Sports({ data, update }) {
+  const [view,setView]=useState("overview"); // overview, sport, food
   const [modal,setModal]=useState(false);
+  const [foodModal,setFoodModal]=useState(false);
   const [form,setForm]=useState({type:"Koşu",duration:"",distance:"",calories:"",date:today(),notes:""});
+  const [foodForm,setFoodForm]=useState({name:"",calories:"",meal:"Öğle",date:today()});
+  const [foodSearch,setFoodSearch]=useState("");
 
-  const add=()=>{
+  const foods = data.foods || [];
+
+  const addSport=()=>{
     if(!form.duration)return;
     const ns={id:uid(),...form,duration:+form.duration,distance:+form.distance||0,calories:+form.calories||0};
     update({...data,sports:[ns,...data.sports]});
     setModal(false);setForm({type:"Koşu",duration:"",distance:"",calories:"",date:today(),notes:""});
   };
-  const del=id=>update({...data,sports:data.sports.filter(s=>s.id!==id)});
+  const delSport=id=>update({...data,sports:data.sports.filter(s=>s.id!==id)});
 
+  const addFood=()=>{
+    if(!foodForm.name.trim()||!foodForm.calories)return;
+    const nf={id:uid(),...foodForm,calories:+foodForm.calories};
+    update({...data,foods:[nf,...foods]});
+    setFoodModal(false);setFoodForm({name:"",calories:"",meal:"Öğle",date:today()});setFoodSearch("");
+  };
+  const delFood=id=>update({...data,foods:foods.filter(f=>f.id!==id)});
+
+  const selectCommonFood=(name,cal)=>{
+    setFoodForm({...foodForm,name,calories:String(cal)});
+  };
+
+  const t=today();
   const wk=data.sports.filter(s=>{const d=(new Date()-new Date(s.date))/864e5;return d>=0&&d<=7;});
   const tMin=wk.reduce((a,s)=>a+(s.duration||0),0);
-  const tCal=wk.reduce((a,s)=>a+(s.calories||0),0);
+  const burnedCal=wk.reduce((a,s)=>a+(s.calories||0),0);
   const tDist=wk.reduce((a,s)=>a+(s.distance||0),0);
+
+  const todayFoods=foods.filter(f=>f.date===t);
+  const todayCalIn=todayFoods.reduce((a,f)=>a+(f.calories||0),0);
+  const todaySports=data.sports.filter(s=>s.date===t);
+  const todayCalOut=todaySports.reduce((a,s)=>a+(s.calories||0),0);
+  const dailyGoal=2000;
+  const netCal=todayCalIn-todayCalOut;
+
+  // AI Coach advice
+  const getCoachTip=()=>{
+    if(todayCalIn===0&&todayCalOut===0) return {icon:"💡",text:"Bugün henüz kayıt yok. Yediklerini ve sporunu kaydet, sağlık koçun seni yönlendirsin!",color:"#3b82f6"};
+    if(netCal>dailyGoal+300) return {icon:"⚠️",text:`Bugün ${netCal} kcal net kalori — hedefin üzerinde. Hafif bir yürüyüş veya koşu iyi gelir!`,color:"#f59e0b"};
+    if(netCal<1200&&todayCalIn>0) return {icon:"🌟",text:`Harika gidiyorsun! ${netCal} kcal net — dengeli ve sağlıklı.`,color:"#22c55e"};
+    if(todayCalOut>300) return {icon:"💪",text:`Bugün ${todayCalOut} kcal yaktın, süpersin! Protein ağırlıklı beslenmeyi unutma.`,color:"#22c55e"};
+    if(todayCalIn>0&&todayCalOut===0) return {icon:"🏃",text:`${todayCalIn} kcal aldın ama henüz spor yapmadın. 30dk yürüyüş ~150 kcal yakar!`,color:"#f97316"};
+    return {icon:"✨",text:"Günü dengeli geçiriyorsun, böyle devam!",color:"#3b82f6"};
+  };
+  const tip=getCoachTip();
+
+  const filteredFoods = foodSearch ? Object.entries(COMMON_FOODS).filter(([k])=>k.toLowerCase().includes(foodSearch.toLowerCase())) : Object.entries(COMMON_FOODS).slice(0,12);
+
+  const mealGroups = ["Kahvaltı","Öğle","Akşam","Atıştırma"];
 
   return (
     <div>
       <div style={sectionHeader}>
-        <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Spor</h3>
-        <button onClick={()=>setModal(true)} style={addBtnStyle}>+ Antrenman</button>
+        <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Sağlık Koçu</h3>
       </div>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:8,marginBottom:16}}>
-        {[
-          {icon:"⏱",val:`${tMin} dk`,label:"Süre",color:"#3b82f6"},
-          {icon:"🔥",val:`${tCal}`,label:"Kalori",color:"#ef4444"},
-          {icon:"📏",val:`${tDist.toFixed(1)} km`,label:"Mesafe",color:"#22c55e"},
-          {icon:"💪",val:wk.length,label:"Antrenman",color:"#f97316"},
-        ].map((s,i)=>(
-          <div key={i} style={{background:"#1c1c2e",borderRadius:14,padding:"14px",borderLeft:`3px solid ${s.color}`}}>
-            <div style={{fontSize:11,opacity:.5}}>{s.icon} {s.label}</div>
-            <div style={{fontSize:20,fontWeight:800,color:s.color,marginTop:4}}>{s.val}</div>
-          </div>
+
+      {/* Tab switcher */}
+      <div style={{display:"flex",gap:6,marginBottom:14}}>
+        {[["overview","📊 Özet"],["sport","🏃 Spor"],["food","🍽 Beslenme"]].map(([k,v])=>(
+          <button key={k} onClick={()=>setView(k)} style={filterBtnStyle(view===k)}>{v}</button>
         ))}
       </div>
-      {data.sports.length===0&&<p style={{textAlign:"center",opacity:.3,fontSize:14,padding:40}}>Henüz kayıt yok</p>}
-      {data.sports.slice(0,30).map(s=>(
-        <div key={s.id} style={{...cardStyle,display:"flex",alignItems:"center",gap:12}}>
-          <div style={{fontSize:24,width:44,height:44,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(255,255,255,0.04)",borderRadius:12}}>{SPORT_EMOJI[s.type]||"⚡"}</div>
-          <div style={{flex:1,minWidth:0}}>
-            <div style={{fontSize:15,fontWeight:600}}>{s.type}</div>
-            <div style={{fontSize:12,opacity:.5}}>{s.date} · {s.duration}dk {s.distance>0&&`· ${s.distance}km`} {s.calories>0&&`· ${s.calories}kcal`}</div>
-            {s.notes&&<div style={{fontSize:11,opacity:.4,marginTop:2}}>{s.notes}</div>}
+
+      {/* ── OVERVIEW ── */}
+      {view==="overview"&&(<>
+        {/* Coach tip */}
+        <div style={{background:`${tip.color}15`,border:`1px solid ${tip.color}30`,borderRadius:14,padding:14,marginBottom:14,display:"flex",gap:10,alignItems:"start"}}>
+          <span style={{fontSize:24}}>{tip.icon}</span>
+          <div>
+            <div style={{fontSize:12,fontWeight:700,color:tip.color,marginBottom:2}}>Sağlık Koçun</div>
+            <div style={{fontSize:13,opacity:.8,lineHeight:1.4}}>{tip.text}</div>
           </div>
-          <button onClick={()=>del(s.id)} style={delBtnStyle}>✕</button>
         </div>
-      ))}
+
+        {/* Today's balance */}
+        <div style={{background:"#1c1c2e",borderRadius:14,padding:16,marginBottom:12}}>
+          <h4 style={{margin:"0 0 10px",fontSize:14,fontWeight:700}}>Bugünkü Denge</h4>
+          <div style={{display:"flex",justifyContent:"space-around",textAlign:"center",marginBottom:10}}>
+            <div>
+              <div style={{fontSize:22,fontWeight:800,color:"#f97316"}}>{todayCalIn}</div>
+              <div style={{fontSize:10,opacity:.5}}>Alınan kcal</div>
+            </div>
+            <div style={{fontSize:20,opacity:.3,alignSelf:"center"}}>−</div>
+            <div>
+              <div style={{fontSize:22,fontWeight:800,color:"#22c55e"}}>{todayCalOut}</div>
+              <div style={{fontSize:10,opacity:.5}}>Yakılan kcal</div>
+            </div>
+            <div style={{fontSize:20,opacity:.3,alignSelf:"center"}}>=</div>
+            <div>
+              <div style={{fontSize:22,fontWeight:800,color:netCal>dailyGoal?"#ef4444":"#3b82f6"}}>{netCal}</div>
+              <div style={{fontSize:10,opacity:.5}}>Net kcal</div>
+            </div>
+          </div>
+          <div style={{height:8,background:"rgba(255,255,255,0.06)",borderRadius:4,overflow:"hidden"}}>
+            <div style={{height:"100%",background:netCal>dailyGoal?"#ef4444":"#3b82f6",borderRadius:4,width:`${Math.min(100,netCal/dailyGoal*100)}%`,transition:"width .3s"}}/>
+          </div>
+          <div style={{fontSize:10,opacity:.4,marginTop:4,textAlign:"center"}}>Günlük hedef: {dailyGoal} kcal</div>
+        </div>
+
+        {/* Weekly stats */}
+        <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:8,marginBottom:14}}>
+          {[
+            {icon:"⏱",val:`${tMin} dk`,label:"Haftalık Spor",color:"#3b82f6"},
+            {icon:"🔥",val:`${burnedCal}`,label:"Yakılan kcal",color:"#ef4444"},
+            {icon:"📏",val:`${tDist.toFixed(1)} km`,label:"Mesafe",color:"#22c55e"},
+            {icon:"💪",val:wk.length,label:"Antrenman",color:"#f97316"},
+          ].map((s,i)=>(
+            <div key={i} style={{background:"#1c1c2e",borderRadius:14,padding:"14px",borderLeft:`3px solid ${s.color}`}}>
+              <div style={{fontSize:11,opacity:.5}}>{s.icon} {s.label}</div>
+              <div style={{fontSize:20,fontWeight:800,color:s.color,marginTop:4}}>{s.val}</div>
+            </div>
+          ))}
+        </div>
+      </>)}
+
+      {/* ── SPORT ── */}
+      {view==="sport"&&(<>
+        <div style={{display:"flex",justifyContent:"flex-end",marginBottom:12}}>
+          <button onClick={()=>setModal(true)} style={addBtnStyle}>+ Antrenman</button>
+        </div>
+        {data.sports.length===0&&<p style={{textAlign:"center",opacity:.3,fontSize:14,padding:40}}>Henüz kayıt yok</p>}
+        {data.sports.slice(0,30).map(s=>(
+          <div key={s.id} style={{...cardStyle,display:"flex",alignItems:"center",gap:12}}>
+            <div style={{fontSize:24,width:44,height:44,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(255,255,255,0.04)",borderRadius:12}}>{SPORT_EMOJI[s.type]||"⚡"}</div>
+            <div style={{flex:1,minWidth:0}}>
+              <div style={{fontSize:15,fontWeight:600}}>{s.type}</div>
+              <div style={{fontSize:12,opacity:.5}}>{s.date} · {s.duration}dk {s.distance>0&&`· ${s.distance}km`} {s.calories>0&&`· ${s.calories}kcal`}</div>
+            </div>
+            <button onClick={()=>delSport(s.id)} style={delBtnStyle}>✕</button>
+          </div>
+        ))}
+      </>)}
+
+      {/* ── FOOD ── */}
+      {view==="food"&&(<>
+        <div style={{display:"flex",justifyContent:"flex-end",marginBottom:12}}>
+          <button onClick={()=>setFoodModal(true)} style={addBtnStyle}>+ Yemek Ekle</button>
+        </div>
+        {/* Today's meals grouped */}
+        {mealGroups.map(meal=>{
+          const mealFoods=todayFoods.filter(f=>f.meal===meal);
+          if(mealFoods.length===0)return null;
+          const mealCal=mealFoods.reduce((a,f)=>a+(f.calories||0),0);
+          return (
+            <div key={meal} style={{marginBottom:12}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
+                <span style={{fontSize:13,fontWeight:700,opacity:.7}}>{meal}</span>
+                <span style={{fontSize:12,fontWeight:600,color:"#f97316"}}>{mealCal} kcal</span>
+              </div>
+              {mealFoods.map(f=>(
+                <div key={f.id} style={{...cardStyle,display:"flex",alignItems:"center",gap:10}}>
+                  <span style={{fontSize:14,flex:1}}>{f.name}</span>
+                  <span style={{fontSize:13,fontWeight:600,color:"#f97316"}}>{f.calories}</span>
+                  <button onClick={()=>delFood(f.id)} style={delBtnStyle}>✕</button>
+                </div>
+              ))}
+            </div>
+          );
+        })}
+        {todayFoods.length===0&&<p style={{textAlign:"center",opacity:.3,fontSize:14,padding:40}}>Bugün yemek kaydı yok</p>}
+      </>)}
+
+      {/* Sport Modal */}
       <Modal open={modal} onClose={()=>setModal(false)} title="Yeni Antrenman">
         <div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:12}}>
           {SPORT_TYPES.map(t=>(
@@ -560,30 +705,96 @@ function Sports({ data, update }) {
           <input style={{...inp,flex:1}} type="number" placeholder="Mesafe (km)" value={form.distance} onChange={e=>setForm({...form,distance:e.target.value})}/>
         </div>
         <div style={{display:"flex",gap:8}}>
-          <input style={{...inp,flex:1}} type="number" placeholder="Kalori" value={form.calories} onChange={e=>setForm({...form,calories:e.target.value})}/>
+          <input style={{...inp,flex:1}} type="number" placeholder="Yakılan kalori" value={form.calories} onChange={e=>setForm({...form,calories:e.target.value})}/>
           <input style={{...inp,flex:1}} type="date" value={form.date} onChange={e=>setForm({...form,date:e.target.value})}/>
         </div>
         <input style={inp} placeholder="Notlar (opsiyonel)" value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})}/>
-        <button style={btnPrimary} onClick={add}>Kaydet</button>
+        <button style={btnPrimary} onClick={addSport}>Kaydet</button>
+      </Modal>
+
+      {/* Food Modal */}
+      <Modal open={foodModal} onClose={()=>{setFoodModal(false);setFoodSearch("");}} title="Yemek Ekle">
+        <div style={{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap"}}>
+          {mealGroups.map(m=>(
+            <button key={m} onClick={()=>setFoodForm({...foodForm,meal:m})} style={{
+              background:foodForm.meal===m?"rgba(59,130,246,0.2)":"rgba(255,255,255,0.04)",
+              color:foodForm.meal===m?"#3b82f6":"#aaa",
+              border:foodForm.meal===m?"1px solid rgba(59,130,246,0.3)":"1px solid rgba(255,255,255,0.06)",
+              padding:"7px 12px",borderRadius:10,fontSize:13,cursor:"pointer",
+            }}>{m}</button>
+          ))}
+        </div>
+        <input style={inp} placeholder="🔍 Yemek ara veya yaz..." value={foodSearch||foodForm.name} onChange={e=>{setFoodSearch(e.target.value);setFoodForm({...foodForm,name:e.target.value,calories:""});}}/>
+        {foodSearch&&(
+          <div style={{maxHeight:160,overflow:"auto",marginBottom:10}}>
+            {filteredFoods.map(([name,cal])=>(
+              <div key={name} onClick={()=>{selectCommonFood(name,cal);setFoodSearch("");}} style={{
+                display:"flex",justifyContent:"space-between",padding:"8px 10px",cursor:"pointer",
+                borderRadius:8,background:"rgba(255,255,255,0.03)",marginBottom:2,
+              }}>
+                <span style={{fontSize:13}}>{name}</span>
+                <span style={{fontSize:12,color:"#f97316",fontWeight:600}}>{cal} kcal</span>
+              </div>
+            ))}
+          </div>
+        )}
+        <div style={{display:"flex",gap:8}}>
+          <input style={{...inp,flex:2}} placeholder="Yemek adı" value={foodForm.name} onChange={e=>setFoodForm({...foodForm,name:e.target.value})}/>
+          <input style={{...inp,flex:1}} type="number" placeholder="kcal" value={foodForm.calories} onChange={e=>setFoodForm({...foodForm,calories:e.target.value})}/>
+        </div>
+        <input style={inp} type="date" value={foodForm.date} onChange={e=>setFoodForm({...foodForm,date:e.target.value})}/>
+        <button style={btnPrimary} onClick={addFood}>Ekle</button>
       </Modal>
     </div>
   );
 }
 
-/* ═══════════ PROJECTS ═══════════ */
+/* ═══════════ TARZIM ═══════════ */
 function Projects({ data, update }) {
+  const [activeRoom,setActiveRoom]=useState(null);
   const [modal,setModal]=useState(false);
+  const [roomModal,setRoomModal]=useState(false);
+  const [itemModal,setItemModal]=useState(false);
   const [form,setForm]=useState({name:"",status:"Planlama",description:"",deadline:"",tags:""});
+  const [roomForm,setRoomForm]=useState({name:"",icon:"\ud83d\udcc2",color:"#3b82f6"});
+  const [itemForm,setItemForm]=useState({title:"",description:"",tags:""});
   const [exp,setExp]=useState(null);
   const [tf,setTf]=useState({title:""});
 
-  const add=()=>{
+  const rooms = data.rooms || [...DEFAULT_ROOMS];
+  const roomItems = data.roomItems || {};
+
+  const addRoom=()=>{
+    if(!roomForm.name.trim())return;
+    const nr={id:uid(),...roomForm,type:"collection"};
+    update({...data,rooms:[...rooms,nr]});
+    setRoomModal(false);setRoomForm({name:"",icon:"\ud83d\udcc2",color:"#3b82f6"});
+  };
+  const delRoom=id=>{
+    const newRooms=rooms.filter(r=>r.id!==id);
+    const ni={...roomItems};delete ni[id];
+    update({...data,rooms:newRooms,roomItems:ni});
+    setActiveRoom(null);
+  };
+  const addItem=()=>{
+    if(!itemForm.title.trim())return;
+    const items=roomItems[activeRoom]||[];
+    const ni={id:uid(),...itemForm,tags:itemForm.tags.split(",").map(t=>t.trim()).filter(Boolean),createdAt:today()};
+    update({...data,roomItems:{...roomItems,[activeRoom]:[ni,...items]}});
+    setItemModal(false);setItemForm({title:"",description:"",tags:""});
+  };
+  const delItem=(roomId,itemId)=>{
+    const items=(roomItems[roomId]||[]).filter(i=>i.id!==itemId);
+    update({...data,roomItems:{...roomItems,[roomId]:items}});
+  };
+
+  const addProject=()=>{
     if(!form.name.trim())return;
     const np={id:uid(),...form,tags:form.tags.split(",").map(t=>t.trim()).filter(Boolean),tasks:[],createdAt:today()};
     update({...data,projects:[np,...data.projects]});
     setModal(false);setForm({name:"",status:"Planlama",description:"",deadline:"",tags:""});
   };
-  const del=id=>update({...data,projects:data.projects.filter(p=>p.id!==id)});
+  const delProject=id=>update({...data,projects:data.projects.filter(p=>p.id!==id)});
   const upSt=(id,st)=>update({...data,projects:data.projects.map(p=>p.id===id?{...p,status:st}:p)});
   const addPT=pid=>{
     if(!tf.title.trim())return;
@@ -593,82 +804,155 @@ function Projects({ data, update }) {
   const togPT=(pid,tid)=>{
     update({...data,projects:data.projects.map(p=>p.id===pid?{...p,tasks:(p.tasks||[]).map(t=>t.id===tid?{...t,done:!t.done}:t)}:p)});
   };
-  const stCol=s=>s==="Tamamlandı"?"#22c55e":s==="Devam Ediyor"?"#3b82f6":s==="Test"?"#f59e0b":"#888";
+  const stCol=s=>s==="Tamamland\u0131"?"#22c55e":s==="Devam Ediyor"?"#3b82f6":s==="Test"?"#f59e0b":"#888";
 
-  return (
+  const roomIcons=["\ud83d\udcc2","\ud83c\udfb5","\ud83d\udc57","\ud83d\udcf8","\ud83c\udfae","\ud83d\udcda","\ud83c\udfa8","\ud83d\udcbc","\ud83c\udfe0","\u2708\ufe0f","\ud83c\udfaf","\ud83d\udca1","\ud83d\uded2","\ud83c\udfac","\ud83c\udf73"];
+
+  if(!activeRoom) return (
     <div>
       <div style={sectionHeader}>
-        <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Projeler</h3>
+        <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Tarz\u0131m</h3>
+        <button onClick={()=>setRoomModal(true)} style={addBtnStyle}>+ Oda Ekle</button>
+      </div>
+      <p style={{fontSize:12,opacity:.4,marginBottom:14}}>Ki\u015fisel alanlar\u0131n \u2014 odalar\u0131na dokun ve ke\u015ffet</p>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:10}}>
+        {rooms.map(room=>{
+          const count=room.type==="project"?data.projects.length:(roomItems[room.id]||[]).length;
+          return (
+            <div key={room.id} onClick={()=>setActiveRoom(room.id)} style={{
+              background:"#1c1c2e",borderRadius:16,padding:20,cursor:"pointer",
+              borderTop:`3px solid ${room.color}`,textAlign:"center",
+            }}>
+              <div style={{fontSize:36,marginBottom:8}}>{room.icon}</div>
+              <div style={{fontSize:14,fontWeight:700}}>{room.name}</div>
+              <div style={{fontSize:11,opacity:.4,marginTop:4}}>{count} \u00f6\u011fe</div>
+            </div>
+          );
+        })}
+      </div>
+      <Modal open={roomModal} onClose={()=>setRoomModal(false)} title="Yeni Oda">
+        <input style={inp} placeholder="Oda ad\u0131..." value={roomForm.name} onChange={e=>setRoomForm({...roomForm,name:e.target.value})} autoFocus/>
+        <div style={{fontSize:12,opacity:.5,marginBottom:6}}>\u0130kon se\u00e7:</div>
+        <div style={{display:"flex",flexWrap:"wrap",gap:8,marginBottom:12}}>
+          {roomIcons.map(ic=>(
+            <button key={ic} onClick={()=>setRoomForm({...roomForm,icon:ic})} style={{
+              width:40,height:40,borderRadius:10,fontSize:20,cursor:"pointer",
+              background:roomForm.icon===ic?"rgba(59,130,246,0.2)":"rgba(255,255,255,0.04)",
+              border:roomForm.icon===ic?"1px solid rgba(59,130,246,0.3)":"1px solid rgba(255,255,255,0.06)",
+              display:"flex",alignItems:"center",justifyContent:"center",
+            }}>{ic}</button>
+          ))}
+        </div>
+        <div style={{fontSize:12,opacity:.5,marginBottom:6}}>Renk se\u00e7:</div>
+        <div style={{display:"flex",gap:8,marginBottom:14}}>
+          {COLORS.map(c=>(
+            <button key={c} onClick={()=>setRoomForm({...roomForm,color:c})} style={{width:30,height:30,borderRadius:"50%",background:c,border:roomForm.color===c?"3px solid #fff":"3px solid transparent",cursor:"pointer"}}/>
+          ))}
+        </div>
+        <button style={btnPrimary} onClick={addRoom}>Olu\u015ftur</button>
+      </Modal>
+    </div>
+  );
+
+  const room=rooms.find(r=>r.id===activeRoom);
+  if(!room){setActiveRoom(null);return null;}
+
+  if(room.type==="project"||activeRoom==="projects") return (
+    <div>
+      <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
+        <button onClick={()=>setActiveRoom(null)} style={{background:"rgba(255,255,255,0.06)",border:"none",color:"#aaa",width:32,height:32,borderRadius:10,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>\u25c0</button>
+        <span style={{fontSize:24}}>{room.icon}</span>
+        <h3 style={{margin:0,fontSize:20,fontWeight:800,flex:1}}>{room.name}</h3>
         <button onClick={()=>setModal(true)} style={addBtnStyle}>+ Yeni</button>
       </div>
-      {data.projects.length===0&&<p style={{textAlign:"center",opacity:.3,fontSize:14,padding:40}}>Henüz proje yok</p>}
+      {data.projects.length===0&&<p style={{textAlign:"center",opacity:.3,fontSize:14,padding:40}}>Hen\u00fcz proje yok</p>}
       {data.projects.map(p=>{
-        const tasks=p.tasks||[]; const d=tasks.filter(t=>t.done).length;
-        const pct=tasks.length?Math.round(d/tasks.length*100):0;
-        const open=exp===p.id;
+        const tasks=p.tasks||[];const d=tasks.filter(t=>t.done).length;
+        const pct=tasks.length?Math.round(d/tasks.length*100):0;const open=exp===p.id;
         return (
           <div key={p.id} style={{background:"#1c1c2e",borderRadius:14,padding:16,marginBottom:8}}>
             <div onClick={()=>setExp(open?null:p.id)} style={{cursor:"pointer"}}>
               <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8}}>
                 <div style={{flex:1,minWidth:0}}>
-                  <div style={{fontSize:16,fontWeight:700,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.name}</div>
+                  <div style={{fontSize:16,fontWeight:700}}>{p.name}</div>
                   <div style={{fontSize:11,opacity:.5,marginTop:4,display:"flex",gap:6,flexWrap:"wrap"}}>
                     {p.tags?.map(t=><span key={t} style={{background:"rgba(59,130,246,0.12)",color:"#3b82f6",padding:"1px 8px",borderRadius:6,fontSize:10}}>{t}</span>)}
-                    {p.deadline&&<span>📅 {p.deadline}</span>}
+                    {p.deadline&&<span>\ud83d\udcc5 {p.deadline}</span>}
                   </div>
                 </div>
-                <span style={{fontSize:11,fontWeight:600,color:stCol(p.status),background:`${stCol(p.status)}20`,padding:"4px 10px",borderRadius:8,whiteSpace:"nowrap"}}>{p.status}</span>
+                <span style={{fontSize:11,fontWeight:600,color:stCol(p.status),background:`${stCol(p.status)}20`,padding:"4px 10px",borderRadius:8}}>{p.status}</span>
               </div>
-              {tasks.length>0&&(
-                <div style={{marginTop:10}}>
-                  <div style={{height:6,background:"rgba(255,255,255,0.06)",borderRadius:3,overflow:"hidden"}}>
-                    <div style={{height:"100%",background:"#3b82f6",borderRadius:3,width:`${pct}%`,transition:"width .3s"}}/>
-                  </div>
-                  <div style={{fontSize:11,opacity:.4,marginTop:4}}>{d}/{tasks.length} — %{pct}</div>
+              {tasks.length>0&&(<div style={{marginTop:10}}>
+                <div style={{height:6,background:"rgba(255,255,255,0.06)",borderRadius:3,overflow:"hidden"}}>
+                  <div style={{height:"100%",background:"#3b82f6",borderRadius:3,width:`${pct}%`,transition:"width .3s"}}/>
                 </div>
-              )}
+                <div style={{fontSize:11,opacity:.4,marginTop:4}}>{d}/{tasks.length} \u2014 %{pct}</div>
+              </div>)}
             </div>
-            {open&&(
-              <div style={{marginTop:12,paddingTop:12,borderTop:"1px solid rgba(255,255,255,0.06)"}}>
-                {p.description&&<p style={{fontSize:13,opacity:.6,margin:"0 0 10px"}}>{p.description}</p>}
-                <div style={{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap"}}>
-                  {PROJECT_STATUSES.map(s=>(
-                    <button key={s} onClick={()=>upSt(p.id,s)} style={{
-                      background:p.status===s?`${stCol(s)}20`:"rgba(255,255,255,0.04)",
-                      color:p.status===s?stCol(s):"#888",
-                      border:`1px solid ${p.status===s?stCol(s)+"40":"rgba(255,255,255,0.06)"}`,
-                      padding:"7px 14px",borderRadius:8,fontSize:12,cursor:"pointer",
-                    }}>{s}</button>
-                  ))}
-                </div>
-                {tasks.map(t=>(
-                  <div key={t.id} style={{display:"flex",alignItems:"center",gap:10,padding:"7px 0"}}>
-                    <button onClick={()=>togPT(p.id,t.id)} style={checkBtnStyle(t.done)}>{t.done&&"✓"}</button>
-                    <span style={{fontSize:13,textDecoration:t.done?"line-through":"none",opacity:t.done?.4:1}}>{t.title}</span>
-                  </div>
-                ))}
-                <div style={{display:"flex",gap:8,marginTop:10}}>
-                  <input style={{...inp,flex:1,marginBottom:0}} placeholder="Alt görev ekle..." value={tf.title}
-                    onChange={e=>setTf({title:e.target.value})} onKeyDown={e=>e.key==="Enter"&&addPT(p.id)}/>
-                  <button onClick={()=>addPT(p.id)} style={{background:"#3b82f6",color:"#fff",border:"none",borderRadius:10,padding:"0 18px",fontSize:18,cursor:"pointer"}}>+</button>
-                </div>
-                <button onClick={()=>del(p.id)} style={{background:"rgba(239,68,68,0.1)",color:"#ef4444",border:"1px solid rgba(239,68,68,0.2)",borderRadius:10,padding:"10px",width:"100%",marginTop:12,fontSize:13,cursor:"pointer"}}>Projeyi Sil</button>
+            {open&&(<div style={{marginTop:12,paddingTop:12,borderTop:"1px solid rgba(255,255,255,0.06)"}}>
+              {p.description&&<p style={{fontSize:13,opacity:.6,margin:"0 0 10px"}}>{p.description}</p>}
+              <div style={{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap"}}>
+                {PROJECT_STATUSES.map(s=>(<button key={s} onClick={()=>upSt(p.id,s)} style={{background:p.status===s?`${stCol(s)}20`:"rgba(255,255,255,0.04)",color:p.status===s?stCol(s):"#888",border:`1px solid ${p.status===s?stCol(s)+"40":"rgba(255,255,255,0.06)"}`,padding:"7px 14px",borderRadius:8,fontSize:12,cursor:"pointer"}}>{s}</button>))}
               </div>
-            )}
+              {tasks.map(t=>(<div key={t.id} style={{display:"flex",alignItems:"center",gap:10,padding:"7px 0"}}>
+                <button onClick={()=>togPT(p.id,t.id)} style={checkBtnStyle(t.done)}>{t.done&&"\u2713"}</button>
+                <span style={{fontSize:13,textDecoration:t.done?"line-through":"none",opacity:t.done?.4:1}}>{t.title}</span>
+              </div>))}
+              <div style={{display:"flex",gap:8,marginTop:10}}>
+                <input style={{...inp,flex:1,marginBottom:0}} placeholder="Alt g\u00f6rev ekle..." value={tf.title} onChange={e=>setTf({title:e.target.value})} onKeyDown={e=>e.key==="Enter"&&addPT(p.id)}/>
+                <button onClick={()=>addPT(p.id)} style={{background:"#3b82f6",color:"#fff",border:"none",borderRadius:10,padding:"0 18px",fontSize:18,cursor:"pointer"}}>+</button>
+              </div>
+              <button onClick={()=>delProject(p.id)} style={{background:"rgba(239,68,68,0.1)",color:"#ef4444",border:"1px solid rgba(239,68,68,0.2)",borderRadius:10,padding:"10px",width:"100%",marginTop:12,fontSize:13,cursor:"pointer"}}>Projeyi Sil</button>
+            </div>)}
           </div>
         );
       })}
       <Modal open={modal} onClose={()=>setModal(false)} title="Yeni Proje">
-        <input style={inp} placeholder="Proje adı..." value={form.name} onChange={e=>setForm({...form,name:e.target.value})} autoFocus/>
-        <input style={inp} placeholder="Açıklama..." value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/>
+        <input style={inp} placeholder="Proje ad\u0131..." value={form.name} onChange={e=>setForm({...form,name:e.target.value})} autoFocus/>
+        <input style={inp} placeholder="A\u00e7\u0131klama..." value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/>
         <div style={{display:"flex",gap:8}}>
-          <select style={{...inp,flex:1}} value={form.status} onChange={e=>setForm({...form,status:e.target.value})}>
-            {PROJECT_STATUSES.map(s=><option key={s}>{s}</option>)}
-          </select>
+          <select style={{...inp,flex:1}} value={form.status} onChange={e=>setForm({...form,status:e.target.value})}>{PROJECT_STATUSES.map(s=><option key={s}>{s}</option>)}</select>
           <input style={{...inp,flex:1}} type="date" value={form.deadline} onChange={e=>setForm({...form,deadline:e.target.value})}/>
         </div>
-        <input style={inp} placeholder="Etiketler (virgülle ayırın)" value={form.tags} onChange={e=>setForm({...form,tags:e.target.value})}/>
-        <button style={btnPrimary} onClick={add}>Oluştur</button>
+        <input style={inp} placeholder="Etiketler (virg\u00fclle ay\u0131r\u0131n)" value={form.tags} onChange={e=>setForm({...form,tags:e.target.value})}/>
+        <button style={btnPrimary} onClick={addProject}>Olu\u015ftur</button>
+      </Modal>
+    </div>
+  );
+
+  const items=roomItems[activeRoom]||[];
+  return (
+    <div>
+      <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
+        <button onClick={()=>setActiveRoom(null)} style={{background:"rgba(255,255,255,0.06)",border:"none",color:"#aaa",width:32,height:32,borderRadius:10,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>\u25c0</button>
+        <span style={{fontSize:24}}>{room.icon}</span>
+        <h3 style={{margin:0,fontSize:20,fontWeight:800,flex:1}}>{room.name}</h3>
+        <button onClick={()=>setItemModal(true)} style={addBtnStyle}>+ Ekle</button>
+      </div>
+      <div style={{display:"flex",justifyContent:"flex-end",marginBottom:10}}>
+        <button onClick={()=>delRoom(activeRoom)} style={{background:"none",border:"none",color:"#ef4444",fontSize:11,cursor:"pointer",opacity:.5}}>Oday\u0131 Sil</button>
+      </div>
+      {items.length===0&&<p style={{textAlign:"center",opacity:.3,fontSize:14,padding:40}}>Bu oda bo\u015f \u2014 \u00f6\u011fe ekle!</p>}
+      {items.map(item=>(
+        <div key={item.id} style={{background:"#1c1c2e",borderRadius:14,padding:14,marginBottom:6,borderLeft:`3px solid ${room.color}`}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"start"}}>
+            <div>
+              <div style={{fontSize:15,fontWeight:600}}>{item.title}</div>
+              {item.description&&<div style={{fontSize:12,opacity:.5,marginTop:4,lineHeight:1.4}}>{item.description}</div>}
+              {item.tags?.length>0&&(<div style={{display:"flex",gap:4,marginTop:6,flexWrap:"wrap"}}>
+                {item.tags.map(t=><span key={t} style={{background:`${room.color}20`,color:room.color,padding:"1px 8px",borderRadius:6,fontSize:10}}>{t}</span>)}
+              </div>)}
+            </div>
+            <button onClick={()=>delItem(activeRoom,item.id)} style={delBtnStyle}>\u2715</button>
+          </div>
+          <div style={{fontSize:10,opacity:.25,marginTop:6}}>{item.createdAt}</div>
+        </div>
+      ))}
+      <Modal open={itemModal} onClose={()=>setItemModal(false)} title={`${room.icon} ${room.name} \u2014 Yeni \u00d6\u011fe`}>
+        <input style={inp} placeholder="Ba\u015fl\u0131k..." value={itemForm.title} onChange={e=>setItemForm({...itemForm,title:e.target.value})} autoFocus/>
+        <textarea style={{...inp,minHeight:80,resize:"vertical",fontFamily:"inherit",lineHeight:1.5}} placeholder="A\u00e7\u0131klama (opsiyonel)..." value={itemForm.description} onChange={e=>setItemForm({...itemForm,description:e.target.value})}/>
+        <input style={inp} placeholder="Etiketler (virg\u00fclle ay\u0131r\u0131n)" value={itemForm.tags} onChange={e=>setItemForm({...itemForm,tags:e.target.value})}/>
+        <button style={btnPrimary} onClick={addItem}>Ekle</button>
       </Modal>
     </div>
   );
