@@ -1051,8 +1051,22 @@ export default function App() {
 
   // Scroll to top when tab changes
   useEffect(() => {
-    if (scrollRef.current) scrollRef.current.scrollTop = 0;
-  }, [tab]);
+    if (isMobile) {
+      window.scrollTo(0, 0);
+    } else if (scrollRef.current) {
+      scrollRef.current.scrollTop = 0;
+    }
+  }, [tab, isMobile]);
+
+  // Mobile scroll listener
+  useEffect(() => {
+    if (!isMobile) return;
+    const handleWindowScroll = () => {
+      setShowScrollTop(window.scrollY > 300);
+    };
+    window.addEventListener("scroll", handleWindowScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleWindowScroll);
+  }, [isMobile]);
 
   const update = useCallback(async (newData) => {
     setData(newData);
@@ -1183,7 +1197,11 @@ export default function App() {
     setShowScrollTop(e.target.scrollTop > 300);
   };
   const scrollToTop = () => {
-    if (scrollRef.current) scrollRef.current.scrollTo({ top: 0, behavior: "smooth" });
+    if (isMobile) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else if (scrollRef.current) {
+      scrollRef.current.scrollTo({ top: 0, behavior: "smooth" });
+    }
   };
 
   const NAV_HEIGHT = isMobile ? 72 : 56;
@@ -1191,26 +1209,29 @@ export default function App() {
   const phoneContent = (
     <div style={{
       width:"100%",
-      height:isMobile?"100dvh":"100%",
+      height:isMobile?"auto":"100%",
+      minHeight:isMobile?"100dvh":"100%",
       background:"#0f0f1a",color:"#e0e0e0",
       fontFamily:"'SF Pro Display',-apple-system,'Segoe UI',sans-serif",
-      display:"flex",flexDirection:"column",
-      position:"relative",
-      overflow:"hidden",
+      position:isMobile?"static":"relative",
+      overflow:isMobile?"visible":"hidden",
     }}>
-      {/* Scrollable content area with swipe */}
+      {/* Content area */}
       <div
-        ref={scrollRef}
+        ref={isMobile?null:scrollRef}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
-        onScroll={handleScroll}
-        style={{
+        onScroll={isMobile?undefined:handleScroll}
+        style={isMobile ? {
+          /* Mobile: normal flow, padding at bottom for fixed nav */
+          padding:"16px 16px 100px",
+          minHeight:"100dvh",
+        } : {
+          /* Desktop frame: absolute positioned scroll area */
           position:"absolute",
-          top:0,
-          left:0,
-          right:0,
-          bottom:NAV_HEIGHT + (isMobile ? 16 : 10),
+          top:0,left:0,right:0,
+          bottom:NAV_HEIGHT + 10,
           overflow:"auto",
           overflowX:"hidden",
           padding:"16px 16px 20px",
@@ -1223,10 +1244,10 @@ export default function App() {
       {/* Scroll to top button */}
       {showScrollTop && (
         <button onClick={scrollToTop} style={{
-          position:"absolute",
+          position:"fixed",
           right:16,
-          bottom:NAV_HEIGHT + (isMobile ? 32 : 20),
-          width:42,height:42,
+          bottom:NAV_HEIGHT + 28,
+          width:44,height:44,
           borderRadius:"50%",
           background:"rgba(59,130,246,0.9)",
           color:"#fff",border:"none",
@@ -1234,25 +1255,23 @@ export default function App() {
           display:"flex",alignItems:"center",justifyContent:"center",
           boxShadow:"0 4px 12px rgba(0,0,0,0.3)",
           zIndex:999,
-          transition:"opacity .2s",
         }}>▲</button>
       )}
 
       {/* Bottom nav bar */}
       <div style={{
-        position:"absolute",
+        position:isMobile?"fixed":"absolute",
         bottom:0,
-        left:0,
-        right:0,
-        height:NAV_HEIGHT + (isMobile ? 16 : 10),
+        left:isMobile?0:0,
+        right:isMobile?0:0,
+        width:isMobile?undefined:"100%",
         background:"#0c0c16",
         borderTop:"1px solid rgba(255,255,255,0.1)",
         display:"flex",justifyContent:"space-around",alignItems:"center",
-        paddingTop:6,
-        paddingBottom:isMobile?"max(env(safe-area-inset-bottom, 12px), 12px)":"8px",
+        paddingTop:8,
+        paddingBottom:isMobile?"max(env(safe-area-inset-bottom, 14px), 14px)":"8px",
         paddingLeft:4,paddingRight:4,
         zIndex:1000,
-        flexShrink:0,
       }}>
         {allTabs.map(t=>(
           <button key={t.id} onClick={()=>setTab(t.id)} style={{
