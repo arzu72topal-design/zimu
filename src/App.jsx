@@ -87,23 +87,27 @@ const addBtnStyle = {
 const filterBtnStyle = (active) => ({
   background: active ? "rgba(59,130,246,0.2)" : "rgba(255,255,255,0.04)",
   color: active ? "#3b82f6" : "#888",
-  border: active ? "1px solid rgba(59,130,246,0.3)" : "1px solid rgba(255,255,255,0.06)",
-  padding:"7px 14px",borderRadius:10,fontSize:13,cursor:"pointer",whiteSpace:"nowrap",
+  border: active ? "1px solid rgba(59,130,246,0.3)" : "1px solid transparent",
+  padding:"7px 16px",borderRadius:20,fontSize:13,cursor:"pointer",whiteSpace:"nowrap",
+  fontWeight: active ? 600 : 400,
 });
 const cardStyle = {
-  background:"#1c1c2e",borderRadius:12,padding:"12px 14px",marginBottom:6,
+  background:"#1c1c2e",borderRadius:16,padding:"14px 16px",marginBottom:8,
+  boxShadow:"0 1px 4px rgba(0,0,0,0.25)",
 };
 const delBtnStyle = {
-  background:"none",border:"none",color:"#555",fontSize:18,cursor:"pointer",padding:4,
+  background:"rgba(255,255,255,0.04)",border:"none",color:"#555",fontSize:14,
+  cursor:"pointer",padding:0,width:32,height:32,borderRadius:8,
+  display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,
 };
 const sectionHeader = {
   display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14,
 };
 const checkBtnStyle = (done) => ({
-  width:26,height:26,borderRadius:8,border:`2px solid ${done?"#22c55e":"#444"}`,
+  width:28,height:28,borderRadius:8,border:`2px solid ${done?"#22c55e":"rgba(255,255,255,0.15)"}`,
   background:done?"#22c55e":"transparent",color:"#fff",cursor:"pointer",
   display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,
-  flexShrink:0,padding:0,
+  flexShrink:0,padding:0,transition:"all .15s",
 });
 
 /* ── Modal ── */
@@ -157,6 +161,68 @@ function Toast({ message, visible }) {
   );
 }
 
+
+/* ── StickyHeader ── */
+function StickyHeader({ title, right, sub }) {
+  return (
+    <div style={{
+      position:"sticky",top:0,zIndex:50,
+      background:"rgba(15,15,26,0.97)",
+      backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",
+      marginLeft:-16,marginRight:-16,
+      padding:"12px 16px 10px",
+      borderBottom:"1px solid rgba(255,255,255,0.06)",
+      display:"flex",justifyContent:"space-between",alignItems:"center",
+      marginBottom:14,
+    }}>
+      <div>
+        <h3 style={{margin:0,fontSize:20,fontWeight:800,letterSpacing:-.3}}>{title}</h3>
+        {sub && <div style={{fontSize:12,color:"#666",marginTop:1}}>{sub}</div>}
+      </div>
+      {right && <div>{right}</div>}
+    </div>
+  );
+}
+
+/* ── FAB (Floating Action Button) ── */
+function FAB({ onClick, color="#3b82f6", icon="+" }) {
+  return (
+    <button onClick={onClick} style={{
+      position:"fixed",
+      right:20,
+      bottom:100,
+      width:56,height:56,
+      borderRadius:"50%",
+      background:color,
+      color:"#fff",
+      border:"none",
+      fontSize:26,
+      fontWeight:300,
+      cursor:"pointer",
+      display:"flex",alignItems:"center",justifyContent:"center",
+      boxShadow:`0 4px 20px ${color}66`,
+      zIndex:900,
+      transition:"transform .15s, box-shadow .15s",
+    }}
+    onTouchStart={e=>e.currentTarget.style.transform="scale(0.93)"}
+    onTouchEnd={e=>e.currentTarget.style.transform="scale(1)"}
+    >{icon}</button>
+  );
+}
+
+/* ── GroupLabel ── */
+function GroupLabel({ label, color="#666" }) {
+  return (
+    <div style={{
+      display:"flex",alignItems:"center",gap:6,
+      marginTop:12,marginBottom:6,
+    }}>
+      <div style={{width:6,height:6,borderRadius:"50%",background:color,flexShrink:0}}/>
+      <span style={{fontSize:11,fontWeight:700,color:"#666",textTransform:"uppercase",letterSpacing:.06*11}}>{label}</span>
+    </div>
+  );
+}
+
 /* ═══════════ DASHBOARD ═══════════ */
 function Dashboard({ data, setTab }) {
   const t = today();
@@ -184,7 +250,6 @@ function Dashboard({ data, setTab }) {
   const todayCalOut = data.sports.filter(s=>s.date===t).reduce((a,s)=>a+(s.calories||0),0);
   const netCal = todayCalIn - todayCalOut;
   const healthGoal = 2000;
-  const healthScore = todayCalIn>0 ? (netCal<=healthGoal ? "Dengeli" : "Fazla") : "Kayıt yok";
 
   const totalRoomItems = rooms.reduce((a,r)=> a + (r.type==="project" ? data.projects.length : (roomItems[r.id]||[]).length), 0);
   const activeProjects = data.projects.filter(p=>p.status!=="Tamamlandı").length;
@@ -192,15 +257,50 @@ function Dashboard({ data, setTab }) {
   const hour = new Date().getHours();
   const greeting = hour<12 ? "Günaydın" : hour<18 ? "İyi günler" : "İyi akşamlar";
 
+  // Combine urgent tasks + upcoming events for "Bugünün Programı"
+  const programItems = [
+    ...urgentTasks.slice(0,2).map(t=>({
+      id:t.id, title:t.title, sub:"Görev", color:PCOL[t.priority]||"#3b82f6", type:"task"
+    })),
+    ...upcoming.slice(0,2).map(e=>({
+      id:e.id, title:e.title, sub:(e.time||"")+(e.time?" · ":"")+"Takvim", color:e.color||"#a855f7", type:"event"
+    })),
+  ].slice(0,4);
+
   return (
     <div>
-      <div style={{marginBottom:16}}>
+      {/* ── Hero greeting ── */}
+      <div style={{
+        background:"linear-gradient(135deg,rgba(59,130,246,0.12),rgba(168,85,247,0.06))",
+        borderRadius:20,padding:"16px",marginBottom:12,
+        border:"1px solid rgba(59,130,246,0.1)",
+      }}>
         <h2 style={{margin:0,fontSize:22,fontWeight:800,letterSpacing:-.5}}>{greeting}! 👋</h2>
-        <p style={{margin:"4px 0 0",opacity:.5,fontSize:13}}>
+        <p style={{margin:"4px 0 12px",opacity:.45,fontSize:13}}>
           {new Date().toLocaleDateString("tr-TR",{weekday:"long",day:"numeric",month:"long"})}
         </p>
+
+        {/* 2×2 quick stats */}
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+          {[
+            {val:pending,label:"Görev bekliyor",color:"#3b82f6",tab:"tasks"},
+            {val:todayEv.length,label:"Bugün etkinlik",color:"#a855f7",tab:"calendar"},
+            {val:todayCalIn,label:"kcal alındı",color:"#f97316",tab:"sports"},
+            {val:activeProjects,label:"Aktif proje",color:"#22c55e",tab:"projects"},
+          ].map((s,i)=>(
+            <div key={i} onClick={()=>setTab(s.tab)} style={{
+              background:`${s.color}18`,borderRadius:14,padding:"12px",textAlign:"center",
+              cursor:"pointer",border:`1px solid ${s.color}20`,
+              transition:"opacity .15s",
+            }}>
+              <div style={{fontSize:22,fontWeight:800,color:s.color,lineHeight:1}}>{s.val}</div>
+              <div style={{fontSize:11,color:s.color,opacity:.75,marginTop:3}}>{s.label}</div>
+            </div>
+          ))}
+        </div>
       </div>
 
+      {/* ── Overdue banner ── */}
       {overdue > 0 && (
         <div onClick={()=>setTab("tasks")} style={{background:"rgba(239,68,68,0.1)",border:"1px solid rgba(239,68,68,0.2)",
           borderRadius:14,padding:"12px 14px",marginBottom:12,display:"flex",alignItems:"center",gap:10,cursor:"pointer"}}>
@@ -213,169 +313,61 @@ function Dashboard({ data, setTab }) {
         </div>
       )}
 
-      {/* GÖREVLER */}
-      <div onClick={()=>setTab("tasks")} style={{
-        background:"#1c1c2e",borderRadius:16,padding:16,marginBottom:10,cursor:"pointer",borderLeft:"4px solid #3b82f6",
-      }}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-          <div style={{display:"flex",alignItems:"center",gap:8}}>
-            <span style={{fontSize:18}}>✓</span>
-            <span style={{fontSize:15,fontWeight:700}}>Görevler</span>
+      {/* ── Bugünün Programı ── */}
+      {programItems.length > 0 && (
+        <div style={{marginBottom:12}}>
+          <div style={{fontSize:11,fontWeight:700,color:"#666",textTransform:"uppercase",letterSpacing:.6,marginBottom:8}}>Bugünün Programı</div>
+          {programItems.map(item=>(
+            <div key={item.id} onClick={()=>setTab(item.type==="task"?"tasks":"calendar")} style={{
+              ...cardStyle,display:"flex",alignItems:"center",gap:12,cursor:"pointer",minHeight:52,
+            }}>
+              <div style={{width:3,height:36,background:item.color,borderRadius:2,flexShrink:0}}/>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:14,fontWeight:500,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.title}</div>
+                <div style={{fontSize:11,opacity:.45,marginTop:2}}>{item.sub}</div>
+              </div>
+              <span style={{fontSize:11,opacity:.2}}>▶</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── Bu Hafta ── */}
+      <div style={{marginBottom:12}}>
+        <div style={{fontSize:11,fontWeight:700,color:"#666",textTransform:"uppercase",letterSpacing:.6,marginBottom:8}}>Bu Hafta</div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
+          <div style={{background:"#1c1c2e",borderRadius:14,padding:"12px 10px",textAlign:"center"}}>
+            <div style={{fontSize:18,fontWeight:800,color:"#3b82f6"}}>{wkSport.length}</div>
+            <div style={{fontSize:9,opacity:.4}}>💪 Antrenman</div>
           </div>
-          <div style={{display:"flex",alignItems:"center",gap:6}}>
-            <div style={{
-              background:taskScore>=70?"rgba(34,197,94,0.15)":taskScore>=40?"rgba(245,158,11,0.15)":"rgba(239,68,68,0.15)",
-              color:taskScore>=70?"#22c55e":taskScore>=40?"#f59e0b":"#ef4444",
-              padding:"3px 10px",borderRadius:8,fontSize:12,fontWeight:700,
-            }}>%{taskScore}</div>
-            <span style={{fontSize:12,opacity:.3}}>▶</span>
+          <div style={{background:"#1c1c2e",borderRadius:14,padding:"12px 10px",textAlign:"center"}}>
+            <div style={{fontSize:18,fontWeight:800,color:"#f97316"}}>{wkBurned}</div>
+            <div style={{fontSize:9,opacity:.4}}>🔥 kcal</div>
+          </div>
+          <div style={{background:"#1c1c2e",borderRadius:14,padding:"12px 10px",textAlign:"center"}}>
+            <div style={{fontSize:18,fontWeight:800,color:"#22c55e"}}>{taskScore}%</div>
+            <div style={{fontSize:9,opacity:.4}}>✓ Görev</div>
           </div>
         </div>
-        <div style={{display:"flex",gap:12,marginBottom:10}}>
-          <div style={{textAlign:"center",flex:1}}>
-            <div style={{fontSize:20,fontWeight:800,color:"#ef4444"}}>{pending}</div>
-            <div style={{fontSize:9,opacity:.4}}>Bekleyen</div>
-          </div>
-          <div style={{textAlign:"center",flex:1}}>
-            <div style={{fontSize:20,fontWeight:800,color:"#22c55e"}}>{done}</div>
-            <div style={{fontSize:9,opacity:.4}}>Tamamlanan</div>
-          </div>
-          <div style={{textAlign:"center",flex:1}}>
-            <div style={{fontSize:20,fontWeight:800,color:"#f59e0b"}}>{overdue}</div>
-            <div style={{fontSize:9,opacity:.4}}>Gecikmiş</div>
-          </div>
-        </div>
-        {urgentTasks.length>0&&(
-          <div style={{borderTop:"1px solid rgba(255,255,255,0.04)",paddingTop:8}}>
-            {urgentTasks.map(task=>(
-              <div key={task.id} style={{display:"flex",alignItems:"center",gap:8,padding:"4px 0"}}>
-                <span style={{width:6,height:6,borderRadius:"50%",background:PCOL[task.priority],flexShrink:0}}/>
-                <span style={{fontSize:12,opacity:.7,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{task.title}</span>
-                {task.dueDate&&<span style={{fontSize:10,opacity:.3}}>{task.dueDate.slice(5)}</span>}
+      </div>
+
+      {/* ── Son Notlar ── */}
+      {data.notes.length > 0 && (
+        <div style={{marginBottom:12}}>
+          <div style={{fontSize:11,fontWeight:700,color:"#666",textTransform:"uppercase",letterSpacing:.6,marginBottom:8}}>Son Notlar</div>
+          <div style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:6,WebkitOverflowScrolling:"touch"}}>
+            {data.notes.slice(0,5).map(n=>(
+              <div key={n.id} onClick={()=>setTab("notes")} style={{
+                background:"#1c1c2e",borderRadius:14,padding:"12px",minWidth:130,flexShrink:0,cursor:"pointer",
+                borderTop:`3px solid ${n.color||"#14b8a6"}`,
+              }}>
+                <div style={{fontSize:12,fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",marginBottom:4}}>{n.title}</div>
+                <div style={{fontSize:10,opacity:.4,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{n.content||"—"}</div>
               </div>
             ))}
           </div>
-        )}
-      </div>
-
-      {/* TAKVİM */}
-      <div onClick={()=>setTab("calendar")} style={{
-        background:"#1c1c2e",borderRadius:16,padding:16,marginBottom:10,cursor:"pointer",borderLeft:"4px solid #a855f7",
-      }}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-          <div style={{display:"flex",alignItems:"center",gap:8}}>
-            <span style={{fontSize:18}}>◫</span>
-            <span style={{fontSize:15,fontWeight:700}}>Takvim</span>
-          </div>
-          <div style={{display:"flex",alignItems:"center",gap:6}}>
-            <div style={{background:"rgba(168,85,247,0.15)",color:"#a855f7",padding:"3px 10px",borderRadius:8,fontSize:12,fontWeight:700}}>{todayEv.length} bugün</div>
-            <span style={{fontSize:12,opacity:.3}}>▶</span>
-          </div>
         </div>
-        {upcoming.length===0 ? (
-          <p style={{opacity:.3,fontSize:12,margin:0}}>Yaklaşan etkinlik yok</p>
-        ) : upcoming.map(e=>(
-          <div key={e.id} style={{display:"flex",alignItems:"center",gap:8,padding:"4px 0"}}>
-            <span style={{width:6,height:6,borderRadius:"50%",background:e.color||"#a855f7",flexShrink:0}}/>
-            <span style={{fontSize:12,opacity:.7,flex:1}}>{e.title}</span>
-            <span style={{fontSize:10,opacity:.3}}>{e.time||""} {e.date.slice(5)}</span>
-          </div>
-        ))}
-      </div>
-
-      {/* SAĞLIK */}
-      <div onClick={()=>setTab("sports")} style={{
-        background:"#1c1c2e",borderRadius:16,padding:16,marginBottom:10,cursor:"pointer",borderLeft:"4px solid #22c55e",
-      }}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-          <div style={{display:"flex",alignItems:"center",gap:8}}>
-            <span style={{fontSize:18}}>♦</span>
-            <span style={{fontSize:15,fontWeight:700}}>Sağlık Koçu</span>
-          </div>
-          <div style={{display:"flex",alignItems:"center",gap:6}}>
-            <div style={{
-              background:healthScore==="Dengeli"?"rgba(34,197,94,0.15)":healthScore==="Fazla"?"rgba(239,68,68,0.15)":"rgba(59,130,246,0.15)",
-              color:healthScore==="Dengeli"?"#22c55e":healthScore==="Fazla"?"#ef4444":"#3b82f6",
-              padding:"3px 10px",borderRadius:8,fontSize:12,fontWeight:700,
-            }}>{healthScore}</div>
-            <span style={{fontSize:12,opacity:.3}}>▶</span>
-          </div>
-        </div>
-        <div style={{display:"flex",gap:8,marginBottom:8}}>
-          <div style={{flex:1,background:"rgba(249,115,22,0.08)",borderRadius:10,padding:"8px 10px",textAlign:"center"}}>
-            <div style={{fontSize:16,fontWeight:800,color:"#f97316"}}>{todayCalIn}</div>
-            <div style={{fontSize:9,opacity:.4}}>Alınan kcal</div>
-          </div>
-          <div style={{flex:1,background:"rgba(34,197,94,0.08)",borderRadius:10,padding:"8px 10px",textAlign:"center"}}>
-            <div style={{fontSize:16,fontWeight:800,color:"#22c55e"}}>{todayCalOut}</div>
-            <div style={{fontSize:9,opacity:.4}}>Yakılan kcal</div>
-          </div>
-          <div style={{flex:1,background:"rgba(59,130,246,0.08)",borderRadius:10,padding:"8px 10px",textAlign:"center"}}>
-            <div style={{fontSize:16,fontWeight:800,color:netCal>healthGoal?"#ef4444":"#3b82f6"}}>{netCal}</div>
-            <div style={{fontSize:9,opacity:.4}}>Net kcal</div>
-          </div>
-        </div>
-        <div style={{display:"flex",gap:12}}>
-          <span style={{fontSize:11,opacity:.4}}>💪 {wkSport.length} antrenman</span>
-          <span style={{fontSize:11,opacity:.4}}>⏱ {wkMin} dk</span>
-          <span style={{fontSize:11,opacity:.4}}>🔥 {wkBurned} kcal</span>
-        </div>
-      </div>
-
-      {/* TARZIM */}
-      <div onClick={()=>setTab("projects")} style={{
-        background:"#1c1c2e",borderRadius:16,padding:16,marginBottom:10,cursor:"pointer",borderLeft:"4px solid #f97316",
-      }}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-          <div style={{display:"flex",alignItems:"center",gap:8}}>
-            <span style={{fontSize:18}}>◈</span>
-            <span style={{fontSize:15,fontWeight:700}}>Tarzım</span>
-          </div>
-          <div style={{display:"flex",alignItems:"center",gap:6}}>
-            <div style={{background:"rgba(249,115,22,0.15)",color:"#f97316",padding:"3px 10px",borderRadius:8,fontSize:12,fontWeight:700}}>{totalRoomItems} öğe</div>
-            <span style={{fontSize:12,opacity:.3}}>▶</span>
-          </div>
-        </div>
-        <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-          {rooms.slice(0,4).map(room=>{
-            const count=room.type==="project"?data.projects.length:(roomItems[room.id]||[]).length;
-            return (
-              <div key={room.id} style={{display:"flex",alignItems:"center",gap:6,background:"rgba(255,255,255,0.03)",borderRadius:8,padding:"6px 10px"}}>
-                <span style={{fontSize:16}}>{room.icon}</span>
-                <span style={{fontSize:11,opacity:.6}}>{room.name}</span>
-                <span style={{fontSize:11,fontWeight:700,color:room.color}}>{count}</span>
-              </div>
-            );
-          })}
-        </div>
-        {activeProjects>0&&<div style={{fontSize:11,opacity:.4,marginTop:8}}>📂 {activeProjects} aktif proje devam ediyor</div>}
-      </div>
-
-      {/* NOTLAR */}
-      <div onClick={()=>setTab("notes")} style={{
-        background:"#1c1c2e",borderRadius:16,padding:16,marginBottom:10,cursor:"pointer",borderLeft:"4px solid #14b8a6",
-      }}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-          <div style={{display:"flex",alignItems:"center",gap:8}}>
-            <span style={{fontSize:18}}>☰</span>
-            <span style={{fontSize:15,fontWeight:700}}>Notlar</span>
-          </div>
-          <div style={{display:"flex",alignItems:"center",gap:6}}>
-            <div style={{background:"rgba(20,184,166,0.15)",color:"#14b8a6",padding:"3px 10px",borderRadius:8,fontSize:12,fontWeight:700}}>{data.notes.length} not</div>
-            <span style={{fontSize:12,opacity:.3}}>▶</span>
-          </div>
-        </div>
-        {data.notes.length>0&&(
-          <div style={{marginTop:8,display:"flex",gap:6,flexWrap:"wrap"}}>
-            {data.notes.slice(0,3).map(n=>(
-              <div key={n.id} style={{background:"rgba(255,255,255,0.03)",borderRadius:8,padding:"4px 10px",borderTop:`2px solid ${n.color||"#14b8a6"}`}}>
-                <span style={{fontSize:11,opacity:.6}}>{n.title}</span>
-              </div>
-            ))}
-            {data.notes.length>3&&<span style={{fontSize:11,opacity:.3,alignSelf:"center"}}>+{data.notes.length-3}</span>}
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 }
@@ -409,19 +401,10 @@ function Tasks({ data, update }) {
   const del=id=>{update({...data,tasks:data.tasks.filter(t=>t.id!==id)});setDetail(null);};
 
   const t = today();
-  const list = data.tasks.filter(task=>{
-    if(filter==="done")return task.done;
-    if(filter==="pending")return !task.done;
-    if(filter==="high")return task.priority==="high"&&!task.done;
-    if(filter==="overdue")return !task.done && task.dueDate && task.dueDate < t;
-    return true;
-  });
-
-  // Quick date helpers
-  const todayStr = today();
   const tomorrow = ()=>{ const d=new Date(); d.setDate(d.getDate()+1); return d.toISOString().split("T")[0]; };
   const nextWeek = ()=>{ const d=new Date(); d.setDate(d.getDate()+7); return d.toISOString().split("T")[0]; };
   const nextMonth = ()=>{ const d=new Date(); d.setMonth(d.getMonth()+1); return d.toISOString().split("T")[0]; };
+  const todayStr = today();
 
   const quickDates = [
     {label:"Bugün",val:todayStr,icon:"📌"},
@@ -438,33 +421,67 @@ function Tasks({ data, update }) {
     return dt.toLocaleDateString("tr-TR",{day:"numeric",month:"short"});
   };
 
+  const all = data.tasks.filter(task=>{
+    if(filter==="done")return task.done;
+    if(filter==="pending")return !task.done;
+    if(filter==="high")return task.priority==="high"&&!task.done;
+    if(filter==="overdue")return !task.done && task.dueDate && task.dueDate < t;
+    return true;
+  });
+
+  // Grouped sections (only when showing all/pending)
+  const showGroups = filter==="all" || filter==="pending";
+  const overdueTasks = all.filter(x=>!x.done && x.dueDate && x.dueDate < t);
+  const todayTasks   = all.filter(x=>!x.done && x.dueDate===t);
+  const weekTasks    = all.filter(x=>!x.done && x.dueDate && x.dueDate>t && x.dueDate<=nextWeek());
+  const pendingTasks = all.filter(x=>!x.done && (!x.dueDate || (x.dueDate>nextWeek())));
+  const doneTasks    = all.filter(x=>x.done);
+
+  const pendingCount = data.tasks.filter(x=>!x.done).length;
+
+  const TaskCard = ({task}) => (
+    <div key={task.id} style={{...cardStyle,display:"flex",alignItems:"center",gap:12,opacity:task.done?.5:1,minHeight:52}}>
+      <button onClick={()=>toggle(task.id)} style={checkBtnStyle(task.done)}>{task.done&&"✓"}</button>
+      <div style={{flex:1,minWidth:0,cursor:"pointer"}} onClick={()=>setDetail(detail===task.id?null:task.id)}>
+        <div style={{fontSize:15,fontWeight:500,textDecoration:task.done?"line-through":"none",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{task.title}</div>
+        <div style={{fontSize:11,opacity:.5,marginTop:3,display:"flex",gap:6,flexWrap:"wrap",alignItems:"center"}}>
+          {task.priority&&!task.done&&(
+            <span style={{background:`${PCOL[task.priority]}20`,color:PCOL[task.priority],padding:"1px 7px",borderRadius:6,fontSize:10,fontWeight:600}}>{PRIORITIES[task.priority]}</span>
+          )}
+          {task.category&&<span style={{background:"rgba(59,130,246,0.12)",color:"#3b82f6",padding:"1px 8px",borderRadius:6,fontSize:10}}>{task.category}</span>}
+          {task.dueDate&&<span style={{color:!task.done&&task.dueDate<today()?"#ef4444":"inherit"}}>📅 {formatDate(task.dueDate)}</span>}
+        </div>
+      </div>
+      <button onClick={()=>del(task.id)} style={delBtnStyle}>✕</button>
+    </div>
+  );
+
   return (
     <div>
-      <div style={sectionHeader}>
-        <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Görevler</h3>
-        <button onClick={openNew} style={addBtnStyle}>+ Yeni</button>
-      </div>
+      <StickyHeader
+        title="Görevler"
+        sub={pendingCount > 0 ? `${pendingCount} bekliyor` : "Hepsi tamamlandı 🎉"}
+      />
+
       <div style={{display:"flex",gap:6,marginBottom:14,overflowX:"auto",paddingBottom:4,WebkitOverflowScrolling:"touch"}}>
         {[["all","Tümü"],["pending","Bekleyen"],["done","Bitti"],["high","Öncelikli"],["overdue","Gecikmiş"]].map(([k,v])=>(
           <button key={k} onClick={()=>setFilter(k)} style={filterBtnStyle(filter===k)}>{v}</button>
         ))}
       </div>
-      {list.length===0 && <p style={{textAlign:"center",opacity:.3,fontSize:14,padding:40}}>Görev yok</p>}
-      {list.map(task=>(
-        <div key={task.id} style={{...cardStyle,display:"flex",alignItems:"center",gap:12,opacity:task.done?.5:1}}>
-          <button onClick={()=>toggle(task.id)} style={checkBtnStyle(task.done)}>{task.done&&"✓"}</button>
-          <div style={{flex:1,minWidth:0,cursor:"pointer"}} onClick={()=>setDetail(detail===task.id?null:task.id)}>
-            <div style={{fontSize:15,fontWeight:500,textDecoration:task.done?"line-through":"none",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{task.title}</div>
-            <div style={{fontSize:11,opacity:.5,marginTop:2,display:"flex",gap:6,flexWrap:"wrap",alignItems:"center"}}>
-              {task.category&&<span style={{background:"rgba(59,130,246,0.12)",color:"#3b82f6",padding:"1px 8px",borderRadius:6,fontSize:10}}>{task.category}</span>}
-              {task.dueDate&&<span style={{color:!task.done&&task.dueDate<today()?"#ef4444":"inherit"}}>📅 {formatDate(task.dueDate)}</span>}
-              {task.description&&<span style={{opacity:.4}}>📝</span>}
-            </div>
-          </div>
-          <span style={{width:10,height:10,borderRadius:"50%",background:PCOL[task.priority],flexShrink:0}}/>
-          <button onClick={()=>del(task.id)} style={delBtnStyle}>✕</button>
-        </div>
-      ))}
+
+      {all.length===0 && <p style={{textAlign:"center",opacity:.3,fontSize:14,padding:40}}>Görev yok</p>}
+
+      {showGroups ? (
+        <>
+          {overdueTasks.length>0&&<><GroupLabel label="Gecikmiş" color="#ef4444"/>{overdueTasks.map(t=><TaskCard key={t.id} task={t}/>)}</>}
+          {todayTasks.length>0&&<><GroupLabel label="Bugün" color="#3b82f6"/>{todayTasks.map(t=><TaskCard key={t.id} task={t}/>)}</>}
+          {weekTasks.length>0&&<><GroupLabel label="Bu Hafta" color="#f59e0b"/>{weekTasks.map(t=><TaskCard key={t.id} task={t}/>)}</>}
+          {pendingTasks.length>0&&<><GroupLabel label="Bekleyen" color="#888"/>{pendingTasks.map(t=><TaskCard key={t.id} task={t}/>)}</>}
+          {doneTasks.length>0&&<><GroupLabel label="Tamamlanan" color="#22c55e"/>{doneTasks.map(t=><TaskCard key={t.id} task={t}/>)}</>}
+        </>
+      ) : (
+        all.map(task=><TaskCard key={task.id} task={task}/>)
+      )}
 
       {/* Task Detail View */}
       {detail && (() => {
@@ -489,6 +506,8 @@ function Tasks({ data, update }) {
           </div>
         );
       })()}
+
+      <FAB onClick={openNew} color="#3b82f6"/>
 
       {/* Add / Edit Modal */}
       <Modal open={modal} onClose={()=>{setModal(false);setEditingId(null);}} title={editingId?"Görevi Düzenle":"Yeni Görev"}>
@@ -586,12 +605,11 @@ function CalendarView({ data, update }) {
   };
   const del=id=>update({...data,events:data.events.filter(e=>e.id!==id)});
 
+  const openAdd = () => { setModal(true); setForm({title:"",date:"",time:"",color:"#3b82f6",description:"",recurring:"none"}); };
+
   return (
     <div>
-      <div style={sectionHeader}>
-        <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Takvim</h3>
-        <button onClick={()=>{setModal(true);setForm({title:"",date:"",time:"",color:"#3b82f6",description:"",recurring:"none"});}} style={addBtnStyle}>+ Etkinlik</button>
-      </div>
+      <StickyHeader title="Takvim" sub={`${data.events.length} etkinlik`}/>
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12,background:"#1c1c2e",borderRadius:12,padding:"10px 14px"}}>
         <button onClick={()=>setVd(new Date(y,m-1))} style={{background:"none",border:"none",color:"#aaa",fontSize:20,cursor:"pointer",padding:"4px 10px"}}>◀</button>
         <span style={{fontWeight:700,fontSize:16}}>{MN[m]} {y}</span>
@@ -640,6 +658,7 @@ function CalendarView({ data, update }) {
           ))}
         </div>
       )}
+      <FAB onClick={openAdd} color="#a855f7"/>
       <Modal open={modal} onClose={()=>setModal(false)} title="Yeni Etkinlik">
         <input style={inp} placeholder="Etkinlik adı..." value={form.title} onChange={e=>setForm({...form,title:e.target.value})} autoFocus/>
         <div style={{display:"flex",gap:8}}>
@@ -867,14 +886,21 @@ function Sports({ data, update }) {
 
   return (
     <div>
-      <div style={sectionHeader}>
-        <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Sağlık Koçu</h3>
-      </div>
+      <StickyHeader title="Sağlık Koçu"/>
 
-      {/* Tab switcher */}
-      <div style={{display:"flex",gap:6,marginBottom:14}}>
+      {/* iOS-style segment control */}
+      <div style={{
+        background:"rgba(255,255,255,0.06)",borderRadius:12,padding:3,
+        display:"flex",marginBottom:14,
+      }}>
         {[["overview","📊 Özet"],["sport","🏃 Spor"],["food","🍽 Beslenme"]].map(([k,v])=>(
-          <button key={k} onClick={()=>setView(k)} style={filterBtnStyle(view===k)}>{v}</button>
+          <button key={k} onClick={()=>setView(k)} style={{
+            flex:1,padding:"8px 4px",borderRadius:10,fontSize:13,cursor:"pointer",border:"none",
+            fontWeight:view===k?600:400,
+            background:view===k?"#2a2a45":"transparent",
+            color:view===k?"#e0e0e0":"#666",
+            transition:"all .18s",
+          }}>{v}</button>
         ))}
       </div>
 
@@ -932,9 +958,7 @@ function Sports({ data, update }) {
 
       {/* ── SPORT ── */}
       {view==="sport"&&(<>
-        <div style={{display:"flex",justifyContent:"flex-end",marginBottom:12}}>
-          <button onClick={()=>setModal(true)} style={addBtnStyle}>+ Antrenman</button>
-        </div>
+        <FAB onClick={()=>setModal(true)} color="#22c55e"/>
         {data.sports.length===0&&<p style={{textAlign:"center",opacity:.3,fontSize:14,padding:40}}>Henüz kayıt yok</p>}
         {data.sports.slice(0,30).map(s=>(
           <div key={s.id} style={{...cardStyle,display:"flex",alignItems:"center",gap:12}}>
@@ -950,16 +974,23 @@ function Sports({ data, update }) {
 
       {/* ── FOOD ── */}
       {view==="food"&&(<>
-        <div style={{display:"flex",justifyContent:"flex-end",gap:6,marginBottom:12}}>
-          {hasAI&&(<>
+        {hasAI&&(
+          <input ref={photoRef} type="file" accept="image/*" capture="environment"
+            onChange={e=>{if(e.target.files?.[0])analyzePhoto(e.target.files[0]);e.target.value="";}}
+            style={{display:"none"}}/>
+        )}
+        <div style={{display:"flex",gap:6,marginBottom:12}}>
+          {hasAI&&(
             <button onClick={()=>photoRef.current?.click()} disabled={analyzing} style={{
-              ...addBtnStyle,background:analyzing?"#555":"#22c55e",
-            }}>{analyzing?"🔄 Analiz...":"📸 Fotoğrafla Ekle"}</button>
-            <input ref={photoRef} type="file" accept="image/*" capture="environment"
-              onChange={e=>{if(e.target.files?.[0])analyzePhoto(e.target.files[0]);e.target.value="";}}
-              style={{display:"none"}}/>
-          </>)}
-          <button onClick={()=>setFoodModal(true)} style={addBtnStyle}>+ Manuel Ekle</button>
+              ...filterBtnStyle(false),flex:1,textAlign:"center",
+              background:analyzing?"rgba(85,85,85,0.2)":"rgba(34,197,94,0.12)",
+              color:analyzing?"#666":"#22c55e",border:"1px solid rgba(34,197,94,0.2)",
+            }}>{analyzing?"🔄 Analiz...":"📸 Fotoğrafla"}</button>
+          )}
+          <button onClick={()=>setFoodModal(true)} style={{
+            ...filterBtnStyle(false),flex:1,textAlign:"center",
+            background:"rgba(249,115,22,0.12)",color:"#f97316",border:"1px solid rgba(249,115,22,0.2)",
+          }}>+ Manuel Ekle</button>
         </div>
 
         {/* AI Result card */}
@@ -1209,11 +1240,8 @@ function Projects({ data, update }) {
 
   if(!activeRoom) return (
     <div>
-      <div style={sectionHeader}>
-        <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Tarzım</h3>
-        <button onClick={()=>setRoomModal(true)} style={addBtnStyle}>+ Oda Ekle</button>
-      </div>
-      <p style={{fontSize:12,opacity:.4,marginBottom:14}}>Kişisel alanların — odalarına dokun ve keşfet</p>
+      <StickyHeader title="Tarzım" sub="Kişisel alanların"/>
+      <FAB onClick={()=>setRoomModal(true)} color="#f97316"/>
       <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:10}}>
         {rooms.map(room=>{
           const count=room.type==="project"?data.projects.length:(roomItems[room.id]||[]).length;
@@ -1259,11 +1287,11 @@ function Projects({ data, update }) {
   if(room.type==="project"||activeRoom==="projects") return (
     <div>
       <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
-        <button onClick={()=>setActiveRoom(null)} style={{background:"rgba(255,255,255,0.06)",border:"none",color:"#aaa",width:32,height:32,borderRadius:10,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>◀</button>
+        <button onClick={()=>setActiveRoom(null)} style={{background:"rgba(255,255,255,0.06)",border:"none",color:"#aaa",width:40,height:40,borderRadius:12,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>◀</button>
         <span style={{fontSize:24}}>{room.icon}</span>
         <h3 style={{margin:0,fontSize:20,fontWeight:800,flex:1}}>{room.name}</h3>
-        <button onClick={()=>setModal(true)} style={addBtnStyle}>+ Yeni</button>
       </div>
+      <FAB onClick={()=>setModal(true)} color={room.color||"#3b82f6"}/>
       {data.projects.length===0&&<p style={{textAlign:"center",opacity:.3,fontSize:14,padding:40}}>Henüz proje yok</p>}
       {data.projects.map(p=>{
         const tasks=p.tasks||[];const d=tasks.filter(t=>t.done).length;
@@ -1323,11 +1351,11 @@ function Projects({ data, update }) {
   return (
     <div>
       <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
-        <button onClick={()=>setActiveRoom(null)} style={{background:"rgba(255,255,255,0.06)",border:"none",color:"#aaa",width:32,height:32,borderRadius:10,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>◀</button>
+        <button onClick={()=>setActiveRoom(null)} style={{background:"rgba(255,255,255,0.06)",border:"none",color:"#aaa",width:40,height:40,borderRadius:12,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>◀</button>
         <span style={{fontSize:24}}>{room.icon}</span>
         <h3 style={{margin:0,fontSize:20,fontWeight:800,flex:1}}>{room.name}</h3>
-        <button onClick={()=>setItemModal(true)} style={addBtnStyle}>+ Ekle</button>
       </div>
+      <FAB onClick={()=>setItemModal(true)} color={room.color||"#3b82f6"}/>
       <div style={{display:"flex",justifyContent:"flex-end",marginBottom:10}}>
         <button onClick={()=>delRoom(activeRoom)} style={{background:"none",border:"none",color:"#ef4444",fontSize:11,cursor:"pointer",opacity:.5}}>Odayı Sil</button>
       </div>
@@ -1378,12 +1406,10 @@ function Notes({ data, update }) {
 
   const filtered=data.notes.filter(n=>n.title.toLowerCase().includes(search.toLowerCase())||n.content.toLowerCase().includes(search.toLowerCase()));
 
+  const openNew2 = () => { setEditing(null); setForm({title:"",content:"",color:"#3b82f6"}); setModal(true); };
   return (
     <div>
-      <div style={sectionHeader}>
-        <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Notlar</h3>
-        <button onClick={()=>{setEditing(null);setForm({title:"",content:"",color:"#3b82f6"});setModal(true);}} style={addBtnStyle}>+ Yeni</button>
-      </div>
+      <StickyHeader title="Notlar" sub={`${data.notes.length} not`}/>
       <input style={{...inp,marginBottom:14}} placeholder="🔍 Notlarda ara..." value={search} onChange={e=>setSearch(e.target.value)}/>
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(155px,1fr))",gap:10}}>
         {filtered.length===0&&<p style={{opacity:.3,fontSize:14,padding:20,gridColumn:"1/-1",textAlign:"center"}}>Not bulunamadı</p>}
@@ -1398,6 +1424,7 @@ function Notes({ data, update }) {
           </div>
         ))}
       </div>
+      <FAB onClick={openNew2} color="#14b8a6"/>
       <Modal open={modal} onClose={()=>{setModal(false);setEditing(null);}} title={editing?"Notu Düzenle":"Yeni Not"}>
         <input style={inp} placeholder="Başlık..." value={form.title} onChange={e=>setForm({...form,title:e.target.value})} autoFocus/>
         <textarea style={{...inp,minHeight:140,resize:"vertical",fontFamily:"inherit",lineHeight:1.5}} placeholder="İçerik yazın..." value={form.content} onChange={e=>setForm({...form,content:e.target.value})}/>
@@ -1465,7 +1492,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
 
   return (
     <div>
-      <h3 style={{margin:"0 0 16px",fontSize:20,fontWeight:800}}>Ayarlar</h3>
+      <StickyHeader title="Ayarlar"/>
 
       {msg && <div style={{background:"rgba(59,130,246,0.15)",border:"1px solid rgba(59,130,246,0.3)",borderRadius:12,padding:"10px 14px",marginBottom:12,fontSize:13,color:"#3b82f6"}}>{msg}</div>}
 
@@ -2009,8 +2036,9 @@ export default function App() {
         position:isMobile?"fixed":"absolute",
         bottom:0,
         left:0,right:0,
-        background:"#0c0c16",
-        borderTop:"1px solid rgba(255,255,255,0.1)",
+        background:"rgba(12,12,22,0.97)",
+        backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",
+        borderTop:"1px solid rgba(255,255,255,0.08)",
         display:"flex",justifyContent:"space-around",alignItems:"center",
         height:NAV_HEIGHT,
         paddingTop:4,
