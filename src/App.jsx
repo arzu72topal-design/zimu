@@ -1257,46 +1257,65 @@ function Sports({ data, update }) {
 /* ═══════════ NEWS ROOM ═══════════ */
 const NEWS_SOURCES = {
   teknoloji: [
-    { name:"BBC Tech",      url:"https://feeds.bbci.co.uk/news/technology/rss.xml",        lang:"EN", color:"#bb1919" },
-    { name:"Ars Technica",  url:"https://feeds.arstechnica.com/arstechnica/index",          lang:"EN", color:"#f60" },
-    { name:"Hacker News",   url:"https://hnrss.org/frontpage?count=15",                    lang:"EN", color:"#ff6600" },
+    { name:"BBC Tech",      url:"https://feeds.bbci.co.uk/news/technology/rss.xml",             lang:"EN", color:"#3b82f6" },
+    { name:"Ars Technica",  url:"https://feeds.arstechnica.com/arstechnica/index",               lang:"EN", color:"#f97316" },
+    { name:"Hacker News",   url:"https://hnrss.org/frontpage?count=15",                         lang:"EN", color:"#ff6600" },
+  ],
+  spor: [
+    { name:"BBC Sport",     url:"https://feeds.bbci.co.uk/sport/rss.xml",                       lang:"EN", color:"#ef4444" },
+    { name:"BBC Football",  url:"https://feeds.bbci.co.uk/sport/football/rss.xml",              lang:"EN", color:"#ef4444" },
+    { name:"ESPN",          url:"https://www.espn.com/espn/rss/news",                           lang:"EN", color:"#cc0000" },
   ],
   sanat: [
-    { name:"BBC Arts",      url:"https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml", lang:"EN", color:"#bb1919" },
-    { name:"NPR Arts",      url:"https://feeds.npr.org/1008/rss.xml",                      lang:"EN", color:"#225490" },
-    { name:"Smithsonian",   url:"https://www.smithsonianmag.com/rss/arts-culture/",        lang:"EN", color:"#004165" },
+    { name:"BBC Arts",      url:"https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml", lang:"EN", color:"#a855f7" },
+    { name:"NPR Arts",      url:"https://feeds.npr.org/1008/rss.xml",                           lang:"EN", color:"#7c3aed" },
+    { name:"Smithsonian",   url:"https://www.smithsonianmag.com/rss/arts-culture/",             lang:"EN", color:"#6d28d9" },
   ],
   saglik: [
-    { name:"BBC Health",    url:"https://feeds.bbci.co.uk/news/health/rss.xml",            lang:"EN", color:"#bb1919" },
-    { name:"NPR Health",    url:"https://feeds.npr.org/1128/rss.xml",                      lang:"EN", color:"#225490" },
-    { name:"Science Daily", url:"https://www.sciencedaily.com/rss/health_medicine.xml",    lang:"EN", color:"#0066cc" },
+    { name:"BBC Health",    url:"https://feeds.bbci.co.uk/news/health/rss.xml",                 lang:"EN", color:"#22c55e" },
+    { name:"NPR Health",    url:"https://feeds.npr.org/1128/rss.xml",                           lang:"EN", color:"#16a34a" },
+    { name:"Science Daily", url:"https://www.sciencedaily.com/rss/health_medicine.xml",         lang:"EN", color:"#0d9488" },
   ],
   ekonomi: [
-    { name:"BBC Business",  url:"https://feeds.bbci.co.uk/news/business/rss.xml",          lang:"EN", color:"#bb1919" },
-    { name:"NPR Economy",   url:"https://feeds.npr.org/1006/rss.xml",                      lang:"EN", color:"#225490" },
-    { name:"MarketWatch",   url:"https://feeds.content.dowjones.io/public/rss/mw_realtimeheadlines", lang:"EN", color:"#003087" },
+    { name:"BBC Business",  url:"https://feeds.bbci.co.uk/news/business/rss.xml",               lang:"EN", color:"#f59e0b" },
+    { name:"NPR Economy",   url:"https://feeds.npr.org/1006/rss.xml",                           lang:"EN", color:"#d97706" },
+    { name:"MarketWatch",   url:"https://feeds.content.dowjones.io/public/rss/mw_realtimeheadlines", lang:"EN", color:"#b45309" },
   ],
   politika: [
-    { name:"BBC World",     url:"https://feeds.bbci.co.uk/news/world/rss.xml",             lang:"EN", color:"#bb1919" },
-    { name:"BBC Türkçe",    url:"https://www.bbc.com/turkce/index.xml",                   lang:"TR", color:"#bb1919" },
-    { name:"NPR Politics",  url:"https://feeds.npr.org/1014/rss.xml",                      lang:"EN", color:"#225490" },
+    { name:"BBC World",     url:"https://feeds.bbci.co.uk/news/world/rss.xml",                  lang:"EN", color:"#ef4444" },
+    { name:"BBC Türkçe",    url:"https://www.bbc.com/turkce/index.xml",                         lang:"TR", color:"#dc2626" },
+    { name:"NPR Politics",  url:"https://feeds.npr.org/1014/rss.xml",                           lang:"EN", color:"#b91c1c" },
+  ],
+  bilim: [
+    { name:"Science Daily", url:"https://www.sciencedaily.com/rss/top/science.xml",             lang:"EN", color:"#06b6d4" },
+    { name:"BBC Science",   url:"https://feeds.bbci.co.uk/news/science_and_environment/rss.xml",lang:"EN", color:"#0891b2" },
+    { name:"NPR Science",   url:"https://feeds.npr.org/1007/rss.xml",                           lang:"EN", color:"#0e7490" },
+  ],
+  dunya: [
+    { name:"BBC World",     url:"https://feeds.bbci.co.uk/news/world/rss.xml",                  lang:"EN", color:"#64748b" },
+    { name:"BBC Türkçe",    url:"https://www.bbc.com/turkce/index.xml",                         lang:"TR", color:"#bb1919" },
+    { name:"NPR World",     url:"https://feeds.npr.org/1004/rss.xml",                           lang:"EN", color:"#475569" },
   ],
 };
 
 const NEWS_CATS = [
-  { id:"teknoloji", label:"Teknoloji", icon:"💻", color:"#3b82f6" },
-  { id:"sanat",     label:"Sanat",     icon:"🎨", color:"#a855f7" },
-  { id:"saglik",    label:"Sağlık",    icon:"🏥", color:"#22c55e" },
-  { id:"ekonomi",   label:"Ekonomi",   icon:"📈", color:"#f59e0b" },
-  { id:"politika",  label:"Politika",  icon:"🌐", color:"#ef4444" },
+  { id:"spor",      label:"Spor",      icon:"⚽", color:"#ef4444",  desc:"Futbol, basketbol & dünya sporları" },
+  { id:"teknoloji", label:"Teknoloji", icon:"💻", color:"#3b82f6",  desc:"Yapay zeka, gadget & yazılım" },
+  { id:"ekonomi",   label:"Ekonomi",   icon:"📈", color:"#f59e0b",  desc:"Piyasalar, borsa & iş dünyası" },
+  { id:"politika",  label:"Politika",  icon:"🌐", color:"#ef4444",  desc:"Dünya siyaseti & gündem" },
+  { id:"saglik",    label:"Sağlık",    icon:"🏥", color:"#22c55e",  desc:"Tıp, beslenme & wellness" },
+  { id:"bilim",     label:"Bilim",     icon:"🔭", color:"#06b6d4",  desc:"Uzay, keşifler & araştırmalar" },
+  { id:"sanat",     label:"Sanat",     icon:"🎨", color:"#a855f7",  desc:"Kültür, sanat & eğlence" },
+  { id:"dunya",     label:"Dünya",     icon:"🗺", color:"#64748b",  desc:"Dünya haberleri & olaylar" },
 ];
 
+/* ── NewsRoom: Category grid → drill into article list ── */
 function NewsRoom({ room, onBack }) {
-  const [cat, setCat] = useState("teknoloji");
-  const [langFilter, setLangFilter] = useState("all"); // all | TR | EN
-  const [articles, setArticles] = useState({});   // { catId: [{...}] }
+  const [activeCat, setActiveCat] = useState(null); // null = grid, string = category id
+  const [articles, setArticles] = useState({});
   const [loading, setLoading] = useState({});
   const [loaded, setLoaded] = useState({});
+  const [langFilter, setLangFilter] = useState("all");
 
   const timeAgo = (dateStr) => {
     if(!dateStr) return "";
@@ -1309,7 +1328,6 @@ function NewsRoom({ room, onBack }) {
     } catch { return ""; }
   };
 
-  /* Parse a single RSS feed URL via multi-proxy → DOMParser */
   const fetchOneFeed = async (src) => {
     const raw = await proxyFetch(src.url);
     const text = typeof raw === "string" ? raw : (raw.contents || JSON.stringify(raw));
@@ -1318,7 +1336,6 @@ function NewsRoom({ room, onBack }) {
     return items.map(item => {
       const txt = (sel) => item.querySelector(sel)?.textContent?.replace(/<[^>]+>/g,"")?.trim() || "";
       const attr = (sel, a) => item.querySelector(sel)?.getAttribute(a) || "";
-      // Get thumbnail from media:thumbnail, enclosure, or og image in description
       let thumb = "";
       try {
         const enc = item.querySelector("enclosure");
@@ -1329,23 +1346,19 @@ function NewsRoom({ room, onBack }) {
           if(mt) thumb = mt.getAttribute("url")||"";
         }
         if(!thumb) {
-          const raw = item.querySelector("description,summary")?.textContent||"";
-          const m = raw.match(/src=["']([^"']+[.](jpg|jpeg|png|webp|gif)[^"']*)/i);
+          const raw2 = item.querySelector("description,summary")?.textContent||"";
+          const m = raw2.match(/src=["']([^"']+[.](jpg|jpeg|png|webp|gif)[^"']*)/i);
           if(m) thumb = m[1];
         }
       } catch(e) {}
-            const link = txt("link") || attr("link","href") || attr("guid","");
+      const link = txt("link") || attr("link","href") || attr("guid","");
       const pubDate = txt("pubDate") || txt("published") || txt("updated") || "";
       return {
         id: link || txt("guid") || Math.random().toString(36),
         title: txt("title"),
-        summary: (txt("description")||txt("summary")).slice(0,140),
-        link,
-        thumb,
-        pubDate,
-        source: src.name,
-        sourceColor: src.color,
-        lang: src.lang,
+        summary: (txt("description")||txt("summary")).slice(0,160),
+        link, thumb, pubDate,
+        source: src.name, sourceColor: src.color, lang: src.lang,
       };
     }).filter(a=>a.title && a.link);
   };
@@ -1358,119 +1371,111 @@ function NewsRoom({ room, onBack }) {
     const seen = new Set();
     const merged = results
       .flatMap(r => r.status==="fulfilled" ? r.value : [])
-      .filter(a => {
-        if(!a.title || seen.has(a.title)) return false;
-        seen.add(a.title); return true;
-      })
+      .filter(a => { if(!a.title||seen.has(a.title))return false; seen.add(a.title); return true; })
       .sort((a,b)=>new Date(b.pubDate)-new Date(a.pubDate))
-      .slice(0,30);
+      .slice(0,35);
     setArticles(prev=>({...prev,[catId]:merged}));
     setLoaded(prev=>({...prev,[catId]:true}));
     setLoading(l=>({...l,[catId]:false}));
   };
 
-  useEffect(()=>{ fetchCategory(cat); }, [cat]);
+  const openCat = (catId) => {
+    setActiveCat(catId);
+    fetchCategory(catId);
+  };
 
-  const catInfo = NEWS_CATS.find(c=>c.id===cat);
-  const rawList = articles[cat] || [];
+  const catInfo = NEWS_CATS.find(c=>c.id===activeCat);
+  const rawList = articles[activeCat] || [];
   const list = langFilter==="all" ? rawList : rawList.filter(a=>a.lang===langFilter);
-  const isLoading = loading[cat];
+  const isLoading = loading[activeCat];
 
-  return (
+  /* ── CATEGORY ARTICLE VIEW ── */
+  if(activeCat) return (
     <div>
       <StickyHeader>
-        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
-          <button onClick={onBack} style={{background:"rgba(255,255,255,0.08)",backdropFilter:"blur(4px)",border:"1px solid rgba(255,255,255,0.1)",color:"#ccc",width:34,height:34,borderRadius:10,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>◀</button>
-          <span style={{fontSize:22}}>📰</span>
-          <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>Haberler</h3>
-          <button onClick={()=>fetchCategory(cat,true)} style={{
-            background:"rgba(255,255,255,0.07)",border:"none",color:"#aaa",
-            width:34,height:34,borderRadius:10,fontSize:14,cursor:"pointer",
+        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
+          <button onClick={()=>setActiveCat(null)} style={{
+            background:"rgba(255,255,255,0.08)",backdropFilter:"blur(4px)",
+            border:"1px solid rgba(255,255,255,0.1)",color:"#ccc",
+            width:34,height:34,borderRadius:10,fontSize:16,cursor:"pointer",
+            display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,
+          }}>◀</button>
+          <span style={{fontSize:22,filter:`drop-shadow(0 0 6px ${catInfo?.color}88)`}}>{catInfo?.icon}</span>
+          <div style={{flex:1}}>
+            <h3 style={{margin:0,fontSize:18,fontWeight:800,color:catInfo?.color}}>{catInfo?.label}</h3>
+            <div style={{fontSize:11,opacity:.4,marginTop:1}}>{catInfo?.desc}</div>
+          </div>
+          <button onClick={()=>fetchCategory(activeCat,true)} style={{
+            background:"rgba(255,255,255,0.07)",border:"1px solid rgba(255,255,255,0.1)",
+            color:"#aaa",width:34,height:34,borderRadius:10,fontSize:14,cursor:"pointer",
             display:"flex",alignItems:"center",justifyContent:"center",
-          }} title="Yenile">↻</button>
+          }}>↻</button>
         </div>
-
-        {/* Category tabs — horizontal scroll */}
-        <div style={{display:"flex",gap:6,overflowX:"auto",paddingBottom:2,WebkitOverflowScrolling:"touch",marginBottom:8}}>
-          {NEWS_CATS.map(c=>(
-            <button key={c.id} onClick={()=>setCat(c.id)} style={{
-              display:"flex",alignItems:"center",gap:5,
-              padding:"7px 14px",borderRadius:20,border:"none",cursor:"pointer",
-              whiteSpace:"nowrap",fontSize:12,fontWeight:cat===c.id?700:500,
-              background:cat===c.id?`${c.color}25`:"rgba(255,255,255,0.05)",
-              color:cat===c.id?c.color:"#666",
-              transition:"all .2s",
-            }}>
-              <span>{c.icon}</span>{c.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Language filter */}
+        {/* Lang filter */}
         <div style={{display:"flex",gap:5}}>
-          {[["all","🌍 Tümü"],["TR","🇹🇷 Türkçe"],["EN","🌐 İngilizce"]].map(([k,v])=>(
+          {[["all","🌍 Tümü"],["TR","🇹🇷 TR"],["EN","🌐 EN"]].map(([k,v])=>(
             <button key={k} onClick={()=>setLangFilter(k)} style={{
               padding:"5px 12px",borderRadius:10,border:"none",cursor:"pointer",
               fontSize:11,fontWeight:langFilter===k?700:400,
-              background:langFilter===k?"rgba(255,255,255,0.12)":"rgba(255,255,255,0.04)",
-              color:langFilter===k?"#e0e0e0":"#555",
+              background:langFilter===k?`${catInfo?.color}25`:"rgba(255,255,255,0.05)",
+              color:langFilter===k?catInfo?.color:"#555",
             }}>{v}</button>
           ))}
         </div>
       </StickyHeader>
 
-      {/* Loading */}
       {isLoading&&(
-        <div style={{textAlign:"center",padding:"40px 0"}}>
-          <div style={{fontSize:32,marginBottom:8,animation:"pulse 1.5s ease-in-out infinite"}}>📰</div>
-          <div style={{fontSize:13,opacity:.4}}>Haberler yükleniyor...</div>
-          <div style={{fontSize:11,opacity:.25,marginTop:4}}>{NEWS_SOURCES[cat]?.map(s=>s.name).join(", ")}</div>
+        <div style={{textAlign:"center",padding:"50px 0"}}>
+          <div style={{fontSize:36,marginBottom:10,animation:"pulse 1.5s ease-in-out infinite"}}>{catInfo?.icon}</div>
+          <div style={{fontSize:13,opacity:.4,marginBottom:4}}>Haberler yükleniyor...</div>
+          <div style={{fontSize:11,opacity:.2}}>{NEWS_SOURCES[activeCat]?.map(s=>s.name).join(" · ")}</div>
         </div>
       )}
 
-      {/* Articles */}
       {!isLoading&&list.length>0&&(
         <div>
-          <div style={{fontSize:11,opacity:.35,marginBottom:10,display:"flex",alignItems:"center",gap:6}}>
-            <span style={{width:6,height:6,borderRadius:"50%",background:catInfo?.color,display:"inline-block"}}/>
-            <span>{list.length} haber · {NEWS_SOURCES[cat]?.filter(s=>langFilter==="all"||s.lang===langFilter).map(s=>s.name).join(", ")}</span>
+          <div style={{fontSize:11,opacity:.3,marginBottom:12,display:"flex",alignItems:"center",gap:6}}>
+            <span style={{width:5,height:5,borderRadius:"50%",background:catInfo?.color,display:"inline-block"}}/>
+            <span>{list.length} haber</span>
           </div>
           {list.map((article,i)=>(
-            <a key={article.id||i} href={article.link} target="_blank" rel="noopener noreferrer" style={{textDecoration:"none",color:"inherit",display:"block"}}>
+            <a key={article.id||i} href={article.link} target="_blank" rel="noopener noreferrer"
+              style={{textDecoration:"none",color:"inherit",display:"block"}}>
               <div style={{
-                ...cardStyle,padding:"12px 14px",marginBottom:8,
-                display:"flex",gap:12,alignItems:"flex-start",minHeight:72,
-                borderLeft:`3px solid ${article.sourceColor}`,
-                boxShadow:`0 0 16px ${article.sourceColor}12`,
-              }}>
-                {/* Thumbnail */}
+                ...cardStyle,padding:0,marginBottom:10,overflow:"hidden",
+                border:`1px solid ${catInfo?.color}25`,
+                boxShadow:`0 0 20px ${catInfo?.color}10`,
+                transition:"transform .15s, box-shadow .15s",
+              }}
+              onTouchStart={e=>{e.currentTarget.style.transform="scale(0.98)";}}
+              onTouchEnd={e=>{e.currentTarget.style.transform="scale(1)";}}
+              >
+                {/* Thumbnail — full width if present */}
                 {article.thumb&&(
-                  <div style={{
-                    width:64,height:64,borderRadius:10,overflow:"hidden",flexShrink:0,
-                    background:"#111",
-                  }}>
+                  <div style={{width:"100%",height:140,overflow:"hidden",background:"#111",flexShrink:0}}>
                     <img src={article.thumb} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}
-                      onError={e=>{e.target.style.display="none";}}/>
+                      onError={e=>{e.target.parentElement.style.display="none";}}/>
                   </div>
                 )}
-                <div style={{flex:1,minWidth:0}}>
-                  <div style={{fontSize:13,fontWeight:700,lineHeight:1.4,marginBottom:4,
-                    display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",overflow:"hidden",
+                <div style={{padding:"12px 14px"}}>
+                  <div style={{fontSize:14,fontWeight:700,lineHeight:1.45,marginBottom:6,
+                    display:"-webkit-box",WebkitLineClamp:article.thumb?2:3,
+                    WebkitBoxOrient:"vertical",overflow:"hidden",
                   }}>{article.title}</div>
-                  {article.summary&&(
-                    <div style={{fontSize:11,opacity:.45,lineHeight:1.4,marginBottom:5,
+                  {!article.thumb&&article.summary&&(
+                    <div style={{fontSize:12,opacity:.45,lineHeight:1.45,marginBottom:6,
                       display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",overflow:"hidden",
                     }}>{article.summary}</div>
                   )}
-                  <div style={{display:"flex",alignItems:"center",gap:6}}>
+                  <div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"}}>
                     <span style={{
-                      fontSize:10,fontWeight:700,color:article.sourceColor,
+                      fontSize:10,fontWeight:700,
+                      color:article.sourceColor,
                       background:`${article.sourceColor}18`,
-                      padding:"2px 7px",borderRadius:5,
+                      padding:"2px 8px",borderRadius:5,
                     }}>{article.source}</span>
-                    <span style={{fontSize:10,opacity:.35}}>{article.lang}</span>
                     {article.pubDate&&<span style={{fontSize:10,opacity:.3}}>{timeAgo(article.pubDate)}</span>}
-                    <span style={{fontSize:10,opacity:.25,marginLeft:"auto"}}>↗</span>
+                    <span style={{fontSize:10,opacity:.2,marginLeft:"auto"}}>↗ Habere git</span>
                   </div>
                 </div>
               </div>
@@ -1479,19 +1484,79 @@ function NewsRoom({ room, onBack }) {
         </div>
       )}
 
-      {/* Empty state */}
-      {!isLoading&&list.length===0&&loaded[cat]&&(
+      {!isLoading&&list.length===0&&loaded[activeCat]&&(
         <div style={{textAlign:"center",padding:"40px 20px"}}>
           <div style={{fontSize:40,marginBottom:10}}>📡</div>
           <div style={{fontSize:14,fontWeight:600,opacity:.4,marginBottom:6}}>Haber yüklenemedi</div>
           <div style={{fontSize:12,opacity:.25,marginBottom:16}}>İnternet bağlantını kontrol et</div>
-          <button onClick={()=>fetchCategory(cat,true)} style={{
-            background:"rgba(239,68,68,0.15)",color:"#ef4444",
-            border:"1px solid rgba(239,68,68,0.3)",borderRadius:10,
-            padding:"8px 20px",fontSize:12,cursor:"pointer",fontWeight:600,
+          <button onClick={()=>fetchCategory(activeCat,true)} style={{
+            background:`${catInfo?.color}20`,color:catInfo?.color,
+            border:`1px solid ${catInfo?.color}40`,borderRadius:10,
+            padding:"10px 24px",fontSize:12,cursor:"pointer",fontWeight:600,
           }}>↻ Tekrar Dene</button>
         </div>
       )}
+    </div>
+  );
+
+  /* ── CATEGORY GRID (main view) ── */
+  return (
+    <div>
+      <StickyHeader>
+        <div style={{display:"flex",alignItems:"center",gap:10}}>
+          <button onClick={onBack} style={{
+            background:"rgba(255,255,255,0.08)",backdropFilter:"blur(4px)",
+            border:"1px solid rgba(255,255,255,0.1)",color:"#ccc",
+            width:34,height:34,borderRadius:10,fontSize:16,cursor:"pointer",
+            display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,
+          }}>◀</button>
+          <span style={{fontSize:22}}>📰</span>
+          <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>Haberler</h3>
+          <span style={{fontSize:11,opacity:.3}}>{NEWS_CATS.length} kategori</span>
+        </div>
+        <p style={{margin:"6px 0 0",fontSize:12,opacity:.35}}>Bir kategoriye dokun ve haberleri keşfet</p>
+      </StickyHeader>
+
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+        {NEWS_CATS.map(cat=>(
+          <div key={cat.id} onClick={()=>openCat(cat.id)}
+            style={{
+              background:`linear-gradient(145deg,rgba(255,255,255,0.06) 0%,rgba(255,255,255,0.02) 100%)`,
+              backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",
+              borderRadius:20,padding:"20px 16px",cursor:"pointer",
+              border:`1px solid ${cat.color}45`,
+              boxShadow:`0 0 28px ${cat.color}22, 0 0 56px ${cat.color}0a, inset 0 1px 0 rgba(255,255,255,0.08)`,
+              minHeight:110,
+              display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:8,
+              transition:"transform .15s, box-shadow .2s",
+            }}
+            onTouchStart={e=>{e.currentTarget.style.transform="scale(0.96)";}}
+            onTouchEnd={e=>{e.currentTarget.style.transform="scale(1)";}}
+            onMouseEnter={e=>{e.currentTarget.style.boxShadow=`0 0 40px ${cat.color}40, 0 0 80px ${cat.color}15, inset 0 1px 0 rgba(255,255,255,0.1)`;e.currentTarget.style.transform="scale(1.02)";}}
+            onMouseLeave={e=>{e.currentTarget.style.boxShadow=`0 0 28px ${cat.color}22, 0 0 56px ${cat.color}0a, inset 0 1px 0 rgba(255,255,255,0.08)`;e.currentTarget.style.transform="scale(1)";}}
+          >
+            <div style={{
+              fontSize:34,
+              filter:`drop-shadow(0 0 10px ${cat.color}88)`,
+              lineHeight:1,
+            }}>{cat.icon}</div>
+            <div style={{fontSize:14,fontWeight:800,color:"#fff",textAlign:"center"}}>{cat.label}</div>
+            <div style={{
+              fontSize:10,color:cat.color,opacity:.8,
+              textAlign:"center",lineHeight:1.3,
+              display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",overflow:"hidden",
+            }}>{cat.desc}</div>
+            {loaded[cat.id]&&articles[cat.id]?.length>0&&(
+              <div style={{fontSize:10,color:cat.color,fontWeight:700,opacity:.7}}>
+                {articles[cat.id].length} haber
+              </div>
+            )}
+            {loading[cat.id]&&(
+              <div style={{fontSize:10,opacity:.4,animation:"pulse 1s ease-in-out infinite"}}>yükleniyor...</div>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
