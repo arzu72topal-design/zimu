@@ -28,6 +28,9 @@ const TABS = [
 
 const SPORT_TYPES = ["Koşu","Yüzme","Bisiklet","Yoga","Ağırlık","Yürüyüş","Diğer"];
 const SPORT_EMOJI = {"Koşu":"🏃","Yüzme":"🏊","Bisiklet":"🚴","Yoga":"🧘","Ağırlık":"🏋️","Yürüyüş":"🚶","Diğer":"⚡"};
+// MET × 70kg × (duration/60) → kcal
+const SPORT_KCAL_PER_MIN = {"Koşu":10,"Yüzme":7,"Bisiklet":7,"Yoga":3.3,"Ağırlık":5,"Yürüyüş":4.7,"Diğer":5};
+const calcSportCal = (type, durationMin) => Math.round((SPORT_KCAL_PER_MIN[type]||5) * (+durationMin||0));
 const PRIORITIES = { high: "Yüksek", medium: "Orta", low: "Düşük" };
 const PCOL = { high: "#ef4444", medium: "#f59e0b", low: "#22c55e" };
 const PROJECT_STATUSES = ["Planlama","Devam Ediyor","Test","Tamamlandı"];
@@ -87,16 +90,15 @@ const addBtnStyle = {
 const filterBtnStyle = (active) => ({
   background: active ? "rgba(59,130,246,0.2)" : "rgba(255,255,255,0.04)",
   color: active ? "#3b82f6" : "#888",
-  border: active ? "1px solid rgba(59,130,246,0.3)" : "1px solid transparent",
-  padding:"7px 16px",borderRadius:20,fontSize:13,cursor:"pointer",whiteSpace:"nowrap",
+  border: active ? "1px solid rgba(59,130,246,0.3)" : "1px solid rgba(255,255,255,0.06)",
+  padding:"7px 14px",borderRadius:20,fontSize:13,cursor:"pointer",whiteSpace:"nowrap",
   fontWeight: active ? 600 : 400,
 });
 const cardStyle = {
   background:"#1c1c2e",borderRadius:16,padding:"14px 16px",marginBottom:8,
-  boxShadow:"0 1px 4px rgba(0,0,0,0.25)",
 };
 const delBtnStyle = {
-  background:"rgba(255,255,255,0.04)",border:"none",color:"#555",fontSize:14,
+  background:"rgba(255,255,255,0.05)",border:"none",color:"#666",fontSize:14,
   cursor:"pointer",padding:0,width:32,height:32,borderRadius:8,
   display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,
 };
@@ -107,7 +109,8 @@ const checkBtnStyle = (done) => ({
   width:28,height:28,borderRadius:8,border:`2px solid ${done?"#22c55e":"rgba(255,255,255,0.15)"}`,
   background:done?"#22c55e":"transparent",color:"#fff",cursor:"pointer",
   display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,
-  flexShrink:0,padding:0,transition:"all .15s",
+  flexShrink:0,padding:0,transition:"all .2s",
+  animation:done?"checkPop .3s ease":undefined,
 });
 
 /* ── Modal ── */
@@ -162,64 +165,57 @@ function Toast({ message, visible }) {
 }
 
 
-/* ── StickyHeader ── */
-function StickyHeader({ title, right, sub }) {
+/* ── Shared UI helpers ── */
+
+function StickyHeader({ children }) {
   return (
     <div style={{
       position:"sticky",top:0,zIndex:50,
       background:"rgba(15,15,26,0.97)",
       backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",
       marginLeft:-16,marginRight:-16,
-      padding:"12px 16px 10px",
-      borderBottom:"1px solid rgba(255,255,255,0.06)",
-      display:"flex",justifyContent:"space-between",alignItems:"center",
+      padding:"14px 16px 12px",
+      borderBottom:"1px solid rgba(255,255,255,0.07)",
       marginBottom:14,
     }}>
-      <div>
-        <h3 style={{margin:0,fontSize:20,fontWeight:800,letterSpacing:-.3}}>{title}</h3>
-        {sub && <div style={{fontSize:12,color:"#666",marginTop:1}}>{sub}</div>}
-      </div>
-      {right && <div>{right}</div>}
+      {children}
     </div>
   );
 }
 
-/* ── FAB (Floating Action Button) ── */
-function FAB({ onClick, color="#3b82f6", icon="+" }) {
-  return (
-    <button onClick={onClick} style={{
-      position:"fixed",
-      right:20,
-      bottom:100,
-      width:56,height:56,
-      borderRadius:"50%",
-      background:color,
-      color:"#fff",
-      border:"none",
-      fontSize:26,
-      fontWeight:300,
-      cursor:"pointer",
-      display:"flex",alignItems:"center",justifyContent:"center",
-      boxShadow:`0 4px 20px ${color}66`,
-      zIndex:900,
-      transition:"transform .15s, box-shadow .15s",
-    }}
-    onTouchStart={e=>e.currentTarget.style.transform="scale(0.93)"}
-    onTouchEnd={e=>e.currentTarget.style.transform="scale(1)"}
-    >{icon}</button>
-  );
-}
-
-/* ── GroupLabel ── */
-function GroupLabel({ label, color="#666" }) {
+function GroupLabel({ label, count, color }) {
   return (
     <div style={{
       display:"flex",alignItems:"center",gap:6,
-      marginTop:12,marginBottom:6,
+      fontSize:11,fontWeight:700,color:"#666",
+      textTransform:"uppercase",letterSpacing:".07em",
+      marginBottom:8,marginTop:4,
     }}>
-      <div style={{width:6,height:6,borderRadius:"50%",background:color,flexShrink:0}}/>
-      <span style={{fontSize:11,fontWeight:700,color:"#666",textTransform:"uppercase",letterSpacing:.06*11}}>{label}</span>
+      <span style={{width:6,height:6,borderRadius:"50%",background:color,flexShrink:0}}/>
+      {label}
+      {count != null && <span style={{opacity:.6}}>({count})</span>}
     </div>
+  );
+}
+
+function FAB({ onClick, color="#3b82f6" }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        position:"fixed",right:20,bottom:100,
+        width:56,height:56,borderRadius:"50%",
+        background:color,color:"#fff",border:"none",
+        fontSize:28,fontWeight:300,lineHeight:1,cursor:"pointer",
+        display:"flex",alignItems:"center",justifyContent:"center",
+        boxShadow:`0 4px 24px ${color}55`,
+        zIndex:900,transition:"transform .1s",
+      }}
+      onMouseDown={e=>e.currentTarget.style.transform="scale(0.93)"}
+      onMouseUp={e=>e.currentTarget.style.transform="scale(1)"}
+      onTouchStart={e=>e.currentTarget.style.transform="scale(0.93)"}
+      onTouchEnd={e=>e.currentTarget.style.transform="scale(1)"}
+    >+</button>
   );
 }
 
@@ -232,12 +228,11 @@ function Dashboard({ data, setTab }) {
 
   const pending = data.tasks.filter(x=>!x.done).length;
   const done = data.tasks.filter(x=>x.done).length;
-  const total = data.tasks.length;
   const overdue = data.tasks.filter(x=>!x.done && x.dueDate && x.dueDate < t).length;
-  const taskScore = total > 0 ? Math.round(done/total*100) : 0;
-  const urgentTasks = data.tasks.filter(x=>!x.done).sort((a,b)=>{
-    const po={high:0,medium:1,low:2}; return (po[a.priority]||1)-(po[b.priority]||1);
-  }).slice(0,3);
+  const urgentTasks = data.tasks
+    .filter(x=>!x.done)
+    .sort((a,b)=>{const po={high:0,medium:1,low:2};return (po[a.priority]||1)-(po[b.priority]||1);})
+    .slice(0,3);
 
   const todayEv = data.events.filter(e=>e.date===t);
   const upcoming = data.events.filter(e=>e.date>=t).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,3);
@@ -248,62 +243,66 @@ function Dashboard({ data, setTab }) {
   const todayFoods = foods.filter(f=>f.date===t);
   const todayCalIn = todayFoods.reduce((a,f)=>a+(f.calories||0),0);
   const todayCalOut = data.sports.filter(s=>s.date===t).reduce((a,s)=>a+(s.calories||0),0);
-  const netCal = todayCalIn - todayCalOut;
-  const healthGoal = 2000;
-
-  const totalRoomItems = rooms.reduce((a,r)=> a + (r.type==="project" ? data.projects.length : (roomItems[r.id]||[]).length), 0);
   const activeProjects = data.projects.filter(p=>p.status!=="Tamamlandı").length;
 
   const hour = new Date().getHours();
   const greeting = hour<12 ? "Günaydın" : hour<18 ? "İyi günler" : "İyi akşamlar";
 
-  // Combine urgent tasks + upcoming events for "Bugünün Programı"
-  const programItems = [
-    ...urgentTasks.slice(0,2).map(t=>({
-      id:t.id, title:t.title, sub:"Görev", color:PCOL[t.priority]||"#3b82f6", type:"task"
-    })),
-    ...upcoming.slice(0,2).map(e=>({
-      id:e.id, title:e.title, sub:(e.time||"")+(e.time?" · ":"")+"Takvim", color:e.color||"#a855f7", type:"event"
-    })),
+  const scheduleItems = [
+    ...urgentTasks.slice(0,2).map(tk=>({ type:"task", id:tk.id, title:tk.title, sub:PRIORITIES[tk.priority]+" öncelik", color:PCOL[tk.priority] })),
+    ...upcoming.slice(0,2).map(e=>({ type:"event", id:e.id, title:e.title, sub:e.time||e.date.slice(5), color:e.color||"#a855f7" })),
   ].slice(0,4);
 
   return (
     <div>
-      {/* ── Hero greeting ── */}
+      {/* HERO */}
       <div style={{
-        background:"linear-gradient(135deg,rgba(59,130,246,0.12),rgba(168,85,247,0.06))",
-        borderRadius:20,padding:"16px",marginBottom:12,
-        border:"1px solid rgba(59,130,246,0.1)",
+        background:"linear-gradient(135deg,#1a2448 0%,#1c1c2e 60%,#1f1a2e 100%)",
+        borderRadius:20,padding:"20px 18px 18px",marginBottom:14,
+        border:"1px solid rgba(255,255,255,0.06)",
       }}>
-        <h2 style={{margin:0,fontSize:22,fontWeight:800,letterSpacing:-.5}}>{greeting}! 👋</h2>
-        <p style={{margin:"4px 0 12px",opacity:.45,fontSize:13}}>
+        <h2 style={{margin:0,fontSize:23,fontWeight:800,letterSpacing:-.5}}>{greeting}! 👋</h2>
+        <p style={{margin:"4px 0 16px",opacity:.45,fontSize:13}}>
           {new Date().toLocaleDateString("tr-TR",{weekday:"long",day:"numeric",month:"long"})}
         </p>
-
-        {/* 2×2 quick stats */}
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
           {[
-            {val:pending,label:"Görev bekliyor",color:"#3b82f6",tab:"tasks"},
-            {val:todayEv.length,label:"Bugün etkinlik",color:"#a855f7",tab:"calendar"},
-            {val:todayCalIn,label:"kcal alındı",color:"#f97316",tab:"sports"},
-            {val:activeProjects,label:"Aktif proje",color:"#22c55e",tab:"projects"},
-          ].map((s,i)=>(
-            <div key={i} onClick={()=>setTab(s.tab)} style={{
-              background:`${s.color}18`,borderRadius:14,padding:"12px",textAlign:"center",
-              cursor:"pointer",border:`1px solid ${s.color}20`,
-              transition:"opacity .15s",
+            {label:"Bekleyen görev",val:pending,color:"#3b82f6",tab:"tasks"},
+            {label:"Bugün etkinlik",val:todayEv.length,color:"#a855f7",tab:"calendar"},
+            {label:"kcal alındı",val:todayCalIn,color:"#f97316",tab:"sports"},
+            {label:"Aktif proje",val:activeProjects,color:"#22c55e",tab:"projects"},
+          ].map(s=>(
+            <div key={s.tab} onClick={()=>setTab(s.tab)} style={{
+              background:`${s.color}18`,borderRadius:14,padding:"12px 14px",cursor:"pointer",
+              border:`1px solid ${s.color}25`,
             }}>
-              <div style={{fontSize:22,fontWeight:800,color:s.color,lineHeight:1}}>{s.val}</div>
-              <div style={{fontSize:11,color:s.color,opacity:.75,marginTop:3}}>{s.label}</div>
+              <div style={{fontSize:24,fontWeight:800,color:s.color,letterSpacing:-.5}}>{s.val}</div>
+              <div style={{fontSize:11,color:s.color,opacity:.8,marginTop:2}}>{s.label}</div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* ── Overdue banner ── */}
-      {overdue > 0 && (
-        <div onClick={()=>setTab("tasks")} style={{background:"rgba(239,68,68,0.1)",border:"1px solid rgba(239,68,68,0.2)",
-          borderRadius:14,padding:"12px 14px",marginBottom:12,display:"flex",alignItems:"center",gap:10,cursor:"pointer"}}>
+      {/* Quick actions */}
+      <div style={{display:"flex",gap:8,marginBottom:14}}>
+        {[
+          {label:"+ Görev",tab:"tasks",color:"#3b82f6"},
+          {label:"+ Yemek",tab:"sports",color:"#f97316"},
+          {label:"+ Spor",tab:"sports",color:"#22c55e"},
+        ].map(a=>(
+          <button key={a.label} onClick={()=>setTab(a.tab)} style={{
+            flex:1,background:`${a.color}15`,color:a.color,border:`1px solid ${a.color}25`,
+            borderRadius:12,padding:"10px 4px",fontSize:12,fontWeight:700,cursor:"pointer",
+          }}>{a.label}</button>
+        ))}
+      </div>
+
+      {overdue>0&&(
+        <div onClick={()=>setTab("tasks")} style={{
+          background:"rgba(239,68,68,0.1)",border:"1px solid rgba(239,68,68,0.2)",
+          borderRadius:14,padding:"12px 14px",marginBottom:12,
+          display:"flex",alignItems:"center",gap:10,cursor:"pointer",
+        }}>
           <span style={{fontSize:20}}>🚨</span>
           <div style={{flex:1}}>
             <div style={{fontSize:14,fontWeight:700,color:"#ef4444"}}>{overdue} gecikmiş görev!</div>
@@ -313,18 +312,18 @@ function Dashboard({ data, setTab }) {
         </div>
       )}
 
-      {/* ── Bugünün Programı ── */}
-      {programItems.length > 0 && (
-        <div style={{marginBottom:12}}>
-          <div style={{fontSize:11,fontWeight:700,color:"#666",textTransform:"uppercase",letterSpacing:.6,marginBottom:8}}>Bugünün Programı</div>
-          {programItems.map(item=>(
+      {scheduleItems.length>0&&(
+        <div style={{marginBottom:14}}>
+          <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em",marginBottom:8}}>Bugünün Programı</div>
+          {scheduleItems.map(item=>(
             <div key={item.id} onClick={()=>setTab(item.type==="task"?"tasks":"calendar")} style={{
-              ...cardStyle,display:"flex",alignItems:"center",gap:12,cursor:"pointer",minHeight:52,
+              background:"#1c1c2e",borderRadius:16,padding:"13px 14px",marginBottom:6,
+              display:"flex",alignItems:"center",gap:12,cursor:"pointer",minHeight:54,
             }}>
               <div style={{width:3,height:36,background:item.color,borderRadius:2,flexShrink:0}}/>
               <div style={{flex:1,minWidth:0}}>
-                <div style={{fontSize:14,fontWeight:500,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.title}</div>
-                <div style={{fontSize:11,opacity:.45,marginTop:2}}>{item.sub}</div>
+                <div style={{fontSize:14,fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.title}</div>
+                <div style={{fontSize:11,opacity:.4,marginTop:2}}>{item.type==="task"?"Görev":"Etkinlik"} · {item.sub}</div>
               </div>
               <span style={{fontSize:11,opacity:.2}}>▶</span>
             </div>
@@ -332,37 +331,37 @@ function Dashboard({ data, setTab }) {
         </div>
       )}
 
-      {/* ── Bu Hafta ── */}
-      <div style={{marginBottom:12}}>
-        <div style={{fontSize:11,fontWeight:700,color:"#666",textTransform:"uppercase",letterSpacing:.6,marginBottom:8}}>Bu Hafta</div>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
-          <div style={{background:"#1c1c2e",borderRadius:14,padding:"12px 10px",textAlign:"center"}}>
-            <div style={{fontSize:18,fontWeight:800,color:"#3b82f6"}}>{wkSport.length}</div>
-            <div style={{fontSize:9,opacity:.4}}>💪 Antrenman</div>
-          </div>
-          <div style={{background:"#1c1c2e",borderRadius:14,padding:"12px 10px",textAlign:"center"}}>
-            <div style={{fontSize:18,fontWeight:800,color:"#f97316"}}>{wkBurned}</div>
-            <div style={{fontSize:9,opacity:.4}}>🔥 kcal</div>
-          </div>
-          <div style={{background:"#1c1c2e",borderRadius:14,padding:"12px 10px",textAlign:"center"}}>
-            <div style={{fontSize:18,fontWeight:800,color:"#22c55e"}}>{taskScore}%</div>
-            <div style={{fontSize:9,opacity:.4}}>✓ Görev</div>
-          </div>
+      <div style={{marginBottom:14}}>
+        <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em",marginBottom:8}}>Bu Hafta</div>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8}}>
+          {[
+            {val:wkSport.length,label:"Antrenman",color:"#3b82f6"},
+            {val:wkBurned,label:"kcal yakıldı",color:"#ef4444"},
+            {val:done,label:"Görev bitti",color:"#22c55e"},
+          ].map((s,i)=>(
+            <div key={i} style={{background:"#1c1c2e",borderRadius:14,padding:"12px 10px",textAlign:"center"}}>
+              <div style={{fontSize:20,fontWeight:800,color:s.color,letterSpacing:-.5}}>{s.val}</div>
+              <div style={{fontSize:10,opacity:.4,marginTop:3,lineHeight:1.2}}>{s.label}</div>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* ── Son Notlar ── */}
-      {data.notes.length > 0 && (
-        <div style={{marginBottom:12}}>
-          <div style={{fontSize:11,fontWeight:700,color:"#666",textTransform:"uppercase",letterSpacing:.6,marginBottom:8}}>Son Notlar</div>
-          <div style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:6,WebkitOverflowScrolling:"touch"}}>
+      {data.notes.length>0&&(
+        <div>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+            <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em"}}>Son Notlar</div>
+            <button onClick={()=>setTab("notes")} style={{background:"none",border:"none",color:"#3b82f6",fontSize:12,cursor:"pointer",fontWeight:600}}>Tümü ▶</button>
+          </div>
+          <div style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:4,WebkitOverflowScrolling:"touch"}}>
             {data.notes.slice(0,5).map(n=>(
               <div key={n.id} onClick={()=>setTab("notes")} style={{
-                background:"#1c1c2e",borderRadius:14,padding:"12px",minWidth:130,flexShrink:0,cursor:"pointer",
+                background:"#1c1c2e",borderRadius:14,padding:"10px 12px",
+                minWidth:130,maxWidth:160,cursor:"pointer",flexShrink:0,
                 borderTop:`3px solid ${n.color||"#14b8a6"}`,
               }}>
-                <div style={{fontSize:12,fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",marginBottom:4}}>{n.title}</div>
-                <div style={{fontSize:10,opacity:.4,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{n.content||"—"}</div>
+                <div style={{fontSize:12,fontWeight:700,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{n.title}</div>
+                {n.content&&<div style={{fontSize:11,opacity:.4,marginTop:4,overflow:"hidden",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",lineHeight:1.4}}>{n.content}</div>}
               </div>
             ))}
           </div>
@@ -404,24 +403,25 @@ function Tasks({ data, update }) {
   const tomorrow = ()=>{ const d=new Date(); d.setDate(d.getDate()+1); return d.toISOString().split("T")[0]; };
   const nextWeek = ()=>{ const d=new Date(); d.setDate(d.getDate()+7); return d.toISOString().split("T")[0]; };
   const nextMonth = ()=>{ const d=new Date(); d.setMonth(d.getMonth()+1); return d.toISOString().split("T")[0]; };
-  const todayStr = today();
+  const weekEnd = nextWeek();
 
   const quickDates = [
-    {label:"Bugün",val:todayStr,icon:"📌"},
+    {label:"Bugün",val:t,icon:"📌"},
     {label:"Yarın",val:tomorrow(),icon:"⏭"},
-    {label:"1 Hafta",val:nextWeek(),icon:"📅"},
+    {label:"1 Hafta",val:weekEnd,icon:"📅"},
     {label:"1 Ay",val:nextMonth(),icon:"🗓"},
   ];
 
   const formatDate = (d) => {
     if(!d) return "";
-    if(d===todayStr) return "Bugün";
+    if(d===t) return "Bugün";
     if(d===tomorrow()) return "Yarın";
-    const dt = new Date(d);
-    return dt.toLocaleDateString("tr-TR",{day:"numeric",month:"short"});
+    return new Date(d).toLocaleDateString("tr-TR",{day:"numeric",month:"short"});
   };
 
-  const all = data.tasks.filter(task=>{
+  const pending = data.tasks.filter(x=>!x.done).length;
+
+  const list = data.tasks.filter(task=>{
     if(filter==="done")return task.done;
     if(filter==="pending")return !task.done;
     if(filter==="high")return task.priority==="high"&&!task.done;
@@ -429,27 +429,23 @@ function Tasks({ data, update }) {
     return true;
   });
 
-  // Grouped sections (only when showing all/pending)
-  const showGroups = filter==="all" || filter==="pending";
-  const overdueTasks = all.filter(x=>!x.done && x.dueDate && x.dueDate < t);
-  const todayTasks   = all.filter(x=>!x.done && x.dueDate===t);
-  const weekTasks    = all.filter(x=>!x.done && x.dueDate && x.dueDate>t && x.dueDate<=nextWeek());
-  const pendingTasks = all.filter(x=>!x.done && (!x.dueDate || (x.dueDate>nextWeek())));
-  const doneTasks    = all.filter(x=>x.done);
+  const groups = filter==="all" ? [
+    {key:"overdue",label:"Gecikmiş",color:"#ef4444",tasks:list.filter(x=>!x.done&&x.dueDate&&x.dueDate<t)},
+    {key:"today",label:"Bugün",color:"#3b82f6",tasks:list.filter(x=>!x.done&&x.dueDate===t)},
+    {key:"week",label:"Bu Hafta",color:"#a855f7",tasks:list.filter(x=>!x.done&&x.dueDate&&x.dueDate>t&&x.dueDate<=weekEnd)},
+    {key:"pending",label:"Bekleyen",color:"#888",tasks:list.filter(x=>!x.done&&(!x.dueDate||x.dueDate>weekEnd))},
+    {key:"done",label:"Tamamlanan",color:"#22c55e",tasks:list.filter(x=>x.done)},
+  ].filter(g=>g.tasks.length>0) : null;
 
-  const pendingCount = data.tasks.filter(x=>!x.done).length;
-
-  const TaskCard = ({task}) => (
-    <div key={task.id} style={{...cardStyle,display:"flex",alignItems:"center",gap:12,opacity:task.done?.5:1,minHeight:52}}>
+  const TaskCard = ({ task }) => (
+    <div style={{...cardStyle,display:"flex",alignItems:"center",gap:12,minHeight:52,opacity:task.done?.5:1}}>
       <button onClick={()=>toggle(task.id)} style={checkBtnStyle(task.done)}>{task.done&&"✓"}</button>
       <div style={{flex:1,minWidth:0,cursor:"pointer"}} onClick={()=>setDetail(detail===task.id?null:task.id)}>
-        <div style={{fontSize:15,fontWeight:500,textDecoration:task.done?"line-through":"none",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{task.title}</div>
-        <div style={{fontSize:11,opacity:.5,marginTop:3,display:"flex",gap:6,flexWrap:"wrap",alignItems:"center"}}>
-          {task.priority&&!task.done&&(
-            <span style={{background:`${PCOL[task.priority]}20`,color:PCOL[task.priority],padding:"1px 7px",borderRadius:6,fontSize:10,fontWeight:600}}>{PRIORITIES[task.priority]}</span>
-          )}
-          {task.category&&<span style={{background:"rgba(59,130,246,0.12)",color:"#3b82f6",padding:"1px 8px",borderRadius:6,fontSize:10}}>{task.category}</span>}
-          {task.dueDate&&<span style={{color:!task.done&&task.dueDate<today()?"#ef4444":"inherit"}}>📅 {formatDate(task.dueDate)}</span>}
+        <div style={{fontSize:15,fontWeight:600,textDecoration:task.done?"line-through":"none",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{task.title}</div>
+        <div style={{display:"flex",gap:6,marginTop:4,flexWrap:"wrap",alignItems:"center"}}>
+          {task.priority&&<span style={{background:`${PCOL[task.priority]}20`,color:PCOL[task.priority],padding:"2px 8px",borderRadius:6,fontSize:11,fontWeight:600}}>{PRIORITIES[task.priority]}</span>}
+          {task.category&&<span style={{background:"rgba(59,130,246,0.12)",color:"#3b82f6",padding:"2px 8px",borderRadius:6,fontSize:11}}>{task.category}</span>}
+          {task.dueDate&&<span style={{fontSize:11,color:!task.done&&task.dueDate<t?"#ef4444":"#666"}}>{formatDate(task.dueDate)}</span>}
         </div>
       </div>
       <button onClick={()=>del(task.id)} style={delBtnStyle}>✕</button>
@@ -458,37 +454,50 @@ function Tasks({ data, update }) {
 
   return (
     <div>
-      <StickyHeader
-        title="Görevler"
-        sub={pendingCount > 0 ? `${pendingCount} bekliyor` : "Hepsi tamamlandı 🎉"}
-      />
+      <StickyHeader>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+          <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Görevler</h3>
+          <span style={{fontSize:12,opacity:.4,fontWeight:500}}>{pending} bekliyor</span>
+        </div>
+        <div style={{display:"flex",gap:6,overflowX:"auto",paddingBottom:2,WebkitOverflowScrolling:"touch"}}>
+          {[["all","Tümü"],["pending","Bekleyen"],["done","Bitti"],["high","Öncelikli"],["overdue","Gecikmiş"]].map(([k,v])=>(
+            <button key={k} onClick={()=>setFilter(k)} style={filterBtnStyle(filter===k)}>{v}</button>
+          ))}
+        </div>
+      </StickyHeader>
 
-      <div style={{display:"flex",gap:6,marginBottom:14,overflowX:"auto",paddingBottom:4,WebkitOverflowScrolling:"touch"}}>
-        {[["all","Tümü"],["pending","Bekleyen"],["done","Bitti"],["high","Öncelikli"],["overdue","Gecikmiş"]].map(([k,v])=>(
-          <button key={k} onClick={()=>setFilter(k)} style={filterBtnStyle(filter===k)}>{v}</button>
-        ))}
-      </div>
-
-      {all.length===0 && <p style={{textAlign:"center",opacity:.3,fontSize:14,padding:40}}>Görev yok</p>}
-
-      {showGroups ? (
-        <>
-          {overdueTasks.length>0&&<><GroupLabel label="Gecikmiş" color="#ef4444"/>{overdueTasks.map(t=><TaskCard key={t.id} task={t}/>)}</>}
-          {todayTasks.length>0&&<><GroupLabel label="Bugün" color="#3b82f6"/>{todayTasks.map(t=><TaskCard key={t.id} task={t}/>)}</>}
-          {weekTasks.length>0&&<><GroupLabel label="Bu Hafta" color="#f59e0b"/>{weekTasks.map(t=><TaskCard key={t.id} task={t}/>)}</>}
-          {pendingTasks.length>0&&<><GroupLabel label="Bekleyen" color="#888"/>{pendingTasks.map(t=><TaskCard key={t.id} task={t}/>)}</>}
-          {doneTasks.length>0&&<><GroupLabel label="Tamamlanan" color="#22c55e"/>{doneTasks.map(t=><TaskCard key={t.id} task={t}/>)}</>}
-        </>
+      {groups ? (
+        groups.length===0
+          ? (
+            <div style={{textAlign:"center",padding:"40px 20px"}}>
+              <div style={{fontSize:40,marginBottom:8}}>✅</div>
+              <div style={{fontSize:14,fontWeight:600,opacity:.4,marginBottom:4}}>Tüm görevler tamamlandı!</div>
+              <div style={{fontSize:12,opacity:.25}}>+ ile yeni görev ekle</div>
+            </div>
+          )
+          : groups.map(group=>(
+            <div key={group.key} style={{marginBottom:16}}>
+              <GroupLabel label={group.label} count={group.tasks.length} color={group.color}/>
+              {group.tasks.map(task=><TaskCard key={task.id} task={task}/>)}
+            </div>
+          ))
       ) : (
-        all.map(task=><TaskCard key={task.id} task={task}/>)
+        list.length===0
+          ? (
+            <div style={{textAlign:"center",padding:"40px 20px"}}>
+              <div style={{fontSize:40,marginBottom:8}}>✅</div>
+              <div style={{fontSize:14,fontWeight:600,opacity:.4,marginBottom:4}}>Tüm görevler tamamlandı!</div>
+              <div style={{fontSize:12,opacity:.25}}>+ ile yeni görev ekle</div>
+            </div>
+          )
+          : list.map(task=><TaskCard key={task.id} task={task}/>)
       )}
 
-      {/* Task Detail View */}
       {detail && (() => {
-        const task = data.tasks.find(t=>t.id===detail);
+        const task = data.tasks.find(tk=>tk.id===detail);
         if(!task) return null;
         return (
-          <div style={{background:"#1c1c2e",borderRadius:14,padding:16,marginTop:8,border:"1px solid rgba(59,130,246,0.2)"}}>
+          <div style={{background:"#1c1c2e",borderRadius:16,padding:16,marginTop:8,border:"1px solid rgba(59,130,246,0.2)"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
               <h4 style={{margin:0,fontSize:16,fontWeight:700}}>{task.title}</h4>
               <div style={{display:"flex",gap:6}}>
@@ -507,15 +516,12 @@ function Tasks({ data, update }) {
         );
       })()}
 
-      <FAB onClick={openNew} color="#3b82f6"/>
+      <FAB onClick={openNew}/>
 
-      {/* Add / Edit Modal */}
       <Modal open={modal} onClose={()=>{setModal(false);setEditingId(null);}} title={editingId?"Görevi Düzenle":"Yeni Görev"}>
         <input style={inp} placeholder="Görev başlığı..." value={form.title} onChange={e=>setForm({...form,title:e.target.value})} autoFocus/>
         <textarea style={{...inp,minHeight:80,resize:"vertical",fontFamily:"inherit",lineHeight:1.5}} placeholder="Açıklama (opsiyonel)..." value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/>
         <input style={inp} placeholder="Kategori (opsiyonel)" value={form.category} onChange={e=>setForm({...form,category:e.target.value})}/>
-
-        {/* Quick date buttons */}
         <div style={{marginBottom:10}}>
           <div style={{fontSize:12,opacity:.5,marginBottom:6}}>Tarih seç:</div>
           <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:8}}>
@@ -528,8 +534,7 @@ function Tasks({ data, update }) {
               }}>{q.icon} {q.label}</button>
             ))}
             {form.dueDate&&<button onClick={()=>setForm({...form,dueDate:""})} style={{
-              background:"rgba(239,68,68,0.1)",color:"#ef4444",
-              border:"1px solid rgba(239,68,68,0.2)",
+              background:"rgba(239,68,68,0.1)",color:"#ef4444",border:"1px solid rgba(239,68,68,0.2)",
               padding:"8px 12px",borderRadius:10,fontSize:13,cursor:"pointer",
             }}>✕ Temizle</button>}
           </div>
@@ -538,8 +543,6 @@ function Tasks({ data, update }) {
             {form.dueDate&&<span style={{fontSize:13,color:"#3b82f6",fontWeight:600,whiteSpace:"nowrap"}}>{formatDate(form.dueDate)}</span>}
           </div>
         </div>
-
-        {/* Priority */}
         <div style={{marginBottom:12}}>
           <div style={{fontSize:12,opacity:.5,marginBottom:6}}>Öncelik:</div>
           <div style={{display:"flex",gap:6}}>
@@ -556,7 +559,6 @@ function Tasks({ data, update }) {
             ))}
           </div>
         </div>
-
         <button style={btnPrimary} onClick={save}>{editingId?"Kaydet":"Ekle"}</button>
         {editingId&&<button onClick={()=>{del(editingId);setModal(false);setEditingId(null);}} style={{...btnPrimary,background:"#ef4444",marginTop:8}}>Görevi Sil</button>}
       </Modal>
@@ -605,16 +607,20 @@ function CalendarView({ data, update }) {
   };
   const del=id=>update({...data,events:data.events.filter(e=>e.id!==id)});
 
-  const openAdd = () => { setModal(true); setForm({title:"",date:"",time:"",color:"#3b82f6",description:"",recurring:"none"}); };
+  const openAdd=()=>{setModal(true);setForm({title:"",date:selDay?ds(selDay):"",time:"",color:"#3b82f6",description:"",recurring:"none"});};
 
   return (
     <div>
-      <StickyHeader title="Takvim" sub={`${data.events.length} etkinlik`}/>
-      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12,background:"#1c1c2e",borderRadius:12,padding:"10px 14px"}}>
-        <button onClick={()=>setVd(new Date(y,m-1))} style={{background:"none",border:"none",color:"#aaa",fontSize:20,cursor:"pointer",padding:"4px 10px"}}>◀</button>
-        <span style={{fontWeight:700,fontSize:16}}>{MN[m]} {y}</span>
-        <button onClick={()=>setVd(new Date(y,m+1))} style={{background:"none",border:"none",color:"#aaa",fontSize:20,cursor:"pointer",padding:"4px 10px"}}>▶</button>
-      </div>
+      <StickyHeader>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+          <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Takvim</h3>
+          <div style={{display:"flex",alignItems:"center",gap:6}}>
+            <button onClick={()=>setVd(new Date(y,m-1))} style={{background:"rgba(255,255,255,0.07)",border:"none",color:"#aaa",width:32,height:32,borderRadius:10,fontSize:16,cursor:"pointer"}}>◀</button>
+            <span style={{fontWeight:700,fontSize:14,minWidth:105,textAlign:"center"}}>{MN[m]} {y}</span>
+            <button onClick={()=>setVd(new Date(y,m+1))} style={{background:"rgba(255,255,255,0.07)",border:"none",color:"#aaa",width:32,height:32,borderRadius:10,fontSize:16,cursor:"pointer"}}>▶</button>
+          </div>
+        </div>
+      </StickyHeader>
       <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:3}}>
         {DN.map(d=><div key={d} style={{textAlign:"center",fontSize:11,fontWeight:700,opacity:.4,padding:"6px 0"}}>{d}</div>)}
         {cells.map((d,i)=>{
@@ -642,7 +648,7 @@ function CalendarView({ data, update }) {
         <div style={{background:"#1c1c2e",borderRadius:14,padding:16,marginTop:12}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
             <h4 style={{margin:0,fontSize:15,fontWeight:700}}>{selDay} {MN[m]}</h4>
-            <button onClick={()=>{setModal(true);setForm({title:"",date:ds(selDay),time:"",color:"#3b82f6",description:"",recurring:"none"});}} style={{background:"rgba(59,130,246,0.15)",color:"#3b82f6",border:"none",borderRadius:8,padding:"6px 14px",fontSize:12,cursor:"pointer",fontWeight:600}}>+ Ekle</button>
+            <button onClick={openAdd} style={{background:"rgba(59,130,246,0.15)",color:"#3b82f6",border:"none",borderRadius:8,padding:"6px 14px",fontSize:12,cursor:"pointer",fontWeight:600}}>+ Ekle</button>
           </div>
           {evOn(selDay).length===0&&<p style={{opacity:.3,fontSize:13,margin:0}}>Etkinlik yok</p>}
           {evOn(selDay).map((e,idx)=>(
@@ -658,7 +664,29 @@ function CalendarView({ data, update }) {
           ))}
         </div>
       )}
+      {/* Upcoming events list */}
+      {(() => {
+        const upEv = data.events.filter(e=>e.date>=t).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,8);
+        if(upEv.length===0) return null;
+        return (
+          <div style={{marginBottom:14}}>
+            <GroupLabel label="Yaklaşan" count={upEv.length} color="#a855f7"/>
+            {upEv.map(e=>(
+              <div key={e.id} style={{...cardStyle,display:"flex",alignItems:"center",gap:12,minHeight:52}}>
+                <span style={{width:10,height:10,borderRadius:"50%",background:e.color||"#a855f7",flexShrink:0}}/>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontSize:14,fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{e.title}</div>
+                  <div style={{fontSize:11,opacity:.45,marginTop:2}}>{e.date}{e.time?` · ${e.time}`:""}</div>
+                </div>
+                <button onClick={()=>update({...data,events:data.events.filter(ev=>ev.id!==e.id)})} style={delBtnStyle}>✕</button>
+              </div>
+            ))}
+          </div>
+        );
+      })()}
+
       <FAB onClick={openAdd} color="#a855f7"/>
+
       <Modal open={modal} onClose={()=>setModal(false)} title="Yeni Etkinlik">
         <input style={inp} placeholder="Etkinlik adı..." value={form.title} onChange={e=>setForm({...form,title:e.target.value})} autoFocus/>
         <div style={{display:"flex",gap:8}}>
@@ -781,7 +809,10 @@ function Sports({ data, update }) {
 
   const addSport=()=>{
     if(!form.duration)return;
-    const ns={id:uid(),...form,duration:+form.duration,distance:+form.distance||0,calories:+form.calories||0};
+    // Auto-calculate calories if not manually entered
+    const autoCal = calcSportCal(form.type, form.duration);
+    const finalCal = form.calories ? +form.calories : autoCal;
+    const ns={id:uid(),...form,duration:+form.duration,distance:+form.distance||0,calories:finalCal};
     update({...data,sports:[ns,...data.sports]});
     setModal(false);setForm({type:"Koşu",duration:"",distance:"",calories:"",date:today(),notes:""});
   };
@@ -886,23 +917,19 @@ function Sports({ data, update }) {
 
   return (
     <div>
-      <StickyHeader title="Sağlık Koçu"/>
-
-      {/* iOS-style segment control */}
-      <div style={{
-        background:"rgba(255,255,255,0.06)",borderRadius:12,padding:3,
-        display:"flex",marginBottom:14,
-      }}>
-        {[["overview","📊 Özet"],["sport","🏃 Spor"],["food","🍽 Beslenme"]].map(([k,v])=>(
-          <button key={k} onClick={()=>setView(k)} style={{
-            flex:1,padding:"8px 4px",borderRadius:10,fontSize:13,cursor:"pointer",border:"none",
-            fontWeight:view===k?600:400,
-            background:view===k?"#2a2a45":"transparent",
-            color:view===k?"#e0e0e0":"#666",
-            transition:"all .18s",
-          }}>{v}</button>
-        ))}
-      </div>
+      <StickyHeader>
+        <h3 style={{margin:"0 0 12px",fontSize:20,fontWeight:800}}>Sağlık Koçu</h3>
+        <div style={{background:"rgba(255,255,255,0.05)",borderRadius:12,padding:3,display:"flex"}}>
+          {[["overview","Özet"],["sport","Spor"],["food","Beslenme"]].map(([k,v])=>(
+            <button key={k} onClick={()=>setView(k)} style={{
+              flex:1,padding:"9px 6px",borderRadius:9,border:"none",cursor:"pointer",
+              fontSize:13,fontWeight:view===k?700:500,letterSpacing:-.2,
+              background:view===k?"#2a2a45":"transparent",
+              color:view===k?"#e0e0e0":"#666",transition:"all .2s",
+            }}>{v}</button>
+          ))}
+        </div>
+      </StickyHeader>
 
       {/* ── OVERVIEW ── */}
       {view==="overview"&&(<>
@@ -958,8 +985,13 @@ function Sports({ data, update }) {
 
       {/* ── SPORT ── */}
       {view==="sport"&&(<>
-        <FAB onClick={()=>setModal(true)} color="#22c55e"/>
-        {data.sports.length===0&&<p style={{textAlign:"center",opacity:.3,fontSize:14,padding:40}}>Henüz kayıt yok</p>}
+        {data.sports.length===0&&(
+          <div style={{textAlign:"center",padding:"40px 20px"}}>
+            <div style={{fontSize:40,marginBottom:8}}>🏃</div>
+            <div style={{fontSize:14,fontWeight:600,opacity:.4,marginBottom:4}}>Henüz antrenman kaydı yok</div>
+            <div style={{fontSize:12,opacity:.25}}>Sağ alttaki + butonuna bas</div>
+          </div>
+        )}
         {data.sports.slice(0,30).map(s=>(
           <div key={s.id} style={{...cardStyle,display:"flex",alignItems:"center",gap:12}}>
             <div style={{fontSize:24,width:44,height:44,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(255,255,255,0.04)",borderRadius:12}}>{SPORT_EMOJI[s.type]||"⚡"}</div>
@@ -975,23 +1007,15 @@ function Sports({ data, update }) {
       {/* ── FOOD ── */}
       {view==="food"&&(<>
         {hasAI&&(
-          <input ref={photoRef} type="file" accept="image/*" capture="environment"
-            onChange={e=>{if(e.target.files?.[0])analyzePhoto(e.target.files[0]);e.target.value="";}}
-            style={{display:"none"}}/>
-        )}
-        <div style={{display:"flex",gap:6,marginBottom:12}}>
-          {hasAI&&(
+          <div style={{marginBottom:10}}>
             <button onClick={()=>photoRef.current?.click()} disabled={analyzing} style={{
-              ...filterBtnStyle(false),flex:1,textAlign:"center",
-              background:analyzing?"rgba(85,85,85,0.2)":"rgba(34,197,94,0.12)",
-              color:analyzing?"#666":"#22c55e",border:"1px solid rgba(34,197,94,0.2)",
-            }}>{analyzing?"🔄 Analiz...":"📸 Fotoğrafla"}</button>
-          )}
-          <button onClick={()=>setFoodModal(true)} style={{
-            ...filterBtnStyle(false),flex:1,textAlign:"center",
-            background:"rgba(249,115,22,0.12)",color:"#f97316",border:"1px solid rgba(249,115,22,0.2)",
-          }}>+ Manuel Ekle</button>
-        </div>
+              ...addBtnStyle,background:analyzing?"#555":"#22c55e",width:"100%",padding:"12px",borderRadius:12,fontSize:14,
+            }}>{analyzing?"🔄 Analiz ediliyor...":"📸 Fotoğrafla Kalori Hesapla"}</button>
+            <input ref={photoRef} type="file" accept="image/*" capture="environment"
+              onChange={e=>{if(e.target.files?.[0])analyzePhoto(e.target.files[0]);e.target.value="";}}
+              style={{display:"none"}}/>
+          </div>
+        )}
 
         {/* AI Result card */}
         {aiResult&&!aiResult.error&&(
@@ -1047,8 +1071,17 @@ function Sports({ data, update }) {
             </div>
           );
         })}
-        {todayFoods.length===0&&!aiResult&&<p style={{textAlign:"center",opacity:.3,fontSize:14,padding:40}}>Bugün yemek kaydı yok</p>}
+        {todayFoods.length===0&&!aiResult&&(
+          <div style={{textAlign:"center",padding:"40px 20px"}}>
+            <div style={{fontSize:40,marginBottom:8}}>🍽</div>
+            <div style={{fontSize:14,fontWeight:600,opacity:.4,marginBottom:4}}>Bugün yemek kaydı yok</div>
+            <div style={{fontSize:12,opacity:.25}}>+ butonuna basarak ekle</div>
+          </div>
+        )}
       </>)}
+
+      {view==="sport"&&<FAB onClick={()=>setModal(true)} color="#22c55e"/>}
+      {view==="food"&&<FAB onClick={()=>setFoodModal(true)} color="#f97316"/>}
 
       {/* Sport Modal */}
       <Modal open={modal} onClose={()=>setModal(false)} title="Yeni Antrenman">
@@ -1067,7 +1100,14 @@ function Sports({ data, update }) {
           <input style={{...inp,flex:1}} type="number" placeholder="Mesafe (km)" value={form.distance} onChange={e=>setForm({...form,distance:e.target.value})}/>
         </div>
         <div style={{display:"flex",gap:8}}>
-          <input style={{...inp,flex:1}} type="number" placeholder="Yakılan kalori" value={form.calories} onChange={e=>setForm({...form,calories:e.target.value})}/>
+          <div style={{flex:1,position:"relative"}}>
+            <input style={inp} type="number" placeholder="Yakılan kalori (opsiyonel)" value={form.calories} onChange={e=>setForm({...form,calories:e.target.value})}/>
+            {form.duration&&!form.calories&&(
+              <div style={{fontSize:11,color:"#22c55e",marginTop:-8,marginBottom:8,paddingLeft:4,opacity:.8}}>
+                ≈ {calcSportCal(form.type,form.duration)} kcal otomatik hesaplanacak
+              </div>
+            )}
+          </div>
           <input style={{...inp,flex:1}} type="date" value={form.date} onChange={e=>setForm({...form,date:e.target.value})}/>
         </div>
         <input style={inp} placeholder="Notlar (opsiyonel)" value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})}/>
@@ -1240,23 +1280,29 @@ function Projects({ data, update }) {
 
   if(!activeRoom) return (
     <div>
-      <StickyHeader title="Tarzım" sub="Kişisel alanların"/>
-      <FAB onClick={()=>setRoomModal(true)} color="#f97316"/>
+      <StickyHeader>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+          <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Tarzım</h3>
+        </div>
+        <p style={{margin:"6px 0 0",fontSize:12,opacity:.4}}>Kişisel alanların — odalarına dokun ve keşfet</p>
+      </StickyHeader>
       <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:10}}>
         {rooms.map(room=>{
           const count=room.type==="project"?data.projects.length:(roomItems[room.id]||[]).length;
           return (
             <div key={room.id} onClick={()=>setActiveRoom(room.id)} style={{
-              background:"#1c1c2e",borderRadius:16,padding:20,cursor:"pointer",
-              borderTop:`3px solid ${room.color}`,textAlign:"center",
+              background:"#1c1c2e",borderRadius:18,padding:20,cursor:"pointer",
+              borderTop:`3px solid ${room.color}`,textAlign:"center",minHeight:110,
+              display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:6,
             }}>
-              <div style={{fontSize:36,marginBottom:8}}>{room.icon}</div>
+              <div style={{fontSize:34}}>{room.icon}</div>
               <div style={{fontSize:14,fontWeight:700}}>{room.name}</div>
-              <div style={{fontSize:11,opacity:.4,marginTop:4}}>{count} öğe</div>
+              <div style={{fontSize:11,opacity:.4}}>{count} öğe</div>
             </div>
           );
         })}
       </div>
+      <FAB onClick={()=>setRoomModal(true)} color="#f97316"/>
       <Modal open={roomModal} onClose={()=>setRoomModal(false)} title="Yeni Oda">
         <input style={inp} placeholder="Oda adı..." value={roomForm.name} onChange={e=>setRoomForm({...roomForm,name:e.target.value})} autoFocus/>
         <div style={{fontSize:12,opacity:.5,marginBottom:6}}>İkon seç:</div>
@@ -1286,12 +1332,13 @@ function Projects({ data, update }) {
 
   if(room.type==="project"||activeRoom==="projects") return (
     <div>
-      <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
-        <button onClick={()=>setActiveRoom(null)} style={{background:"rgba(255,255,255,0.06)",border:"none",color:"#aaa",width:40,height:40,borderRadius:12,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>◀</button>
-        <span style={{fontSize:24}}>{room.icon}</span>
-        <h3 style={{margin:0,fontSize:20,fontWeight:800,flex:1}}>{room.name}</h3>
-      </div>
-      <FAB onClick={()=>setModal(true)} color={room.color||"#3b82f6"}/>
+      <StickyHeader>
+        <div style={{display:"flex",alignItems:"center",gap:10}}>
+          <button onClick={()=>setActiveRoom(null)} style={{background:"rgba(255,255,255,0.07)",border:"none",color:"#aaa",width:34,height:34,borderRadius:10,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>◀</button>
+          <span style={{fontSize:22}}>{room.icon}</span>
+          <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{room.name}</h3>
+        </div>
+      </StickyHeader>
       {data.projects.length===0&&<p style={{textAlign:"center",opacity:.3,fontSize:14,padding:40}}>Henüz proje yok</p>}
       {data.projects.map(p=>{
         const tasks=p.tasks||[];const d=tasks.filter(t=>t.done).length;
@@ -1334,6 +1381,7 @@ function Projects({ data, update }) {
           </div>
         );
       })}
+      <FAB onClick={()=>setModal(true)}/>
       <Modal open={modal} onClose={()=>setModal(false)} title="Yeni Proje">
         <input style={inp} placeholder="Proje adı..." value={form.name} onChange={e=>setForm({...form,name:e.target.value})} autoFocus/>
         <input style={inp} placeholder="Açıklama..." value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/>
@@ -1350,15 +1398,14 @@ function Projects({ data, update }) {
   const items=roomItems[activeRoom]||[];
   return (
     <div>
-      <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
-        <button onClick={()=>setActiveRoom(null)} style={{background:"rgba(255,255,255,0.06)",border:"none",color:"#aaa",width:40,height:40,borderRadius:12,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>◀</button>
-        <span style={{fontSize:24}}>{room.icon}</span>
-        <h3 style={{margin:0,fontSize:20,fontWeight:800,flex:1}}>{room.name}</h3>
-      </div>
-      <FAB onClick={()=>setItemModal(true)} color={room.color||"#3b82f6"}/>
-      <div style={{display:"flex",justifyContent:"flex-end",marginBottom:10}}>
-        <button onClick={()=>delRoom(activeRoom)} style={{background:"none",border:"none",color:"#ef4444",fontSize:11,cursor:"pointer",opacity:.5}}>Odayı Sil</button>
-      </div>
+      <StickyHeader>
+        <div style={{display:"flex",alignItems:"center",gap:10}}>
+          <button onClick={()=>setActiveRoom(null)} style={{background:"rgba(255,255,255,0.07)",border:"none",color:"#aaa",width:34,height:34,borderRadius:10,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>◀</button>
+          <span style={{fontSize:22}}>{room.icon}</span>
+          <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{room.name}</h3>
+          <button onClick={()=>delRoom(activeRoom)} style={{background:"none",border:"none",color:"#ef4444",fontSize:11,cursor:"pointer",opacity:.5}}>Sil</button>
+        </div>
+      </StickyHeader>
       {items.length===0&&<p style={{textAlign:"center",opacity:.3,fontSize:14,padding:40}}>Bu oda boş — öğe ekle!</p>}
       {items.map(item=>(
         <div key={item.id} style={{background:"#1c1c2e",borderRadius:14,padding:14,marginBottom:6,borderLeft:`3px solid ${room.color}`}}>
@@ -1375,6 +1422,7 @@ function Projects({ data, update }) {
           <div style={{fontSize:10,opacity:.25,marginTop:6}}>{item.createdAt}</div>
         </div>
       ))}
+      <FAB onClick={()=>setItemModal(true)} color={room.color}/>
       <Modal open={itemModal} onClose={()=>setItemModal(false)} title={`${room.icon} ${room.name} — Yeni Öğe`}>
         <input style={inp} placeholder="Başlık..." value={itemForm.title} onChange={e=>setItemForm({...itemForm,title:e.target.value})} autoFocus/>
         <textarea style={{...inp,minHeight:80,resize:"vertical",fontFamily:"inherit",lineHeight:1.5}} placeholder="Açıklama (opsiyonel)..." value={itemForm.description} onChange={e=>setItemForm({...itemForm,description:e.target.value})}/>
@@ -1406,15 +1454,30 @@ function Notes({ data, update }) {
 
   const filtered=data.notes.filter(n=>n.title.toLowerCase().includes(search.toLowerCase())||n.content.toLowerCase().includes(search.toLowerCase()));
 
-  const openNew2 = () => { setEditing(null); setForm({title:"",content:"",color:"#3b82f6"}); setModal(true); };
   return (
     <div>
-      <StickyHeader title="Notlar" sub={`${data.notes.length} not`}/>
-      <input style={{...inp,marginBottom:14}} placeholder="🔍 Notlarda ara..." value={search} onChange={e=>setSearch(e.target.value)}/>
+      <StickyHeader>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+          <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Notlar</h3>
+          <span style={{fontSize:12,opacity:.4}}>{data.notes.length} not</span>
+        </div>
+        <input
+          style={{...inp,marginBottom:0,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.06)"}}
+          placeholder="🔍 Notlarda ara..."
+          value={search}
+          onChange={e=>setSearch(e.target.value)}
+        />
+      </StickyHeader>
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(155px,1fr))",gap:10}}>
-        {filtered.length===0&&<p style={{opacity:.3,fontSize:14,padding:20,gridColumn:"1/-1",textAlign:"center"}}>Not bulunamadı</p>}
+        {filtered.length===0&&(
+          <div style={{gridColumn:"1/-1",textAlign:"center",padding:"40px 20px"}}>
+            <div style={{fontSize:40,marginBottom:8}}>📝</div>
+            <div style={{fontSize:14,fontWeight:600,opacity:.4,marginBottom:4}}>{data.notes.length===0?"Henüz not yok":"Arama sonucu bulunamadı"}</div>
+            {data.notes.length===0&&<div style={{fontSize:12,opacity:.25}}>+ butonuna basarak ilk notunu yaz</div>}
+          </div>
+        )}
         {filtered.map(n=>(
-          <div key={n.id} onClick={()=>edit(n)} style={{background:"#1c1c2e",borderRadius:14,padding:14,cursor:"pointer",borderTop:`3px solid ${n.color||"#3b82f6"}`}}>
+          <div key={n.id} onClick={()=>edit(n)} style={{background:"#1c1c2e",borderRadius:16,padding:14,cursor:"pointer",borderTop:`3px solid ${n.color||"#3b82f6"}`,minHeight:100}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"start"}}>
               <h4 style={{margin:0,fontSize:14,fontWeight:700,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{n.title}</h4>
               <button onClick={e=>{e.stopPropagation();del(n.id);}} style={{...delBtnStyle,fontSize:14,marginLeft:4}}>✕</button>
@@ -1424,7 +1487,7 @@ function Notes({ data, update }) {
           </div>
         ))}
       </div>
-      <FAB onClick={openNew2} color="#14b8a6"/>
+      <FAB onClick={()=>{setEditing(null);setForm({title:"",content:"",color:"#3b82f6"});setModal(true);}} color="#14b8a6"/>
       <Modal open={modal} onClose={()=>{setModal(false);setEditing(null);}} title={editing?"Notu Düzenle":"Yeni Not"}>
         <input style={inp} placeholder="Başlık..." value={form.title} onChange={e=>setForm({...form,title:e.target.value})} autoFocus/>
         <textarea style={{...inp,minHeight:140,resize:"vertical",fontFamily:"inherit",lineHeight:1.5}} placeholder="İçerik yazın..." value={form.content} onChange={e=>setForm({...form,content:e.target.value})}/>
@@ -1492,7 +1555,9 @@ function Settings({ data, update, onImport, user, onLogout }) {
 
   return (
     <div>
-      <StickyHeader title="Ayarlar"/>
+      <StickyHeader>
+        <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Ayarlar</h3>
+      </StickyHeader>
 
       {msg && <div style={{background:"rgba(59,130,246,0.15)",border:"1px solid rgba(59,130,246,0.3)",borderRadius:12,padding:"10px 14px",marginBottom:12,fontSize:13,color:"#3b82f6"}}>{msg}</div>}
 
@@ -1896,6 +1961,8 @@ export default function App() {
         }
         @keyframes fadeInUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+        @keyframes checkPop { 0%{transform:scale(1)} 40%{transform:scale(1.25)} 70%{transform:scale(0.9)} 100%{transform:scale(1)} }
+        .task-check-done { animation: checkPop .3s ease; }
         @keyframes shimmer { 0%{opacity:.4} 50%{opacity:1} 100%{opacity:.4} }
         @keyframes groundDraw { from{width:0} to{width:80%} }
       `}</style>
@@ -2019,8 +2086,8 @@ export default function App() {
         <button onClick={scrollToTop} style={{
           position:"fixed",
           right:16,
-          bottom:NAV_HEIGHT + SAFE_BOTTOM + 10,
-          width:44,height:44,
+          bottom:NAV_HEIGHT + SAFE_BOTTOM + 70,
+          width:40,height:40,
           borderRadius:"50%",
           background:"rgba(59,130,246,0.9)",
           color:"#fff",border:"none",
@@ -2055,7 +2122,7 @@ export default function App() {
             padding:isMobile?"10px 6px":"8px 5px",
             minWidth:isMobile?52:40,
             borderRadius:14,
-            color:tab===t.id?"#3b82f6":"#666",
+            color:tab===t.id?"#3b82f6":"#555",
             transition:"all .15s",
             flex:1,
           }}>
@@ -2073,6 +2140,8 @@ export default function App() {
         @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
         @keyframes slideDown { from{transform:translateY(-20px);opacity:0} to{transform:translateY(0);opacity:1} }
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+        @keyframes checkPop { 0%{transform:scale(1)} 40%{transform:scale(1.25)} 70%{transform:scale(0.9)} 100%{transform:scale(1)} }
+        .task-check-done { animation: checkPop .3s ease; }
         * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
         ::-webkit-scrollbar { width:4px; }
         ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1);border-radius:4px; }
