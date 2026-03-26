@@ -2049,10 +2049,18 @@ export default function App() {
         ::-webkit-scrollbar { width:4px; }
         ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1);border-radius:4px; }
         input[type="date"]::-webkit-calendar-picker-indicator { filter:invert(0.7); }
-        html, body { margin:0; padding:0; overscroll-behavior:none; background:#080810; height:100%; overflow:hidden; }
-        #root { height:100%; }
+        html, body { margin:0; padding:0; overscroll-behavior:none; background:#080810; }
+        @media (max-width: 639px) {
+          html, body { overflow:auto; height:auto; background:#0f0f1a; }
+          #root { height:auto; }
+        }
+        @media (min-width: 640px) {
+          html, body { overflow:hidden; height:100%; }
+          #root { height:100%; }
+        }
         @media(display-mode:standalone){ 
-          html, body { background:#0f0f1a; }
+          html, body { background:#0f0f1a; overflow:auto; height:auto; }
+          #root { height:auto; }
           body { padding-top: env(safe-area-inset-top); } 
         }
       `}</style>
