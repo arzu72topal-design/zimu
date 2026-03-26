@@ -666,8 +666,92 @@ function Sports({ data, update }) {
   const [form,setForm]=useState({type:"Koşu",duration:"",distance:"",calories:"",date:today(),notes:""});
   const [foodForm,setFoodForm]=useState({name:"",calories:"",meal:"Öğle",date:today()});
   const [foodSearch,setFoodSearch]=useState("");
+  const [analyzing,setAnalyzing]=useState(false);
+  const [aiResult,setAiResult]=useState(null);
+  const photoRef=useRef(null);
 
   const foods = data.foods || [];
+  const aiProvider = data.settings?.aiProvider||"none";
+  const aiKey = data.settings?.aiKey||"";
+  const hasAI = aiProvider!=="none" && aiKey;
+
+  // AI Photo Analysis
+  const analyzePhoto = async (file) => {
+    if(!hasAI) return;
+    setAnalyzing(true);setAiResult(null);
+    try {
+      const base64 = await new Promise((res,rej) => {
+        const reader = new FileReader();
+        reader.onload = () => res(reader.result.split(",")[1]);
+        reader.onerror = rej;
+        reader.readAsDataURL(file);
+      });
+
+      let result;
+      if(aiProvider==="gemini") {
+        const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${aiKey}`, {
+          method:"POST",headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({
+            contents:[{parts:[
+              {inlineData:{mimeType:file.type,data:base64}},
+              {text:"Bu yemek fotoğrafını analiz et. JSON formatında cevap ver, başka hiçbir şey yazma. Format: {\"items\":[{\"name\":\"yemek adı\",\"calories\":sayı}],\"total\":toplam_kalori}. Türkçe yemek isimleri kullan. Porsiyon büyüklüğünü tahmin et."}
+            ]}]
+          })
+        });
+        const d = await resp.json();
+        const text = d.candidates?.[0]?.content?.parts?.[0]?.text || "";
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        if(jsonMatch) result = JSON.parse(jsonMatch[0]);
+      } else if(aiProvider==="claude") {
+        const resp = await fetch("https://api.anthropic.com/v1/messages", {
+          method:"POST",
+          headers:{"Content-Type":"application/json","x-api-key":aiKey,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+          body:JSON.stringify({
+            model:"claude-sonnet-4-20250514",max_tokens:500,
+            messages:[{role:"user",content:[
+              {type:"image",source:{type:"base64",media_type:file.type,data:base64}},
+              {type:"text",text:"Bu yemek fotoğrafını analiz et. SADECE JSON formatında cevap ver: {\"items\":[{\"name\":\"yemek adı\",\"calories\":sayı}],\"total\":toplam_kalori}. Türkçe yemek isimleri kullan."}
+            ]}]
+          })
+        });
+        const d = await resp.json();
+        const text = d.content?.[0]?.text || "";
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        if(jsonMatch) result = JSON.parse(jsonMatch[0]);
+      } else if(aiProvider==="openai") {
+        const resp = await fetch("https://api.openai.com/v1/chat/completions", {
+          method:"POST",
+          headers:{"Content-Type":"application/json","Authorization":`Bearer ${aiKey}`},
+          body:JSON.stringify({
+            model:"gpt-4o-mini",max_tokens:500,
+            messages:[{role:"user",content:[
+              {type:"image_url",image_url:{url:`data:${file.type};base64,${base64}`}},
+              {type:"text",text:"Bu yemek fotoğrafını analiz et. SADECE JSON formatında cevap ver: {\"items\":[{\"name\":\"yemek adı\",\"calories\":sayı}],\"total\":toplam_kalori}. Türkçe yemek isimleri kullan."}
+            ]}]
+          })
+        });
+        const d = await resp.json();
+        const text = d.choices?.[0]?.message?.content || "";
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        if(jsonMatch) result = JSON.parse(jsonMatch[0]);
+      }
+      if(result&&result.items) setAiResult(result);
+      else setAiResult({error:"Analiz yapılamadı, tekrar deneyin"});
+    } catch(err) {
+      console.error("AI error:",err);
+      setAiResult({error:"Hata: "+err.message});
+    }
+    setAnalyzing(false);
+  };
+
+  const saveAiResult = () => {
+    if(!aiResult||!aiResult.items) return;
+    const newFoods = aiResult.items.map(item=>({
+      id:uid(),name:item.name,calories:item.calories,meal:foodForm.meal,date:today()
+    }));
+    update({...data,foods:[...newFoods,...foods]});
+    setAiResult(null);
+  };
 
   const addSport=()=>{
     if(!form.duration)return;
@@ -802,9 +886,51 @@ function Sports({ data, update }) {
 
       {/* ── FOOD ── */}
       {view==="food"&&(<>
-        <div style={{display:"flex",justifyContent:"flex-end",marginBottom:12}}>
-          <button onClick={()=>setFoodModal(true)} style={addBtnStyle}>+ Yemek Ekle</button>
+        <div style={{display:"flex",justifyContent:"flex-end",gap:6,marginBottom:12}}>
+          {hasAI&&(<>
+            <button onClick={()=>photoRef.current?.click()} disabled={analyzing} style={{
+              ...addBtnStyle,background:analyzing?"#555":"#22c55e",
+            }}>{analyzing?"🔄 Analiz...":"📸 Fotoğrafla Ekle"}</button>
+            <input ref={photoRef} type="file" accept="image/*" capture="environment"
+              onChange={e=>{if(e.target.files?.[0])analyzePhoto(e.target.files[0]);e.target.value="";}}
+              style={{display:"none"}}/>
+          </>)}
+          <button onClick={()=>setFoodModal(true)} style={addBtnStyle}>+ Manuel Ekle</button>
         </div>
+
+        {/* AI Result card */}
+        {aiResult&&!aiResult.error&&(
+          <div style={{background:"rgba(34,197,94,0.08)",border:"1px solid rgba(34,197,94,0.2)",borderRadius:14,padding:14,marginBottom:12}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+              <span style={{fontSize:13,fontWeight:700,color:"#22c55e"}}>🤖 AI Analiz Sonucu</span>
+              <span style={{fontSize:14,fontWeight:800,color:"#f97316"}}>{aiResult.total} kcal</span>
+            </div>
+            {aiResult.items.map((item,i)=>(
+              <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"4px 0",fontSize:13}}>
+                <span style={{opacity:.7}}>{item.name}</span>
+                <span style={{fontWeight:600,color:"#f97316"}}>{item.calories} kcal</span>
+              </div>
+            ))}
+            <div style={{display:"flex",gap:8,marginTop:10}}>
+              <button onClick={saveAiResult} style={{...btnPrimary,flex:1,marginTop:0,background:"#22c55e",padding:"10px"}}>✓ Kaydet</button>
+              <button onClick={()=>setAiResult(null)} style={{...btnPrimary,flex:1,marginTop:0,background:"rgba(239,68,68,0.15)",color:"#ef4444",padding:"10px",border:"1px solid rgba(239,68,68,0.2)"}}>✕ İptal</button>
+            </div>
+          </div>
+        )}
+        {aiResult?.error&&(
+          <div style={{background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:14,padding:14,marginBottom:12}}>
+            <span style={{fontSize:13,color:"#ef4444"}}>{aiResult.error}</span>
+            <button onClick={()=>setAiResult(null)} style={{display:"block",marginTop:6,background:"none",border:"none",color:"#ef4444",fontSize:12,cursor:"pointer",textDecoration:"underline"}}>Kapat</button>
+          </div>
+        )}
+
+        {!hasAI&&(
+          <div style={{background:"rgba(59,130,246,0.06)",border:"1px solid rgba(59,130,246,0.15)",borderRadius:12,padding:12,marginBottom:12,textAlign:"center"}}>
+            <div style={{fontSize:12,opacity:.6,marginBottom:4}}>📸 Fotoğrafla kalori hesaplamak için</div>
+            <div style={{fontSize:11,opacity:.4}}>Ayarlar → AI Kalori Asistanı'ndan bir AI seç ve API anahtarını gir</div>
+          </div>
+        )}
+
         {/* Today's meals grouped */}
         {mealGroups.map(meal=>{
           const mealFoods=todayFoods.filter(f=>f.meal===meal);
@@ -826,7 +952,7 @@ function Sports({ data, update }) {
             </div>
           );
         })}
-        {todayFoods.length===0&&<p style={{textAlign:"center",opacity:.3,fontSize:14,padding:40}}>Bugün yemek kaydı yok</p>}
+        {todayFoods.length===0&&!aiResult&&<p style={{textAlign:"center",opacity:.3,fontSize:14,padding:40}}>Bugün yemek kaydı yok</p>}
       </>)}
 
       {/* Sport Modal */}
@@ -1300,6 +1426,69 @@ function Settings({ data, update, onImport, user, onLogout }) {
           {importing ? "Aktarılıyor..." : "📤 Dosyadan Aktar (JSON)"}
         </button>
         <input ref={fileRef} type="file" accept=".json" onChange={handleImport} style={{display:"none"}}/>
+      </div>
+
+      {/* AI Kalori Asistanı */}
+      <div style={{background:"#1c1c2e",borderRadius:14,padding:16,marginBottom:12}}>
+        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>🤖 AI Kalori Asistanı</h4>
+        <p style={{fontSize:12,opacity:.5,margin:"0 0 12px"}}>Yemek fotoğrafı çekerek kalori hesaplatabilirsin. Kendi AI hesabını seç ve API anahtarını gir.</p>
+
+        {/* Provider selection */}
+        <div style={{display:"flex",flexDirection:"column",gap:6,marginBottom:12}}>
+          {[
+            {id:"none",name:"Manuel Giriş",desc:"AI kullanma, kalorileri kendim girerim",icon:"✏️",color:"#888"},
+            {id:"gemini",name:"Google Gemini",desc:"Ücretsiz, günde 60 istek",icon:"✨",color:"#3b82f6"},
+            {id:"claude",name:"Claude (Anthropic)",desc:"En akıllı analiz, ücretli",icon:"🧠",color:"#a855f7"},
+            {id:"openai",name:"OpenAI (ChatGPT)",desc:"Popüler, ücretli",icon:"🤖",color:"#22c55e"},
+          ].map(p=>{
+            const selected = (data.settings?.aiProvider||"none")===p.id;
+            return (
+              <div key={p.id} onClick={()=>update({...data,settings:{...data.settings,aiProvider:p.id}})} style={{
+                display:"flex",alignItems:"center",gap:10,padding:"10px 12px",borderRadius:12,cursor:"pointer",
+                background:selected?`${p.color}15`:"rgba(255,255,255,0.02)",
+                border:selected?`1px solid ${p.color}40`:"1px solid rgba(255,255,255,0.04)",
+              }}>
+                <span style={{fontSize:20}}>{p.icon}</span>
+                <div style={{flex:1}}>
+                  <div style={{fontSize:13,fontWeight:600,color:selected?p.color:"#ccc"}}>{p.name}</div>
+                  <div style={{fontSize:10,opacity:.5}}>{p.desc}</div>
+                </div>
+                {selected&&<span style={{color:p.color,fontSize:16}}>●</span>}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* API Key input */}
+        {data.settings?.aiProvider && data.settings.aiProvider!=="none" && (<>
+          <input style={inp} type="password" placeholder="API anahtarını yapıştır..."
+            value={data.settings?.aiKey||""}
+            onChange={e=>update({...data,settings:{...data.settings,aiKey:e.target.value}})}/>
+          <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:10}}>
+            {data.settings?.aiKey ? (
+              <><span style={{width:8,height:8,borderRadius:"50%",background:"#22c55e"}}/>
+              <span style={{fontSize:11,color:"#22c55e"}}>Anahtar kaydedildi</span></>
+            ) : (
+              <><span style={{width:8,height:8,borderRadius:"50%",background:"#f59e0b"}}/>
+              <span style={{fontSize:11,color:"#f59e0b"}}>Anahtar gerekli</span></>
+            )}
+          </div>
+          <div style={{fontSize:10,opacity:.3,marginBottom:10}}>🔒 Anahtarın sadece senin telefonunda saklanır, sunucuya gönderilmez</div>
+
+          {/* Guide button */}
+          <button onClick={()=>setMsg(
+            data.settings.aiProvider==="gemini" ?
+              "GOOGLE GEMİNİ REHBERİ:\n\n1. aistudio.google.com/apikey adresine git\n2. Gmail ile giriş yap\n3. 'Create API Key' butonuna bas\n4. Anahtarı kopyala ve yukarıya yapıştır\n\n✅ Ücretsiz: Günde 60 istek, dakikada 15 istek\n💡 Gmail hesabın varsa 2 dakikada hazır!" :
+            data.settings.aiProvider==="claude" ?
+              "CLAUDE (ANTHROPİC) REHBERİ:\n\n1. console.anthropic.com adresine git\n2. Hesap oluştur (kredi kartı gerekli)\n3. API Keys → Create Key\n4. Anahtarı kopyala ve yukarıya yapıştır\n\n💰 Ücretli: İlk $5 ücretsiz kredi\n🧠 En detaylı analiz" :
+              "OPENAİ (CHATGPT) REHBERİ:\n\n1. platform.openai.com adresine git\n2. Hesap oluştur veya giriş yap\n3. API Keys → Create new secret key\n4. Anahtarı kopyala ve yukarıya yapıştır\n\n💰 Ücretli: İlk $5 ücretsiz kredi\n🤖 Popüler ve güvenilir"
+          )} style={{
+            width:"100%",padding:"10px",borderRadius:10,border:"1px solid rgba(59,130,246,0.2)",
+            background:"rgba(59,130,246,0.08)",color:"#3b82f6",fontSize:13,cursor:"pointer",fontWeight:600,
+          }}>
+            📖 {data.settings.aiProvider==="gemini"?"Gemini":data.settings.aiProvider==="claude"?"Claude":"OpenAI"} API Anahtarı Nasıl Alınır?
+          </button>
+        </>)}
       </div>
 
       {/* Danger zone */}
