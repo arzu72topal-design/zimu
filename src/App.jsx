@@ -3824,12 +3824,14 @@ function LoginScreen({ onLogin, lang="tr", setLang }) {
 }
 
 /* ═══════════════════ MAIN APP ═══════════════════ */
+const DEFAULT_DATA = {tasks:[],events:[],sports:[],projects:[],notes:[],foods:[],rooms:[],roomItems:{},settings:{},dailyThoughts:["","",""]};
+
 export default function App() {
   const [tab, setTab] = useState("dashboard");
   const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [splash, setSplash] = useState(true);
-  const [user, setUser] = useState(undefined);
+  const [user, setUser] = useState(undefined); // undefined=unknown, null=skip, object=firebase user
+  const [authReady, setAuthReady] = useState(false); // true once firebase responds or times out
   const [toast, setToast] = useState({ visible: false, message: "" });
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [lang, setLang] = useState(() => localStorage.getItem("zimu-lang") || "tr");
@@ -3844,56 +3846,53 @@ export default function App() {
   // Derived tabs
   const TABS = getTabs(lang);
 
-  // Listen to auth state
+  // ── Step 1: Splash timer — always dismiss after 2.5s ──
   useEffect(() => {
+    const timer = setTimeout(() => setSplash(false), 2500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // ── Step 2: Listen to Firebase auth ──
+  useEffect(() => {
+    let timeout;
     const unsubscribe = onAuthChange((firebaseUser) => {
+      clearTimeout(timeout);
       if (firebaseUser) {
         setUser(firebaseUser);
       } else {
         const skipped = localStorage.getItem('zimu-skip-login');
-        if (skipped) {
-          setUser(null);
-        } else {
-          setUser(undefined);
-          setLoading(false);
-        }
+        setUser(skipped ? null : undefined);
       }
+      setAuthReady(true);
     });
-    return () => unsubscribe();
+    // If Firebase doesn't respond in 4s, mark auth as ready anyway
+    timeout = setTimeout(() => {
+      setAuthReady(true);
+    }, 4000);
+    return () => { unsubscribe(); clearTimeout(timeout); };
   }, []);
 
-  // Load data when user is determined
+  // ── Step 3: Load data once user is determined (not undefined) ──
   useEffect(() => {
-    if (user === undefined) return;
+    if (user === undefined) return; // still waiting for auth decision
     const userId = user?.uid || null;
-    setLoading(true);
-    loadData(userId).then(d => { setData(d); setLoading(false); }).catch(() => {
-      // Fallback: provide default empty data
-      setData({tasks:[],events:[],sports:[],projects:[],notes:[],foods:[],rooms:[],roomItems:{},settings:{},dailyThoughts:["","",""]});
-      setLoading(false);
-    });
+    loadData(userId)
+      .then(d => setData(d || DEFAULT_DATA))
+      .catch(() => setData(DEFAULT_DATA));
   }, [user]);
 
-  // Splash screen — 2.5s, sonra zorla geç
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setSplash(false);
-    }, 2500);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Firebase 6 saniyede cevap vermezse zorla login göster
-  // 10 saniyede data hala yoksa default data yükle
+  // ── Step 4: Ultimate fallback — if after 8s we still have no data, force it ──
   useEffect(() => {
     const fallback = setTimeout(() => {
-      setLoading(false);
-    }, 6000);
-    const dataFallback = setTimeout(() => {
-      setData(prev => prev || {tasks:[],events:[],sports:[],projects:[],notes:[],foods:[],rooms:[],roomItems:{},settings:{},dailyThoughts:["","",""]});
-      setLoading(false);
-    }, 10000);
-    return () => { clearTimeout(fallback); clearTimeout(dataFallback); };
-  }, []);
+      setAuthReady(true);
+      setSplash(false);
+      if (!data) {
+        if (user === undefined) setUser(null); // force skip mode
+        setData(prev => prev || DEFAULT_DATA);
+      }
+    }, 8000);
+    return () => clearTimeout(fallback);
+  }, [data, user]);
 
   // Schedule notifications
   useEffect(() => {
@@ -3948,9 +3947,9 @@ export default function App() {
 
   const handleLogin = (firebaseUser) => {
     if (firebaseUser === null) {
+      // Skip mode
       localStorage.setItem('zimu-skip-login', 'true');
-      setLoading(true); // Show loading while data loads
-      setUser(null);
+      setUser(null); // This triggers loadData effect
     }
   };
 
@@ -3963,12 +3962,19 @@ export default function App() {
 
   const allTabs = [...TABS, { id: "settings", label: t("tab.settings", lang), icon: "⚙" }];
 
+  // ── RENDER DECISION ──
+  // 1. Splash still showing → splash screen
+  // 2. Auth ready, no user → login screen
+  // 3. Data not loaded yet → loading screen
+  // 4. Everything ready → main app
+
   // Show login screen (after splash, when not authenticated)
-  if (!splash && user === undefined && !loading) {
+  if (!splash && authReady && user === undefined) {
     return <LoginScreen onLogin={handleLogin} lang={lang} setLang={setLang} />;
   }
 
-  if (splash || loading || !data) return (
+  // Splash or loading
+  if (splash || !data) return (
     <NebulaBackground
       onClick={() => {
         setSplash(false);
@@ -4025,7 +4031,7 @@ export default function App() {
         fontSize:11,opacity:.3,letterSpacing:1,
         display:"flex",alignItems:"center",gap:8,
       }}>
-        {!splash && (loading || !data) ? (
+        {!splash && !data ? (
           <>
             <div style={{width:14,height:14,border:"2px solid rgba(167,139,250,0.3)",borderTopColor:"#a78bfa",borderRadius:"50%",animation:"spin 0.8s linear infinite"}}/>
             {t("dash.loading", lang)}
