@@ -63,11 +63,13 @@ const DN = ["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"];
 const today = () => new Date().toISOString().split("T")[0];
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
 
-/* ── MascotImage: beyaz arka planı canvas ile şeffaf yapar ── */
+/* ── MascotImage: kareli kağıt arka planını canvas ile kaldırır ── */
 function MascotImage({ src, style }) {
   const canvasRef = useRef(null);
+  const [ready, setReady] = useState(false);
   useEffect(() => {
     const img = new window.Image();
+    img.crossOrigin = "anonymous";
     img.onload = () => {
       const canvas = canvasRef.current;
       if (!canvas) return;
@@ -79,16 +81,26 @@ function MascotImage({ src, style }) {
       const d = imageData.data;
       for (let i = 0; i < d.length; i += 4) {
         const r = d[i], g = d[i+1], b = d[i+2];
-        // Beyaz / açık krem kağıt piksellerini şeffaf yap
-        if (r > 190 && g > 185 && b > 175) {
-          d[i+3] = 0;
+        // Beyaz ve krem kağıt rengi
+        const isWhitePaper = r > 180 && g > 175 && b > 165;
+        // Kareli kağıt mavi çizgileri (açık mavi/gri tonlar)
+        const isGridLine = r > 160 && g > 175 && b > 185 && b > r;
+        // Sarımtırak kağıt tonu
+        const isYellowish = r > 200 && g > 190 && b > 150 && r > b + 30;
+        if (isWhitePaper || isGridLine || isYellowish) {
+          // Hafif yumuşatma — tam şeffaf yerine kontura göre
+          const brightness = (r + g + b) / 3;
+          const alpha = Math.max(0, Math.min(255, (255 - brightness) * 2.5));
+          d[i+3] = Math.round(alpha);
         }
       }
       ctx.putImageData(imageData, 0, 0);
+      setReady(true);
     };
+    img.onerror = () => setReady(true); // yüklenemezse de göster
     img.src = src;
   }, [src]);
-  return <canvas ref={canvasRef} style={style} />;
+  return <canvas ref={canvasRef} style={{...style, opacity: ready ? 1 : 0, transition:"opacity .3s"}} />;
 }
 
 /* ── Hooks ── */
@@ -305,8 +317,28 @@ function Dashboard({ data, setTab, update }) {
     update({ ...data, dailyThoughts: next });
   };
 
-  // Mini news/music from rooms
-  const newsItems = (data.roomItems || {})["news"] || [];
+  // Live news headlines
+  const [headlines, setHeadlines] = useState([]);
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchHeadlines() {
+      try {
+        const url = "https://www.bbc.com/turkce/index.xml";
+        const res = await fetch(`/api/proxy?url=${encodeURIComponent(url)}`, { signal: AbortSignal.timeout(5000) }).catch(() => null)
+          || await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`, { signal: AbortSignal.timeout(5000) });
+        if (!res || !res.ok) return;
+        const text = res.url?.includes("allorigins") ? JSON.parse(await res.text()).contents : await res.text();
+        const titles = [...text.matchAll(/<title><!\[CDATA\[(.+?)\]\]><\/title>|<title>([^<]+)<\/title>/g)]
+          .slice(1, 6)
+          .map(m => (m[1] || m[2] || "").trim())
+          .filter(t => t.length > 5);
+        if (!cancelled) setHeadlines(titles);
+      } catch {}
+    }
+    fetchHeadlines();
+    return () => { cancelled = true; };
+  }, []);
+
   const musicItems = (data.roomItems || {})["music"] || [];
 
   const scheduleItems = [
@@ -442,25 +474,23 @@ function Dashboard({ data, setTab, update }) {
       {/* ── MİNİ HABERLER ── */}
       <div style={{marginBottom:14}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
-          <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em"}}>📰 Son Haberler</div>
+          <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em"}}>📰 BBC Türkçe Haberler</div>
           <button onClick={()=>setTab("projects")} style={{background:"none",border:"none",color:"#ef4444",fontSize:12,cursor:"pointer",fontWeight:600}}>Tümü ▶</button>
         </div>
-        <div style={{background:"rgba(255,255,255,0.04)",backdropFilter:"blur(12px)",borderRadius:16,padding:"12px 14px",border:"1px solid rgba(239,68,68,0.15)",boxShadow:"0 0 20px rgba(239,68,68,0.06)"}}>
-          {newsItems.length===0 ? (
-            <div style={{display:"flex",alignItems:"center",gap:12,cursor:"pointer"}} onClick={()=>setTab("projects")}>
-              <span style={{fontSize:28}}>📰</span>
-              <div>
-                <div style={{fontSize:13,fontWeight:600,opacity:.6}}>Henüz haber yok</div>
-                <div style={{fontSize:11,opacity:.35,marginTop:2}}>Tarzım → Haberler ekranına git</div>
-              </div>
+        <div style={{background:"rgba(239,68,68,0.06)",backdropFilter:"blur(12px)",borderRadius:16,padding:"12px 14px",border:"1px solid rgba(239,68,68,0.18)",boxShadow:"0 0 20px rgba(239,68,68,0.06)"}}>
+          {headlines.length === 0 ? (
+            <div style={{display:"flex",alignItems:"center",gap:10,opacity:.5}}>
+              <span style={{fontSize:20,animation:"pulse 1.5s infinite"}}>📡</span>
+              <span style={{fontSize:13}}>Haberler yükleniyor...</span>
             </div>
-          ) : newsItems.slice(0,3).map((item,i)=>(
-            <div key={item.id||i} style={{display:"flex",alignItems:"flex-start",gap:10,marginBottom:i<Math.min(newsItems.length,3)-1?10:0,paddingBottom:i<Math.min(newsItems.length,3)-1?10:0,borderBottom:i<Math.min(newsItems.length,3)-1?"1px solid rgba(255,255,255,0.05)":"none"}}>
-              <span style={{fontSize:16,flexShrink:0,marginTop:1}}>📰</span>
-              <div style={{flex:1,minWidth:0}}>
-                <div style={{fontSize:13,fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.title||"Haber"}</div>
-                {item.source&&<div style={{fontSize:11,opacity:.4,marginTop:2}}>{item.source}</div>}
-              </div>
+          ) : headlines.slice(0,4).map((title,i)=>(
+            <div key={i} style={{display:"flex",alignItems:"flex-start",gap:10,
+              paddingBottom: i < headlines.slice(0,4).length-1 ? 8 : 0,
+              marginBottom: i < headlines.slice(0,4).length-1 ? 8 : 0,
+              borderBottom: i < headlines.slice(0,4).length-1 ? "1px solid rgba(239,68,68,0.1)" : "none",
+            }}>
+              <span style={{fontSize:10,color:"#ef4444",fontWeight:800,marginTop:3,flexShrink:0,minWidth:16}}>{i+1}</span>
+              <span style={{fontSize:13,lineHeight:1.4,opacity:.85}}>{title}</span>
             </div>
           ))}
         </div>
@@ -472,31 +502,39 @@ function Dashboard({ data, setTab, update }) {
           <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em"}}>🎵 Müzik Koleksiyonu</div>
           <button onClick={()=>setTab("projects")} style={{background:"none",border:"none",color:"#a855f7",fontSize:12,cursor:"pointer",fontWeight:600}}>Tümü ▶</button>
         </div>
-        <div style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:4,WebkitOverflowScrolling:"touch"}}>
-          {musicItems.length===0 ? (
-            <div onClick={()=>setTab("projects")} style={{
-              background:"rgba(168,85,247,0.08)",border:"1px solid rgba(168,85,247,0.2)",borderRadius:14,
-              padding:"14px 18px",cursor:"pointer",display:"flex",alignItems:"center",gap:12,width:"100%",
-            }}>
-              <span style={{fontSize:28}}>🎧</span>
-              <div>
-                <div style={{fontSize:13,fontWeight:600,color:"#a855f7"}}>Müzik ekle</div>
-                <div style={{fontSize:11,opacity:.4,marginTop:2}}>Tarzım → Müziklerim</div>
-              </div>
+        {musicItems.length === 0 ? (
+          <div onClick={()=>setTab("projects")} style={{
+            background:"rgba(168,85,247,0.06)",border:"1px solid rgba(168,85,247,0.18)",borderRadius:16,
+            padding:"16px 18px",cursor:"pointer",display:"flex",alignItems:"center",gap:14,
+          }}>
+            <div style={{width:48,height:48,borderRadius:14,background:"rgba(168,85,247,0.15)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0}}>🎧</div>
+            <div>
+              <div style={{fontSize:14,fontWeight:700,color:"#a855f7"}}>Müzik koleksiyonu boş</div>
+              <div style={{fontSize:12,opacity:.45,marginTop:3}}>Tarzım → Müziklerim'e git ve ekle</div>
             </div>
-          ) : musicItems.slice(0,5).map((item,i)=>(
-            <div key={item.id||i} style={{
-              background:"rgba(168,85,247,0.08)",border:"1px solid rgba(168,85,247,0.15)",borderRadius:14,
-              padding:"10px 12px",minWidth:130,maxWidth:160,flexShrink:0,cursor:"pointer",
-            }} onClick={()=>item.link&&window.open(item.link,"_blank")}>
-              <div style={{width:44,height:44,borderRadius:10,background:item.albumArt?"#000":"rgba(168,85,247,0.2)",overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center",marginBottom:8}}>
-                {item.albumArt ? <img src={item.albumArt} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/> : <span style={{fontSize:20}}>🎵</span>}
+            <span style={{marginLeft:"auto",opacity:.3,fontSize:16}}>▶</span>
+          </div>
+        ) : (
+          <div style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:6,WebkitOverflowScrolling:"touch"}}>
+            {musicItems.slice(0,6).map((item,i)=>(
+              <div key={item.id||i}
+                onClick={()=>item.link&&window.open(item.link,"_blank")}
+                style={{
+                  background:"rgba(168,85,247,0.08)",border:"1px solid rgba(168,85,247,0.18)",borderRadius:14,
+                  padding:"10px 12px",minWidth:120,maxWidth:140,flexShrink:0,cursor:"pointer",
+                  boxShadow:"0 0 12px rgba(168,85,247,0.1)",
+                }}>
+                <div style={{width:44,height:44,borderRadius:10,background:item.albumArt?"#000":"rgba(168,85,247,0.2)",overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center",marginBottom:8}}>
+                  {item.albumArt
+                    ? <img src={item.albumArt} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                    : <span style={{fontSize:20}}>🎵</span>}
+                </div>
+                <div style={{fontSize:12,fontWeight:700,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.title||"Parça"}</div>
+                {item.artist&&<div style={{fontSize:10,opacity:.5,marginTop:2,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.artist}</div>}
               </div>
-              <div style={{fontSize:12,fontWeight:700,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.title||"Parça"}</div>
-              {item.artist&&<div style={{fontSize:10,opacity:.5,marginTop:2,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.artist}</div>}
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {data.notes.length>0&&(
