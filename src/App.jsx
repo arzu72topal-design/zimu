@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, Component } from "react";
 import { loadData, saveData, exportData, importData } from "./db.js";
 import {
   signInWithGoogle,
@@ -15,6 +15,30 @@ import {
   scheduleTaskReminders,
   clearAllReminders,
 } from "./notifications.js";
+
+/* ── Error Boundary — catches ANY render crash ── */
+class ErrorBoundary extends Component {
+  constructor(props) { super(props); this.state = { error: null }; }
+  static getDerivedStateFromError(error) { return { error }; }
+  render() {
+    if (this.state.error) {
+      return (
+        <div style={{minHeight:"100vh",background:"#060611",color:"#e0e0e0",padding:20,fontFamily:"monospace"}}>
+          <h1 style={{color:"#ef4444"}}>Zimu Crash Report</h1>
+          <p style={{color:"#f59e0b"}}>{this.state.error?.message || "Unknown error"}</p>
+          <pre style={{fontSize:11,opacity:.6,whiteSpace:"pre-wrap",maxHeight:300,overflow:"auto"}}>
+            {this.state.error?.stack || "No stack trace"}
+          </pre>
+          <button onClick={() => { localStorage.clear(); window.location.reload(); }}
+            style={{marginTop:20,padding:"12px 24px",background:"#3b82f6",color:"#fff",border:"none",borderRadius:8,cursor:"pointer",fontSize:14}}>
+            Sıfırla ve Yeniden Başlat
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 /* ── i18n — Translations ── */
 const LANGUAGES = [
@@ -3826,7 +3850,7 @@ function LoginScreen({ onLogin, lang="tr", setLang }) {
 /* ═══════════════════ MAIN APP ═══════════════════ */
 const DEFAULT_DATA = {tasks:[],events:[],sports:[],projects:[],notes:[],foods:[],rooms:[],roomItems:{},settings:{},dailyThoughts:["","",""]};
 
-export default function App() {
+function AppInner() {
   const [tab, setTab] = useState("dashboard");
   const [data, setData] = useState(DEFAULT_DATA); // ← NEVER null, app always works
   const [showSplash, setShowSplash] = useState(true);
@@ -4074,22 +4098,22 @@ export default function App() {
         zIndex:1000,
       }}>
         <div style={{display:"flex",justifyContent:"space-around",alignItems:"center",width:"100%",maxWidth:isMobile?undefined:600}}>
-        {allTabs.map(t=>(
-          <button key={t.id} onClick={()=>setTab(t.id)} style={{
-            background:tab===t.id?"rgba(59,130,246,0.15)":"none",
-            boxShadow:tab===t.id?"0 0 20px rgba(59,130,246,0.25)":undefined,
+        {allTabs.map(tb=>(
+          <button key={tb.id} onClick={()=>setTab(tb.id)} style={{
+            background:tab===tb.id?"rgba(59,130,246,0.15)":"none",
+            boxShadow:tab===tb.id?"0 0 20px rgba(59,130,246,0.25)":undefined,
             border:"none",cursor:"pointer",
             display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",
             gap:isMobile?4:3,
             padding:isMobile?"10px 6px":"8px 12px",
             minWidth:isMobile?52:50,
             borderRadius:14,
-            color:tab===t.id?"#3b82f6":"#555",
+            color:tab===tb.id?"#3b82f6":"#555",
             transition:"all .15s",
             flex:1,
           }}>
-            <span style={{fontSize:isMobile?22:18,lineHeight:1}}>{t.icon}</span>
-            <span style={{fontSize:isMobile?10:9,fontWeight:tab===t.id?700:500,letterSpacing:-.2}}>{t.label}</span>
+            <span style={{fontSize:isMobile?22:18,lineHeight:1}}>{tb.icon}</span>
+            <span style={{fontSize:isMobile?10:9,fontWeight:tab===tb.id?700:500,letterSpacing:-.2}}>{tb.label}</span>
           </button>
         ))}
         </div>
@@ -4135,5 +4159,14 @@ export default function App() {
         phoneContent
       )}
     </>
+  );
+}
+
+/* ── Wrapper with Error Boundary ── */
+export default function App() {
+  return (
+    <ErrorBoundary>
+      <AppInner />
+    </ErrorBoundary>
   );
 }
