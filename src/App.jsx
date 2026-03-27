@@ -2801,7 +2801,7 @@ function LoginScreen({ onLogin }) {
       <div style={{width:"100%",maxWidth:360}}>
         {/* Logo */}
         <div style={{textAlign:"center",marginBottom:32}}>
-          <img src="/zimu-mascot.png" alt="Zimu" style={{width:120,height:120,objectFit:"contain",marginBottom:12}} />
+          <img src="/zimu-mascot.png" alt="Zimu" style={{width:120,height:120,objectFit:"contain",marginBottom:12,mixBlendMode:"multiply",background:"#0f0f1a"}} />
           <div style={{fontSize:28,fontWeight:800,letterSpacing:-1}}>Zimu</div>
           <div style={{fontSize:13,opacity:.4,marginTop:4}}>Hayatını yönet</div>
         </div>
@@ -2911,10 +2911,20 @@ export default function App() {
     loadData(userId).then(d => { setData(d); setLoading(false); });
   }, [user]);
 
-  // Splash screen
+  // Splash screen — 2.5s, sonra zorla geç
   useEffect(() => {
-    const timer = setTimeout(() => setSplash(false), 4000);
+    const timer = setTimeout(() => {
+      setSplash(false);
+    }, 2500);
     return () => clearTimeout(timer);
+  }, []);
+
+  // Firebase 6 saniyede cevap vermezse zorla login göster
+  useEffect(() => {
+    const fallback = setTimeout(() => {
+      setLoading(false);
+    }, 6000);
+    return () => clearTimeout(fallback);
   }, []);
 
   // Schedule notifications
@@ -2978,12 +2988,15 @@ export default function App() {
   }
 
   if (splash || loading || !data) return (
-    <div style={{
-      minHeight:"100vh",minHeight:"100dvh",background:"#060611",
-      display:"flex",alignItems:"center",justifyContent:"center",
-      color:"#e0e0e0",fontFamily:"'SF Pro Display',-apple-system,sans-serif",
-      flexDirection:"column",overflow:"hidden",position:"relative",
-    }}>
+    <div
+      onClick={() => { setSplash(false); setLoading(false); }}
+      style={{
+        minHeight:"100vh",minHeight:"100dvh",background:"#060611",
+        display:"flex",alignItems:"center",justifyContent:"center",
+        color:"#e0e0e0",fontFamily:"'SF Pro Display',-apple-system,sans-serif",
+        flexDirection:"column",overflow:"hidden",position:"relative",
+        cursor:"pointer",userSelect:"none",
+      }}>
       <style>{`
         @keyframes walkAcross { 
           0% { transform: translateX(-120px) scaleX(1); }
@@ -3006,15 +3019,19 @@ export default function App() {
         @keyframes groundDraw { from{width:0} to{width:80%} }
       `}</style>
 
-      {/* Walking mascot */}
+      {/* Walking mascot — mix-blend-mode:multiply ile beyaz arka plan karışır */}
       <div style={{
         animation:"walkAcross 4s ease-in-out infinite",
         marginBottom:8,
+        background:"#060611",
+        borderRadius:"50%",
       }}>
         <div style={{animation:"bobWalk 0.6s ease-in-out infinite"}}>
           <img src="/zimu-mascot.png" alt="Zimu" style={{
             width:280,height:280,objectFit:"contain",
+            mixBlendMode:"multiply",
             filter:"drop-shadow(0 12px 32px rgba(59,130,246,0.25))",
+            display:"block",
           }}/>
         </div>
       </div>
@@ -3031,6 +3048,7 @@ export default function App() {
       <div style={{animation:"fadeInUp 0.8s ease 0.3s both",textAlign:"center"}}>
         <div style={{fontSize:32,fontWeight:800,letterSpacing:-1,marginBottom:6}}>Zimu</div>
         <div style={{fontSize:14,opacity:.4,animation:"shimmer 2s ease-in-out infinite"}}>Hayatını yönet...</div>
+        <div style={{fontSize:11,opacity:.2,marginTop:16}}>Devam etmek için dokun</div>
       </div>
     </div>
   );
