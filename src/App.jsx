@@ -63,44 +63,55 @@ const DN = ["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"];
 const today = () => new Date().toISOString().split("T")[0];
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
 
-/* ── MascotImage: kareli kağıt arka planını canvas ile kaldırır ── */
-function MascotImage({ src, style }) {
-  const canvasRef = useRef(null);
-  const [ready, setReady] = useState(false);
-  useEffect(() => {
-    const img = new window.Image();
-    img.crossOrigin = "anonymous";
-    img.onload = () => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      canvas.width = img.naturalWidth;
-      canvas.height = img.naturalHeight;
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0);
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const d = imageData.data;
-      for (let i = 0; i < d.length; i += 4) {
-        const r = d[i], g = d[i+1], b = d[i+2];
-        // Beyaz ve krem kağıt rengi
-        const isWhitePaper = r > 180 && g > 175 && b > 165;
-        // Kareli kağıt mavi çizgileri (açık mavi/gri tonlar)
-        const isGridLine = r > 160 && g > 175 && b > 185 && b > r;
-        // Sarımtırak kağıt tonu
-        const isYellowish = r > 200 && g > 190 && b > 150 && r > b + 30;
-        if (isWhitePaper || isGridLine || isYellowish) {
-          // Hafif yumuşatma — tam şeffaf yerine kontura göre
-          const brightness = (r + g + b) / 3;
-          const alpha = Math.max(0, Math.min(255, (255 - brightness) * 2.5));
-          d[i+3] = Math.round(alpha);
-        }
-      }
-      ctx.putImageData(imageData, 0, 0);
-      setReady(true);
-    };
-    img.onerror = () => setReady(true); // yüklenemezse de göster
-    img.src = src;
-  }, [src]);
-  return <canvas ref={canvasRef} style={{...style, opacity: ready ? 1 : 0, transition:"opacity .3s"}} />;
+/* ── Nebula Background: splash & login ortak arka plan ── */
+const NEBULA_KEYFRAMES = `
+  @keyframes nebulaShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  @keyframes starFloat {
+    0%,100% { opacity:.2; transform:translateY(0) scale(1); }
+    50%     { opacity:1;  transform:translateY(-8px) scale(1.3); }
+  }
+  @keyframes glowPulse {
+    0%,100% { text-shadow: 0 0 40px rgba(99,102,241,0.4), 0 0 80px rgba(99,102,241,0.15); }
+    50%     { text-shadow: 0 0 60px rgba(99,102,241,0.6), 0 0 120px rgba(168,85,247,0.25); }
+  }
+  @keyframes fadeInUp  { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeIn    { from{opacity:0} to{opacity:1} }
+  @keyframes shimmer   { 0%{opacity:.4} 50%{opacity:1} 100%{opacity:.4} }
+`;
+
+function NebulaBackground({ children, onClick, style }) {
+  return (
+    <div onClick={onClick} style={{
+      minHeight:"100vh", minHeight:"100dvh",
+      background:"radial-gradient(ellipse at 20% 50%, #1a0533 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, #0c1445 0%, transparent 50%), radial-gradient(ellipse at 50% 80%, #1e0a2e 0%, transparent 50%), #060611",
+      backgroundSize:"200% 200%",
+      animation:"nebulaShift 20s ease-in-out infinite",
+      display:"flex", alignItems:"center", justifyContent:"center",
+      color:"#e8e4f0", fontFamily:"'SF Pro Display',-apple-system,sans-serif",
+      flexDirection:"column", overflow:"hidden", position:"relative",
+      ...style,
+    }}>
+      {/* Floating stars */}
+      {[...Array(18)].map((_,i) => (
+        <div key={i} style={{
+          position:"absolute",
+          width: 2 + Math.random()*3,
+          height: 2 + Math.random()*3,
+          borderRadius:"50%",
+          background: i%3===0 ? "#a78bfa" : i%3===1 ? "#6366f1" : "#e0d5f5",
+          left: `${5 + Math.random()*90}%`,
+          top: `${5 + Math.random()*90}%`,
+          animation: `starFloat ${2.5 + Math.random()*3}s ease-in-out ${Math.random()*3}s infinite`,
+          pointerEvents:"none",
+        }}/>
+      ))}
+      {children}
+    </div>
+  );
 }
 
 /* ── Hooks ── */
@@ -2858,83 +2869,100 @@ function LoginScreen({ onLogin }) {
   const handleSkip = () => { onLogin(null); };
 
   return (
-    <div style={{
-      minHeight:"100vh",minHeight:"100dvh",background:"#0f0f1a",
-      display:"flex",alignItems:"center",justifyContent:"center",
-      color:"#e0e0e0",fontFamily:"'SF Pro Display',-apple-system,sans-serif",
-      padding:16,
-    }}>
-      <div style={{width:"100%",maxWidth:360}}>
-        {/* Logo */}
-        <div style={{textAlign:"center",marginBottom:32}}>
-          <MascotImage src="/zimu-mascot.png" style={{width:120,height:120,objectFit:"contain",marginBottom:12,display:"block",margin:"0 auto 12px"}} />
-          <div style={{fontSize:28,fontWeight:800,letterSpacing:-1}}>Zimu</div>
-          <div style={{fontSize:13,opacity:.4,marginTop:4}}>Hayatını yönet</div>
-        </div>
-
-        {/* Error */}
-        {error && (
-          <div style={{background:"rgba(239,68,68,0.1)",border:"1px solid rgba(239,68,68,0.2)",
-            borderRadius:12,padding:"10px 14px",marginBottom:12,fontSize:13,color:"#ef4444",textAlign:"center"}}>
-            {error}
-          </div>
-        )}
-
-        {/* Google Sign In */}
-        <button onClick={handleGoogle} disabled={loading} style={{
-          width:"100%",padding:"14px",borderRadius:12,border:"1px solid rgba(255,255,255,0.1)",
-          background:"rgba(255,255,255,0.04)",color:"#e0e0e0",fontSize:15,fontWeight:600,cursor:"pointer",
-          display:"flex",alignItems:"center",justifyContent:"center",gap:10,marginBottom:16,
-          opacity:loading?.6:1,
-        }}>
-          <span style={{fontSize:18}}>G</span>
-          Google ile Giriş Yap
-        </button>
-
-        {/* Divider */}
-        <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:16}}>
-          <div style={{flex:1,height:1,background:"rgba(255,255,255,0.08)"}}/>
-          <span style={{fontSize:12,opacity:.4}}>veya</span>
-          <div style={{flex:1,height:1,background:"rgba(255,255,255,0.08)"}}/>
-        </div>
-
-        {/* Email/Password */}
-        <input type="email" placeholder="Email adresi" value={email}
-          onChange={e=>setEmail(e.target.value)}
-          style={{...inp,marginBottom:8}} />
-        <input type="password" placeholder="Şifre (en az 6 karakter)" value={password}
-          onChange={e=>setPassword(e.target.value)}
-          onKeyDown={e=>e.key==="Enter"&&handleEmail()}
-          style={inp} />
-
-        <button onClick={handleEmail} disabled={loading} style={{
-          ...btnPrimary,opacity:loading?.6:1,marginBottom:12,
-        }}>
-          {loading ? "Bekleyin..." : mode === "register" ? "Kayıt Ol" : "Giriş Yap"}
-        </button>
-
-        {/* Toggle mode */}
-        <div style={{textAlign:"center",marginBottom:20}}>
-          <button onClick={()=>{setMode(mode==="login"?"register":"login");setError("");}} style={{
-            background:"none",border:"none",color:"#3b82f6",fontSize:13,cursor:"pointer",
+    <NebulaBackground style={{padding:16,cursor:"default"}}>
+      <style>{NEBULA_KEYFRAMES}</style>
+      <div style={{width:"100%",maxWidth:380,animation:"fadeInUp 0.7s ease both"}}>
+        {/* Title block */}
+        <div style={{textAlign:"center",marginBottom:36}}>
+          <div style={{
+            fontSize:52,fontWeight:900,letterSpacing:-2,
+            background:"linear-gradient(135deg,#e0d5f5 0%,#a78bfa 40%,#6366f1 70%,#818cf8 100%)",
+            WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",
+            animation:"glowPulse 4s ease-in-out infinite",
+            lineHeight:1.1,
+          }}>Zimu</div>
+          <div style={{
+            fontSize:14,opacity:.55,marginTop:10,fontStyle:"italic",
+            letterSpacing:.5,lineHeight:1.6,
           }}>
-            {mode === "login" ? "Hesabın yok mu? Kayıt ol" : "Zaten hesabın var mı? Giriş yap"}
-          </button>
+            Kendi destanını yaz.<br/>
+            <span style={{opacity:.7,fontSize:12}}>Write your own epic.</span>
+          </div>
         </div>
 
-        {/* Skip - use without login */}
-        <div style={{textAlign:"center"}}>
+        {/* Glassmorphism card */}
+        <div style={{
+          background:"rgba(255,255,255,0.04)",
+          backdropFilter:"blur(24px)",WebkitBackdropFilter:"blur(24px)",
+          border:"1px solid rgba(255,255,255,0.08)",
+          borderRadius:20,padding:"28px 24px",
+          boxShadow:"0 8px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06)",
+        }}>
+          {/* Error */}
+          {error && (
+            <div style={{background:"rgba(239,68,68,0.1)",border:"1px solid rgba(239,68,68,0.2)",
+              borderRadius:12,padding:"10px 14px",marginBottom:14,fontSize:13,color:"#ef4444",textAlign:"center"}}>
+              {error}
+            </div>
+          )}
+
+          {/* Google Sign In */}
+          <button onClick={handleGoogle} disabled={loading} style={{
+            width:"100%",padding:"14px",borderRadius:14,border:"1px solid rgba(255,255,255,0.1)",
+            background:"rgba(255,255,255,0.06)",color:"#e0d5f5",fontSize:15,fontWeight:600,cursor:"pointer",
+            display:"flex",alignItems:"center",justifyContent:"center",gap:10,marginBottom:18,
+            opacity:loading?.6:1,transition:"all .2s",
+          }}>
+            <span style={{fontSize:18,fontWeight:700}}>G</span>
+            Google ile Giriş Yap
+          </button>
+
+          {/* Divider */}
+          <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:18}}>
+            <div style={{flex:1,height:1,background:"linear-gradient(90deg,transparent,rgba(167,139,250,0.2),transparent)"}}/>
+            <span style={{fontSize:12,opacity:.35,letterSpacing:1}}>veya</span>
+            <div style={{flex:1,height:1,background:"linear-gradient(90deg,transparent,rgba(167,139,250,0.2),transparent)"}}/>
+          </div>
+
+          {/* Email/Password */}
+          <input type="email" placeholder="Email adresi" value={email}
+            onChange={e=>setEmail(e.target.value)}
+            style={{...inp,marginBottom:8,borderRadius:14,border:"1px solid rgba(255,255,255,0.08)"}} />
+          <input type="password" placeholder="Şifre (en az 6 karakter)" value={password}
+            onChange={e=>setPassword(e.target.value)}
+            onKeyDown={e=>e.key==="Enter"&&handleEmail()}
+            style={{...inp,borderRadius:14,border:"1px solid rgba(255,255,255,0.08)"}} />
+
+          <button onClick={handleEmail} disabled={loading} style={{
+            ...btnPrimary,opacity:loading?.6:1,marginBottom:12,borderRadius:14,
+            background:"linear-gradient(135deg,#6366f1,#8b5cf6)",
+          }}>
+            {loading ? "Bekleyin..." : mode === "register" ? "Kayıt Ol" : "Giriş Yap"}
+          </button>
+
+          {/* Toggle mode */}
+          <div style={{textAlign:"center",marginBottom:4}}>
+            <button onClick={()=>{setMode(mode==="login"?"register":"login");setError("");}} style={{
+              background:"none",border:"none",color:"#a78bfa",fontSize:13,cursor:"pointer",
+            }}>
+              {mode === "login" ? "Hesabın yok mu? Kayıt ol" : "Zaten hesabın var mı? Giriş yap"}
+            </button>
+          </div>
+        </div>
+
+        {/* Skip */}
+        <div style={{textAlign:"center",marginTop:20,animation:"fadeIn 1s ease 0.5s both"}}>
           <button onClick={handleSkip} style={{
-            background:"none",border:"none",color:"#666",fontSize:12,cursor:"pointer",
+            background:"none",border:"none",color:"rgba(167,139,250,0.45)",fontSize:12,cursor:"pointer",
           }}>
             Giriş yapmadan devam et →
           </button>
-          <div style={{fontSize:10,opacity:.3,marginTop:4}}>
+          <div style={{fontSize:10,opacity:.2,marginTop:4}}>
             Veriler sadece bu cihazda kalır
           </div>
         </div>
       </div>
-    </div>
+    </NebulaBackground>
   );
 }
 
@@ -3066,11 +3094,10 @@ export default function App() {
   }
 
   if (splash || loading || !data) return (
-    <div
+    <NebulaBackground
       onClick={() => {
         setSplash(false);
         setLoading(false);
-        // data yoksa boş yükle (Firebase cevap vermediyse)
         if (!data) {
           const uid2 = null;
           loadData(uid2).then(d => setData(d)).catch(() => {
@@ -3078,64 +3105,60 @@ export default function App() {
           });
         }
       }}
-      style={{
-        minHeight:"100vh",minHeight:"100dvh",background:"#060611",
-        display:"flex",alignItems:"center",justifyContent:"center",
-        color:"#e0e0e0",fontFamily:"'SF Pro Display',-apple-system,sans-serif",
-        flexDirection:"column",overflow:"hidden",position:"relative",
-        cursor:"pointer",userSelect:"none",
-      }}>
-      <style>{`
-        @keyframes walkAcross { 
-          0% { transform: translateX(-120px) scaleX(1); }
-          45% { transform: translateX(40px) scaleX(1); }
-          50% { transform: translateX(40px) scaleX(-1); }
-          95% { transform: translateX(-40px) scaleX(-1); }
-          100% { transform: translateX(-40px) scaleX(1); }
+      style={{cursor:"pointer",userSelect:"none"}}
+    >
+      <style>{NEBULA_KEYFRAMES + `
+        @keyframes titleReveal {
+          0%   { opacity:0; letter-spacing:12px; filter:blur(12px); }
+          100% { opacity:1; letter-spacing:-3px;  filter:blur(0); }
         }
-        @keyframes bobWalk {
-          0%,100% { transform: translateY(0) rotate(-3deg); }
-          25% { transform: translateY(-12px) rotate(3deg); }
-          50% { transform: translateY(0) rotate(-3deg); }
-          75% { transform: translateY(-12px) rotate(3deg); }
+        @keyframes lineGrow {
+          from { width:0; opacity:0; }
+          to   { width:120px; opacity:1; }
         }
-        @keyframes fadeInUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
-        @keyframes checkPop { 0%{transform:scale(1)} 40%{transform:scale(1.25)} 70%{transform:scale(0.9)} 100%{transform:scale(1)} }
-        .task-check-done { animation: checkPop .3s ease; }
-        @keyframes shimmer { 0%{opacity:.4} 50%{opacity:1} 100%{opacity:.4} }
-        @keyframes groundDraw { from{width:0} to{width:80%} }
+        @keyframes subtitleIn {
+          from { opacity:0; transform:translateY(10px); }
+          to   { opacity:1; transform:translateY(0); }
+        }
       `}</style>
 
-      {/* Walking mascot — canvas ile beyaz kağıt arka planı kaldırıldı */}
+      {/* Big Zimu title */}
       <div style={{
-        animation:"walkAcross 4s ease-in-out infinite",
-        marginBottom:8,
+        fontSize:72,fontWeight:900,
+        background:"linear-gradient(135deg,#e0d5f5 0%,#a78bfa 30%,#6366f1 60%,#818cf8 100%)",
+        WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",
+        animation:"titleReveal 1.2s cubic-bezier(.22,1,.36,1) both, glowPulse 4s ease-in-out 1.2s infinite",
+        lineHeight:1,marginBottom:8,textAlign:"center",
       }}>
-        <div style={{animation:"bobWalk 0.6s ease-in-out infinite"}}>
-          <MascotImage src="/zimu-mascot.png" style={{
-            width:280,height:280,objectFit:"contain",
-            filter:"drop-shadow(0 12px 32px rgba(59,130,246,0.35))",
-            display:"block",
-          }}/>
+        Zimu
+      </div>
+
+      {/* Decorative line */}
+      <div style={{
+        height:2,borderRadius:1,marginBottom:20,
+        background:"linear-gradient(90deg, transparent, rgba(167,139,250,0.5), rgba(99,102,241,0.6), rgba(167,139,250,0.5), transparent)",
+        animation:"lineGrow 0.8s ease 0.6s both",
+      }}/>
+
+      {/* Motivational text */}
+      <div style={{textAlign:"center",animation:"subtitleIn 0.8s ease 1s both"}}>
+        <div style={{fontSize:16,opacity:.6,fontStyle:"italic",letterSpacing:.5,lineHeight:1.8}}>
+          Kendi destanını yaz.
+        </div>
+        <div style={{fontSize:13,opacity:.35,fontStyle:"italic",letterSpacing:.5}}>
+          Write your own epic.
         </div>
       </div>
 
-      {/* Ground line */}
+      {/* Tap to continue */}
       <div style={{
-        width:"80%",maxWidth:360,height:2,
-        background:"linear-gradient(90deg, transparent, rgba(59,130,246,0.3), rgba(59,130,246,0.5), rgba(59,130,246,0.3), transparent)",
-        borderRadius:1,marginBottom:24,
-        animation:"groundDraw 1s ease-out",
-      }}/>
-
-      {/* Text */}
-      <div style={{animation:"fadeInUp 0.8s ease 0.3s both",textAlign:"center"}}>
-        <div style={{fontSize:32,fontWeight:800,letterSpacing:-1,marginBottom:6}}>Zimu</div>
-        <div style={{fontSize:14,opacity:.4,animation:"shimmer 2s ease-in-out infinite"}}>Hayatını yönet...</div>
-        <div style={{fontSize:11,opacity:.2,marginTop:16}}>Devam etmek için dokun</div>
+        position:"absolute",bottom:48,
+        fontSize:11,opacity:.2,animation:"shimmer 2s ease-in-out 1.5s infinite",
+        letterSpacing:1,
+      }}>
+        Devam etmek için dokun
       </div>
-    </div>
+    </NebulaBackground>
   );
 
   const content = () => {
