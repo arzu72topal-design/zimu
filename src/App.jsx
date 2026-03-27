@@ -241,7 +241,7 @@ function FAB({ onClick, color="#3b82f6" }) {
 }
 
 /* ═══════════ DASHBOARD ═══════════ */
-function Dashboard({ data, setTab }) {
+function Dashboard({ data, setTab, update }) {
   const t = today();
   const foods = data.foods || [];
   const rooms = data.rooms || [...DEFAULT_ROOMS];
@@ -268,6 +268,18 @@ function Dashboard({ data, setTab }) {
 
   const hour = new Date().getHours();
   const greeting = hour<12 ? "Günaydın" : hour<18 ? "İyi günler" : "İyi akşamlar";
+
+  // Daily thoughts (3 slots)
+  const thoughts = data.dailyThoughts || ["","",""];
+  const updateThought = (i, val) => {
+    const next = [...thoughts];
+    next[i] = val;
+    update({ ...data, dailyThoughts: next });
+  };
+
+  // Mini news/music from rooms
+  const newsItems = (data.roomItems || {})["news"] || [];
+  const musicItems = (data.roomItems || {})["music"] || [];
 
   const scheduleItems = [
     ...urgentTasks.slice(0,2).map(tk=>({ type:"task", id:tk.id, title:tk.title, sub:PRIORITIES[tk.priority]+" öncelik", color:PCOL[tk.priority] })),
@@ -372,6 +384,88 @@ function Dashboard({ data, setTab }) {
             <div key={i} style={{background:"rgba(255,255,255,0.04)",backdropFilter:"blur(8px)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:14,padding:"12px 10px",textAlign:"center",boxShadow:"0 4px 16px rgba(0,0,0,0.2)"}}>
               <div style={{fontSize:20,fontWeight:800,color:s.color,letterSpacing:-.5}}>{s.val}</div>
               <div style={{fontSize:10,opacity:.4,marginTop:3,lineHeight:1.2}}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── KAFAMDAKILER ── */}
+      <div style={{marginBottom:14}}>
+        <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em",marginBottom:8}}>☁️ Bugün Kafamı Kurcalayanlar</div>
+        <div style={{background:"rgba(255,255,255,0.04)",backdropFilter:"blur(12px)",borderRadius:16,padding:"12px 14px",border:"1px solid rgba(20,184,166,0.2)",boxShadow:"0 0 20px rgba(20,184,166,0.08)"}}>
+          {[0,1,2].map(i=>(
+            <div key={i} style={{display:"flex",alignItems:"center",gap:10,marginBottom:i<2?8:0}}>
+              <span style={{fontSize:13,opacity:.35,flexShrink:0,fontWeight:700}}>{i+1}.</span>
+              <input
+                value={thoughts[i]||""}
+                onChange={e=>updateThought(i,e.target.value)}
+                placeholder={["Bugün en çok düşündüğüm şey...","Kafamı karıştıran bir şey...","Çözmek istediğim bir sorun..."][i]}
+                style={{
+                  flex:1,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.07)",
+                  borderRadius:10,padding:"9px 12px",color:"#e0e0e0",fontSize:13,outline:"none",
+                  WebkitAppearance:"none",boxSizing:"border-box",
+                }}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── MİNİ HABERLER ── */}
+      <div style={{marginBottom:14}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+          <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em"}}>📰 Son Haberler</div>
+          <button onClick={()=>setTab("projects")} style={{background:"none",border:"none",color:"#ef4444",fontSize:12,cursor:"pointer",fontWeight:600}}>Tümü ▶</button>
+        </div>
+        <div style={{background:"rgba(255,255,255,0.04)",backdropFilter:"blur(12px)",borderRadius:16,padding:"12px 14px",border:"1px solid rgba(239,68,68,0.15)",boxShadow:"0 0 20px rgba(239,68,68,0.06)"}}>
+          {newsItems.length===0 ? (
+            <div style={{display:"flex",alignItems:"center",gap:12,cursor:"pointer"}} onClick={()=>setTab("projects")}>
+              <span style={{fontSize:28}}>📰</span>
+              <div>
+                <div style={{fontSize:13,fontWeight:600,opacity:.6}}>Henüz haber yok</div>
+                <div style={{fontSize:11,opacity:.35,marginTop:2}}>Tarzım → Haberler ekranına git</div>
+              </div>
+            </div>
+          ) : newsItems.slice(0,3).map((item,i)=>(
+            <div key={item.id||i} style={{display:"flex",alignItems:"flex-start",gap:10,marginBottom:i<Math.min(newsItems.length,3)-1?10:0,paddingBottom:i<Math.min(newsItems.length,3)-1?10:0,borderBottom:i<Math.min(newsItems.length,3)-1?"1px solid rgba(255,255,255,0.05)":"none"}}>
+              <span style={{fontSize:16,flexShrink:0,marginTop:1}}>📰</span>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:13,fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.title||"Haber"}</div>
+                {item.source&&<div style={{fontSize:11,opacity:.4,marginTop:2}}>{item.source}</div>}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── MİNİ MÜZİK ── */}
+      <div style={{marginBottom:14}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+          <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em"}}>🎵 Müzik Koleksiyonu</div>
+          <button onClick={()=>setTab("projects")} style={{background:"none",border:"none",color:"#a855f7",fontSize:12,cursor:"pointer",fontWeight:600}}>Tümü ▶</button>
+        </div>
+        <div style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:4,WebkitOverflowScrolling:"touch"}}>
+          {musicItems.length===0 ? (
+            <div onClick={()=>setTab("projects")} style={{
+              background:"rgba(168,85,247,0.08)",border:"1px solid rgba(168,85,247,0.2)",borderRadius:14,
+              padding:"14px 18px",cursor:"pointer",display:"flex",alignItems:"center",gap:12,width:"100%",
+            }}>
+              <span style={{fontSize:28}}>🎧</span>
+              <div>
+                <div style={{fontSize:13,fontWeight:600,color:"#a855f7"}}>Müzik ekle</div>
+                <div style={{fontSize:11,opacity:.4,marginTop:2}}>Tarzım → Müziklerim</div>
+              </div>
+            </div>
+          ) : musicItems.slice(0,5).map((item,i)=>(
+            <div key={item.id||i} style={{
+              background:"rgba(168,85,247,0.08)",border:"1px solid rgba(168,85,247,0.15)",borderRadius:14,
+              padding:"10px 12px",minWidth:130,maxWidth:160,flexShrink:0,cursor:"pointer",
+            }} onClick={()=>item.link&&window.open(item.link,"_blank")}>
+              <div style={{width:44,height:44,borderRadius:10,background:item.albumArt?"#000":"rgba(168,85,247,0.2)",overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center",marginBottom:8}}>
+                {item.albumArt ? <img src={item.albumArt} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/> : <span style={{fontSize:20}}>🎵</span>}
+              </div>
+              <div style={{fontSize:12,fontWeight:700,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.title||"Parça"}</div>
+              {item.artist&&<div style={{fontSize:10,opacity:.5,marginTop:2,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.artist}</div>}
             </div>
           ))}
         </div>
@@ -2943,7 +3037,7 @@ export default function App() {
 
   const content = () => {
     switch(tab) {
-      case "dashboard": return <Dashboard data={data} setTab={setTab}/>;
+      case "dashboard": return <Dashboard data={data} setTab={setTab} update={update}/>;
       case "tasks": return <Tasks data={data} update={update}/>;
       case "calendar": return <CalendarView data={data} update={update}/>;
       case "sports": return <Sports data={data} update={update}/>;
@@ -2978,30 +3072,32 @@ export default function App() {
     touchEnd.current = null;
   };
 
-  const handleScroll = (e) => {
-    setShowScrollTop(e.target.scrollTop > 300);
-  };
-  const scrollToTop = () => {
-    if (isMobile) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } else if (scrollRef.current) {
-      scrollRef.current.scrollTo({ top: 0, behavior: "smooth" });
+  const handleScroll = useCallback((e) => {
+    const top = e?.target?.scrollTop ?? window.scrollY;
+    setShowScrollTop(top > 300);
+  }, []);
+
+  useEffect(() => {
+    if (!isMobile) {
+      window.addEventListener("scroll", handleScroll);
+      return () => window.removeEventListener("scroll", handleScroll);
     }
+  }, [isMobile, handleScroll]);
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const NAV_HEIGHT = isMobile ? 80 : 56;
-  const SAFE_BOTTOM = isMobile ? 20 : 10;
-  const CONTENT_PAD_BOTTOM = NAV_HEIGHT + SAFE_BOTTOM + 30;
+  const NAV_HEIGHT = 64;
+  const SAFE_BOTTOM = isMobile ? 20 : 0;
+  const CONTENT_PAD_BOTTOM = (isMobile ? NAV_HEIGHT + SAFE_BOTTOM + 30 : NAV_HEIGHT + 24);
 
   const phoneContent = (
     <div style={{
       width:"100%",
-      height:isMobile?"auto":"100%",
-      minHeight:isMobile?"100dvh":"100%",
+      minHeight:isMobile?"100dvh":"100vh",
       background:"#060611",color:"#e0e0e0",
       fontFamily:"'SF Pro Display',-apple-system,'Segoe UI',sans-serif",
-      position:isMobile?"static":"relative",
-      overflow:isMobile?"visible":"hidden",
+      position:"relative",
     }}>
       {/* Nebula ambient orbs — fixed position, behind content */}
       <div style={{position:"fixed",inset:0,pointerEvents:"none",zIndex:0,overflow:"hidden"}}>
@@ -3021,18 +3117,12 @@ export default function App() {
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
-        onScroll={isMobile?undefined:handleScroll}
-        style={isMobile ? {
-          padding:`16px 16px ${CONTENT_PAD_BOTTOM}px`,
-          minHeight:"100dvh",
-        } : {
-          position:"absolute",
-          top:0,left:0,right:0,
-          bottom:NAV_HEIGHT + SAFE_BOTTOM,
-          overflow:"auto",
-          overflowX:"hidden",
-          padding:"16px 16px 20px",
-          WebkitOverflowScrolling:"touch",
+        onScroll={handleScroll}
+        style={{
+          padding:`16px ${isMobile?"16px":"clamp(16px, 5vw, 60px)"} ${CONTENT_PAD_BOTTOM}px`,
+          minHeight: isMobile ? "100dvh" : "100vh",
+          maxWidth: isMobile ? undefined : 800,
+          margin: isMobile ? undefined : "0 auto",
         }}
       >
         {content()}
@@ -3057,20 +3147,21 @@ export default function App() {
 
       {/* Bottom nav bar */}
       <div style={{
-        position:isMobile?"fixed":"absolute",
+        position:"fixed",
         bottom:0,
         left:0,right:0,
-        background:"rgba(4,4,14,0.92)",
+        background:"rgba(4,4,14,0.95)",
         backdropFilter:"blur(24px) saturate(180%)",
         WebkitBackdropFilter:"blur(24px) saturate(180%)",
         borderTop:"1px solid rgba(255,255,255,0.1)",
-        display:"flex",justifyContent:"space-around",alignItems:"center",
+        display:"flex",justifyContent:"center",alignItems:"center",
         height:NAV_HEIGHT,
         paddingTop:4,
         paddingBottom:isMobile?"env(safe-area-inset-bottom, 8px)":"6px",
         paddingLeft:4,paddingRight:4,
         zIndex:1000,
       }}>
+        <div style={{display:"flex",justifyContent:"space-around",alignItems:"center",width:"100%",maxWidth:isMobile?undefined:600}}>
         {allTabs.map(t=>(
           <button key={t.id} onClick={()=>setTab(t.id)} style={{
             background:tab===t.id?"rgba(59,130,246,0.15)":"none",
@@ -3078,17 +3169,18 @@ export default function App() {
             border:"none",cursor:"pointer",
             display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",
             gap:isMobile?4:3,
-            padding:isMobile?"10px 6px":"8px 5px",
-            minWidth:isMobile?52:40,
+            padding:isMobile?"10px 6px":"8px 12px",
+            minWidth:isMobile?52:50,
             borderRadius:14,
             color:tab===t.id?"#3b82f6":"#555",
             transition:"all .15s",
             flex:1,
           }}>
-            <span style={{fontSize:isMobile?22:17,lineHeight:1}}>{t.icon}</span>
-            <span style={{fontSize:isMobile?10:8,fontWeight:tab===t.id?700:500,letterSpacing:-.2}}>{t.label}</span>
+            <span style={{fontSize:isMobile?22:18,lineHeight:1}}>{t.icon}</span>
+            <span style={{fontSize:isMobile?10:9,fontWeight:tab===t.id?700:500,letterSpacing:-.2}}>{t.label}</span>
           </button>
         ))}
+        </div>
       </div>
     </div>
   );
@@ -3109,16 +3201,9 @@ export default function App() {
         ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.12);border-radius:4px; }
         ::-webkit-scrollbar-track { background:transparent; }
         input[type="date"]::-webkit-calendar-picker-indicator { filter:invert(0.7); }
-        html, body { margin:0; padding:0; overscroll-behavior:none; background:#060611; }
+        html, body { margin:0; padding:0; overscroll-behavior:none; background:#060611; overflow:auto; height:auto; }
+        #root { height:auto; }
         select option { background:#1a1a2e; color:#e0e0e0; }
-        @media (max-width: 639px) {
-          html, body { overflow:auto; height:auto; background:#060611; }
-          #root { height:auto; }
-        }
-        @media (min-width: 640px) {
-          html, body { overflow:hidden; height:100%; }
-          #root { height:100%; }
-        }
         @media(display-mode:standalone){ 
           html, body { background:#060611; overflow:auto; height:auto; }
           #root { height:auto; }
@@ -3132,62 +3217,8 @@ export default function App() {
         /* Mobile: full screen */
         phoneContent
       ) : (
-        /* Desktop: phone frame centered */
-        <div style={{
-          minHeight:"100vh",background:"#080810",
-          display:"flex",alignItems:"center",justifyContent:"center",
-          padding:"20px",
-        }}>
-          {/* Phone label */}
-          <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:12}}>
-            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
-              <span style={{fontSize:18}}>◉</span>
-              <span style={{fontWeight:800,fontSize:18,color:"#e0e0e0",letterSpacing:-.5}}>Zimu</span>
-            </div>
-            {/* Phone frame */}
-            <div style={{
-              width:390,height:760,
-              borderRadius:40,
-              border:"4px solid #2a2a3e",
-              background:"#0f0f1a",
-              overflow:"hidden",
-              boxShadow:"0 0 60px rgba(59,130,246,0.08), 0 0 120px rgba(0,0,0,0.5)",
-              position:"relative",
-            }}>
-              {/* Notch */}
-              <div style={{
-                position:"absolute",top:0,left:"50%",transform:"translateX(-50%)",
-                width:120,height:28,background:"#080810",
-                borderRadius:"0 0 18px 18px",zIndex:100,
-                display:"flex",alignItems:"center",justifyContent:"center",
-              }}>
-                <div style={{width:60,height:5,borderRadius:3,background:"#1a1a2e"}}/>
-              </div>
-              {/* Status bar */}
-              <div style={{
-                position:"absolute",top:0,left:0,right:0,height:44,
-                display:"flex",justifyContent:"space-between",alignItems:"flex-end",
-                padding:"0 24px 4px",fontSize:12,fontWeight:600,color:"#aaa",zIndex:99,
-                background:"linear-gradient(to bottom, rgba(15,15,26,0.9), transparent)",
-              }}>
-                <span>9:41</span>
-                <span style={{display:"flex",gap:4,alignItems:"center"}}>
-                  <span style={{fontSize:10}}>5G</span>
-                  <span style={{display:"inline-block",width:22,height:10,border:"1.5px solid #aaa",borderRadius:3,position:"relative"}}>
-                    <span style={{position:"absolute",left:1.5,top:1.5,bottom:1.5,width:14,background:"#22c55e",borderRadius:1.5}}/>
-                  </span>
-                </span>
-              </div>
-              {/* App content */}
-              <div style={{paddingTop:44,height:"100%",boxSizing:"border-box"}}>
-                {phoneContent}
-              </div>
-            </div>
-            <div style={{fontSize:11,opacity:.25,color:"#888",marginTop:4}}>
-              Telefonundan aç → Ana ekrana ekle
-            </div>
-          </div>
-        </div>
+        /* Desktop: full page, no phone frame */
+        phoneContent
       )}
     </>
   );
