@@ -3828,7 +3828,7 @@ const DEFAULT_DATA = {tasks:[],events:[],sports:[],projects:[],notes:[],foods:[]
 
 export default function App() {
   const [tab, setTab] = useState("dashboard");
-  const [data, setData] = useState(null);
+  const [data, setData] = useState(DEFAULT_DATA); // ← NEVER null, app always works
   const [showSplash, setShowSplash] = useState(true);
   const [user, setUser] = useState(null);
   const [toast, setToast] = useState({ visible: false, message: "" });
@@ -3956,46 +3956,7 @@ export default function App() {
   // Use appData everywhere — guaranteed non-null
   const appData = data || DEFAULT_DATA;
 
-  // SPLASH: show while splash timer active AND data not ready
-  if (showSplash) return (
-    <NebulaBackground
-      onClick={() => {
-        setShowSplash(false);
-        if (!data) setData(DEFAULT_DATA);
-      }}
-      style={{cursor:"pointer",userSelect:"none"}}
-    >
-      <style>{NEBULA_KEYFRAMES + `
-        @keyframes titleReveal {
-          0%   { opacity:0; letter-spacing:12px; filter:blur(12px); }
-          100% { opacity:1; letter-spacing:-3px;  filter:blur(0); }
-        }
-        @keyframes lineGrow { from { width:0; opacity:0; } to { width:120px; opacity:1; } }
-        @keyframes subtitleIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
-        @keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
-      `}</style>
-      <div style={{
-        fontSize:72,fontWeight:900,
-        background:"linear-gradient(135deg,#e0d5f5 0%,#a78bfa 30%,#6366f1 60%,#818cf8 100%)",
-        WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",
-        animation:"titleReveal 1.2s cubic-bezier(.22,1,.36,1) both, glowPulse 4s ease-in-out 1.2s infinite",
-        lineHeight:1,marginBottom:8,textAlign:"center",
-      }}>Zimu</div>
-      <div style={{ height:2,borderRadius:1,marginBottom:20,
-        background:"linear-gradient(90deg, transparent, rgba(167,139,250,0.5), rgba(99,102,241,0.6), rgba(167,139,250,0.5), transparent)",
-        animation:"lineGrow 0.8s ease 0.6s both",
-      }}/>
-      <div style={{textAlign:"center",animation:"subtitleIn 0.8s ease 1s both"}}>
-        <div style={{fontSize:16,opacity:.6,fontStyle:"italic",letterSpacing:.5,lineHeight:1.8}}>{t("splash.motto1", lang)}</div>
-        <div style={{fontSize:13,opacity:.35,fontStyle:"italic",letterSpacing:.5}}>{t("splash.motto2", lang)}</div>
-      </div>
-      <div style={{ position:"absolute",bottom:48, fontSize:11,opacity:.3,letterSpacing:1, display:"flex",alignItems:"center",gap:8 }}>
-        <span style={{animation:"shimmer 2s ease-in-out 1.5s infinite"}}>{t("splash.tap", lang)}</span>
-      </div>
-    </NebulaBackground>
-  );
-
-  // ── MAIN APP ──
+  // ── MAIN APP ── (splash removed for debugging — will re-add later)
 
   const content = () => {
     switch(tab) {
@@ -4010,7 +3971,7 @@ export default function App() {
   };
 
   // Swipe navigation
-  const tabOrder = allTabs.map(t => t.id);
+  const tabOrder = allTabs.map(tb => tb.id);
 
   const handleTouchStart = (e) => {
     touchEnd.current = null;
@@ -4163,6 +4124,8 @@ export default function App() {
       `}</style>
 
       <Toast {...toast} />
+      {/* DEBUG: remove this after confirming deploy works */}
+      <div style={{position:"fixed",top:4,left:4,fontSize:9,color:"#f00",zIndex:99999,opacity:.7}}>v42-nosplash</div>
 
       {isMobile ? (
         /* Mobile: full screen */
