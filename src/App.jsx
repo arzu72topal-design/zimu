@@ -298,37 +298,96 @@ function Dashboard({ data, setTab, update }) {
   const rooms = data.rooms || [...DEFAULT_ROOMS];
   const roomItems = data.roomItems || {};
 
-  const pending = data.tasks.filter(x=>!x.done).length;
-  const done = data.tasks.filter(x=>x.done).length;
-  const overdue = data.tasks.filter(x=>!x.done && x.dueDate && x.dueDate < t).length;
-  const urgentTasks = data.tasks
-    .filter(x=>!x.done)
-    .sort((a,b)=>{const po={high:0,medium:1,low:2};return (po[a.priority]||1)-(po[b.priority]||1);})
-    .slice(0,3);
+  // ── Task calculations ──
+  const allTasks = data.tasks || [];
+  const todayTasks = allTasks.filter(x => x.dueDate === t);
+  const todayDone = todayTasks.filter(x => x.done).length;
+  const todayTotal = todayTasks.length;
+  const todayProgress = todayTotal > 0 ? Math.round((todayDone / todayTotal) * 100) : 0;
 
-  const todayEv = data.events.filter(e=>e.date===t);
-  const upcoming = data.events.filter(e=>e.date>=t).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,3);
+  const pending = allTasks.filter(x => !x.done).length;
+  const overdue = allTasks.filter(x => !x.done && x.dueDate && x.dueDate < t).length;
+  const urgentTasks = allTasks
+    .filter(x => !x.done && (x.dueDate === t || x.dueDate === "" || !x.dueDate || x.dueDate <= t))
+    .sort((a, b) => {
+      // Overdue first, then by priority
+      const aOver = a.dueDate && a.dueDate < t ? -1 : 0;
+      const bOver = b.dueDate && b.dueDate < t ? -1 : 0;
+      if (aOver !== bOver) return aOver - bOver;
+      const po = { high: 0, medium: 1, low: 2 };
+      return (po[a.priority] || 1) - (po[b.priority] || 1);
+    });
 
-  const wkSport = data.sports.filter(s=>{const d=(new Date()-new Date(s.date))/864e5;return d>=0&&d<=7;});
-  const wkMin = wkSport.reduce((a,s)=>a+(s.duration||0),0);
-  const wkBurned = wkSport.reduce((a,s)=>a+(s.calories||0),0);
-  const todayFoods = foods.filter(f=>f.date===t);
-  const todayCalIn = todayFoods.reduce((a,f)=>a+(f.calories||0),0);
-  const todayCalOut = data.sports.filter(s=>s.date===t).reduce((a,s)=>a+(s.calories||0),0);
-  const activeProjects = data.projects.filter(p=>p.status!=="Tamamlandı").length;
+  // ── Streak calculation ──
+  const calcStreak = () => {
+    let streak = 0;
+    const d = new Date();
+    // Start from yesterday (today is still in progress)
+    d.setDate(d.getDate() - 1);
+    while (true) {
+      const dateStr = d.toISOString().split("T")[0];
+      const dayTasks = allTasks.filter(x => x.dueDate === dateStr);
+      if (dayTasks.length === 0) { d.setDate(d.getDate() - 1); if (streak === 0) continue; else break; }
+      const allDone = dayTasks.every(x => x.done);
+      if (allDone) { streak++; d.setDate(d.getDate() - 1); }
+      else break;
+      if (streak > 365) break; // safety
+    }
+    // If today's tasks are all done, add today
+    if (todayTotal > 0 && todayDone === todayTotal) streak++;
+    return streak;
+  };
+  const streak = calcStreak();
+
+  // ── Events ──
+  const todayEv = data.events.filter(e => e.date === t);
+  const upcoming = data.events.filter(e => e.date >= t).sort((a, b) => a.date.localeCompare(b.date) || (a.time || "").localeCompare(b.time || "")).slice(0, 5);
+
+  // ── Sports & food ──
+  const wkSport = data.sports.filter(s => { const d = (new Date() - new Date(s.date)) / 864e5; return d >= 0 && d <= 7; });
+  const wkMin = wkSport.reduce((a, s) => a + (s.duration || 0), 0);
+  const wkBurned = wkSport.reduce((a, s) => a + (s.calories || 0), 0);
+  const todayFoods = foods.filter(f => f.date === t);
+  const todayCalIn = todayFoods.reduce((a, f) => a + (f.calories || 0), 0);
+  const todayCalOut = data.sports.filter(s => s.date === t).reduce((a, s) => a + (s.calories || 0), 0);
+
+  // ── Timeline: merge events + due tasks chronologically ──
+  const timelineItems = [
+    ...todayEv.map(e => ({ type: "event", id: e.id, title: e.title, time: e.time || "", color: e.color || "#a855f7", done: false })),
+    ...todayTasks.map(tk => ({ type: "task", id: tk.id, title: tk.title, time: tk.dueTime || "", color: PCOL[tk.priority] || "#888", done: tk.done, priority: tk.priority })),
+  ].sort((a, b) => {
+    // Items with time first, sorted by time; then items without time
+    if (a.time && b.time) return a.time.localeCompare(b.time);
+    if (a.time && !b.time) return -1;
+    if (!a.time && b.time) return 1;
+    return 0;
+  });
 
   const hour = new Date().getHours();
-  const greeting = hour<12 ? "Günaydın" : hour<18 ? "İyi günler" : "İyi akşamlar";
+  const greeting = hour < 12 ? "Günaydın" : hour < 18 ? "İyi günler" : "İyi akşamlar";
 
-  // Daily thoughts (3 slots)
-  const thoughts = data.dailyThoughts || ["","",""];
+  // ── Daily thoughts ──
+  const thoughts = data.dailyThoughts || ["", "", ""];
   const updateThought = (i, val) => {
     const next = [...thoughts];
     next[i] = val;
     update({ ...data, dailyThoughts: next });
   };
 
-  // Live news headlines
+  // ── Quick toggle task from dashboard ──
+  const toggleTask = (id) => {
+    update({ ...data, tasks: data.tasks.map(tk => tk.id === id ? { ...tk, done: !tk.done } : tk) });
+  };
+
+  // ── Quick add task ──
+  const [quickTask, setQuickTask] = useState("");
+  const addQuickTask = () => {
+    if (!quickTask.trim()) return;
+    update({ ...data, tasks: [{ id: uid(), title: quickTask.trim(), priority: "medium", dueDate: t, done: false, createdAt: t }, ...data.tasks] });
+    setQuickTask("");
+  };
+
+  // ── Live news ──
   const [headlines, setHeadlines] = useState([]);
   useEffect(() => {
     let cancelled = false;
@@ -352,129 +411,275 @@ function Dashboard({ data, setTab, update }) {
 
   const musicItems = (data.roomItems || {})["music"] || [];
 
-  const scheduleItems = [
-    ...urgentTasks.slice(0,2).map(tk=>({ type:"task", id:tk.id, title:tk.title, sub:PRIORITIES[tk.priority]+" öncelik", color:PCOL[tk.priority] })),
-    ...upcoming.slice(0,2).map(e=>({ type:"event", id:e.id, title:e.title, sub:e.time||e.date.slice(5), color:e.color||"#a855f7" })),
-  ].slice(0,4);
-
   return (
     <div>
-      {/* HERO */}
+      {/* ══ HERO — Greeting + Date + Streak ══ */}
       <div style={{
-        background:"linear-gradient(135deg,rgba(26,36,72,0.9) 0%,rgba(28,28,46,0.7) 60%,rgba(31,26,46,0.9) 100%)",
-        backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",
-        borderRadius:20,padding:"20px 18px 18px",marginBottom:14,
-        border:"1px solid rgba(255,255,255,0.1)",
-        boxShadow:"0 0 40px rgba(59,130,246,0.08), 0 8px 32px rgba(0,0,0,0.4)",
+        background: "linear-gradient(135deg,rgba(26,36,72,0.9) 0%,rgba(28,28,46,0.7) 60%,rgba(31,26,46,0.9) 100%)",
+        backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)",
+        borderRadius: 20, padding: "20px 18px 18px", marginBottom: 14,
+        border: "1px solid rgba(255,255,255,0.1)",
+        boxShadow: "0 0 40px rgba(59,130,246,0.08), 0 8px 32px rgba(0,0,0,0.4)",
       }}>
-        <h2 style={{margin:0,fontSize:23,fontWeight:800,letterSpacing:-.5}}>{greeting}! 👋</h2>
-        <p style={{margin:"4px 0 16px",opacity:.45,fontSize:13}}>
-          {new Date().toLocaleDateString("tr-TR",{weekday:"long",day:"numeric",month:"long"})}
-        </p>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
-          {[
-            {label:"Bekleyen görev",val:pending,color:"#3b82f6",tab:"tasks"},
-            {label:"Bugün etkinlik",val:todayEv.length,color:"#a855f7",tab:"calendar"},
-            {label:"kcal alındı",val:todayCalIn,color:"#f97316",tab:"sports"},
-            {label:"Aktif proje",val:activeProjects,color:"#22c55e",tab:"projects"},
-          ].map(s=>(
-            <div key={s.tab} onClick={()=>setTab(s.tab)} style={{
-              background:`linear-gradient(135deg,${s.color}18,${s.color}08)`,
-              backdropFilter:"blur(8px)",
-              borderRadius:14,padding:"12px 14px",cursor:"pointer",
-              border:`1px solid ${s.color}40`,
-              boxShadow:`0 0 20px ${s.color}15, inset 0 1px 0 ${s.color}20`,
-              transition:"transform .15s, box-shadow .15s",
-            }}>
-              <div style={{fontSize:24,fontWeight:800,color:s.color,letterSpacing:-.5}}>{s.val}</div>
-              <div style={{fontSize:11,color:s.color,opacity:.8,marginTop:2}}>{s.label}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Quick actions */}
-      <div style={{display:"flex",gap:8,marginBottom:14}}>
-        {[
-          {label:"+ Görev",tab:"tasks",color:"#3b82f6"},
-          {label:"+ Yemek",tab:"sports",color:"#f97316"},
-          {label:"+ Spor",tab:"sports",color:"#22c55e"},
-        ].map(a=>(
-          <button key={a.label} onClick={()=>setTab(a.tab)} style={{
-            flex:1,background:`${a.color}12`,backdropFilter:"blur(8px)",color:a.color,border:`1px solid ${a.color}40`,
-            borderRadius:12,padding:"10px 4px",fontSize:12,fontWeight:700,cursor:"pointer",
-            boxShadow:`0 0 16px ${a.color}15`,
-          }}>{a.label}</button>
-        ))}
-      </div>
-
-      {overdue>0&&(
-        <div onClick={()=>setTab("tasks")} style={{
-          background:"rgba(239,68,68,0.1)",backdropFilter:"blur(8px)",border:"1px solid rgba(239,68,68,0.3)",
-          borderRadius:14,padding:"12px 14px",marginBottom:12,
-          display:"flex",alignItems:"center",gap:10,cursor:"pointer",
-          boxShadow:"0 0 20px rgba(239,68,68,0.1)",
-        }}>
-          <span style={{fontSize:20}}>🚨</span>
-          <div style={{flex:1}}>
-            <div style={{fontSize:14,fontWeight:700,color:"#ef4444"}}>{overdue} gecikmiş görev!</div>
-            <div style={{fontSize:11,opacity:.5}}>Hemen kontrol et</div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+          <div>
+            <h2 style={{ margin: 0, fontSize: 23, fontWeight: 800, letterSpacing: -.5 }}>{greeting}! 👋</h2>
+            <p style={{ margin: "4px 0 0", opacity: .45, fontSize: 13 }}>
+              {new Date().toLocaleDateString("tr-TR", { weekday: "long", day: "numeric", month: "long" })}
+            </p>
           </div>
-          <span style={{fontSize:14,opacity:.3}}>▶</span>
-        </div>
-      )}
-
-      {scheduleItems.length>0&&(
-        <div style={{marginBottom:14}}>
-          <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em",marginBottom:8}}>Bugünün Programı</div>
-          {scheduleItems.map(item=>(
-            <div key={item.id} onClick={()=>setTab(item.type==="task"?"tasks":"calendar")} style={{
-              ...cardStyle,padding:"13px 14px",marginBottom:6,
-              display:"flex",alignItems:"center",gap:12,cursor:"pointer",minHeight:54,
-              border:`1px solid ${item.color}25`,boxShadow:`0 0 16px ${item.color}10`,
+          {streak > 0 && (
+            <div style={{
+              background: "linear-gradient(135deg,rgba(245,158,11,0.15),rgba(245,158,11,0.05))",
+              border: "1px solid rgba(245,158,11,0.3)", borderRadius: 14,
+              padding: "6px 12px", textAlign: "center", minWidth: 56,
             }}>
-              <div style={{width:3,height:36,background:item.color,borderRadius:2,flexShrink:0}}/>
-              <div style={{flex:1,minWidth:0}}>
-                <div style={{fontSize:14,fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.title}</div>
-                <div style={{fontSize:11,opacity:.4,marginTop:2}}>{item.type==="task"?"Görev":"Etkinlik"} · {item.sub}</div>
-              </div>
-              <span style={{fontSize:11,opacity:.2}}>▶</span>
+              <div style={{ fontSize: 20, fontWeight: 900, color: "#f59e0b" }}>{streak}🔥</div>
+              <div style={{ fontSize: 9, color: "#f59e0b", opacity: .7 }}>gün seri</div>
             </div>
-          ))}
+          )}
         </div>
-      )}
 
-      <div style={{marginBottom:14}}>
-        <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em",marginBottom:8}}>Bu Hafta</div>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8}}>
+        {/* ── Today's Progress Bar ── */}
+        <div style={{ marginTop: 16 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+            <span style={{ fontSize: 12, fontWeight: 700, opacity: .6 }}>Bugünün İlerlemesi</span>
+            <span style={{ fontSize: 12, fontWeight: 800, color: todayProgress === 100 ? "#22c55e" : "#3b82f6" }}>
+              {todayTotal > 0 ? `${todayDone}/${todayTotal}` : "görev yok"}
+            </span>
+          </div>
+          <div style={{
+            height: 8, borderRadius: 4, background: "rgba(255,255,255,0.06)",
+            overflow: "hidden", position: "relative",
+          }}>
+            <div style={{
+              height: "100%", borderRadius: 4,
+              background: todayProgress === 100
+                ? "linear-gradient(90deg,#22c55e,#16a34a)"
+                : "linear-gradient(90deg,#3b82f6,#6366f1)",
+              width: `${todayProgress}%`,
+              transition: "width .5s cubic-bezier(.4,0,.2,1)",
+              boxShadow: todayProgress > 0 ? `0 0 12px ${todayProgress === 100 ? "rgba(34,197,94,0.4)" : "rgba(59,130,246,0.4)"}` : "none",
+            }} />
+          </div>
+          {todayProgress === 100 && todayTotal > 0 && (
+            <div style={{ fontSize: 11, color: "#22c55e", marginTop: 6, textAlign: "center", fontWeight: 600 }}>
+              ✨ Bugünkü tüm görevler tamamlandı!
+            </div>
+          )}
+        </div>
+
+        {/* ── Mini stat cards ── */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 6, marginTop: 14 }}>
           {[
-            {val:wkSport.length,label:"Antrenman",color:"#3b82f6"},
-            {val:wkBurned,label:"kcal yakıldı",color:"#ef4444"},
-            {val:done,label:"Görev bitti",color:"#22c55e"},
-          ].map((s,i)=>(
-            <div key={i} style={{background:"rgba(255,255,255,0.04)",backdropFilter:"blur(8px)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:14,padding:"12px 10px",textAlign:"center",boxShadow:"0 4px 16px rgba(0,0,0,0.2)"}}>
-              <div style={{fontSize:20,fontWeight:800,color:s.color,letterSpacing:-.5}}>{s.val}</div>
-              <div style={{fontSize:10,opacity:.4,marginTop:3,lineHeight:1.2}}>{s.label}</div>
+            { label: "Bekleyen", val: pending, color: "#3b82f6", tab: "tasks" },
+            { label: "Gecikmiş", val: overdue, color: "#ef4444", tab: "tasks" },
+            { label: "kcal", val: todayCalIn, color: "#f97316", tab: "sports" },
+            { label: "Etkinlik", val: todayEv.length, color: "#a855f7", tab: "calendar" },
+          ].map(s => (
+            <div key={s.label} onClick={() => setTab(s.tab)} style={{
+              background: `linear-gradient(135deg,${s.color}18,${s.color}08)`,
+              borderRadius: 12, padding: "10px 8px", cursor: "pointer", textAlign: "center",
+              border: `1px solid ${s.color}30`,
+            }}>
+              <div style={{ fontSize: 20, fontWeight: 800, color: s.val > 0 ? s.color : "rgba(255,255,255,0.2)", letterSpacing: -.5 }}>{s.val}</div>
+              <div style={{ fontSize: 9, color: s.color, opacity: .7, marginTop: 1 }}>{s.label}</div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* ── KAFAMDAKILER ── */}
-      <div style={{marginBottom:14}}>
-        <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em",marginBottom:8}}>☁️ Bugün Kafamı Kurcalayanlar</div>
-        <div style={{background:"rgba(255,255,255,0.04)",backdropFilter:"blur(12px)",borderRadius:16,padding:"12px 14px",border:"1px solid rgba(20,184,166,0.2)",boxShadow:"0 0 20px rgba(20,184,166,0.08)"}}>
-          {[0,1,2].map(i=>(
-            <div key={i} style={{display:"flex",alignItems:"center",gap:10,marginBottom:i<2?8:0}}>
-              <span style={{fontSize:13,opacity:.35,flexShrink:0,fontWeight:700}}>{i+1}.</span>
+      {/* ══ QUICK ADD TASK ══ */}
+      <div style={{
+        display: "flex", gap: 8, marginBottom: 14,
+      }}>
+        <input
+          value={quickTask}
+          onChange={e => setQuickTask(e.target.value)}
+          onKeyDown={e => e.key === "Enter" && addQuickTask()}
+          placeholder="Hızlı görev ekle..."
+          style={{
+            ...inp, flex: 1, borderRadius: 14,
+            border: "1px solid rgba(59,130,246,0.2)",
+            background: "rgba(59,130,246,0.06)",
+            fontSize: 13,
+          }}
+        />
+        <button onClick={addQuickTask} style={{
+          background: "linear-gradient(135deg,#3b82f6,#6366f1)",
+          border: "none", borderRadius: 14, padding: "0 18px",
+          color: "#fff", fontSize: 18, fontWeight: 700, cursor: "pointer",
+          flexShrink: 0,
+        }}>+</button>
+      </div>
+
+      {/* ══ OVERDUE WARNING ══ */}
+      {overdue > 0 && (
+        <div onClick={() => setTab("tasks")} style={{
+          background: "rgba(239,68,68,0.08)", backdropFilter: "blur(8px)", border: "1px solid rgba(239,68,68,0.25)",
+          borderRadius: 14, padding: "12px 14px", marginBottom: 14,
+          display: "flex", alignItems: "center", gap: 10, cursor: "pointer",
+        }}>
+          <span style={{ fontSize: 18 }}>🚨</span>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#ef4444" }}>{overdue} gecikmiş görev!</div>
+            <div style={{ fontSize: 11, opacity: .5 }}>Hemen kontrol et</div>
+          </div>
+          <span style={{ fontSize: 14, opacity: .3 }}>▶</span>
+        </div>
+      )}
+
+      {/* ══ TODAY'S TIMELINE — tasks + events chronologically ══ */}
+      {timelineItems.length > 0 && (
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, opacity: .4, textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 10 }}>
+            Bugünün Akışı
+          </div>
+          <div style={{ position: "relative", paddingLeft: 18 }}>
+            {/* Timeline line */}
+            <div style={{
+              position: "absolute", left: 5, top: 4, bottom: 4, width: 2,
+              background: "linear-gradient(180deg,rgba(99,102,241,0.4),rgba(99,102,241,0.1))",
+              borderRadius: 1,
+            }} />
+            {timelineItems.map((item, i) => (
+              <div key={item.id} style={{
+                position: "relative", marginBottom: i < timelineItems.length - 1 ? 6 : 0,
+              }}>
+                {/* Dot */}
+                <div style={{
+                  position: "absolute", left: -16, top: 14, width: 10, height: 10,
+                  borderRadius: "50%",
+                  background: item.done ? "#22c55e" : item.color,
+                  border: `2px solid ${item.done ? "#22c55e" : item.color}`,
+                  opacity: item.done ? .6 : 1,
+                  boxShadow: item.done ? "none" : `0 0 8px ${item.color}40`,
+                }} />
+                <div
+                  onClick={() => item.type === "task" ? toggleTask(item.id) : setTab("calendar")}
+                  style={{
+                    ...cardStyle, padding: "12px 14px",
+                    display: "flex", alignItems: "center", gap: 12, cursor: "pointer",
+                    border: `1px solid ${item.done ? "rgba(34,197,94,0.15)" : item.color + "20"}`,
+                    opacity: item.done ? .5 : 1,
+                    transition: "all .2s",
+                  }}>
+                  {/* Checkbox or event icon */}
+                  {item.type === "task" ? (
+                    <div style={{
+                      width: 22, height: 22, borderRadius: 7,
+                      border: item.done ? "none" : `2px solid ${item.color}60`,
+                      background: item.done ? "#22c55e" : "transparent",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      flexShrink: 0, transition: "all .2s",
+                    }}>
+                      {item.done && <span style={{ color: "#fff", fontSize: 12, fontWeight: 700 }}>✓</span>}
+                    </div>
+                  ) : (
+                    <div style={{
+                      width: 22, height: 22, borderRadius: 7,
+                      background: `${item.color}20`,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      flexShrink: 0, fontSize: 11,
+                    }}>📅</div>
+                  )}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{
+                      fontSize: 13, fontWeight: 600,
+                      textDecoration: item.done ? "line-through" : "none",
+                      overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                    }}>{item.title}</div>
+                    <div style={{ fontSize: 10, opacity: .4, marginTop: 2 }}>
+                      {item.type === "task" ? "Görev" : "Etkinlik"}
+                      {item.time && ` · ${item.time}`}
+                      {item.priority && ` · ${PRIORITIES[item.priority]}`}
+                    </div>
+                  </div>
+                  {item.type === "task" && !item.done && (
+                    <div style={{ fontSize: 10, opacity: .25, flexShrink: 0 }}>tıkla ✓</div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ══ UPCOMING TASKS (not today, next 7 days) ══ */}
+      {(() => {
+        const nextDays = allTasks.filter(x => !x.done && x.dueDate && x.dueDate > t && x.dueDate <= (() => { const d = new Date(); d.setDate(d.getDate() + 7); return d.toISOString().split("T")[0]; })());
+        if (nextDays.length === 0) return null;
+        return (
+          <div style={{ marginBottom: 14 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, opacity: .4, textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 8 }}>
+              Önümüzdeki 7 Gün ({nextDays.length} görev)
+            </div>
+            {nextDays.sort((a, b) => a.dueDate.localeCompare(b.dueDate)).slice(0, 5).map(tk => (
+              <div key={tk.id} onClick={() => toggleTask(tk.id)} style={{
+                ...cardStyle, padding: "11px 14px", marginBottom: 5,
+                display: "flex", alignItems: "center", gap: 10, cursor: "pointer",
+                border: `1px solid ${PCOL[tk.priority] || "#888"}15`,
+              }}>
+                <div style={{
+                  width: 18, height: 18, borderRadius: 6,
+                  border: `2px solid ${PCOL[tk.priority] || "#888"}50`,
+                  flexShrink: 0,
+                }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{tk.title}</div>
+                  <div style={{ fontSize: 10, opacity: .4, marginTop: 1 }}>
+                    {new Date(tk.dueDate).toLocaleDateString("tr-TR", { weekday: "short", day: "numeric", month: "short" })}
+                    {tk.priority && ` · ${PRIORITIES[tk.priority]}`}
+                  </div>
+                </div>
+              </div>
+            ))}
+            {nextDays.length > 5 && (
+              <button onClick={() => setTab("tasks")} style={{
+                background: "none", border: "none", color: "#6366f1", fontSize: 12,
+                cursor: "pointer", fontWeight: 600, padding: "6px 0", width: "100%", textAlign: "center",
+              }}>+{nextDays.length - 5} görev daha → Tümünü gör</button>
+            )}
+          </div>
+        );
+      })()}
+
+      {/* ══ THIS WEEK STATS ══ */}
+      <div style={{ marginBottom: 14 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, opacity: .4, textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 8 }}>Bu Hafta</div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8 }}>
+          {[
+            { val: wkSport.length, label: "Antrenman", color: "#3b82f6" },
+            { val: wkBurned, label: "kcal yakıldı", color: "#ef4444" },
+            { val: allTasks.filter(x => x.done).length, label: "Görev bitti", color: "#22c55e" },
+          ].map((s, i) => (
+            <div key={i} style={{
+              background: "rgba(255,255,255,0.04)", backdropFilter: "blur(8px)",
+              border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14,
+              padding: "12px 10px", textAlign: "center",
+            }}>
+              <div style={{ fontSize: 20, fontWeight: 800, color: s.color, letterSpacing: -.5 }}>{s.val}</div>
+              <div style={{ fontSize: 10, opacity: .4, marginTop: 3, lineHeight: 1.2 }}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ══ KAFAMDAKILER ══ */}
+      <div style={{ marginBottom: 14 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, opacity: .4, textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 8 }}>☁️ Bugün Kafamı Kurcalayanlar</div>
+        <div style={{ background: "rgba(255,255,255,0.04)", backdropFilter: "blur(12px)", borderRadius: 16, padding: "12px 14px", border: "1px solid rgba(20,184,166,0.2)" }}>
+          {[0, 1, 2].map(i => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: i < 2 ? 8 : 0 }}>
+              <span style={{ fontSize: 13, opacity: .35, flexShrink: 0, fontWeight: 700 }}>{i + 1}.</span>
               <input
-                value={thoughts[i]||""}
-                onChange={e=>updateThought(i,e.target.value)}
-                placeholder={["Bugün en çok düşündüğüm şey...","Kafamı karıştıran bir şey...","Çözmek istediğim bir sorun..."][i]}
+                value={thoughts[i] || ""}
+                onChange={e => updateThought(i, e.target.value)}
+                placeholder={["Bugün en çok düşündüğüm şey...", "Kafamı karıştıran bir şey...", "Çözmek istediğim bir sorun..."][i]}
                 style={{
-                  flex:1,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.07)",
-                  borderRadius:10,padding:"9px 12px",color:"#e0e0e0",fontSize:13,outline:"none",
-                  WebkitAppearance:"none",boxSizing:"border-box",
+                  flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)",
+                  borderRadius: 10, padding: "9px 12px", color: "#e0e0e0", fontSize: 13, outline: "none",
+                  WebkitAppearance: "none", boxSizing: "border-box",
                 }}
               />
             </div>
@@ -482,87 +687,68 @@ function Dashboard({ data, setTab, update }) {
         </div>
       </div>
 
-      {/* ── MİNİ HABERLER ── */}
-      <div style={{marginBottom:14}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
-          <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em"}}>📰 BBC Türkçe Haberler</div>
-          <button onClick={()=>setTab("projects")} style={{background:"none",border:"none",color:"#ef4444",fontSize:12,cursor:"pointer",fontWeight:600}}>Tümü ▶</button>
+      {/* ══ COMPACT NEWS ══ */}
+      <div style={{ marginBottom: 14 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, opacity: .4, textTransform: "uppercase", letterSpacing: ".07em" }}>📰 Haberler</div>
+          <button onClick={() => setTab("projects")} style={{ background: "none", border: "none", color: "#ef4444", fontSize: 11, cursor: "pointer", fontWeight: 600 }}>Tümü ▶</button>
         </div>
-        <div style={{background:"rgba(239,68,68,0.06)",backdropFilter:"blur(12px)",borderRadius:16,padding:"12px 14px",border:"1px solid rgba(239,68,68,0.18)",boxShadow:"0 0 20px rgba(239,68,68,0.06)"}}>
+        <div style={{ background: "rgba(239,68,68,0.05)", borderRadius: 14, padding: "10px 14px", border: "1px solid rgba(239,68,68,0.12)" }}>
           {headlines.length === 0 ? (
-            <div style={{display:"flex",alignItems:"center",gap:10,opacity:.5}}>
-              <span style={{fontSize:20,animation:"pulse 1.5s infinite"}}>📡</span>
-              <span style={{fontSize:13}}>Haberler yükleniyor...</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, opacity: .4, fontSize: 12 }}>
+              <span style={{ animation: "pulse 1.5s infinite" }}>📡</span> Yükleniyor...
             </div>
-          ) : headlines.slice(0,4).map((title,i)=>(
-            <div key={i} style={{display:"flex",alignItems:"flex-start",gap:10,
-              paddingBottom: i < headlines.slice(0,4).length-1 ? 8 : 0,
-              marginBottom: i < headlines.slice(0,4).length-1 ? 8 : 0,
-              borderBottom: i < headlines.slice(0,4).length-1 ? "1px solid rgba(239,68,68,0.1)" : "none",
+          ) : headlines.slice(0, 3).map((title, i) => (
+            <div key={i} style={{
+              fontSize: 12, lineHeight: 1.4, opacity: .8,
+              paddingBottom: i < 2 ? 6 : 0, marginBottom: i < 2 ? 6 : 0,
+              borderBottom: i < 2 ? "1px solid rgba(239,68,68,0.08)" : "none",
             }}>
-              <span style={{fontSize:10,color:"#ef4444",fontWeight:800,marginTop:3,flexShrink:0,minWidth:16}}>{i+1}</span>
-              <span style={{fontSize:13,lineHeight:1.4,opacity:.85}}>{title}</span>
+              <span style={{ color: "#ef4444", fontWeight: 700, marginRight: 6, fontSize: 10 }}>{i + 1}</span>{title}
             </div>
           ))}
         </div>
       </div>
 
-      {/* ── MİNİ MÜZİK ── */}
-      <div style={{marginBottom:14}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
-          <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em"}}>🎵 Müzik Koleksiyonu</div>
-          <button onClick={()=>setTab("projects")} style={{background:"none",border:"none",color:"#a855f7",fontSize:12,cursor:"pointer",fontWeight:600}}>Tümü ▶</button>
-        </div>
-        {musicItems.length === 0 ? (
-          <div onClick={()=>setTab("projects")} style={{
-            background:"rgba(168,85,247,0.06)",border:"1px solid rgba(168,85,247,0.18)",borderRadius:16,
-            padding:"16px 18px",cursor:"pointer",display:"flex",alignItems:"center",gap:14,
-          }}>
-            <div style={{width:48,height:48,borderRadius:14,background:"rgba(168,85,247,0.15)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0}}>🎧</div>
-            <div>
-              <div style={{fontSize:14,fontWeight:700,color:"#a855f7"}}>Müzik koleksiyonu boş</div>
-              <div style={{fontSize:12,opacity:.45,marginTop:3}}>Tarzım → Müziklerim'e git ve ekle</div>
-            </div>
-            <span style={{marginLeft:"auto",opacity:.3,fontSize:16}}>▶</span>
+      {/* ══ COMPACT MUSIC ══ */}
+      {musicItems.length > 0 && (
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, opacity: .4, textTransform: "uppercase", letterSpacing: ".07em" }}>🎵 Müzik</div>
+            <button onClick={() => setTab("projects")} style={{ background: "none", border: "none", color: "#a855f7", fontSize: 11, cursor: "pointer", fontWeight: 600 }}>Tümü ▶</button>
           </div>
-        ) : (
-          <div style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:6,WebkitOverflowScrolling:"touch"}}>
-            {musicItems.slice(0,6).map((item,i)=>(
-              <div key={item.id||i}
-                onClick={()=>item.link&&window.open(item.link,"_blank")}
+          <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 4, WebkitOverflowScrolling: "touch" }}>
+            {musicItems.slice(0, 5).map((item, i) => (
+              <div key={item.id || i}
+                onClick={() => item.link && window.open(item.link, "_blank")}
                 style={{
-                  background:"rgba(168,85,247,0.08)",border:"1px solid rgba(168,85,247,0.18)",borderRadius:14,
-                  padding:"10px 12px",minWidth:120,maxWidth:140,flexShrink:0,cursor:"pointer",
-                  boxShadow:"0 0 12px rgba(168,85,247,0.1)",
+                  background: "rgba(168,85,247,0.06)", border: "1px solid rgba(168,85,247,0.15)", borderRadius: 12,
+                  padding: "8px 10px", minWidth: 100, maxWidth: 120, flexShrink: 0, cursor: "pointer",
                 }}>
-                <div style={{width:44,height:44,borderRadius:10,background:item.albumArt?"#000":"rgba(168,85,247,0.2)",overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center",marginBottom:8}}>
-                  {item.albumArt
-                    ? <img src={item.albumArt} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
-                    : <span style={{fontSize:20}}>🎵</span>}
-                </div>
-                <div style={{fontSize:12,fontWeight:700,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.title||"Parça"}</div>
-                {item.artist&&<div style={{fontSize:10,opacity:.5,marginTop:2,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.artist}</div>}
+                <div style={{ fontSize: 11, fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.title || "Parça"}</div>
+                {item.artist && <div style={{ fontSize: 9, opacity: .4, marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.artist}</div>}
               </div>
             ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
-      {data.notes.length>0&&(
+      {/* ══ RECENT NOTES ══ */}
+      {data.notes.length > 0 && (
         <div>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
-            <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em"}}>Son Notlar</div>
-            <button onClick={()=>setTab("notes")} style={{background:"none",border:"none",color:"#3b82f6",fontSize:12,cursor:"pointer",fontWeight:600}}>Tümü ▶</button>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, opacity: .4, textTransform: "uppercase", letterSpacing: ".07em" }}>Son Notlar</div>
+            <button onClick={() => setTab("notes")} style={{ background: "none", border: "none", color: "#3b82f6", fontSize: 11, cursor: "pointer", fontWeight: 600 }}>Tümü ▶</button>
           </div>
-          <div style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:4,WebkitOverflowScrolling:"touch"}}>
-            {data.notes.slice(0,5).map(n=>(
-              <div key={n.id} onClick={()=>setTab("notes")} style={{
-                background:"rgba(255,255,255,0.04)",backdropFilter:"blur(8px)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:14,padding:"10px 12px",
-                minWidth:130,maxWidth:160,cursor:"pointer",flexShrink:0,
-                borderTop:`3px solid ${n.color||"#14b8a6"}`,
+          <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 4, WebkitOverflowScrolling: "touch" }}>
+            {data.notes.slice(0, 5).map(n => (
+              <div key={n.id} onClick={() => setTab("notes")} style={{
+                background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, padding: "10px 12px",
+                minWidth: 130, maxWidth: 160, cursor: "pointer", flexShrink: 0,
+                borderTop: `3px solid ${n.color || "#14b8a6"}`,
               }}>
-                <div style={{fontSize:12,fontWeight:700,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{n.title}</div>
-                {n.content&&<div style={{fontSize:11,opacity:.4,marginTop:4,overflow:"hidden",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",lineHeight:1.4}}>{n.content}</div>}
+                <div style={{ fontSize: 12, fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{n.title}</div>
+                {n.content && <div style={{ fontSize: 11, opacity: .4, marginTop: 4, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", lineHeight: 1.4 }}>{n.content}</div>}
               </div>
             ))}
           </div>
