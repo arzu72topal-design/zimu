@@ -3829,9 +3829,8 @@ const DEFAULT_DATA = {tasks:[],events:[],sports:[],projects:[],notes:[],foods:[]
 export default function App() {
   const [tab, setTab] = useState("dashboard");
   const [data, setData] = useState(null);
-  const [splash, setSplash] = useState(true);
-  const [user, setUser] = useState(undefined);
-  const [showLogin, setShowLogin] = useState(false);
+  const [showSplash, setShowSplash] = useState(true);
+  const [user, setUser] = useState(null);
   const [toast, setToast] = useState({ visible: false, message: "" });
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [lang, setLang] = useState(() => localStorage.getItem("zimu-lang") || "tr");
@@ -3843,44 +3842,46 @@ export default function App() {
   useEffect(() => { localStorage.setItem("zimu-lang", lang); }, [lang]);
   const TABS = getTabs(lang);
 
-  // ── Auth listener ──
+  // ── BOOT SEQUENCE: load data immediately, don't wait for anything ──
   useEffect(() => {
-    const unsubscribe = onAuthChange((firebaseUser) => {
-      if (firebaseUser) {
-        setUser(firebaseUser);
-      } else {
-        const skipped = localStorage.getItem('zimu-skip-login');
-        if (skipped) {
-          setUser(null);
-        } else {
-          // No firebase user and no skip → show login
-          setShowLogin(true);
+    // 1. Load local data RIGHT NOW
+    try {
+      loadData(null).then(d => {
+        setData(d && typeof d === "object" ? d : DEFAULT_DATA);
+      }).catch(() => setData(DEFAULT_DATA));
+    } catch(e) {
+      setData(DEFAULT_DATA);
+    }
+
+    // 2. Listen firebase auth in background (non-blocking)
+    try {
+      const unsub = onAuthChange((fu) => {
+        if (fu) {
+          setUser(fu);
+          // Re-load with user ID
+          loadData(fu.uid).then(d => {
+            if (d && typeof d === "object") setData(d);
+          }).catch(() => {});
         }
-      }
-    });
-    // If firebase doesn't respond in 4s, show login
-    const t1 = setTimeout(() => {
-      setUser(prev => {
-        if (prev === undefined) setShowLogin(true);
-        return prev;
       });
-    }, 4000);
-    return () => { unsubscribe(); clearTimeout(t1); };
+      // cleanup
+      return () => { try { unsub(); } catch(e) {} };
+    } catch(e) {
+      // firebase broken? no problem, app still works
+    }
   }, []);
 
-  // ── Load data when user is known ──
+  // 3. Splash auto-dismiss + GUARANTEED data after 3s
   useEffect(() => {
-    if (user === undefined) return;
-    const userId = user?.uid || null;
-    loadData(userId)
-      .then(d => setData(d || DEFAULT_DATA))
-      .catch(() => setData(DEFAULT_DATA));
-  }, [user]);
-
-  // ── Auto dismiss splash after 2.5s ──
-  useEffect(() => {
-    const t2 = setTimeout(() => setSplash(false), 2500);
-    return () => clearTimeout(t2);
+    const t1 = setTimeout(() => setShowSplash(false), 2500);
+    const t2 = setTimeout(() => {
+      setData(prev => {
+        if (!prev || typeof prev !== "object") return DEFAULT_DATA;
+        return prev;
+      });
+      setShowSplash(false);
+    }, 3500);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
   }, []);
 
   // Schedule notifications
@@ -3937,40 +3938,30 @@ export default function App() {
   const handleLogin = (firebaseUser) => {
     if (firebaseUser === null) {
       localStorage.setItem('zimu-skip-login', 'true');
-      setShowLogin(false);
-      setUser(null);
     }
   };
 
   const handleLogout = async () => {
-    await logOut();
+    try { await logOut(); } catch(e) {}
     localStorage.removeItem('zimu-skip-login');
-    setUser(undefined);
-    setData(null);
-    setShowLogin(true);
+    setUser(null);
+    setData(DEFAULT_DATA);
   };
 
   const allTabs = [...TABS, { id: "settings", label: t("tab.settings", lang), icon: "⚙" }];
 
-  // ── RENDER ──
+  // ══════════ RENDER ══════════
+  // Only two states: splash or app. NO login gate.
 
-  // 1. Login screen
-  if (!splash && showLogin && !data) {
-    return <LoginScreen onLogin={handleLogin} lang={lang} setLang={setLang} />;
-  }
+  // Use appData everywhere — guaranteed non-null
+  const appData = data || DEFAULT_DATA;
 
-  // 2. Splash or waiting for data
-  if (splash || !data) return (
+  // SPLASH: show while splash timer active AND data not ready
+  if (showSplash) return (
     <NebulaBackground
       onClick={() => {
-        setSplash(false);
-        // FORCE OPEN: if stuck, just load default data and skip login
-        if (!data) {
-          localStorage.setItem('zimu-skip-login', 'true');
-          setShowLogin(false);
-          if (user === undefined) setUser(null);
-          setData(DEFAULT_DATA);
-        }
+        setShowSplash(false);
+        if (!data) setData(DEFAULT_DATA);
       }}
       style={{cursor:"pointer",userSelect:"none"}}
     >
@@ -3979,74 +3970,42 @@ export default function App() {
           0%   { opacity:0; letter-spacing:12px; filter:blur(12px); }
           100% { opacity:1; letter-spacing:-3px;  filter:blur(0); }
         }
-        @keyframes lineGrow {
-          from { width:0; opacity:0; }
-          to   { width:120px; opacity:1; }
-        }
-        @keyframes subtitleIn {
-          from { opacity:0; transform:translateY(10px); }
-          to   { opacity:1; transform:translateY(0); }
-        }
+        @keyframes lineGrow { from { width:0; opacity:0; } to { width:120px; opacity:1; } }
+        @keyframes subtitleIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
         @keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
       `}</style>
-
-      {/* Big Zimu title */}
       <div style={{
         fontSize:72,fontWeight:900,
         background:"linear-gradient(135deg,#e0d5f5 0%,#a78bfa 30%,#6366f1 60%,#818cf8 100%)",
         WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",
         animation:"titleReveal 1.2s cubic-bezier(.22,1,.36,1) both, glowPulse 4s ease-in-out 1.2s infinite",
         lineHeight:1,marginBottom:8,textAlign:"center",
-      }}>
-        Zimu
-      </div>
-
-      {/* Decorative line */}
-      <div style={{
-        height:2,borderRadius:1,marginBottom:20,
+      }}>Zimu</div>
+      <div style={{ height:2,borderRadius:1,marginBottom:20,
         background:"linear-gradient(90deg, transparent, rgba(167,139,250,0.5), rgba(99,102,241,0.6), rgba(167,139,250,0.5), transparent)",
         animation:"lineGrow 0.8s ease 0.6s both",
       }}/>
-
-      {/* Motivational text */}
       <div style={{textAlign:"center",animation:"subtitleIn 0.8s ease 1s both"}}>
-        <div style={{fontSize:16,opacity:.6,fontStyle:"italic",letterSpacing:.5,lineHeight:1.8}}>
-          {t("splash.motto1", lang)}
-        </div>
-        <div style={{fontSize:13,opacity:.35,fontStyle:"italic",letterSpacing:.5}}>
-          {t("splash.motto2", lang)}
-        </div>
+        <div style={{fontSize:16,opacity:.6,fontStyle:"italic",letterSpacing:.5,lineHeight:1.8}}>{t("splash.motto1", lang)}</div>
+        <div style={{fontSize:13,opacity:.35,fontStyle:"italic",letterSpacing:.5}}>{t("splash.motto2", lang)}</div>
       </div>
-
-      {/* Bottom text: either "tap to continue" or loading spinner */}
-      <div style={{
-        position:"absolute",bottom:48,
-        fontSize:11,opacity:.3,letterSpacing:1,
-        display:"flex",alignItems:"center",gap:8,
-      }}>
-        {!splash && !data ? (
-          <>
-            <div style={{width:14,height:14,border:"2px solid rgba(167,139,250,0.3)",borderTopColor:"#a78bfa",borderRadius:"50%",animation:"spin 0.8s linear infinite"}}/>
-            {t("dash.loading", lang)}
-          </>
-        ) : (
-          <span style={{animation:"shimmer 2s ease-in-out 1.5s infinite"}}>
-            {t("splash.tap", lang)}
-          </span>
-        )}
+      <div style={{ position:"absolute",bottom:48, fontSize:11,opacity:.3,letterSpacing:1, display:"flex",alignItems:"center",gap:8 }}>
+        <span style={{animation:"shimmer 2s ease-in-out 1.5s infinite"}}>{t("splash.tap", lang)}</span>
       </div>
     </NebulaBackground>
   );
 
+  // ── MAIN APP ──
+
   const content = () => {
     switch(tab) {
-      case "dashboard": return <Dashboard data={data} setTab={setTab} update={update} lang={lang}/>;
-      case "tasks": return <Tasks data={data} update={update} lang={lang}/>;
-      case "calendar": return <CalendarView data={data} update={update} lang={lang}/>;
-      case "sports": return <Sports data={data} update={update} lang={lang}/>;
-      case "projects": return <Projects data={data} update={update} lang={lang}/>;
-      case "notes": return <Notes data={data} update={update} lang={lang}/>;
-      case "settings": return <Settings data={data} update={update} onImport={d=>{setData(d);showToast(t("set.importDone",lang))}} user={user} onLogout={handleLogout} lang={lang} setLang={setLang}/>;
+      case "dashboard": return <Dashboard data={appData} setTab={setTab} update={update} lang={lang}/>;
+      case "tasks": return <Tasks data={appData} update={update} lang={lang}/>;
+      case "calendar": return <CalendarView data={appData} update={update} lang={lang}/>;
+      case "sports": return <Sports data={appData} update={update} lang={lang}/>;
+      case "projects": return <Projects data={appData} update={update} lang={lang}/>;
+      case "notes": return <Notes data={appData} update={update} lang={lang}/>;
+      case "settings": return <Settings data={appData} update={update} onImport={d=>{setData(d);showToast(t("set.importDone",lang))}} user={user} onLogout={handleLogout} lang={lang} setLang={setLang}/>;
     }
   };
 
