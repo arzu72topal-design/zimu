@@ -3866,7 +3866,12 @@ export default function App() {
   useEffect(() => {
     if (user === undefined) return;
     const userId = user?.uid || null;
-    loadData(userId).then(d => { setData(d); setLoading(false); });
+    setLoading(true);
+    loadData(userId).then(d => { setData(d); setLoading(false); }).catch(() => {
+      // Fallback: provide default empty data
+      setData({tasks:[],events:[],sports:[],projects:[],notes:[],foods:[],rooms:[],roomItems:{},settings:{},dailyThoughts:["","",""]});
+      setLoading(false);
+    });
   }, [user]);
 
   // Splash screen — 2.5s, sonra zorla geç
@@ -3878,11 +3883,16 @@ export default function App() {
   }, []);
 
   // Firebase 6 saniyede cevap vermezse zorla login göster
+  // 10 saniyede data hala yoksa default data yükle
   useEffect(() => {
     const fallback = setTimeout(() => {
       setLoading(false);
     }, 6000);
-    return () => clearTimeout(fallback);
+    const dataFallback = setTimeout(() => {
+      setData(prev => prev || {tasks:[],events:[],sports:[],projects:[],notes:[],foods:[],rooms:[],roomItems:{},settings:{},dailyThoughts:["","",""]});
+      setLoading(false);
+    }, 10000);
+    return () => { clearTimeout(fallback); clearTimeout(dataFallback); };
   }, []);
 
   // Schedule notifications
@@ -3939,6 +3949,7 @@ export default function App() {
   const handleLogin = (firebaseUser) => {
     if (firebaseUser === null) {
       localStorage.setItem('zimu-skip-login', 'true');
+      setLoading(true); // Show loading while data loads
       setUser(null);
     }
   };
@@ -3961,13 +3972,6 @@ export default function App() {
     <NebulaBackground
       onClick={() => {
         setSplash(false);
-        setLoading(false);
-        if (!data) {
-          const uid2 = null;
-          loadData(uid2).then(d => setData(d)).catch(() => {
-            import("./db.js").then(m => setData(m.getDefaultData ? m.getDefaultData() : {tasks:[],events:[],sports:[],projects:[],notes:[],foods:[],rooms:[],roomItems:{},settings:{},dailyThoughts:["","",""]}));
-          });
-        }
       }}
       style={{cursor:"pointer",userSelect:"none"}}
     >
@@ -3984,6 +3988,7 @@ export default function App() {
           from { opacity:0; transform:translateY(10px); }
           to   { opacity:1; transform:translateY(0); }
         }
+        @keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
       `}</style>
 
       {/* Big Zimu title */}
@@ -4014,13 +4019,22 @@ export default function App() {
         </div>
       </div>
 
-      {/* Tap to continue */}
+      {/* Bottom text: either "tap to continue" or loading spinner */}
       <div style={{
         position:"absolute",bottom:48,
-        fontSize:11,opacity:.2,animation:"shimmer 2s ease-in-out 1.5s infinite",
-        letterSpacing:1,
+        fontSize:11,opacity:.3,letterSpacing:1,
+        display:"flex",alignItems:"center",gap:8,
       }}>
-        {t("splash.tap", lang)}
+        {!splash && (loading || !data) ? (
+          <>
+            <div style={{width:14,height:14,border:"2px solid rgba(167,139,250,0.3)",borderTopColor:"#a78bfa",borderRadius:"50%",animation:"spin 0.8s linear infinite"}}/>
+            {t("dash.loading", lang)}
+          </>
+        ) : (
+          <span style={{animation:"shimmer 2s ease-in-out 1.5s infinite"}}>
+            {t("splash.tap", lang)}
+          </span>
+        )}
       </div>
     </NebulaBackground>
   );
