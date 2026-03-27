@@ -63,6 +63,34 @@ const DN = ["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"];
 const today = () => new Date().toISOString().split("T")[0];
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
 
+/* ── MascotImage: beyaz arka planı canvas ile şeffaf yapar ── */
+function MascotImage({ src, style }) {
+  const canvasRef = useRef(null);
+  useEffect(() => {
+    const img = new window.Image();
+    img.onload = () => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const d = imageData.data;
+      for (let i = 0; i < d.length; i += 4) {
+        const r = d[i], g = d[i+1], b = d[i+2];
+        // Beyaz / açık krem kağıt piksellerini şeffaf yap
+        if (r > 190 && g > 185 && b > 175) {
+          d[i+3] = 0;
+        }
+      }
+      ctx.putImageData(imageData, 0, 0);
+    };
+    img.src = src;
+  }, [src]);
+  return <canvas ref={canvasRef} style={style} />;
+}
+
 /* ── Hooks ── */
 function useIsMobile() {
   const [m, setM] = useState(window.innerWidth < 640);
@@ -2801,7 +2829,7 @@ function LoginScreen({ onLogin }) {
       <div style={{width:"100%",maxWidth:360}}>
         {/* Logo */}
         <div style={{textAlign:"center",marginBottom:32}}>
-          <img src="/zimu-mascot.png" alt="Zimu" style={{width:120,height:120,objectFit:"contain",marginBottom:12,mixBlendMode:"multiply",background:"#0f0f1a"}} />
+          <MascotImage src="/zimu-mascot.png" style={{width:120,height:120,objectFit:"contain",marginBottom:12,display:"block",margin:"0 auto 12px"}} />
           <div style={{fontSize:28,fontWeight:800,letterSpacing:-1}}>Zimu</div>
           <div style={{fontSize:13,opacity:.4,marginTop:4}}>Hayatını yönet</div>
         </div>
@@ -2955,6 +2983,18 @@ export default function App() {
     return () => window.removeEventListener("scroll", handleWindowScroll);
   }, [isMobile]);
 
+  // Desktop scroll listener
+  const handleScroll = useCallback((e) => {
+    const top = e?.target?.scrollTop ?? window.scrollY;
+    setShowScrollTop(top > 300);
+  }, []);
+
+  useEffect(() => {
+    if (isMobile) return;
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isMobile, handleScroll]);
+
   const update = useCallback(async (newData) => {
     setData(newData);
     const userId = user?.uid || null;
@@ -2989,7 +3029,17 @@ export default function App() {
 
   if (splash || loading || !data) return (
     <div
-      onClick={() => { setSplash(false); setLoading(false); }}
+      onClick={() => {
+        setSplash(false);
+        setLoading(false);
+        // data yoksa boş yükle (Firebase cevap vermediyse)
+        if (!data) {
+          const uid2 = null;
+          loadData(uid2).then(d => setData(d)).catch(() => {
+            import("./db.js").then(m => setData(m.getDefaultData ? m.getDefaultData() : {tasks:[],events:[],sports:[],projects:[],notes:[],foods:[],rooms:[],roomItems:{},settings:{},dailyThoughts:["","",""]}));
+          });
+        }
+      }}
       style={{
         minHeight:"100vh",minHeight:"100dvh",background:"#060611",
         display:"flex",alignItems:"center",justifyContent:"center",
@@ -3019,18 +3069,15 @@ export default function App() {
         @keyframes groundDraw { from{width:0} to{width:80%} }
       `}</style>
 
-      {/* Walking mascot — mix-blend-mode:multiply ile beyaz arka plan karışır */}
+      {/* Walking mascot — canvas ile beyaz kağıt arka planı kaldırıldı */}
       <div style={{
         animation:"walkAcross 4s ease-in-out infinite",
         marginBottom:8,
-        background:"#060611",
-        borderRadius:"50%",
       }}>
         <div style={{animation:"bobWalk 0.6s ease-in-out infinite"}}>
-          <img src="/zimu-mascot.png" alt="Zimu" style={{
+          <MascotImage src="/zimu-mascot.png" style={{
             width:280,height:280,objectFit:"contain",
-            mixBlendMode:"multiply",
-            filter:"drop-shadow(0 12px 32px rgba(59,130,246,0.25))",
+            filter:"drop-shadow(0 12px 32px rgba(59,130,246,0.35))",
             display:"block",
           }}/>
         </div>
@@ -3090,17 +3137,6 @@ export default function App() {
     touchEnd.current = null;
   };
 
-  const handleScroll = useCallback((e) => {
-    const top = e?.target?.scrollTop ?? window.scrollY;
-    setShowScrollTop(top > 300);
-  }, []);
-
-  useEffect(() => {
-    if (!isMobile) {
-      window.addEventListener("scroll", handleScroll);
-      return () => window.removeEventListener("scroll", handleScroll);
-    }
-  }, [isMobile, handleScroll]);
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
