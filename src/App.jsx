@@ -141,7 +141,7 @@ const T = {
   "proj.projects":    { tr:"Projeler", en:"Projects", de:"Projekte", da:"Projekter", fi:"Projektit" },
   "proj.news":        { tr:"Haberler", en:"News", de:"Nachrichten", da:"Nyheder", fi:"Uutiset" },
   "proj.myMusic":     { tr:"Müziklerim", en:"My Music", de:"Meine Musik", da:"Min musik", fi:"Musiikkini" },
-  "proj.myClothes":   { tr:"Kıyafetlerim", en:"My Clothes", de:"Meine Kleidung", da:"Mit tøj", fi:"Vaatteeni" },
+  "proj.myStyle":     { tr:"Stilim", en:"My Style", de:"Mein Stil", da:"Min Stil", fi:"Tyylini" },
   "proj.memories":    { tr:"Anılar", en:"Memories", de:"Erinnerungen", da:"Minder", fi:"Muistot" },
 
   // ── Notes ──
@@ -229,6 +229,30 @@ const T = {
   "months": { tr:["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"], en:["January","February","March","April","May","June","July","August","September","October","November","December"], de:["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"], da:["Januar","Februar","Marts","April","Maj","Juni","Juli","August","September","Oktober","November","December"], fi:["Tammikuu","Helmikuu","Maaliskuu","Huhtikuu","Toukokuu","Kesäkuu","Heinäkuu","Elokuu","Syyskuu","Lokakuu","Marraskuu","Joulukuu"] },
   "days": { tr:["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"], en:["Mon","Tue","Wed","Thu","Fri","Sat","Sun"], de:["Mo","Di","Mi","Do","Fr","Sa","So"], da:["Man","Tir","Ons","Tor","Fre","Lør","Søn"], fi:["Ma","Ti","Ke","To","Pe","La","Su"] },
 
+
+  // ── Style Lookbook ──
+  "style.title":       { tr:"Stilim", en:"My Style", de:"Mein Stil", da:"Min Stil", fi:"Tyylini" },
+  "style.weather":     { tr:"Bugünün Havası", en:"Today's Weather", de:"Heutiges Wetter", da:"Dagens vejr", fi:"Tämän päivän sää" },
+  "style.sugLooks":    { tr:"Önerilen Kombinler", en:"Suggested Looks", de:"Vorgeschlagene Looks", da:"Foreslåede looks", fi:"Ehdotetut asut" },
+  "style.rules":       { tr:"Stil Kurallarım", en:"My Style Rules", de:"Meine Stilregeln", da:"Mine stilregler", fi:"Tyylisääntöni" },
+  "style.palette":     { tr:"Renk Paletim", en:"My Color Palette", de:"Meine Farbpalette", da:"Min farvepalet", fi:"Väripalettini" },
+  "style.addLook":     { tr:"Yeni Kombin / Kural", en:"New Look / Rule", de:"Neuer Look / Regel", da:"Nyt look / Regel", fi:"Uusi asu / Sääntö" },
+  "style.wearFreq":    { tr:"Giyim Sıklığı", en:"Wear Frequency", de:"Tragehäufigkeit", da:"Brugsfrekvens", fi:"Käyttötiheys" },
+  "style.workOk":      { tr:"İş Yerine Uygun", en:"Workplace Appropriate", de:"Bürotauglich", da:"Arbejdsvenlig", fi:"Työpaikalle sopiva" },
+  "style.sustainable": { tr:"Sürdürülebilir Palet", en:"Sustainable Palette", de:"Nachhaltige Palette", da:"Bæredygtig palette", fi:"Kestävä paletti" },
+  "style.noPurchase":  { tr:"Bu Ay Alışveriş Yok", en:"No Purchases This Month", de:"Keine Einkäufe diesen Monat", da:"Ingen køb denne måned", fi:"Ei ostoksia tässä kuussa" },
+  "style.occasion":    { tr:"Ortam", en:"Occasion", de:"Anlass", da:"Lejlighed", fi:"Tilaisuus" },
+  "style.mood":        { tr:"Ruh Hali", en:"Mood", de:"Stimmung", da:"Humør", fi:"Tunnelma" },
+  "style.idealWeather":{ tr:"İdeal Hava", en:"Ideal Weather", de:"Ideales Wetter", da:"Ideelt vejr", fi:"Ihannesää" },
+  "style.casual":      { tr:"Günlük", en:"Casual", de:"Lässig", da:"Afslappet", fi:"Rento" },
+  "style.work":        { tr:"İş", en:"Work", de:"Arbeit", da:"Arbejde", fi:"Työ" },
+  "style.night":       { tr:"Gece", en:"Night Out", de:"Abend", da:"Aften", fi:"Ilta" },
+  "style.confident":   { tr:"Özgüvenli", en:"Confident", de:"Selbstbewusst", da:"Selvsikker", fi:"Itsevarma" },
+  "style.relaxed":     { tr:"Rahat", en:"Relaxed", de:"Entspannt", da:"Afslappet", fi:"Rento" },
+  "style.elegant":     { tr:"Şık", en:"Elegant", de:"Elegant", da:"Elegant", fi:"Elegantti" },
+  "style.savedLooks":  { tr:"Kayıtlı Kombinler", en:"Saved Looks", de:"Gespeicherte Looks", da:"Gemte looks", fi:"Tallennetut asut" },
+  "style.noLooks":     { tr:"Henüz kombin eklenmemiş", en:"No looks added yet", de:"Noch keine Looks", da:"Ingen looks endnu", fi:"Ei asuja vielä" },
+
   // ── News room ──
   "news.politics":  { tr:"Politika", en:"Politics", de:"Politik", da:"Politik", fi:"Politiikka" },
   "news.health":    { tr:"Sağlık", en:"Health", de:"Gesundheit", da:"Sundhed", fi:"Terveys" },
@@ -269,6 +293,7 @@ const SPORT_EMOJI = {"Koşu":"🏃","Yüzme":"🏊","Bisiklet":"🚴","Yoga":"�
 const SPORT_KCAL_PER_MIN = {"Koşu":10,"Yüzme":7,"Bisiklet":7,"Yoga":3.3,"Ağırlık":5,"Yürüyüş":4.7,"Diğer":5};
 const calcSportCal = (type, durationMin) => Math.round((SPORT_KCAL_PER_MIN[type]||5) * (+durationMin||0));
 const getPriorities = (lang="tr") => ({ high: t("pri.high",lang), medium: t("pri.medium",lang), low: t("pri.low",lang) });
+const PRIORITIES = { high: "Yüksek", medium: "Orta", low: "Düşük" };
 const PCOL = { high: "#ef4444", medium: "#f59e0b", low: "#22c55e" };
 const getProjectStatuses = (lang="tr") => [t("proj.planning",lang),t("proj.inProgress",lang),t("proj.testing",lang),t("proj.completed",lang)];
 const PROJECT_STATUSES = ["Planlama","Devam Ediyor","Test","Tamamlandı"];
@@ -282,7 +307,7 @@ const getDefaultRooms = (lang="tr") => [
   { id: "projects", name: t("proj.projects",lang), icon: "📂", color: "#3b82f6", type: "project" },
   { id: "news", name: t("proj.news",lang), icon: "📰", color: "#ef4444", type: "news" },
   { id: "music", name: t("proj.myMusic",lang), icon: "🎵", color: "#a855f7", type: "collection" },
-  { id: "clothes", name: t("proj.myClothes",lang), icon: "👗", color: "#f97316", type: "collection" },
+  { id: "clothes", name: t("proj.myStyle",lang), icon: "✨", color: "#f97316", type: "style" },
   { id: "memories", name: t("proj.memories",lang), icon: "📸", color: "#22c55e", type: "collection" },
 ];
 
@@ -1180,7 +1205,7 @@ function Tasks({ data, update, lang="tr" }) {
         <div style={{marginBottom:12}}>
           <div style={{fontSize:12,opacity:.5,marginBottom:6}}>Öncelik:</div>
           <div style={{display:"flex",gap:6}}>
-            {Object.entries(PRIORITIES).map(([k,v])=>(
+            {Object.entries(getPriorities(lang)).map(([k,v])=>(
               <button key={k} onClick={()=>setForm({...form,priority:k})} style={{
                 flex:1,padding:"10px",borderRadius:10,fontSize:13,cursor:"pointer",textAlign:"center",fontWeight:600,
                 background:form.priority===k?`${PCOL[k]}20`:"rgba(255,255,255,0.04)",
@@ -2744,6 +2769,372 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
   );
 }
 
+/* ═══════════ STYLE LOOKBOOK ═══════════ */
+function StyleLookbook({ room, items, onBack, onAdd, onDel, lang="tr" }) {
+  const [showAddLook, setShowAddLook] = useState(false);
+  const [lookForm, setLookForm] = useState({ title: "", occasion: "casual", mood: "confident", weather: "mild", notes: "" });
+  const [weather, setWeather] = useState(null);
+
+  // Style rules stored in items as type:"rule" 
+  const looks = items.filter(i => i.type !== "rule");
+  const rules = items.filter(i => i.type === "rule");
+
+  // Fetch weather
+  useEffect(() => {
+    let c = false;
+    (async () => {
+      try {
+        // Try geolocation
+        const pos = await new Promise((res, rej) => navigator.geolocation?.getCurrentPosition(res, rej, { timeout: 5000 })).catch(() => null);
+        const lat = pos?.coords?.latitude || 41.01;
+        const lon = pos?.coords?.longitude || 28.97;
+        const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,wind_speed_10m&timezone=auto`, { signal: AbortSignal.timeout(6000) });
+        const d = await r.json();
+        if (!c && d.current) {
+          const code = d.current.weather_code;
+          let condition = "clear";
+          if ([0, 1].includes(code)) condition = "clear";
+          else if ([2, 3].includes(code)) condition = "cloudy";
+          else if ([45, 48].includes(code)) condition = "foggy";
+          else if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(code)) condition = "rainy";
+          else if ([71, 73, 75, 77, 85, 86].includes(code)) condition = "snowy";
+          else if ([95, 96, 99].includes(code)) condition = "stormy";
+          setWeather({ temp: Math.round(d.current.temperature_2m), wind: Math.round(d.current.wind_speed_10m), condition });
+        }
+      } catch {}
+    })();
+    return () => { c = true; };
+  }, []);
+
+  const weatherIcon = { clear: "☀️", cloudy: "☁️", foggy: "🌫️", rainy: "🌧️", snowy: "❄️", stormy: "⛈️" };
+  const weatherLabel = {
+    clear: { tr: "Güneşli", en: "Sunny", de: "Sonnig", da: "Solrigt", fi: "Aurinkoinen" },
+    cloudy: { tr: "Bulutlu", en: "Cloudy", de: "Bewölkt", da: "Overskyet", fi: "Pilvinen" },
+    foggy: { tr: "Sisli", en: "Foggy", de: "Neblig", da: "Tåget", fi: "Sumuinen" },
+    rainy: { tr: "Yağmurlu", en: "Rainy", de: "Regnerisch", da: "Regnfuldt", fi: "Sateinen" },
+    snowy: { tr: "Karlı", en: "Snowy", de: "Verschneit", da: "Snevejr", fi: "Luminen" },
+    stormy: { tr: "Fırtınalı", en: "Stormy", de: "Stürmisch", da: "Stormfuldt", fi: "Myrskyinen" },
+  };
+
+  // Generate weather-based outfit suggestions
+  const getSuggestions = () => {
+    if (!weather) return [];
+    const temp = weather.temp;
+    const cond = weather.condition;
+    const suggestions = [];
+
+    if (temp >= 25) {
+      suggestions.push({ title: lang === "tr" ? "Hafif & Serin" : "Light & Breezy", pieces: ["👕 T-shirt", "🩳 Shorts", "🩴 Sandals"], occasion: "casual", mood: "relaxed", color: "#f97316" });
+      suggestions.push({ title: lang === "tr" ? "Şık Yaz" : "Chic Summer", pieces: ["👗 Dress", "🕶️ Sunglasses", "👜 Tote"], occasion: "work", mood: "elegant", color: "#a855f7" });
+    } else if (temp >= 15) {
+      suggestions.push({ title: lang === "tr" ? "Katmanlı & Rahat" : "Layered & Cool", pieces: ["🧥 Jacket", "👖 Jeans", "👟 Sneakers"], occasion: "casual", mood: "confident", color: "#3b82f6" });
+      suggestions.push({ title: lang === "tr" ? "İş Şıklığı" : "Office Smart", pieces: ["🧥 Blazer", "👔 Shirt", "👞 Loafers"], occasion: "work", mood: "elegant", color: "#14b8a6" });
+    } else if (temp >= 5) {
+      suggestions.push({ title: lang === "tr" ? "Sıcak Tutan" : "Warm & Cozy", pieces: ["🧶 Sweater", "🧣 Scarf", "🥾 Boots"], occasion: "casual", mood: "relaxed", color: "#f59e0b" });
+      suggestions.push({ title: lang === "tr" ? "Sonbahar Şıklığı" : "Autumn Elegance", pieces: ["🧥 Coat", "👖 Trousers", "🧣 Scarf"], occasion: "work", mood: "confident", color: "#ef4444" });
+    } else {
+      suggestions.push({ title: lang === "tr" ? "Kış Savaşçısı" : "Winter Warrior", pieces: ["🧥 Puffer", "🧤 Gloves", "🥾 Boots"], occasion: "casual", mood: "confident", color: "#6366f1" });
+      suggestions.push({ title: lang === "tr" ? "Kar Şıklığı" : "Snow Chic", pieces: ["🧥 Wool Coat", "🧣 Cashmere", "👢 Tall Boots"], occasion: "night", mood: "elegant", color: "#ec4899" });
+    }
+
+    if (cond === "rainy" || cond === "stormy") {
+      suggestions.push({ title: lang === "tr" ? "Yağmur Hazır" : "Rain Ready", pieces: ["☂️ Umbrella", "🧥 Raincoat", "🥾 Waterproof"], occasion: "casual", mood: "relaxed", color: "#64748b" });
+    }
+
+    return suggestions;
+  };
+
+  const suggestions = getSuggestions();
+
+  // Style rule toggles (persisted in items as type:"rule")
+  const defaultRules = [
+    { key: "workOk", default: true },
+    { key: "sustainable", default: false },
+    { key: "noPurchase", default: false },
+  ];
+  const getRuleVal = (key) => {
+    const r = rules.find(i => i.ruleKey === key);
+    return r ? r.enabled : defaultRules.find(d => d.key === key)?.default ?? false;
+  };
+  const toggleRule = (key) => {
+    const existing = rules.find(i => i.ruleKey === key);
+    if (existing) {
+      // Update the item
+      const updated = items.map(i => i.id === existing.id ? { ...i, enabled: !existing.enabled } : i);
+      // Reconstruct: we need to call onAdd/onDel approach... simpler: pass update
+      // Actually onAdd and onDel are separate, let's toggle via onDel + onAdd
+      onDel(existing.id);
+      setTimeout(() => onAdd({ id: uid(), type: "rule", ruleKey: key, enabled: !existing.enabled, title: key }), 50);
+    } else {
+      onAdd({ id: uid(), type: "rule", ruleKey: key, enabled: true, title: key });
+    }
+  };
+
+  // Color palette
+  const palette = [
+    { name: "Navy", hex: "#1e3a5f" }, { name: "Charcoal", hex: "#374151" },
+    { name: "Beige", hex: "#d4b896" }, { name: "Cream", hex: "#f5f0e8" },
+    { name: "Olive", hex: "#6b7c3f" }, { name: "Burgundy", hex: "#7c2d3a" },
+    { name: "Camel", hex: "#c4956a" }, { name: "Stone", hex: "#9ca3af" },
+  ];
+
+  const occasionLabel = { casual: t("style.casual", lang), work: t("style.work", lang), night: t("style.night", lang) };
+  const moodLabel = { confident: t("style.confident", lang), relaxed: t("style.relaxed", lang), elegant: t("style.elegant", lang) };
+  const occasionColor = { casual: "#22c55e", work: "#3b82f6", night: "#a855f7" };
+  const moodColor = { confident: "#f59e0b", relaxed: "#14b8a6", elegant: "#ec4899" };
+
+  const addLook = () => {
+    if (!lookForm.title.trim()) return;
+    onAdd({ id: uid(), type: "look", ...lookForm, createdAt: today() });
+    setLookForm({ title: "", occasion: "casual", mood: "confident", weather: "mild", notes: "" });
+    setShowAddLook(false);
+  };
+
+  // Wear frequency mock (based on saved looks count)
+  const wearPct = Math.min(100, looks.length * 12);
+
+  return (
+    <div>
+      <StickyHeader>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <button onClick={onBack} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)", color: "#ccc", width: 34, height: 34, borderRadius: 10, fontSize: 16, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>◀</button>
+          <span style={{ fontSize: 22 }}>✨</span>
+          <h3 style={{ margin: 0, fontSize: 19, fontWeight: 800, flex: 1 }}>{t("style.title", lang)}</h3>
+        </div>
+      </StickyHeader>
+
+      {/* ── WEATHER WIDGET ── */}
+      <div style={{
+        background: "linear-gradient(135deg, rgba(99,102,241,0.12), rgba(168,85,247,0.08), rgba(249,115,22,0.06))",
+        border: "1px solid rgba(99,102,241,0.2)", borderRadius: 20,
+        padding: "18px 20px", marginBottom: 14,
+        boxShadow: "0 0 30px rgba(99,102,241,0.08), inset 0 1px 0 rgba(255,255,255,0.05)",
+      }}>
+        <div style={{ fontSize: 11, fontWeight: 700, opacity: .4, textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 10 }}>
+          {t("style.weather", lang)}
+        </div>
+        {weather ? (
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <div style={{ fontSize: 44 }}>{weatherIcon[weather.condition] || "🌤️"}</div>
+            <div>
+              <div style={{ fontSize: 32, fontWeight: 900, letterSpacing: -1 }}>{weather.temp}°C</div>
+              <div style={{ fontSize: 13, opacity: .6 }}>
+                {weatherLabel[weather.condition]?.[lang] || weather.condition}
+                {weather.wind > 15 && ` · 💨 ${weather.wind} km/h`}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div style={{ display: "flex", alignItems: "center", gap: 10, opacity: .4 }}>
+            <span style={{ fontSize: 28, animation: "pulse 1.5s infinite" }}>🌤️</span>
+            <span style={{ fontSize: 13 }}>{t("dash.loading", lang)}</span>
+          </div>
+        )}
+      </div>
+
+      {/* ── SUGGESTED LOOKS (weather-based) ── */}
+      {suggestions.length > 0 && (
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, opacity: .4, textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 10 }}>
+            {t("style.sugLooks", lang)}
+          </div>
+          <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 6, WebkitOverflowScrolling: "touch" }}>
+            {suggestions.map((s, i) => (
+              <div key={i} style={{
+                minWidth: 180, maxWidth: 200, flexShrink: 0,
+                background: `linear-gradient(135deg, ${s.color}15, ${s.color}05)`,
+                border: `1px solid ${s.color}30`,
+                borderRadius: 18, padding: "16px 14px",
+                boxShadow: `0 0 20px ${s.color}10, inset 0 1px 0 ${s.color}15`,
+              }}>
+                <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 10, color: s.color }}>{s.title}</div>
+                {s.pieces.map((p, j) => (
+                  <div key={j} style={{ fontSize: 13, opacity: .8, marginBottom: 3 }}>{p}</div>
+                ))}
+                <div style={{ display: "flex", gap: 4, marginTop: 10, flexWrap: "wrap" }}>
+                  <span style={{ background: `${occasionColor[s.occasion]}20`, color: occasionColor[s.occasion], padding: "2px 8px", borderRadius: 6, fontSize: 9, fontWeight: 700 }}>
+                    {occasionLabel[s.occasion]}
+                  </span>
+                  <span style={{ background: `${moodColor[s.mood]}20`, color: moodColor[s.mood], padding: "2px 8px", borderRadius: 6, fontSize: 9, fontWeight: 700 }}>
+                    {moodLabel[s.mood]}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── STYLE RULES & DISCIPLINE ── */}
+      <div style={{ marginBottom: 14 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, opacity: .4, textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 10 }}>
+          {t("style.rules", lang)}
+        </div>
+        <div style={{
+          background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
+          borderRadius: 18, padding: "16px", overflow: "hidden",
+        }}>
+          {/* Wear Frequency meter */}
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+              <span style={{ fontSize: 13, fontWeight: 600 }}>{t("style.wearFreq", lang)}</span>
+              <span style={{ fontSize: 12, fontWeight: 800, color: wearPct > 60 ? "#22c55e" : "#f59e0b" }}>{wearPct}%</span>
+            </div>
+            <div style={{ position: "relative", width: 80, height: 80, margin: "0 auto" }}>
+              <svg viewBox="0 0 36 36" style={{ width: 80, height: 80, transform: "rotate(-90deg)" }}>
+                <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="3" />
+                <circle cx="18" cy="18" r="15.9" fill="none" stroke={wearPct > 60 ? "#22c55e" : "#f59e0b"}
+                  strokeWidth="3" strokeDasharray={`${wearPct} ${100 - wearPct}`} strokeLinecap="round"
+                  style={{ transition: "stroke-dasharray .6s ease", filter: `drop-shadow(0 0 6px ${wearPct > 60 ? "rgba(34,197,94,0.4)" : "rgba(245,158,11,0.4)"})` }}
+                />
+              </svg>
+              <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>👗</div>
+            </div>
+          </div>
+
+          {/* Rule toggles */}
+          <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 14 }}>
+            {[
+              { key: "workOk", label: t("style.workOk", lang), icon: "💼", color: "#3b82f6" },
+              { key: "sustainable", label: t("style.sustainable", lang), icon: "🌿", color: "#22c55e" },
+              { key: "noPurchase", label: t("style.noPurchase", lang), icon: "🚫", color: "#ef4444" },
+            ].map(rule => {
+              const on = getRuleVal(rule.key);
+              return (
+                <div key={rule.key} onClick={() => toggleRule(rule.key)} style={{
+                  display: "flex", alignItems: "center", gap: 12, padding: "10px 0",
+                  borderBottom: "1px solid rgba(255,255,255,0.04)", cursor: "pointer",
+                }}>
+                  <span style={{ fontSize: 18 }}>{rule.icon}</span>
+                  <span style={{ flex: 1, fontSize: 13, fontWeight: 600 }}>{rule.label}</span>
+                  <div style={{
+                    width: 44, height: 24, borderRadius: 12,
+                    background: on ? `${rule.color}30` : "rgba(255,255,255,0.06)",
+                    border: `1px solid ${on ? rule.color + "50" : "rgba(255,255,255,0.1)"}`,
+                    position: "relative", transition: "all .2s",
+                    boxShadow: on ? `0 0 12px ${rule.color}20` : "none",
+                  }}>
+                    <div style={{
+                      width: 18, height: 18, borderRadius: "50%",
+                      background: on ? rule.color : "#555",
+                      position: "absolute", top: 2,
+                      left: on ? 23 : 3,
+                      transition: "all .2s",
+                      boxShadow: on ? `0 0 8px ${rule.color}60` : "none",
+                    }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* ── COLOR PALETTE ── */}
+      <div style={{ marginBottom: 14 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, opacity: .4, textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 10 }}>
+          {t("style.palette", lang)}
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8 }}>
+          {palette.map(c => (
+            <div key={c.hex} style={{
+              aspectRatio: "1", borderRadius: 14,
+              background: c.hex,
+              border: "1px solid rgba(255,255,255,0.1)",
+              display: "flex", alignItems: "flex-end", justifyContent: "center",
+              paddingBottom: 6,
+              boxShadow: `0 4px 16px ${c.hex}30, inset 0 -20px 30px rgba(0,0,0,0.3)`,
+            }}>
+              <span style={{ fontSize: 9, color: "#fff", fontWeight: 700, textShadow: "0 1px 4px rgba(0,0,0,0.6)", letterSpacing: ".03em" }}>{c.name}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── SAVED LOOKS ── */}
+      <div style={{ marginBottom: 14 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, opacity: .4, textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 10 }}>
+          {t("style.savedLooks", lang)}
+        </div>
+        {looks.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "30px 20px", background: "rgba(255,255,255,0.03)", borderRadius: 16, border: "1px solid rgba(255,255,255,0.06)" }}>
+            <div style={{ fontSize: 36, marginBottom: 8 }}>✨</div>
+            <div style={{ fontSize: 13, opacity: .4 }}>{t("style.noLooks", lang)}</div>
+          </div>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+            {looks.map(look => (
+              <div key={look.id} style={{
+                background: "rgba(255,255,255,0.04)", border: "1px solid rgba(249,115,22,0.15)",
+                borderRadius: 16, padding: "14px 12px", position: "relative",
+              }}>
+                <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 6 }}>{look.title}</div>
+                <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 6 }}>
+                  <span style={{ background: `${occasionColor[look.occasion] || "#888"}20`, color: occasionColor[look.occasion] || "#888", padding: "1px 6px", borderRadius: 5, fontSize: 9, fontWeight: 700 }}>
+                    {occasionLabel[look.occasion] || look.occasion}
+                  </span>
+                  <span style={{ background: `${moodColor[look.mood] || "#888"}20`, color: moodColor[look.mood] || "#888", padding: "1px 6px", borderRadius: 5, fontSize: 9, fontWeight: 700 }}>
+                    {moodLabel[look.mood] || look.mood}
+                  </span>
+                </div>
+                {look.notes && <div style={{ fontSize: 11, opacity: .5, lineHeight: 1.3 }}>{look.notes}</div>}
+                <button onClick={() => onDel(look.id)} style={{ position: "absolute", top: 8, right: 8, background: "rgba(239,68,68,0.1)", border: "none", color: "#ef4444", width: 22, height: 22, borderRadius: 6, fontSize: 11, cursor: "pointer" }}>✕</button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ── FAB ── */}
+      <div onClick={() => setShowAddLook(true)} style={{
+        position: "fixed", bottom: 80, right: 20, width: 56, height: 56,
+        borderRadius: 18,
+        background: "linear-gradient(135deg, #f97316, #a855f7, #3b82f6)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        fontSize: 24, color: "#fff", cursor: "pointer", zIndex: 100,
+        boxShadow: "0 4px 20px rgba(249,115,22,0.3), 0 4px 20px rgba(168,85,247,0.2)",
+      }}>+</div>
+
+      {/* ── ADD LOOK MODAL ── */}
+      <Modal open={showAddLook} onClose={() => setShowAddLook(false)} title={t("style.addLook", lang)}>
+        <input style={inp} placeholder={lang === "tr" ? "Kombin adı..." : "Look name..."} value={lookForm.title} onChange={e => setLookForm({ ...lookForm, title: e.target.value })} autoFocus />
+
+        <div style={{ fontSize: 12, opacity: .5, marginBottom: 6 }}>{t("style.occasion", lang)}:</div>
+        <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
+          {["casual", "work", "night"].map(o => (
+            <button key={o} onClick={() => setLookForm({ ...lookForm, occasion: o })} style={{
+              flex: 1, padding: "8px", borderRadius: 10, fontSize: 12, cursor: "pointer", fontWeight: 600,
+              background: lookForm.occasion === o ? `${occasionColor[o]}20` : "rgba(255,255,255,0.04)",
+              color: lookForm.occasion === o ? occasionColor[o] : "#888",
+              border: `1px solid ${lookForm.occasion === o ? occasionColor[o] + "40" : "rgba(255,255,255,0.06)"}`,
+            }}>{occasionLabel[o]}</button>
+          ))}
+        </div>
+
+        <div style={{ fontSize: 12, opacity: .5, marginBottom: 6 }}>{t("style.mood", lang)}:</div>
+        <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
+          {["confident", "relaxed", "elegant"].map(m => (
+            <button key={m} onClick={() => setLookForm({ ...lookForm, mood: m })} style={{
+              flex: 1, padding: "8px", borderRadius: 10, fontSize: 12, cursor: "pointer", fontWeight: 600,
+              background: lookForm.mood === m ? `${moodColor[m]}20` : "rgba(255,255,255,0.04)",
+              color: lookForm.mood === m ? moodColor[m] : "#888",
+              border: `1px solid ${lookForm.mood === m ? moodColor[m] + "40" : "rgba(255,255,255,0.06)"}`,
+            }}>{moodLabel[m]}</button>
+          ))}
+        </div>
+
+        <textarea style={{ ...inp, minHeight: 60, resize: "vertical", fontFamily: "inherit", lineHeight: 1.5 }}
+          placeholder={t("common.descOpt", lang)} value={lookForm.notes}
+          onChange={e => setLookForm({ ...lookForm, notes: e.target.value })} />
+
+        <button style={{ ...btnPrimary, background: "linear-gradient(135deg, #f97316, #a855f7)" }} onClick={addLook}>
+          {t("common.add", lang)}
+        </button>
+      </Modal>
+    </div>
+  );
+}
+
 /* ═══════════ TARZIM ═══════════ */
 function Projects({ data, update, lang="tr" }) {
   const [activeRoom,setActiveRoom]=useState(null);
@@ -2935,6 +3326,7 @@ function Projects({ data, update, lang="tr" }) {
   /* ── SPECIAL ROOM RENDERERS ── */
   if(activeRoom==="news" || room.type==="news") return <NewsRoom room={room} onBack={()=>setActiveRoom(null)} />;
   if(activeRoom==="music" || room.name==="Müziklerim") return <MusicRoom room={room} items={items} onBack={()=>setActiveRoom(null)} onAdd={(item)=>{const cur=roomItems[activeRoom]||[];update({...data,roomItems:{...roomItems,[activeRoom]:[item,...cur]}});}} onDel={(id)=>delItem(activeRoom,id)} />;
+  if(activeRoom==="clothes" || room.type==="style") return <StyleLookbook room={room} items={items} onBack={()=>setActiveRoom(null)} onAdd={(item)=>{const cur=roomItems[activeRoom]||[];update({...data,roomItems:{...roomItems,[activeRoom]:[item,...cur]}});}} onDel={(id)=>delItem(activeRoom,id)} lang={lang} />;
 
   return (
     <div>
