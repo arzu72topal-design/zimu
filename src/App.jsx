@@ -16,14 +16,251 @@ import {
   clearAllReminders,
 } from "./notifications.js";
 
+/* ── i18n — Translations ── */
+const LANGUAGES = [
+  { code: "tr", name: "Türkçe", flag: "🇹🇷" },
+  { code: "en", name: "English", flag: "🇬🇧" },
+  { code: "de", name: "Deutsch", flag: "🇩🇪" },
+  { code: "da", name: "Dansk", flag: "🇩🇰" },
+  { code: "fi", name: "Suomi", flag: "🇫🇮" },
+];
+
+const T = {
+  // ── Tabs ──
+  "tab.home":       { tr:"Ana Sayfa", en:"Home", de:"Startseite", da:"Hjem", fi:"Etusivu" },
+  "tab.tasks":      { tr:"Görevler", en:"Tasks", de:"Aufgaben", da:"Opgaver", fi:"Tehtävät" },
+  "tab.calendar":   { tr:"Takvim", en:"Calendar", de:"Kalender", da:"Kalender", fi:"Kalenteri" },
+  "tab.health":     { tr:"Sağlık", en:"Health", de:"Gesundheit", da:"Sundhed", fi:"Terveys" },
+  "tab.style":      { tr:"Tarzım", en:"My Style", de:"Mein Stil", da:"Min Stil", fi:"Tyylini" },
+  "tab.notes":      { tr:"Notlar", en:"Notes", de:"Notizen", da:"Noter", fi:"Muistiinpanot" },
+  "tab.settings":   { tr:"Ayarlar", en:"Settings", de:"Einstellungen", da:"Indstillinger", fi:"Asetukset" },
+
+  // ── Greetings ──
+  "greet.morning":  { tr:"Günaydın", en:"Good morning", de:"Guten Morgen", da:"God morgen", fi:"Hyvää huomenta" },
+  "greet.afternoon":{ tr:"İyi günler", en:"Good afternoon", de:"Guten Tag", da:"God eftermiddag", fi:"Hyvää iltapäivää" },
+  "greet.evening":  { tr:"İyi akşamlar", en:"Good evening", de:"Guten Abend", da:"God aften", fi:"Hyvää iltaa" },
+
+  // ── Dashboard ──
+  "dash.progress":     { tr:t("dash.progress",lang), en:"Today's Progress", de:"Fortschritt heute", da:"Dagens fremskridt", fi:"Päivän edistyminen" },
+  "dash.noTasks":      { tr:"görev yok", en:"no tasks", de:"keine Aufgaben", da:"ingen opgaver", fi:"ei tehtäviä" },
+  "dash.allDone":      { tr:"Bugünkü tüm görevler tamamlandı!", en:"All today's tasks completed!", de:"Alle heutigen Aufgaben erledigt!", da:"Alle dagens opgaver fuldført!", fi:"Kaikki päivän tehtävät valmiit!" },
+  "dash.pending":      { tr:"Bekleyen", en:"Pending", de:"Ausstehend", da:"Afventende", fi:"Odottaa" },
+  "dash.overdue":      { tr:"Gecikmiş", en:"Overdue", de:"Überfällig", da:"Forsinket", fi:"Myöhässä" },
+  "dash.kcal":         { tr:"kcal", en:"kcal", de:"kcal", da:"kcal", fi:"kcal" },
+  "dash.event":        { tr:"Etkinlik", en:"Event", de:"Termin", da:"Begivenhed", fi:"Tapahtuma" },
+  "dash.streak":       { tr:t("dash.streak",lang), en:"day streak", de:"Tage Serie", da:"dages streak", fi:"päivän putki" },
+  "dash.quickAdd":     { tr:t("dash.quickAdd",lang), en:"Quick add task...", de:"Schnell Aufgabe hinzufügen...", da:"Tilføj hurtig opgave...", fi:"Lisää tehtävä nopeasti..." },
+  "dash.overdueWarn":  { tr:"gecikmiş görev!", en:"overdue task(s)!", de:"überfällige Aufgabe(n)!", da:"forsinkede opgave(r)!", fi:"myöhässä olevaa tehtävää!" },
+  "dash.checkNow":     { tr:t("dash.checkNow",lang), en:"Check now", de:"Jetzt prüfen", da:"Tjek nu", fi:"Tarkista nyt" },
+  "dash.todayFlow":    { tr:"{t("dash.todayFlow",lang)}", en:"Today's Flow", de:"Tagesablauf", da:"Dagens flow", fi:"Päivän kulku" },
+  "dash.task":         { tr:"Görev", en:"Task", de:"Aufgabe", da:"Opgave", fi:"Tehtävä" },
+  "dash.tapDone":      { tr:t("dash.tapDone",lang), en:"tap ✓", de:"tippen ✓", da:"tryk ✓", fi:"napauta ✓" },
+  "dash.next7":        { tr:"Önümüzdeki 7 Gün", en:"Next 7 Days", de:"Nächste 7 Tage", da:"Næste 7 dage", fi:"Seuraavat 7 päivää" },
+  "dash.moreTasks":    { tr:"{t("dash.moreTasks",lang)}", en:"more task(s) → See all", de:"weitere Aufgabe(n) → Alle anzeigen", da:"flere opgaver → Se alle", fi:"tehtävää lisää → Näytä kaikki" },
+  "dash.thisWeek":     { tr:"Bu Hafta", en:"This Week", de:"Diese Woche", da:"Denne uge", fi:"Tämä viikko" },
+  "dash.workout":      { tr:"Antrenman", en:"Workout", de:"Training", da:"Træning", fi:"Treeni" },
+  "dash.kcalBurned":   { tr:"kcal yakıldı", en:"kcal burned", de:"kcal verbrannt", da:"kcal forbrændt", fi:"kcal poltettu" },
+  "dash.tasksDone":    { tr:"Görev bitti", en:"Tasks done", de:"Aufgaben erledigt", da:"Opgaver udført", fi:"Tehtävät valmiit" },
+  "dash.thoughts":     { tr:"Bugün Kafamı Kurcalayanlar", en:"On My Mind Today", de:"Was mich heute beschäftigt", da:"Det der fylder i dag", fi:"Mielessäni tänään" },
+  "dash.thought1":     { tr:t("dash.thought1",lang), en:"What I'm thinking about most...", de:"Was mich am meisten beschäftigt...", da:"Det jeg tænker mest over...", fi:"Mitä ajattelen eniten..." },
+  "dash.thought2":     { tr:t("dash.thought2",lang), en:"Something confusing me...", de:"Etwas das mich verwirrt...", da:"Noget der forvirrer mig...", fi:"Jokin hämmentävä..." },
+  "dash.thought3":     { tr:t("dash.thought3",lang), en:"A problem I want to solve...", de:"Ein Problem das ich lösen will...", da:"Et problem jeg vil løse...", fi:"Ongelma jonka haluan ratkaista..." },
+  "dash.news":         { tr:"Haberler", en:"News", de:"Nachrichten", da:"Nyheder", fi:"Uutiset" },
+  "dash.music":        { tr:"Müzik", en:"Music", de:"Musik", da:"Musik", fi:"Musiikki" },
+  "dash.recentNotes":  { tr:"Son Notlar", en:"Recent Notes", de:"Letzte Notizen", da:"Seneste noter", fi:"Viimeisimmät muistiinpanot" },
+  "dash.loading":      { tr:"Yükleniyor...", en:"Loading...", de:"Laden...", da:"Indlæser...", fi:"Ladataan..." },
+  "dash.allLabel":     { tr:"Tümü ▶", en:"All ▶", de:"Alle ▶", da:"Alle ▶", fi:"Kaikki ▶" },
+
+  // ── Tasks ──
+  "tasks.new":        { tr:"Yeni Görev", en:"New Task", de:"Neue Aufgabe", da:"Ny opgave", fi:"Uusi tehtävä" },
+  "tasks.edit":       { tr:"Görevi Düzenle", en:"Edit Task", de:"Aufgabe bearbeiten", da:"Rediger opgave", fi:"Muokkaa tehtävää" },
+  "tasks.all":        { tr:"Tümü", en:"All", de:"Alle", da:"Alle", fi:"Kaikki" },
+  "tasks.pending":    { tr:"Bekleyen", en:"Pending", de:"Ausstehend", da:"Afventende", fi:"Odottaa" },
+  "tasks.done":       { tr:"Bitti", en:"Done", de:"Erledigt", da:"Færdig", fi:"Valmis" },
+  "tasks.priority":   { tr:"Öncelikli", en:"Priority", de:"Priorität", da:"Prioritet", fi:"Prioriteetti" },
+  "tasks.overdue":    { tr:"Gecikmiş", en:"Overdue", de:"Überfällig", da:"Forsinket", fi:"Myöhässä" },
+  "tasks.title":      { tr:"Görev başlığı", en:"Task title", de:"Aufgabentitel", da:"Opgavetitel", fi:"Tehtävän otsikko" },
+  "tasks.desc":       { tr:"Açıklama (opsiyonel)...", en:"Description (optional)...", de:"Beschreibung (optional)...", da:"Beskrivelse (valgfri)...", fi:"Kuvaus (valinnainen)..." },
+  "tasks.category":   { tr:"Kategori (opsiyonel)", en:"Category (optional)", de:"Kategorie (optional)", da:"Kategori (valgfri)", fi:"Kategoria (valinnainen)" },
+  "tasks.save":       { tr:"Kaydet", en:"Save", de:"Speichern", da:"Gem", fi:"Tallenna" },
+  "tasks.add":        { tr:"Ekle", en:"Add", de:"Hinzufügen", da:"Tilføj", fi:"Lisää" },
+  "tasks.editBtn":    { tr:"Düzenle", en:"Edit", de:"Bearbeiten", da:"Rediger", fi:"Muokkaa" },
+  "tasks.delete":     { tr:"Sil", en:"Delete", de:"Löschen", da:"Slet", fi:"Poista" },
+  "tasks.today":      { tr:"Bugün", en:"Today", de:"Heute", da:"I dag", fi:"Tänään" },
+  "tasks.tomorrow":   { tr:"Yarın", en:"Tomorrow", de:"Morgen", da:"I morgen", fi:"Huomenna" },
+  "tasks.overdueGrp": { tr:"Gecikmiş", en:"Overdue", de:"Überfällig", da:"Forsinket", fi:"Myöhässä" },
+  "tasks.weekGrp":    { tr:"Bu Hafta", en:"This Week", de:"Diese Woche", da:"Denne uge", fi:"Tämä viikko" },
+  "tasks.pendingGrp": { tr:"Bekleyen", en:"Pending", de:"Ausstehend", da:"Afventende", fi:"Odottaa" },
+  "tasks.doneGrp":    { tr:"Tamamlanan", en:"Completed", de:"Abgeschlossen", da:"Fuldført", fi:"Valmistuneet" },
+
+  // ── Priorities ──
+  "pri.high":   { tr:"Yüksek", en:"High", de:"Hoch", da:"Høj", fi:"Korkea" },
+  "pri.medium": { tr:"Orta", en:"Medium", de:"Mittel", da:"Mellem", fi:"Keskitaso" },
+  "pri.low":    { tr:"Düşük", en:"Low", de:"Niedrig", da:"Lav", fi:"Matala" },
+
+  // ── Calendar ──
+  "cal.add":      { tr:"+ Ekle", en:"+ Add", de:"+ Hinzufügen", da:"+ Tilføj", fi:"+ Lisää" },
+  "cal.newEvent": { tr:t("cal.newEvent",lang), en:"New Event", de:"Neuer Termin", da:"Ny begivenhed", fi:"Uusi tapahtuma" },
+  "cal.title":    { tr:"Etkinlik başlığı", en:"Event title", de:"Terminname", da:"Begivenhedstitel", fi:"Tapahtuman otsikko" },
+  "cal.daily":    { tr:"Her gün", en:"Daily", de:"Täglich", da:"Daglig", fi:"Päivittäin" },
+  "cal.weekly":   { tr:"Her hafta", en:"Weekly", de:"Wöchentlich", da:"Ugentlig", fi:"Viikoittain" },
+  "cal.none":     { tr:"Tekrar yok", en:"No repeat", de:"Keine Wiederholung", da:"Ingen gentagelse", fi:"Ei toistoa" },
+
+  // ── Sports / Health ──
+  "sport.new":        { tr:"Yeni Antrenman", en:"New Workout", de:"Neues Training", da:"Ny træning", fi:"Uusi treeni" },
+  "sport.run":        { tr:"Koşu", en:"Running", de:"Laufen", da:"Løb", fi:"Juoksu" },
+  "sport.swim":       { tr:"Yüzme", en:"Swimming", de:"Schwimmen", da:"Svømning", fi:"Uinti" },
+  "sport.bike":       { tr:"Bisiklet", en:"Cycling", de:"Radfahren", da:"Cykling", fi:"Pyöräily" },
+  "sport.yoga":       { tr:"Yoga", en:"Yoga", de:"Yoga", da:"Yoga", fi:"Jooga" },
+  "sport.weights":    { tr:"Ağırlık", en:"Weights", de:"Gewichte", da:"Vægte", fi:"Painot" },
+  "sport.walk":       { tr:"Yürüyüş", en:"Walking", de:"Gehen", da:"Gang", fi:"Kävely" },
+  "sport.other":      { tr:"Diğer", en:"Other", de:"Andere", da:"Andet", fi:"Muu" },
+  "sport.duration":   { tr:"Süre (dk)", en:"Duration (min)", de:"Dauer (Min)", da:"Varighed (min)", fi:"Kesto (min)" },
+  "sport.distance":   { tr:"Mesafe (km)", en:"Distance (km)", de:"Distanz (km)", da:"Distance (km)", fi:"Matka (km)" },
+  "sport.calories":   { tr:"Yakılan kalori", en:"Calories burned", de:"Verbrannte Kalorien", da:"Forbrændte kalorier", fi:"Poltetut kalorit" },
+  "sport.calOpt":     { tr:"Yakılan kalori (opsiyonel)", en:"Calories burned (optional)", de:"Verbrannte Kalorien (optional)", da:"Forbrændte kalorier (valgfri)", fi:"Poltetut kalorit (valinnainen)" },
+  "sport.weeklySport": { tr:t("sport.weeklySport",lang), en:"Weekly Sport", de:"Wöchentlicher Sport", da:"Ugentlig sport", fi:"Viikon urheilu" },
+  "sport.addFood":    { tr:"Yemek Ekle", en:"Add Food", de:"Essen hinzufügen", da:"Tilføj mad", fi:"Lisää ruoka" },
+  "sport.dailyGoal":  { tr:"Günlük hedef", en:"Daily goal", de:"Tagesziel", da:"Dagligt mål", fi:"Päivätavoite" },
+  "sport.breakfast":  { tr:"Kahvaltı", en:"Breakfast", de:"Frühstück", da:"Morgenmad", fi:"Aamiainen" },
+  "sport.lunch":      { tr:"Öğle", en:"Lunch", de:"Mittagessen", da:"Frokost", fi:"Lounas" },
+  "sport.dinner":     { tr:"Akşam", en:"Dinner", de:"Abendessen", da:"Aftensmad", fi:"Illallinen" },
+  "sport.snack":      { tr:"Atıştırma", en:"Snack", de:"Snack", da:"Snack", fi:"Välipala" },
+  "sport.searching":  { tr:"Aranıyor...", en:"Searching...", de:"Suche...", da:"Søger...", fi:"Haetaan..." },
+  "sport.min":        { tr:"dk", en:"min", de:"Min", da:"min", fi:"min" },
+
+  // ── Projects / Style ──
+  "proj.new":         { tr:"Yeni Proje", en:"New Project", de:"Neues Projekt", da:"Nyt projekt", fi:"Uusi projekti" },
+  "proj.noProjects":  { tr:"Henüz proje yok", en:"No projects yet", de:"Noch keine Projekte", da:"Ingen projekter endnu", fi:"Ei vielä projekteja" },
+  "proj.delete":      { tr:"Projeyi Sil", en:"Delete Project", de:"Projekt löschen", da:"Slet projekt", fi:"Poista projekti" },
+  "proj.addSub":      { tr:"Alt görev ekle...", en:"Add subtask...", de:"Unteraufgabe hinzufügen...", da:"Tilføj underopgave...", fi:"Lisää alitehtävä..." },
+  "proj.planning":    { tr:"Planlama", en:"Planning", de:"Planung", da:"Planlægning", fi:"Suunnittelu" },
+  "proj.inProgress":  { tr:"Devam Ediyor", en:"In Progress", de:"In Arbeit", da:"I gang", fi:"Käynnissä" },
+  "proj.testing":     { tr:"Test", en:"Testing", de:"Test", da:"Test", fi:"Testaus" },
+  "proj.completed":   { tr:"Tamamlandı", en:"Completed", de:"Abgeschlossen", da:"Fuldført", fi:"Valmis" },
+  "proj.projects":    { tr:"Projeler", en:"Projects", de:"Projekte", da:"Projekter", fi:"Projektit" },
+  "proj.news":        { tr:"Haberler", en:"News", de:"Nachrichten", da:"Nyheder", fi:"Uutiset" },
+  "proj.myMusic":     { tr:"Müziklerim", en:"My Music", de:"Meine Musik", da:"Min musik", fi:"Musiikkini" },
+  "proj.myClothes":   { tr:"Kıyafetlerim", en:"My Clothes", de:"Meine Kleidung", da:"Mit tøj", fi:"Vaatteeni" },
+  "proj.memories":    { tr:"Anılar", en:"Memories", de:"Erinnerungen", da:"Minder", fi:"Muistot" },
+
+  // ── Notes ──
+  "notes.new":       { tr:"Yeni Not", en:"New Note", de:"Neue Notiz", da:"Ny note", fi:"Uusi muistiinpano" },
+  "notes.edit":      { tr:"Notu Düzenle", en:"Edit Note", de:"Notiz bearbeiten", da:"Rediger note", fi:"Muokkaa muistiinpanoa" },
+  "notes.noNotes":   { tr:"Henüz not yok", en:"No notes yet", de:"Noch keine Notizen", da:"Ingen noter endnu", fi:"Ei vielä muistiinpanoja" },
+  "notes.noResult":  { tr:"Arama sonucu bulunamadı", en:"No results found", de:"Keine Ergebnisse", da:"Ingen resultater fundet", fi:"Ei tuloksia" },
+  "notes.update":    { tr:"Güncelle", en:"Update", de:"Aktualisieren", da:"Opdater", fi:"Päivitä" },
+  "notes.search":    { tr:"Not ara...", en:"Search notes...", de:"Notizen suchen...", da:"Søg noter...", fi:"Hae muistiinpanoja..." },
+
+  // ── Settings ──
+  "set.title":       { tr:"Ayarlar", en:"Settings", de:"Einstellungen", da:"Indstillinger", fi:"Asetukset" },
+  "set.account":     { tr:"Hesap", en:"Account", de:"Konto", da:"Konto", fi:"Tili" },
+  "set.cloudSync":   { tr:"Bulut senkronizasyon aktif", en:"Cloud sync active", de:"Cloud-Sync aktiv", da:"Cloud-synk aktiv", fi:"Pilvisynkronointi aktiivinen" },
+  "set.syncDesc":    { tr:"Veriler tüm cihazlarında otomatik senkronize edilir", en:"Data syncs across all devices", de:"Daten werden auf allen Geräten synchronisiert", da:"Data synkroniseres på alle enheder", fi:"Tiedot synkronoidaan kaikilla laitteilla" },
+  "set.logout":      { tr:"Çıkış Yap", en:"Log Out", de:"Abmelden", da:"Log ud", fi:"Kirjaudu ulos" },
+  "set.guest":       { tr:"Misafir modu", en:"Guest mode", de:"Gastmodus", da:"Gæstetilstand", fi:"Vierastila" },
+  "set.guestDesc":   { tr:"Veriler sadece bu cihazda saklanıyor. Giriş yaparak tüm cihazlarında senkronize edebilirsin.", en:"Data stored on this device only. Sign in to sync across devices.", de:"Daten nur auf diesem Gerät. Melden Sie sich an, um zu synchronisieren.", da:"Data kun gemt på denne enhed. Log ind for at synkronisere.", fi:"Tiedot vain tällä laitteella. Kirjaudu synkronointiin." },
+  "set.loginOrReg":  { tr:"Giriş Yap / Kayıt Ol", en:"Sign In / Register", de:"Anmelden / Registrieren", da:"Log ind / Registrer", fi:"Kirjaudu / Rekisteröidy" },
+  "set.notif":       { tr:"Bildirimler", en:"Notifications", de:"Benachrichtigungen", da:"Notifikationer", fi:"Ilmoitukset" },
+  "set.notifNoSupp": { tr:"Bu tarayıcı bildirimleri desteklemiyor", en:"This browser doesn't support notifications", de:"Dieser Browser unterstützt keine Benachrichtigungen", da:"Denne browser understøtter ikke notifikationer", fi:"Tämä selain ei tue ilmoituksia" },
+  "set.notifActive": { tr:"Bildirimler aktif", en:"Notifications active", de:"Benachrichtigungen aktiv", da:"Notifikationer aktive", fi:"Ilmoitukset aktiiviset" },
+  "set.notifDesc":   { tr:"Etkinlik ve görev hatırlatmaları otomatik olarak gönderilecek", en:"Event and task reminders will be sent automatically", de:"Erinnerungen werden automatisch gesendet", da:"Påmindelser sendes automatisk", fi:"Muistutukset lähetetään automaattisesti" },
+  "set.notifDenied": { tr:"Bildirimler engellendi. Tarayıcı ayarlarından izin verin.", en:"Notifications blocked. Allow in browser settings.", de:"Benachrichtigungen blockiert. In Browsereinstellungen erlauben.", da:"Notifikationer blokeret. Tillad i browserindstillinger.", fi:"Ilmoitukset estetty. Salli selainasetuksissa." },
+  "set.notifEnable": { tr:"Bildirimleri Aç", en:"Enable Notifications", de:"Benachrichtigungen aktivieren", da:"Aktiver notifikationer", fi:"Ota ilmoitukset käyttöön" },
+  "set.dataSummary": { tr:"Veri Özeti", en:"Data Summary", de:"Datenübersicht", da:"Dataoversigt", fi:"Tietoyhteenveto" },
+  "set.taskLabel":   { tr:"Görev", en:"Task", de:"Aufgabe", da:"Opgave", fi:"Tehtävä" },
+  "set.eventLabel":  { tr:"Etkinlik", en:"Event", de:"Termin", da:"Begivenhed", fi:"Tapahtuma" },
+  "set.sportLabel":  { tr:"Spor Kaydı", en:"Sport Log", de:"Sportprotokoll", da:"Sportlog", fi:"Urheiluloki" },
+  "set.projectLabel":{ tr:"Proje", en:"Project", de:"Projekt", da:"Projekt", fi:"Projekti" },
+  "set.noteLabel":   { tr:"Not", en:"Note", de:"Notiz", da:"Note", fi:"Muistiinpano" },
+  "set.totalLabel":  { tr:"Toplam", en:"Total", de:"Gesamt", da:"Total", fi:"Yhteensä" },
+  "set.dataManage":  { tr:"Veri Yönetimi", en:"Data Management", de:"Datenverwaltung", da:"Datastyring", fi:"Tiedonhallinta" },
+  "set.dataDesc":    { tr:"Bilgisayarınızdan veri aktarabilir veya yedeğinizi indirebilirsiniz", en:"Import data or download a backup", de:"Daten importieren oder Backup herunterladen", da:"Importer data eller download backup", fi:"Tuo tietoja tai lataa varmuuskopio" },
+  "set.backup":      { tr:"Yedek İndir (JSON)", en:"Download Backup (JSON)", de:"Backup herunterladen (JSON)", da:"Download backup (JSON)", fi:"Lataa varmuuskopio (JSON)" },
+  "set.import":      { tr:"Dosyadan Aktar (JSON)", en:"Import from File (JSON)", de:"Aus Datei importieren (JSON)", da:"Importer fra fil (JSON)", fi:"Tuo tiedostosta (JSON)" },
+  "set.importing":   { tr:"Aktarılıyor...", en:"Importing...", de:"Importieren...", da:"Importerer...", fi:"Tuodaan..." },
+  "set.aiTitle":     { tr:"AI Kalori Asistanı", en:"AI Calorie Assistant", de:"AI-Kalorien-Assistent", da:"AI kalorieassistent", fi:"AI-kaloriavustaja" },
+  "set.aiDesc":      { tr:"Yemek fotoğrafı çekerek kalori hesaplatabilirsin. Kendi AI hesabını seç ve API anahtarını gir.", en:"Take a food photo to estimate calories. Choose your AI provider and enter API key.", de:"Fotografiere Essen für Kalorienanalyse. Wähle deinen AI-Anbieter.", da:"Tag et foto af mad for kalorieanalyse. Vælg din AI-udbyder.", fi:"Ota kuva ruoasta kalorilaskentaa varten. Valitse AI-tarjoaja." },
+  "set.manualEntry": { tr:"Manuel Giriş", en:"Manual Entry", de:"Manuelle Eingabe", da:"Manuel indtastning", fi:"Manuaalinen syöttö" },
+  "set.manualDesc":  { tr:"AI kullanma, kalorileri kendim girerim", en:"No AI, I'll enter calories myself", de:"Kein AI, Kalorien manuell eingeben", da:"Ingen AI, jeg indtaster selv kalorier", fi:"Ei tekoälyä, syötän kalorit itse" },
+  "set.keySaved":    { tr:"Anahtar kaydedildi", en:"Key saved", de:"Schlüssel gespeichert", da:"Nøgle gemt", fi:"Avain tallennettu" },
+  "set.keyNeeded":   { tr:"Anahtar gerekli", en:"Key required", de:"Schlüssel erforderlich", da:"Nøgle påkrævet", fi:"Avain vaaditaan" },
+  "set.keyPrivacy":  { tr:"Anahtarın sadece senin telefonunda saklanır, sunucuya gönderilmez", en:"Your key is stored only on your device, never sent to a server", de:"Ihr Schlüssel wird nur auf Ihrem Gerät gespeichert", da:"Din nøgle gemmes kun på din enhed", fi:"Avaimesi tallennetaan vain laitteeseesi" },
+  "set.apiPaste":    { tr:"API anahtarını yapıştır...", en:"Paste API key...", de:"API-Schlüssel einfügen...", da:"Indsæt API-nøgle...", fi:"Liitä API-avain..." },
+  "set.danger":      { tr:"Tehlikeli Bölge", en:"Danger Zone", de:"Gefahrenzone", da:"Farezone", fi:"Vaaravyöhyke" },
+  "set.deleteAll":   { tr:"Tüm Verileri Sil", en:"Delete All Data", de:"Alle Daten löschen", da:"Slet alle data", fi:"Poista kaikki tiedot" },
+  "set.confirmDel":  { tr:t("set.confirmDel",lang), en:"All data will be deleted. Are you sure?", de:"Alle Daten werden gelöscht. Sind Sie sicher?", da:"Alle data slettes. Er du sikker?", fi:"Kaikki tiedot poistetaan. Oletko varma?" },
+  "set.deleted":     { tr:"Tüm veriler silindi", en:"All data deleted", de:"Alle Daten gelöscht", da:"Alle data slettet", fi:"Kaikki tiedot poistettu" },
+  "set.backupDone":  { tr:"Yedek dosyası indirildi!", en:"Backup file downloaded!", de:"Backup-Datei heruntergeladen!", da:"Backup-fil downloadet!", fi:"Varmuuskopio ladattu!" },
+  "set.importDone":  { tr:"Veriler başarıyla aktarıldı!", en:"Data imported successfully!", de:"Daten erfolgreich importiert!", da:"Data importeret!", fi:"Tiedot tuotu onnistuneesti!" },
+  "set.language":    { tr:"Dil", en:"Language", de:"Sprache", da:"Sprog", fi:"Kieli" },
+
+  // ── Login ──
+  "login.google":    { tr:"Google ile Giriş Yap", en:"Sign in with Google", de:"Mit Google anmelden", da:"Log ind med Google", fi:"Kirjaudu Googlella" },
+  "login.or":        { tr:"veya", en:"or", de:"oder", da:"eller", fi:"tai" },
+  "login.email":     { tr:"Email adresi", en:"Email address", de:"E-Mail-Adresse", da:"E-mailadresse", fi:"Sähköpostiosoite" },
+  "login.password":  { tr:"Şifre (en az 6 karakter)", en:"Password (min 6 chars)", de:"Passwort (mind. 6 Zeichen)", da:"Adgangskode (min. 6 tegn)", fi:"Salasana (vähintään 6 merkkiä)" },
+  "login.signIn":    { tr:"Giriş Yap", en:"Sign In", de:"Anmelden", da:"Log ind", fi:"Kirjaudu" },
+  "login.register":  { tr:"Kayıt Ol", en:"Register", de:"Registrieren", da:"Registrer", fi:"Rekisteröidy" },
+  "login.wait":      { tr:"Bekleyin...", en:"Please wait...", de:"Bitte warten...", da:"Vent venligst...", fi:"Odota..." },
+  "login.noAccount": { tr:"Hesabın yok mu? Kayıt ol", en:"No account? Register", de:"Kein Konto? Registrieren", da:"Ingen konto? Registrer", fi:"Ei tiliä? Rekisteröidy" },
+  "login.hasAccount":{ tr:"Zaten hesabın var mı? Giriş yap", en:"Already have an account? Sign in", de:"Bereits ein Konto? Anmelden", da:"Har du allerede en konto? Log ind", fi:"Onko jo tili? Kirjaudu" },
+  "login.skip":      { tr:"Giriş yapmadan devam et →", en:"Continue without signing in →", de:"Ohne Anmeldung fortfahren →", da:"Fortsæt uden at logge ind →", fi:"Jatka kirjautumatta →" },
+  "login.skipNote":  { tr:"Veriler sadece bu cihazda kalır", en:"Data stays on this device only", de:"Daten bleiben nur auf diesem Gerät", da:"Data forbliver kun på denne enhed", fi:"Tiedot pysyvät vain tällä laitteella" },
+  "login.emailReq":  { tr:"Email ve şifre gerekli", en:"Email and password required", de:"E-Mail und Passwort erforderlich", da:"E-mail og adgangskode påkrævet", fi:"Sähköposti ja salasana vaaditaan" },
+
+  // ── Splash ──
+  "splash.tap":      { tr:"Devam etmek için dokun", en:"Tap to continue", de:"Zum Fortfahren tippen", da:"Tryk for at fortsætte", fi:"Napauta jatkaaksesi" },
+  "splash.motto1":   { tr:"Kendi destanını yaz.", en:"Write your own epic.", de:"Schreib dein eigenes Epos.", da:"Skriv dit eget epos.", fi:"Kirjoita oma eepoksesi." },
+  "splash.motto2":   { tr:"Write your own epic.", en:"Write your own epic.", de:"Write your own epic.", da:"Write your own epic.", fi:"Write your own epic." },
+
+  // ── Common ──
+  "common.save":     { tr:"Kaydet", en:"Save", de:"Speichern", da:"Gem", fi:"Tallenna" },
+  "common.cancel":   { tr:"İptal", en:"Cancel", de:"Abbrechen", da:"Annuller", fi:"Peruuta" },
+  "common.delete":   { tr:"Sil", en:"Delete", de:"Löschen", da:"Slet", fi:"Poista" },
+  "common.edit":     { tr:"Düzenle", en:"Edit", de:"Bearbeiten", da:"Rediger", fi:"Muokkaa" },
+  "common.add":      { tr:"Ekle", en:"Add", de:"Hinzufügen", da:"Tilføj", fi:"Lisää" },
+  "common.search":   { tr:"Ara...", en:"Search...", de:"Suchen...", da:"Søg...", fi:"Hae..." },
+  "common.back":     { tr:"Geri", en:"Back", de:"Zurück", da:"Tilbage", fi:"Takaisin" },
+  "common.error":    { tr:"Hata", en:"Error", de:"Fehler", da:"Fejl", fi:"Virhe" },
+  "common.descOpt":  { tr:"Açıklama (opsiyonel)...", en:"Description (optional)...", de:"Beschreibung (optional)...", da:"Beskrivelse (valgfri)...", fi:"Kuvaus (valinnainen)..." },
+
+  // ── Day/month names ──
+  "months": { tr:["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"], en:["January","February","March","April","May","June","July","August","September","October","November","December"], de:["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"], da:["Januar","Februar","Marts","April","Maj","Juni","Juli","August","September","Oktober","November","December"], fi:["Tammikuu","Helmikuu","Maaliskuu","Huhtikuu","Toukokuu","Kesäkuu","Heinäkuu","Elokuu","Syyskuu","Lokakuu","Marraskuu","Joulukuu"] },
+  "days": { tr:["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"], en:["Mon","Tue","Wed","Thu","Fri","Sat","Sun"], de:["Mo","Di","Mi","Do","Fr","Sa","So"], da:["Man","Tir","Ons","Tor","Fre","Lør","Søn"], fi:["Ma","Ti","Ke","To","Pe","La","Su"] },
+
+  // ── News room ──
+  "news.politics":  { tr:"Politika", en:"Politics", de:"Politik", da:"Politik", fi:"Politiikka" },
+  "news.health":    { tr:"Sağlık", en:"Health", de:"Gesundheit", da:"Sundhed", fi:"Terveys" },
+  "news.world":     { tr:"Dünya", en:"World", de:"Welt", da:"Verden", fi:"Maailma" },
+  "news.allCat":    { tr:"Tümü", en:"All", de:"Alle", da:"Alle", fi:"Kaikki" },
+  "news.goToNews":  { tr:"Habere git", en:"Go to article", de:"Zum Artikel", da:"Gå til artikel", fi:"Siirry artikkeliin" },
+
+  // ── Music room ──
+  "music.addLink":   { tr:"Link Ekle", en:"Add Link", de:"Link hinzufügen", da:"Tilføj link", fi:"Lisää linkki" },
+  "music.platform":  { tr:"Müzik", en:"Music", de:"Musik", da:"Musik", fi:"Musiikki" },
+  "music.howTo":     { tr:"Nasıl kullanılır?", en:"How to use?", de:"Wie benutzen?", da:"Hvordan bruger man?", fi:"Kuinka käyttää?" },
+  "music.addToCol":  { tr:"Koleksiyona Ekle", en:"Add to Collection", de:"Zur Sammlung hinzufügen", da:"Tilføj til samling", fi:"Lisää kokoelmaan" },
+};
+
+/* Translation helper — t("key", lang) returns localized string */
+const t = (key, lang = "tr") => {
+  const entry = T[key];
+  if (!entry) return key;
+  return entry[lang] || entry["en"] || entry["tr"] || key;
+};
+
+/* Locale code for date formatting */
+const LOCALE_MAP = { tr:"tr-TR", en:"en-US", de:"de-DE", da:"da-DK", fi:"fi-FI" };
+
 /* ── Constants ── */
-const TABS = [
-  { id: "dashboard", label: "Ana Sayfa", icon: "⌂" },
-  { id: "tasks", label: "Görevler", icon: "✓" },
-  { id: "calendar", label: "Takvim", icon: "◫" },
-  { id: "sports", label: "Sağlık", icon: "♦" },
-  { id: "projects", label: "Tarzım", icon: "◈" },
-  { id: "notes", label: "Notlar", icon: "☰" },
+const getTabs = (lang) => [
+  { id: "dashboard", label: t("tab.home", lang), icon: "⌂" },
+  { id: "tasks", label: t("tab.tasks", lang), icon: "✓" },
+  { id: "calendar", label: t("tab.calendar", lang), icon: "◫" },
+  { id: "sports", label: t("tab.health", lang), icon: "♦" },
+  { id: "projects", label: t("tab.style", lang), icon: "◈" },
+  { id: "notes", label: t("tab.notes", lang), icon: "☰" },
 ];
 
 const SPORT_TYPES = ["Koşu","Yüzme","Bisiklet","Yoga","Ağırlık","Yürüyüş","Diğer"];
@@ -31,17 +268,22 @@ const SPORT_EMOJI = {"Koşu":"🏃","Yüzme":"🏊","Bisiklet":"🚴","Yoga":"�
 // MET × 70kg × (duration/60) → kcal
 const SPORT_KCAL_PER_MIN = {"Koşu":10,"Yüzme":7,"Bisiklet":7,"Yoga":3.3,"Ağırlık":5,"Yürüyüş":4.7,"Diğer":5};
 const calcSportCal = (type, durationMin) => Math.round((SPORT_KCAL_PER_MIN[type]||5) * (+durationMin||0));
-const PRIORITIES = { high: "Yüksek", medium: "Orta", low: "Düşük" };
+const getPriorities = (lang="tr") => ({ high: t("pri.high",lang), medium: t("pri.medium",lang), low: t("pri.low",lang) });
 const PCOL = { high: "#ef4444", medium: "#f59e0b", low: "#22c55e" };
+const getProjectStatuses = (lang="tr") => [t("proj.planning",lang),t("proj.inProgress",lang),t("proj.testing",lang),t("proj.completed",lang)];
 const PROJECT_STATUSES = ["Planlama","Devam Ediyor","Test","Tamamlandı"];
+const statusDisplay = (s, lang="tr") => {
+  const idx = PROJECT_STATUSES.indexOf(s);
+  return idx >= 0 ? getProjectStatuses(lang)[idx] : s;
+};
 const COLORS = ["#3b82f6","#ef4444","#22c55e","#f59e0b","#a855f7","#f97316","#14b8a6"];
 
-const DEFAULT_ROOMS = [
-  { id: "projects", name: "Projeler", icon: "📂", color: "#3b82f6", type: "project" },
-  { id: "news", name: "Haberler", icon: "📰", color: "#ef4444", type: "news" },
-  { id: "music", name: "Müziklerim", icon: "🎵", color: "#a855f7", type: "collection" },
-  { id: "clothes", name: "Kıyafetlerim", icon: "👗", color: "#f97316", type: "collection" },
-  { id: "memories", name: "Anılar", icon: "📸", color: "#22c55e", type: "collection" },
+const getDefaultRooms = (lang="tr") => [
+  { id: "projects", name: t("proj.projects",lang), icon: "📂", color: "#3b82f6", type: "project" },
+  { id: "news", name: t("proj.news",lang), icon: "📰", color: "#ef4444", type: "news" },
+  { id: "music", name: t("proj.myMusic",lang), icon: "🎵", color: "#a855f7", type: "collection" },
+  { id: "clothes", name: t("proj.myClothes",lang), icon: "👗", color: "#f97316", type: "collection" },
+  { id: "memories", name: t("proj.memories",lang), icon: "📸", color: "#22c55e", type: "collection" },
 ];
 
 const COMMON_FOODS = {
@@ -57,7 +299,9 @@ const COMMON_FOODS = {
   "Baklava (1 dilim)": 250, "Sütlaç": 200, "Dondurma (1 top)": 140,
   "Ceviz (5 adet)": 130, "Badem (10 adet)": 70, "Çikolata (1 bar)": 230,
 };
+const getMN = (lang="tr") => t("months",lang);
 const MN = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
+const getDN = (lang="tr") => t("days",lang);
 const DN = ["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"];
 
 const today = () => new Date().toISOString().split("T")[0];
@@ -292,27 +536,27 @@ function FAB({ onClick, color="#3b82f6" }) {
 }
 
 /* ═══════════ DASHBOARD ═══════════ */
-function Dashboard({ data, setTab, update }) {
-  const t = today();
+function Dashboard({ data, setTab, update, lang }) {
+  const tdy = today();
   const foods = data.foods || [];
-  const rooms = data.rooms || [...DEFAULT_ROOMS];
+  const rooms = data.rooms || [...getDefaultRooms(lang)];
   const roomItems = data.roomItems || {};
 
   // ── Task calculations ──
   const allTasks = data.tasks || [];
-  const todayTasks = allTasks.filter(x => x.dueDate === t);
+  const todayTasks = allTasks.filter(x => x.dueDate === tdydy);
   const todayDone = todayTasks.filter(x => x.done).length;
   const todayTotal = todayTasks.length;
   const todayProgress = todayTotal > 0 ? Math.round((todayDone / todayTotal) * 100) : 0;
 
   const pending = allTasks.filter(x => !x.done).length;
-  const overdue = allTasks.filter(x => !x.done && x.dueDate && x.dueDate < t).length;
+  const overdue = allTasks.filter(x => !x.done && x.dueDate && x.dueDate < tdydy).length;
   const urgentTasks = allTasks
-    .filter(x => !x.done && (x.dueDate === t || x.dueDate === "" || !x.dueDate || x.dueDate <= t))
+    .filter(x => !x.done && (x.dueDate === tdydy || x.dueDate === "" || !x.dueDate || x.dueDate <= tdydy))
     .sort((a, b) => {
       // Overdue first, then by priority
-      const aOver = a.dueDate && a.dueDate < t ? -1 : 0;
-      const bOver = b.dueDate && b.dueDate < t ? -1 : 0;
+      const aOver = a.dueDate && a.dueDate < tdy ? -1 : 0;
+      const bOver = b.dueDate && b.dueDate < tdy ? -1 : 0;
       if (aOver !== bOver) return aOver - bOver;
       const po = { high: 0, medium: 1, low: 2 };
       return (po[a.priority] || 1) - (po[b.priority] || 1);
@@ -340,16 +584,16 @@ function Dashboard({ data, setTab, update }) {
   const streak = calcStreak();
 
   // ── Events ──
-  const todayEv = data.events.filter(e => e.date === t);
-  const upcoming = data.events.filter(e => e.date >= t).sort((a, b) => a.date.localeCompare(b.date) || (a.time || "").localeCompare(b.time || "")).slice(0, 5);
+  const todayEv = data.events.filter(e => e.date === tdydydy);
+  const upcoming = data.events.filter(e => e.date >= tdydy).sort((a, b) => a.date.localeCompare(b.date) || (a.time || "").localeCompare(b.time || "")).slice(0, 5);
 
   // ── Sports & food ──
   const wkSport = data.sports.filter(s => { const d = (new Date() - new Date(s.date)) / 864e5; return d >= 0 && d <= 7; });
   const wkMin = wkSport.reduce((a, s) => a + (s.duration || 0), 0);
   const wkBurned = wkSport.reduce((a, s) => a + (s.calories || 0), 0);
-  const todayFoods = foods.filter(f => f.date === t);
+  const todayFoods = foods.filter(f => f.date === tdydydy);
   const todayCalIn = todayFoods.reduce((a, f) => a + (f.calories || 0), 0);
-  const todayCalOut = data.sports.filter(s => s.date === t).reduce((a, s) => a + (s.calories || 0), 0);
+  const todayCalOut = data.sports.filter(s => s.date === tdydydy).reduce((a, s) => a + (s.calories || 0), 0);
 
   // ── Timeline: merge events + due tasks chronologically ──
   const timelineItems = [
@@ -364,7 +608,7 @@ function Dashboard({ data, setTab, update }) {
   });
 
   const hour = new Date().getHours();
-  const greeting = hour < 12 ? "Günaydın" : hour < 18 ? "İyi günler" : "İyi akşamlar";
+  const greeting = hour < 12 ? t("greet.morning",lang) : hour < 18 ? t("greet.afternoon",lang) : t("greet.evening",lang);
 
   // ── Daily thoughts ──
   const thoughts = data.dailyThoughts || ["", "", ""];
@@ -383,7 +627,7 @@ function Dashboard({ data, setTab, update }) {
   const [quickTask, setQuickTask] = useState("");
   const addQuickTask = () => {
     if (!quickTask.trim()) return;
-    update({ ...data, tasks: [{ id: uid(), title: quickTask.trim(), priority: "medium", dueDate: t, done: false, createdAt: t }, ...data.tasks] });
+    update({ ...data, tasks: [{ id: uid(), title: quickTask.trim(), priority: "medium", dueDate: tdy, done: false, createdAt: t }, ...data.tasks] });
     setQuickTask("");
   };
 
@@ -425,7 +669,7 @@ function Dashboard({ data, setTab, update }) {
           <div>
             <h2 style={{ margin: 0, fontSize: 23, fontWeight: 800, letterSpacing: -.5 }}>{greeting}! 👋</h2>
             <p style={{ margin: "4px 0 0", opacity: .45, fontSize: 13 }}>
-              {new Date().toLocaleDateString("tr-TR", { weekday: "long", day: "numeric", month: "long" })}
+              {new Date().toLocaleDateString(LOCALE_MAP[lang]||"tr-TR", { weekday: "long", day: "numeric", month: "long" })}
             </p>
           </div>
           {streak > 0 && (
@@ -445,7 +689,7 @@ function Dashboard({ data, setTab, update }) {
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
             <span style={{ fontSize: 12, fontWeight: 700, opacity: .6 }}>Bugünün İlerlemesi</span>
             <span style={{ fontSize: 12, fontWeight: 800, color: todayProgress === 100 ? "#22c55e" : "#3b82f6" }}>
-              {todayTotal > 0 ? `${todayDone}/${todayTotal}` : "görev yok"}
+              {todayTotal > 0 ? `${todayDone}/${todayTotal}` : t("dash.noTasks",lang)}
             </span>
           </div>
           <div style={{
@@ -464,7 +708,7 @@ function Dashboard({ data, setTab, update }) {
           </div>
           {todayProgress === 100 && todayTotal > 0 && (
             <div style={{ fontSize: 11, color: "#22c55e", marginTop: 6, textAlign: "center", fontWeight: 600 }}>
-              ✨ Bugünkü tüm görevler tamamlandı!
+              ✨ {t("dash.allDone",lang)}
             </div>
           )}
         </div>
@@ -472,10 +716,10 @@ function Dashboard({ data, setTab, update }) {
         {/* ── Mini stat cards ── */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 6, marginTop: 14 }}>
           {[
-            { label: "Bekleyen", val: pending, color: "#3b82f6", tab: "tasks" },
-            { label: "Gecikmiş", val: overdue, color: "#ef4444", tab: "tasks" },
-            { label: "kcal", val: todayCalIn, color: "#f97316", tab: "sports" },
-            { label: "Etkinlik", val: todayEv.length, color: "#a855f7", tab: "calendar" },
+            { label: t("dash.pending",lang), val: pending, color: "#3b82f6", tab: "tasks" },
+            { label: t("dash.overdue",lang), val: overdue, color: "#ef4444", tab: "tasks" },
+            { label: t("dash.kcal",lang), val: todayCalIn, color: "#f97316", tab: "sports" },
+            { label: t("dash.event",lang), val: todayEv.length, color: "#a855f7", tab: "calendar" },
           ].map(s => (
             <div key={s.label} onClick={() => setTab(s.tab)} style={{
               background: `linear-gradient(135deg,${s.color}18,${s.color}08)`,
@@ -497,7 +741,7 @@ function Dashboard({ data, setTab, update }) {
           value={quickTask}
           onChange={e => setQuickTask(e.target.value)}
           onKeyDown={e => e.key === "Enter" && addQuickTask()}
-          placeholder="Hızlı görev ekle..."
+          placeholder={t("dash.quickAdd",lang)}
           style={{
             ...inp, flex: 1, borderRadius: 14,
             border: "1px solid rgba(59,130,246,0.2)",
@@ -522,7 +766,7 @@ function Dashboard({ data, setTab, update }) {
         }}>
           <span style={{ fontSize: 18 }}>🚨</span>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: "#ef4444" }}>{overdue} gecikmiş görev!</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#ef4444" }}>{overdue} {t("dash.overdueWarn",lang)}</div>
             <div style={{ fontSize: 11, opacity: .5 }}>Hemen kontrol et</div>
           </div>
           <span style={{ fontSize: 14, opacity: .3 }}>▶</span>
@@ -590,9 +834,9 @@ function Dashboard({ data, setTab, update }) {
                       overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
                     }}>{item.title}</div>
                     <div style={{ fontSize: 10, opacity: .4, marginTop: 2 }}>
-                      {item.type === "task" ? "Görev" : "Etkinlik"}
+                      {item.type === "task" ? t("dash.task",lang) : t("dash.event",lang)}
                       {item.time && ` · ${item.time}`}
-                      {item.priority && ` · ${PRIORITIES[item.priority]}`}
+                      {item.priority && ` · ${getPriorities(lang)[item.priority]}`}
                     </div>
                   </div>
                   {item.type === "task" && !item.done && (
@@ -607,12 +851,12 @@ function Dashboard({ data, setTab, update }) {
 
       {/* ══ UPCOMING TASKS (not today, next 7 days) ══ */}
       {(() => {
-        const nextDays = allTasks.filter(x => !x.done && x.dueDate && x.dueDate > t && x.dueDate <= (() => { const d = new Date(); d.setDate(d.getDate() + 7); return d.toISOString().split("T")[0]; })());
+        const nextDays = allTasks.filter(x => !x.done && x.dueDate && x.dueDate > tdydy && x.dueDate <= (() => { const d = new Date(); d.setDate(d.getDate() + 7); return d.toISOString().split("T")[0]; })());
         if (nextDays.length === 0) return null;
         return (
           <div style={{ marginBottom: 14 }}>
             <div style={{ fontSize: 11, fontWeight: 700, opacity: .4, textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 8 }}>
-              Önümüzdeki 7 Gün ({nextDays.length} görev)
+              {t("dash.next7",lang)} ({nextDays.length} {t("dash.task",lang)})
             </div>
             {nextDays.sort((a, b) => a.dueDate.localeCompare(b.dueDate)).slice(0, 5).map(tk => (
               <div key={tk.id} onClick={() => toggleTask(tk.id)} style={{
@@ -628,8 +872,8 @@ function Dashboard({ data, setTab, update }) {
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 13, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{tk.title}</div>
                   <div style={{ fontSize: 10, opacity: .4, marginTop: 1 }}>
-                    {new Date(tk.dueDate).toLocaleDateString("tr-TR", { weekday: "short", day: "numeric", month: "short" })}
-                    {tk.priority && ` · ${PRIORITIES[tk.priority]}`}
+                    {new Date(tk.dueDate).toLocaleDateString(LOCALE_MAP[lang]||"tr-TR", { weekday: "short", day: "numeric", month: "short" })}
+                    {tk.priority && ` · ${getPriorities(lang)[tk.priority]}`}
                   </div>
                 </div>
               </div>
@@ -646,12 +890,12 @@ function Dashboard({ data, setTab, update }) {
 
       {/* ══ THIS WEEK STATS ══ */}
       <div style={{ marginBottom: 14 }}>
-        <div style={{ fontSize: 11, fontWeight: 700, opacity: .4, textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 8 }}>Bu Hafta</div>
+        <div style={{ fontSize: 11, fontWeight: 700, opacity: .4, textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 8 }}>{t("dash.thisWeek",lang)}</div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8 }}>
           {[
-            { val: wkSport.length, label: "Antrenman", color: "#3b82f6" },
-            { val: wkBurned, label: "kcal yakıldı", color: "#ef4444" },
-            { val: allTasks.filter(x => x.done).length, label: "Görev bitti", color: "#22c55e" },
+            { val: wkSport.length, label: t("dash.workout",lang), color: "#3b82f6" },
+            { val: wkBurned, label: t("dash.kcalBurned",lang), color: "#ef4444" },
+            { val: allTasks.filter(x => x.done).length, label: t("dash.tasksDone",lang), color: "#22c55e" },
           ].map((s, i) => (
             <div key={i} style={{
               background: "rgba(255,255,255,0.04)", backdropFilter: "blur(8px)",
@@ -667,7 +911,7 @@ function Dashboard({ data, setTab, update }) {
 
       {/* ══ KAFAMDAKILER ══ */}
       <div style={{ marginBottom: 14 }}>
-        <div style={{ fontSize: 11, fontWeight: 700, opacity: .4, textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 8 }}>☁️ Bugün Kafamı Kurcalayanlar</div>
+        <div style={{ fontSize: 11, fontWeight: 700, opacity: .4, textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 8 }}>☁️ {t("dash.thoughts",lang)}</div>
         <div style={{ background: "rgba(255,255,255,0.04)", backdropFilter: "blur(12px)", borderRadius: 16, padding: "12px 14px", border: "1px solid rgba(20,184,166,0.2)" }}>
           {[0, 1, 2].map(i => (
             <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: i < 2 ? 8 : 0 }}>
@@ -690,8 +934,8 @@ function Dashboard({ data, setTab, update }) {
       {/* ══ COMPACT NEWS ══ */}
       <div style={{ marginBottom: 14 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, opacity: .4, textTransform: "uppercase", letterSpacing: ".07em" }}>📰 Haberler</div>
-          <button onClick={() => setTab("projects")} style={{ background: "none", border: "none", color: "#ef4444", fontSize: 11, cursor: "pointer", fontWeight: 600 }}>Tümü ▶</button>
+          <div style={{ fontSize: 11, fontWeight: 700, opacity: .4, textTransform: "uppercase", letterSpacing: ".07em" }}>📰 {t("dash.news",lang)}</div>
+          <button onClick={() => setTab("projects")} style={{ background: "none", border: "none", color: "#ef4444", fontSize: 11, cursor: "pointer", fontWeight: 600 }}>{t("dash.allLabel",lang)}</button>
         </div>
         <div style={{ background: "rgba(239,68,68,0.05)", borderRadius: 14, padding: "10px 14px", border: "1px solid rgba(239,68,68,0.12)" }}>
           {headlines.length === 0 ? (
@@ -714,7 +958,7 @@ function Dashboard({ data, setTab, update }) {
       {musicItems.length > 0 && (
         <div style={{ marginBottom: 14 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, opacity: .4, textTransform: "uppercase", letterSpacing: ".07em" }}>🎵 Müzik</div>
+            <div style={{ fontSize: 11, fontWeight: 700, opacity: .4, textTransform: "uppercase", letterSpacing: ".07em" }}>🎵 {t("dash.music",lang)}</div>
             <button onClick={() => setTab("projects")} style={{ background: "none", border: "none", color: "#a855f7", fontSize: 11, cursor: "pointer", fontWeight: 600 }}>Tümü ▶</button>
           </div>
           <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 4, WebkitOverflowScrolling: "touch" }}>
@@ -737,7 +981,7 @@ function Dashboard({ data, setTab, update }) {
       {data.notes.length > 0 && (
         <div>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, opacity: .4, textTransform: "uppercase", letterSpacing: ".07em" }}>Son Notlar</div>
+            <div style={{ fontSize: 11, fontWeight: 700, opacity: .4, textTransform: "uppercase", letterSpacing: ".07em" }}>{t("dash.recentNotes",lang)}</div>
             <button onClick={() => setTab("notes")} style={{ background: "none", border: "none", color: "#3b82f6", fontSize: 11, cursor: "pointer", fontWeight: 600 }}>Tümü ▶</button>
           </div>
           <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 4, WebkitOverflowScrolling: "touch" }}>
@@ -759,7 +1003,7 @@ function Dashboard({ data, setTab, update }) {
 }
 
 /* ═══════════ TASKS ═══════════ */
-function Tasks({ data, update }) {
+function Tasks({ data, update, lang="tr" }) {
   const [modal,setModal]=useState(false);
   const [filter,setFilter]=useState("all");
   const [editingId,setEditingId]=useState(null);
@@ -786,24 +1030,24 @@ function Tasks({ data, update }) {
   const toggle=id=>update({...data,tasks:data.tasks.map(t=>t.id===id?{...t,done:!t.done}:t)});
   const del=id=>{update({...data,tasks:data.tasks.filter(t=>t.id!==id)});setDetail(null);};
 
-  const t = today();
+  const tdy = today();
   const tomorrow = ()=>{ const d=new Date(); d.setDate(d.getDate()+1); return d.toISOString().split("T")[0]; };
   const nextWeek = ()=>{ const d=new Date(); d.setDate(d.getDate()+7); return d.toISOString().split("T")[0]; };
   const nextMonth = ()=>{ const d=new Date(); d.setMonth(d.getMonth()+1); return d.toISOString().split("T")[0]; };
   const weekEnd = nextWeek();
 
   const quickDates = [
-    {label:"Bugün",val:t,icon:"📌"},
-    {label:"Yarın",val:tomorrow(),icon:"⏭"},
+    {label:t("tasks.today",lang),val:tdy,icon:"📌"},
+    {label:t("tasks.tomorrow",lang),val:tomorrow(),icon:"⏭"},
     {label:"1 Hafta",val:weekEnd,icon:"📅"},
     {label:"1 Ay",val:nextMonth(),icon:"🗓"},
   ];
 
   const formatDate = (d) => {
     if(!d) return "";
-    if(d===t) return "Bugün";
-    if(d===tomorrow()) return "Yarın";
-    return new Date(d).toLocaleDateString("tr-TR",{day:"numeric",month:"short"});
+    if(d===tdy) return t("tasks.today",lang);
+    if(d===tomorrow()) return t("tasks.tomorrow",lang);
+    return new Date(d).toLocaleDateString(LOCALE_MAP[lang]||"tr-TR",{day:"numeric",month:"short"});
   };
 
   const pending = data.tasks.filter(x=>!x.done).length;
@@ -812,16 +1056,16 @@ function Tasks({ data, update }) {
     if(filter==="done")return task.done;
     if(filter==="pending")return !task.done;
     if(filter==="high")return task.priority==="high"&&!task.done;
-    if(filter==="overdue")return !task.done && task.dueDate && task.dueDate < t;
+    if(filter==="overdue")return !task.done && task.dueDate && task.dueDate < tdy;
     return true;
   });
 
   const groups = filter==="all" ? [
-    {key:"overdue",label:"Gecikmiş",color:"#ef4444",tasks:list.filter(x=>!x.done&&x.dueDate&&x.dueDate<t)},
-    {key:"today",label:"Bugün",color:"#3b82f6",tasks:list.filter(x=>!x.done&&x.dueDate===t)},
-    {key:"week",label:"Bu Hafta",color:"#a855f7",tasks:list.filter(x=>!x.done&&x.dueDate&&x.dueDate>t&&x.dueDate<=weekEnd)},
-    {key:"pending",label:"Bekleyen",color:"#888",tasks:list.filter(x=>!x.done&&(!x.dueDate||x.dueDate>weekEnd))},
-    {key:"done",label:"Tamamlanan",color:"#22c55e",tasks:list.filter(x=>x.done)},
+    {key:"overdue",label:t("tasks.overdueGrp",lang),color:"#ef4444",tasks:list.filter(x=>!x.done&&x.dueDate&&x.dueDate<t)},
+    {key:"today",label:t("tasks.today",lang),color:"#3b82f6",tasks:list.filter(x=>!x.done&&x.dueDate===t)},
+    {key:"week",label:t("tasks.weekGrp",lang),color:"#a855f7",tasks:list.filter(x=>!x.done&&x.dueDate&&x.dueDate>t&&x.dueDate<=weekEnd)},
+    {key:"pending",label:t("tasks.pendingGrp",lang),color:"#888",tasks:list.filter(x=>!x.done&&(!x.dueDate||x.dueDate>weekEnd))},
+    {key:"done",label:t("tasks.doneGrp",lang),color:"#22c55e",tasks:list.filter(x=>x.done)},
   ].filter(g=>g.tasks.length>0) : null;
 
   const TaskCard = ({ task }) => (
@@ -833,7 +1077,7 @@ function Tasks({ data, update }) {
       <div style={{flex:1,minWidth:0,cursor:"pointer"}} onClick={()=>setDetail(detail===task.id?null:task.id)}>
         <div style={{fontSize:15,fontWeight:600,textDecoration:task.done?"line-through":"none",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{task.title}</div>
         <div style={{display:"flex",gap:6,marginTop:4,flexWrap:"wrap",alignItems:"center"}}>
-          {task.priority&&<span style={{background:`${PCOL[task.priority]}20`,color:PCOL[task.priority],padding:"2px 8px",borderRadius:6,fontSize:11,fontWeight:600}}>{PRIORITIES[task.priority]}</span>}
+          {task.priority&&<span style={{background:`${PCOL[task.priority]}20`,color:PCOL[task.priority],padding:"2px 8px",borderRadius:6,fontSize:11,fontWeight:600}}>{getPriorities(lang)[task.priority]}</span>}
           {task.category&&<span style={{background:"rgba(59,130,246,0.12)",color:"#3b82f6",padding:"2px 8px",borderRadius:6,fontSize:11}}>{task.category}</span>}
           {task.dueDate&&<span style={{fontSize:11,color:!task.done&&task.dueDate<t?"#ef4444":"#666"}}>{formatDate(task.dueDate)}</span>}
         </div>
@@ -850,7 +1094,7 @@ function Tasks({ data, update }) {
           <span style={{fontSize:12,opacity:.4,fontWeight:500}}>{pending} bekliyor</span>
         </div>
         <div style={{display:"flex",gap:6,overflowX:"auto",paddingBottom:2,WebkitOverflowScrolling:"touch"}}>
-          {[["all","Tümü"],["pending","Bekleyen"],["done","Bitti"],["high","Öncelikli"],["overdue","Gecikmiş"]].map(([k,v])=>(
+          {[["all",t("tasks.all",lang)],["pending",t("tasks.pending",lang)],["done",t("tasks.done",lang)],["high",t("tasks.priority",lang)],["overdue",t("tasks.overdue",lang)]].map(([k,v])=>(
             <button key={k} onClick={()=>setFilter(k)} style={filterBtnStyle(filter===k)}>{v}</button>
           ))}
         </div>
@@ -891,7 +1135,7 @@ function Tasks({ data, update }) {
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
               <h4 style={{margin:0,fontSize:16,fontWeight:700}}>{task.title}</h4>
               <div style={{display:"flex",gap:6}}>
-                <button onClick={()=>openEdit(task)} style={{background:"rgba(59,130,246,0.15)",color:"#3b82f6",border:"none",borderRadius:8,padding:"6px 12px",fontSize:12,cursor:"pointer",fontWeight:600}}>Düzenle</button>
+                <button onClick={()=>openEdit(task)} style={{background:"rgba(59,130,246,0.15)",color:"#3b82f6",border:"none",borderRadius:8,padding:"6px 12px",fontSize:12,cursor:"pointer",fontWeight:600}}>{t("tasks.editBtn",lang)}</button>
                 <button onClick={()=>setDetail(null)} style={{background:"rgba(255,255,255,0.06)",color:"#888",border:"none",borderRadius:8,padding:"6px 10px",fontSize:14,cursor:"pointer"}}>✕</button>
               </div>
             </div>
@@ -899,7 +1143,7 @@ function Tasks({ data, update }) {
             <div style={{display:"flex",flexWrap:"wrap",gap:8,fontSize:12,opacity:.6}}>
               {task.category&&<span>🏷 {task.category}</span>}
               {task.dueDate&&<span style={{color:!task.done&&task.dueDate<today()?"#ef4444":"inherit"}}>📅 {task.dueDate}</span>}
-              <span>⚡ {PRIORITIES[task.priority]}</span>
+              <span>⚡ {getPriorities(lang)[task.priority]}</span>
               <span>{task.done?"✅ Tamamlandı":"⏳ Bekliyor"}</span>
             </div>
           </div>
@@ -908,9 +1152,9 @@ function Tasks({ data, update }) {
 
       <FAB onClick={openNew}/>
 
-      <Modal open={modal} onClose={()=>{setModal(false);setEditingId(null);}} title={editingId?"Görevi Düzenle":"Yeni Görev"}>
-        <input style={inp} placeholder="Görev başlığı..." value={form.title} onChange={e=>setForm({...form,title:e.target.value})} autoFocus/>
-        <textarea style={{...inp,minHeight:80,resize:"vertical",fontFamily:"inherit",lineHeight:1.5}} placeholder="Açıklama (opsiyonel)..." value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/>
+      <Modal open={modal} onClose={()=>{setModal(false);setEditingId(null);}} title={editingId?t("tasks.edit",lang):t("tasks.new",lang)}>
+        <input style={inp} placeholder={t("tasks.title",lang)} value={form.title} onChange={e=>setForm({...form,title:e.target.value})} autoFocus/>
+        <textarea style={{...inp,minHeight:80,resize:"vertical",fontFamily:"inherit",lineHeight:1.5}} placeholder={t("common.descOpt",lang)} value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/>
         <input style={inp} placeholder="Kategori (opsiyonel)" value={form.category} onChange={e=>setForm({...form,category:e.target.value})}/>
         <div style={{marginBottom:10}}>
           <div style={{fontSize:12,opacity:.5,marginBottom:6}}>Tarih seç:</div>
@@ -949,7 +1193,7 @@ function Tasks({ data, update }) {
             ))}
           </div>
         </div>
-        <button style={btnPrimary} onClick={save}>{editingId?"Kaydet":"Ekle"}</button>
+        <button style={btnPrimary} onClick={save}>{editingId?t("tasks.save",lang):t("tasks.add",lang)}</button>
         {editingId&&<button onClick={()=>{del(editingId);setModal(false);setEditingId(null);}} style={{...btnPrimary,background:"#ef4444",marginTop:8}}>Görevi Sil</button>}
       </Modal>
     </div>
@@ -957,7 +1201,7 @@ function Tasks({ data, update }) {
 }
 
 /* ═══════════ CALENDAR ═══════════ */
-function CalendarView({ data, update }) {
+function CalendarView({ data, update, lang="tr" }) {
   const [vd,setVd]=useState(new Date());
   const [modal,setModal]=useState(false);
   const [selDay,setSelDay]=useState(null);
@@ -988,7 +1232,7 @@ function CalendarView({ data, update }) {
     });
   };
 
-  const t = today();
+  const tdy = today();
 
   const add=()=>{
     if(!form.title.trim()||!form.date)return;
@@ -1038,7 +1282,7 @@ function CalendarView({ data, update }) {
         <div style={{background:"rgba(255,255,255,0.04)",borderRadius:14,padding:16,marginTop:12}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
             <h4 style={{margin:0,fontSize:15,fontWeight:700}}>{selDay} {MN[m]}</h4>
-            <button onClick={openAdd} style={{background:"rgba(59,130,246,0.15)",color:"#3b82f6",border:"none",borderRadius:8,padding:"6px 14px",fontSize:12,cursor:"pointer",fontWeight:600}}>+ Ekle</button>
+            <button onClick={openAdd} style={{background:"rgba(59,130,246,0.15)",color:"#3b82f6",border:"none",borderRadius:8,padding:"6px 14px",fontSize:12,cursor:"pointer",fontWeight:600}}>{t("cal.add",lang)}</button>
           </div>
           {evOn(selDay).length===0&&<p style={{opacity:.3,fontSize:13,margin:0}}>Etkinlik yok</p>}
           {evOn(selDay).map((e,idx)=>(
@@ -1056,7 +1300,7 @@ function CalendarView({ data, update }) {
       )}
       {/* Upcoming events list */}
       {(() => {
-        const upEv = data.events.filter(e=>e.date>=t).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,8);
+        const upEv = data.events.filter(e=>e.date>=tdy).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,8);
         if(upEv.length===0) return null;
         return (
           <div style={{marginBottom:14}}>
@@ -1086,8 +1330,8 @@ function CalendarView({ data, update }) {
         <input style={inp} placeholder="Açıklama (opsiyonel)" value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/>
         <select style={inp} value={form.recurring} onChange={e=>setForm({...form,recurring:e.target.value})}>
           <option value="none">Tekrarlama yok</option>
-          <option value="daily">Her gün</option>
-          <option value="weekly">Her hafta</option>
+          <option value="daily">{t("cal.daily",lang)}</option>
+          <option value="weekly">{t("cal.weekly",lang)}</option>
           <option value="monthly">Her ay</option>
         </select>
         <div style={{display:"flex",gap:8,marginBottom:14}}>
@@ -1103,7 +1347,7 @@ function CalendarView({ data, update }) {
 
 /* ═══════════ SPORTS ═══════════ */
 /* ═══════════ SAĞLIK (Health Coach) ═══════════ */
-function Sports({ data, update }) {
+function Sports({ data, update, lang="tr" }) {
   const [view,setView]=useState("overview"); // overview, sport, food
   const [modal,setModal]=useState(false);
   const [foodModal,setFoodModal]=useState(false);
@@ -1272,9 +1516,9 @@ function Sports({ data, update }) {
   const burnedCal=wk.reduce((a,s)=>a+(s.calories||0),0);
   const tDist=wk.reduce((a,s)=>a+(s.distance||0),0);
 
-  const todayFoods=foods.filter(f=>f.date===t);
+  const todayFoods=foods.filter(f=>f.date===tdydy);
   const todayCalIn=todayFoods.reduce((a,f)=>a+(f.calories||0),0);
-  const todaySports=data.sports.filter(s=>s.date===t);
+  const todaySports=data.sports.filter(s=>s.date===tdydy);
   const todayCalOut=todaySports.reduce((a,s)=>a+(s.calories||0),0);
   const dailyGoal=2000;
   const netCal=todayCalIn-todayCalOut;
@@ -1303,7 +1547,7 @@ function Sports({ data, update }) {
       ].slice(0,12);
   const noResults = foodSearch && filteredFoods.length === 0;
 
-  const mealGroups = ["Kahvaltı","Öğle","Akşam","Atıştırma"];
+  const mealGroups = [t("sport.breakfast",lang),t("sport.lunch",lang),t("sport.dinner",lang),t("sport.snack",lang)];
 
   return (
     <div>
@@ -1360,10 +1604,10 @@ function Sports({ data, update }) {
         {/* Weekly stats */}
         <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:8,marginBottom:14}}>
           {[
-            {icon:"⏱",val:`${tMin} dk`,label:"Haftalık Spor",color:"#3b82f6"},
+            {icon:"⏱",val:`${tMin} dk`,label:t("sport.weeklySport",lang),color:"#3b82f6"},
             {icon:"🔥",val:`${burnedCal}`,label:"Yakılan kcal",color:"#ef4444"},
             {icon:"📏",val:`${tDist.toFixed(1)} km`,label:"Mesafe",color:"#22c55e"},
-            {icon:"💪",val:wk.length,label:"Antrenman",color:"#f97316"},
+            {icon:"💪",val:wk.length,label:t("dash.workout",lang),color:"#f97316"},
           ].map((s,i)=>(
             <div key={i} style={{...cardStyle,padding:"14px",borderLeft:`3px solid ${s.color}`,boxShadow:`0 0 16px ${s.color}18`}}>
               <div style={{fontSize:11,opacity:.5}}>{s.icon} {s.label}</div>
@@ -1474,7 +1718,7 @@ function Sports({ data, update }) {
       {view==="food"&&<FAB onClick={()=>setFoodModal(true)} color="#f97316"/>}
 
       {/* Sport Modal */}
-      <Modal open={modal} onClose={()=>setModal(false)} title="Yeni Antrenman">
+      <Modal open={modal} onClose={()=>setModal(false)} title={t("sport.new",lang)}>
         <div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:12}}>
           {SPORT_TYPES.map(t=>(
             <button key={t} onClick={()=>setForm({...form,type:t})} style={{
@@ -1491,7 +1735,7 @@ function Sports({ data, update }) {
         </div>
         <div style={{display:"flex",gap:8}}>
           <div style={{flex:1,position:"relative"}}>
-            <input style={inp} type="number" placeholder="Yakılan kalori (opsiyonel)" value={form.calories} onChange={e=>setForm({...form,calories:e.target.value})}/>
+            <input style={inp} type="number" placeholder={t("sport.calOpt",lang)} value={form.calories} onChange={e=>setForm({...form,calories:e.target.value})}/>
             {form.duration&&!form.calories&&(
               <div style={{fontSize:11,color:"#22c55e",marginTop:-8,marginBottom:8,paddingLeft:4,opacity:.8}}>
                 ≈ {calcSportCal(form.type,form.duration)} kcal otomatik hesaplanacak
@@ -1500,12 +1744,12 @@ function Sports({ data, update }) {
           </div>
           <input style={{...inp,flex:1}} type="date" value={form.date} onChange={e=>setForm({...form,date:e.target.value})}/>
         </div>
-        <input style={inp} placeholder="Notlar (opsiyonel)" value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})}/>
+        <input style={inp} placeholder={t("common.descOpt",lang)} value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})}/>
         <button style={btnPrimary} onClick={addSport}>Kaydet</button>
       </Modal>
 
       {/* Food Modal */}
-      <Modal open={foodModal} onClose={()=>{setFoodModal(false);setFoodSearch("");setAiLookup(false);}} title="Yemek Ekle">
+      <Modal open={foodModal} onClose={()=>{setFoodModal(false);setFoodSearch("");setAiLookup(false);}} title={t("sport.addFood",lang)}>
         <div style={{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap"}}>
           {mealGroups.map(m=>(
             <button key={m} onClick={()=>setFoodForm({...foodForm,meal:m})} style={{
@@ -2501,7 +2745,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
 }
 
 /* ═══════════ TARZIM ═══════════ */
-function Projects({ data, update }) {
+function Projects({ data, update, lang="tr" }) {
   const [activeRoom,setActiveRoom]=useState(null);
   const [modal,setModal]=useState(false);
   const [roomModal,setRoomModal]=useState(false);
@@ -2512,7 +2756,7 @@ function Projects({ data, update }) {
   const [exp,setExp]=useState(null);
   const [tf,setTf]=useState({title:""});
 
-  const rooms = data.rooms || [...DEFAULT_ROOMS];
+  const rooms = data.rooms || [...getDefaultRooms(lang)];
   const roomItems = data.roomItems || {};
 
   const addRoom=()=>{
@@ -2630,7 +2874,7 @@ function Projects({ data, update }) {
           <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{room.name}</h3>
         </div>
       </StickyHeader>
-      {data.projects.length===0&&<p style={{textAlign:"center",opacity:.3,fontSize:14,padding:40}}>Henüz proje yok</p>}
+      {data.projects.length===0&&<p style={{textAlign:"center",opacity:.3,fontSize:14,padding:40}}>{t("proj.noProjects",lang)}</p>}
       {data.projects.map(p=>{
         const tasks=p.tasks||[];const d=tasks.filter(t=>t.done).length;
         const pct=tasks.length?Math.round(d/tasks.length*100):0;const open=exp===p.id;
@@ -2657,30 +2901,30 @@ function Projects({ data, update }) {
             {open&&(<div style={{marginTop:12,paddingTop:12,borderTop:"1px solid rgba(255,255,255,0.06)"}}>
               {p.description&&<p style={{fontSize:13,opacity:.6,margin:"0 0 10px"}}>{p.description}</p>}
               <div style={{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap"}}>
-                {PROJECT_STATUSES.map(s=>(<button key={s} onClick={()=>upSt(p.id,s)} style={{background:p.status===s?`${stCol(s)}20`:"rgba(255,255,255,0.04)",color:p.status===s?stCol(s):"#888",border:`1px solid ${p.status===s?stCol(s)+"40":"rgba(255,255,255,0.06)"}`,padding:"7px 14px",borderRadius:8,fontSize:12,cursor:"pointer"}}>{s}</button>))}
+                {PROJECT_STATUSES.map(s=>(<button key={s} onClick={()=>upSt(p.id,s)} style={{background:p.status===s?`${stCol(s)}20`:"rgba(255,255,255,0.04)",color:p.status===s?stCol(s):"#888",border:`1px solid ${p.status===s?stCol(s)+"40":"rgba(255,255,255,0.06)"}`,padding:"7px 14px",borderRadius:8,fontSize:12,cursor:"pointer"}}>{statusDisplay(s,lang)}</button>))}
               </div>
               {tasks.map(t=>(<div key={t.id} style={{display:"flex",alignItems:"center",gap:10,padding:"7px 0"}}>
                 <button onClick={()=>togPT(p.id,t.id)} style={checkBtnStyle(t.done)}>{t.done&&"✓"}</button>
                 <span style={{fontSize:13,textDecoration:t.done?"line-through":"none",opacity:t.done?.4:1}}>{t.title}</span>
               </div>))}
               <div style={{display:"flex",gap:8,marginTop:10}}>
-                <input style={{...inp,flex:1,marginBottom:0}} placeholder="Alt görev ekle..." value={tf.title} onChange={e=>setTf({title:e.target.value})} onKeyDown={e=>e.key==="Enter"&&addPT(p.id)}/>
+                <input style={{...inp,flex:1,marginBottom:0}} placeholder={t("proj.addSub",lang)} value={tf.title} onChange={e=>setTf({title:e.target.value})} onKeyDown={e=>e.key==="Enter"&&addPT(p.id)}/>
                 <button onClick={()=>addPT(p.id)} style={{background:"#3b82f6",color:"#fff",border:"none",borderRadius:10,padding:"0 18px",fontSize:18,cursor:"pointer"}}>+</button>
               </div>
-              <button onClick={()=>delProject(p.id)} style={{background:"rgba(239,68,68,0.1)",color:"#ef4444",border:"1px solid rgba(239,68,68,0.2)",borderRadius:10,padding:"10px",width:"100%",marginTop:12,fontSize:13,cursor:"pointer"}}>Projeyi Sil</button>
+              <button onClick={()=>delProject(p.id)} style={{background:"rgba(239,68,68,0.1)",color:"#ef4444",border:"1px solid rgba(239,68,68,0.2)",borderRadius:10,padding:"10px",width:"100%",marginTop:12,fontSize:13,cursor:"pointer"}}>{t("proj.delete",lang)}</button>
             </div>)}
           </div>
         );
       })}
       <FAB onClick={()=>setModal(true)}/>
-      <Modal open={modal} onClose={()=>setModal(false)} title="Yeni Proje">
-        <input style={inp} placeholder="Proje adı..." value={form.name} onChange={e=>setForm({...form,name:e.target.value})} autoFocus/>
-        <input style={inp} placeholder="Açıklama..." value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/>
+      <Modal open={modal} onClose={()=>setModal(false)} title={t("proj.new",lang)}>
+        <input style={inp} placeholder={t("proj.new",lang)} value={form.name} onChange={e=>setForm({...form,name:e.target.value})} autoFocus/>
+        <input style={inp} placeholder={t("common.descOpt",lang)} value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/>
         <div style={{display:"flex",gap:8}}>
-          <select style={{...inp,flex:1}} value={form.status} onChange={e=>setForm({...form,status:e.target.value})}>{PROJECT_STATUSES.map(s=><option key={s}>{s}</option>)}</select>
+          <select style={{...inp,flex:1}} value={form.status} onChange={e=>setForm({...form,status:e.target.value})}>{PROJECT_STATUSES.map(s=><option key={s} value={s}>{statusDisplay(s,lang)}</option>)}</select>
           <input style={{...inp,flex:1}} type="date" value={form.deadline} onChange={e=>setForm({...form,deadline:e.target.value})}/>
         </div>
-        <input style={inp} placeholder="Etiketler (virgülle ayırın)" value={form.tags} onChange={e=>setForm({...form,tags:e.target.value})}/>
+        <input style={inp} placeholder={t("common.descOpt",lang)} value={form.tags} onChange={e=>setForm({...form,tags:e.target.value})}/>
         <button style={btnPrimary} onClick={addProject}>Oluştur</button>
       </Modal>
     </div>
@@ -2736,7 +2980,7 @@ function Projects({ data, update }) {
 }
 
 /* ═══════════ NOTES ═══════════ */
-function Notes({ data, update }) {
+function Notes({ data, update, lang="tr" }) {
   const [modal,setModal]=useState(false);
   const [editing,setEditing]=useState(null);
   const [form,setForm]=useState({title:"",content:"",color:"#3b82f6"});
@@ -2774,7 +3018,7 @@ function Notes({ data, update }) {
         {filtered.length===0&&(
           <div style={{gridColumn:"1/-1",textAlign:"center",padding:"40px 20px"}}>
             <div style={{fontSize:40,marginBottom:8}}>📝</div>
-            <div style={{fontSize:14,fontWeight:600,opacity:.4,marginBottom:4}}>{data.notes.length===0?"Henüz not yok":"Arama sonucu bulunamadı"}</div>
+            <div style={{fontSize:14,fontWeight:600,opacity:.4,marginBottom:4}}>{data.notes.length===0?t("notes.noNotes",lang):t("notes.noResult",lang)}</div>
             {data.notes.length===0&&<div style={{fontSize:12,opacity:.25}}>+ butonuna basarak ilk notunu yaz</div>}
           </div>
         )}
@@ -2790,7 +3034,7 @@ function Notes({ data, update }) {
         ))}
       </div>
       <FAB onClick={()=>{setEditing(null);setForm({title:"",content:"",color:"#3b82f6"});setModal(true);}} color="#14b8a6"/>
-      <Modal open={modal} onClose={()=>{setModal(false);setEditing(null);}} title={editing?"Notu Düzenle":"Yeni Not"}>
+      <Modal open={modal} onClose={()=>{setModal(false);setEditing(null);}} title={editing?t("notes.edit",lang):t("notes.new",lang)}>
         <input style={inp} placeholder="Başlık..." value={form.title} onChange={e=>setForm({...form,title:e.target.value})} autoFocus/>
         <textarea style={{...inp,minHeight:140,resize:"vertical",fontFamily:"inherit",lineHeight:1.5}} placeholder="İçerik yazın..." value={form.content} onChange={e=>setForm({...form,content:e.target.value})}/>
         <div style={{display:"flex",gap:8,marginBottom:14}}>
@@ -2798,14 +3042,14 @@ function Notes({ data, update }) {
             <button key={c} onClick={()=>setForm({...form,color:c})} style={{width:30,height:30,borderRadius:"50%",background:c,border:form.color===c?"3px solid #fff":"3px solid transparent",cursor:"pointer"}}/>
           ))}
         </div>
-        <button style={btnPrimary} onClick={save2}>{editing?"Güncelle":"Kaydet"}</button>
+        <button style={btnPrimary} onClick={save2}>{editing?t("notes.update",lang):t("common.save",lang)}</button>
       </Modal>
     </div>
   );
 }
 
 /* ═══════════ SETTINGS ═══════════ */
-function Settings({ data, update, onImport, user, onLogout }) {
+function Settings({ data, update, onImport, user, onLogout, lang="tr", setLang }) {
   const fileRef = useRef(null);
   const [notifStatus, setNotifStatus] = useState(getNotificationPermission());
   const [importing, setImporting] = useState(false);
@@ -2821,7 +3065,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
 
   const handleExport = () => {
     exportData();
-    setMsg("Yedek dosyası indirildi!");
+    setMsg(t("set.backupDone",lang));
     setTimeout(() => setMsg(""), 2000);
   };
 
@@ -2832,19 +3076,19 @@ function Settings({ data, update, onImport, user, onLogout }) {
     try {
       const imported = await importData(file);
       onImport(imported);
-      setMsg("Veriler başarıyla aktarıldı!");
+      setMsg(t("set.importDone",lang));
     } catch (err) {
-      setMsg("Hata: " + err.message);
+      setMsg(t("common.error",lang) + ": " + err.message);
     }
     setImporting(false);
     setTimeout(() => setMsg(""), 3000);
   };
 
   const clearAll = () => {
-    if (confirm("Tüm veriler silinecek. Emin misiniz?")) {
+    if (confirm(t("set.confirmDel",lang))) {
       const empty = { tasks: [], events: [], sports: [], projects: [], notes: [], settings: data.settings };
       update(empty);
-      setMsg("Tüm veriler silindi");
+      setMsg(t("set.deleted",lang));
       setTimeout(() => setMsg(""), 2000);
     }
   };
@@ -2858,14 +3102,14 @@ function Settings({ data, update, onImport, user, onLogout }) {
   return (
     <div>
       <StickyHeader>
-        <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Ayarlar</h3>
+        <h3 style={{margin:0,fontSize:20,fontWeight:800}}>{t("set.title",lang)}</h3>
       </StickyHeader>
 
       {msg && <div style={{background:"rgba(59,130,246,0.15)",border:"1px solid rgba(59,130,246,0.3)",borderRadius:12,padding:"10px 14px",marginBottom:12,fontSize:13,color:"#3b82f6"}}>{msg}</div>}
 
       {/* User info */}
       <div style={{background:"rgba(255,255,255,0.04)",borderRadius:14,padding:16,marginBottom:12}}>
-        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>👤 Hesap</h4>
+        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>👤 {t("set.account",lang)}</h4>
         {user ? (
           <div>
             <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
@@ -2883,55 +3127,77 @@ function Settings({ data, update, onImport, user, onLogout }) {
             </div>
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
               <span style={{width:8,height:8,borderRadius:"50%",background:"#22c55e"}}/>
-              <span style={{fontSize:12,color:"#22c55e"}}>Bulut senkronizasyon aktif</span>
+              <span style={{fontSize:12,color:"#22c55e"}}>{t("set.cloudSync",lang)}</span>
             </div>
-            <p style={{fontSize:11,opacity:.4,margin:"0 0 12px"}}>Veriler tüm cihazlarında otomatik senkronize edilir</p>
+            <p style={{fontSize:11,opacity:.4,margin:"0 0 12px"}}>{t("set.syncDesc",lang)}</p>
             <button onClick={onLogout} style={{...btnPrimary,marginTop:0,background:"rgba(239,68,68,0.15)",color:"#ef4444",border:"1px solid rgba(239,68,68,0.2)"}}>
-              Çıkış Yap
+              {t("set.logout",lang)}
             </button>
           </div>
         ) : (
           <div>
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
               <span style={{width:8,height:8,borderRadius:"50%",background:"#f59e0b"}}/>
-              <span style={{fontSize:12,color:"#f59e0b"}}>Misafir modu</span>
+              <span style={{fontSize:12,color:"#f59e0b"}}>{t("set.guest",lang)}</span>
             </div>
-            <p style={{fontSize:11,opacity:.4,margin:"0 0 12px"}}>Veriler sadece bu cihazda saklanıyor. Giriş yaparak tüm cihazlarında senkronize edebilirsin.</p>
+            <p style={{fontSize:11,opacity:.4,margin:"0 0 12px"}}>{t("set.guestDesc",lang)}</p>
             <button onClick={onLogout} style={{...btnPrimary,marginTop:0,background:"#3b82f6"}}>
-              Giriş Yap / Kayıt Ol
+              {t("set.loginOrReg",lang)}
             </button>
           </div>
         )}
       </div>
 
+      {/* Language selector */}
+      <div style={{background:"rgba(255,255,255,0.04)",borderRadius:14,padding:16,marginBottom:12}}>
+        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>🌍 {t("set.language",lang)}</h4>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:6}}>
+          {LANGUAGES.map(l => {
+            const active = lang === l.code;
+            return (
+              <div key={l.code} onClick={() => setLang(l.code)} style={{
+                background: active ? "rgba(99,102,241,0.15)" : "rgba(255,255,255,0.03)",
+                border: active ? "1px solid rgba(99,102,241,0.4)" : "1px solid rgba(255,255,255,0.06)",
+                borderRadius: 12, padding: "10px 4px", textAlign: "center", cursor: "pointer",
+                transition: "all .2s",
+                boxShadow: active ? "0 0 16px rgba(99,102,241,0.15)" : "none",
+              }}>
+                <div style={{fontSize:22,marginBottom:4}}>{l.flag}</div>
+                <div style={{fontSize:10,fontWeight:active?700:500,color:active?"#818cf8":"#999",letterSpacing:".02em"}}>{l.code.toUpperCase()}</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Notifications */}
       <div style={{background:"rgba(255,255,255,0.04)",borderRadius:14,padding:16,marginBottom:12}}>
-        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>🔔 Bildirimler</h4>
+        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>🔔 {t("set.notif",lang)}</h4>
         {!isNotificationSupported() ? (
-          <p style={{fontSize:13,opacity:.5}}>Bu tarayıcı bildirimleri desteklemiyor</p>
+          <p style={{fontSize:13,opacity:.5}}>{t("set.notifNoSupp",lang)}</p>
         ) : notifStatus === "granted" ? (
           <div>
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
               <span style={{width:10,height:10,borderRadius:"50%",background:"#22c55e"}}/>
-              <span style={{fontSize:13,color:"#22c55e"}}>Bildirimler aktif</span>
+              <span style={{fontSize:13,color:"#22c55e"}}>{t("set.notifActive",lang)}</span>
             </div>
-            <p style={{fontSize:12,opacity:.5,margin:0}}>Etkinlik ve görev hatırlatmaları otomatik olarak gönderilecek</p>
+            <p style={{fontSize:12,opacity:.5,margin:0}}>{t("set.notifDesc",lang)}</p>
           </div>
         ) : notifStatus === "denied" ? (
-          <p style={{fontSize:13,color:"#ef4444"}}>Bildirimler engellendi. Tarayıcı ayarlarından izin verin.</p>
+          <p style={{fontSize:13,color:"#ef4444"}}>{t("set.notifDenied",lang)}</p>
         ) : (
-          <button onClick={enableNotif} style={{...btnPrimary,marginTop:0,background:"#22c55e"}}>Bildirimleri Aç</button>
+          <button onClick={enableNotif} style={{...btnPrimary,marginTop:0,background:"#22c55e"}}>{t("set.notifEnable",lang)}</button>
         )}
       </div>
 
       {/* Data Stats */}
       <div style={{background:"rgba(255,255,255,0.04)",borderRadius:14,padding:16,marginBottom:12}}>
-        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>📊 Veri Özeti</h4>
+        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>📊 {t("set.dataSummary",lang)}</h4>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
           {[
-            {l:"Görev",v:taskCount},{l:"Etkinlik",v:eventCount},
-            {l:"Spor Kaydı",v:sportCount},{l:"Proje",v:projectCount},
-            {l:"Not",v:noteCount},{l:"Toplam",v:taskCount+eventCount+sportCount+projectCount+noteCount},
+            {l:t("set.taskLabel",lang),v:taskCount},{l:t("set.eventLabel",lang),v:eventCount},
+            {l:t("set.sportLabel",lang),v:sportCount},{l:t("set.projectLabel",lang),v:projectCount},
+            {l:t("set.noteLabel",lang),v:noteCount},{l:t("set.totalLabel",lang),v:taskCount+eventCount+sportCount+projectCount+noteCount},
           ].map((s,i)=>(
             <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"6px 0",borderBottom:"1px solid rgba(255,255,255,0.04)"}}>
               <span style={{fontSize:13,opacity:.6}}>{s.l}</span>
@@ -2943,26 +3209,26 @@ function Settings({ data, update, onImport, user, onLogout }) {
 
       {/* Import / Export */}
       <div style={{background:"rgba(255,255,255,0.04)",borderRadius:14,padding:16,marginBottom:12}}>
-        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>💾 Veri Yönetimi</h4>
-        <p style={{fontSize:12,opacity:.5,margin:"0 0 12px"}}>Bilgisayarınızdan veri aktarabilir veya yedeğinizi indirebilirsiniz</p>
+        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>💾 {t("set.dataManage",lang)}</h4>
+        <p style={{fontSize:12,opacity:.5,margin:"0 0 12px"}}>{t("set.dataDesc",lang)}</p>
         <button onClick={handleExport} style={{...btnPrimary,marginTop:0,marginBottom:8,background:"#14b8a6"}}>
-          📥 Yedek İndir (JSON)
+          📥 {t("set.backup",lang)}
         </button>
         <button onClick={()=>fileRef.current?.click()} disabled={importing} style={{...btnPrimary,marginTop:0,background:"#a855f7"}}>
-          {importing ? "Aktarılıyor..." : "📤 Dosyadan Aktar (JSON)"}
+          {importing ? t("set.importing",lang) : "📤 "+t("set.import",lang)}
         </button>
         <input ref={fileRef} type="file" accept=".json" onChange={handleImport} style={{display:"none"}}/>
       </div>
 
       {/* AI Kalori Asistanı */}
       <div style={{background:"rgba(255,255,255,0.04)",borderRadius:14,padding:16,marginBottom:12}}>
-        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>🤖 AI Kalori Asistanı</h4>
-        <p style={{fontSize:12,opacity:.5,margin:"0 0 12px"}}>Yemek fotoğrafı çekerek kalori hesaplatabilirsin. Kendi AI hesabını seç ve API anahtarını gir.</p>
+        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>🤖 {t("set.aiTitle",lang)}</h4>
+        <p style={{fontSize:12,opacity:.5,margin:"0 0 12px"}}>{t("set.aiDesc",lang)}</p>
 
         {/* Provider selection */}
         <div style={{display:"flex",flexDirection:"column",gap:6,marginBottom:12}}>
           {[
-            {id:"none",name:"Manuel Giriş",desc:"AI kullanma, kalorileri kendim girerim",icon:"✏️",color:"#888"},
+            {id:"none",name:t("set.manualEntry",lang),desc:t("set.manualDesc",lang),icon:"✏️",color:"#888"},
             {id:"gemini",name:"Google Gemini",desc:"Ücretsiz, günde 60 istek",icon:"✨",color:"#3b82f6"},
             {id:"claude",name:"Claude (Anthropic)",desc:"En akıllı analiz, ücretli",icon:"🧠",color:"#a855f7"},
             {id:"openai",name:"OpenAI (ChatGPT)",desc:"Popüler, ücretli",icon:"🤖",color:"#22c55e"},
@@ -2987,19 +3253,19 @@ function Settings({ data, update, onImport, user, onLogout }) {
 
         {/* API Key input */}
         {data.settings?.aiProvider && data.settings.aiProvider!=="none" && (<>
-          <input style={inp} type="password" placeholder="API anahtarını yapıştır..."
+          <input style={inp} type="password" placeholder={t("set.apiPaste",lang)}
             value={data.settings?.aiKey||""}
             onChange={e=>update({...data,settings:{...data.settings,aiKey:e.target.value}})}/>
           <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:10}}>
             {data.settings?.aiKey ? (
               <><span style={{width:8,height:8,borderRadius:"50%",background:"#22c55e"}}/>
-              <span style={{fontSize:11,color:"#22c55e"}}>Anahtar kaydedildi</span></>
+              <span style={{fontSize:11,color:"#22c55e"}}>{t("set.keySaved",lang)}</span></>
             ) : (
               <><span style={{width:8,height:8,borderRadius:"50%",background:"#f59e0b"}}/>
-              <span style={{fontSize:11,color:"#f59e0b"}}>Anahtar gerekli</span></>
+              <span style={{fontSize:11,color:"#f59e0b"}}>{t("set.keyNeeded",lang)}</span></>
             )}
           </div>
-          <div style={{fontSize:10,opacity:.3,marginBottom:10}}>🔒 Anahtarın sadece senin telefonunda saklanır, sunucuya gönderilmez</div>
+          <div style={{fontSize:10,opacity:.3,marginBottom:10}}>🔒 {t("set.keyPrivacy",lang)}</div>
 
           {/* Guide button */}
           <button onClick={()=>setMsg(
@@ -3019,9 +3285,9 @@ function Settings({ data, update, onImport, user, onLogout }) {
 
       {/* Danger zone */}
       <div style={{background:"rgba(255,255,255,0.04)",borderRadius:14,padding:16}}>
-        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700,color:"#ef4444"}}>⚠️ Tehlikeli Bölge</h4>
+        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700,color:"#ef4444"}}>⚠️ {t("set.danger",lang)}</h4>
         <button onClick={clearAll} style={{...btnPrimary,marginTop:0,background:"#ef4444"}}>
-          Tüm Verileri Sil
+          {t("set.deleteAll",lang)}
         </button>
       </div>
     </div>
@@ -3029,7 +3295,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
 }
 
 /* ═══════════ LOGIN SCREEN ═══════════ */
-function LoginScreen({ onLogin }) {
+function LoginScreen({ onLogin, lang="tr", setLang }) {
   const [mode, setMode] = useState("login"); // login, register
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -3044,7 +3310,7 @@ function LoginScreen({ onLogin }) {
   };
 
   const handleEmail = async () => {
-    if (!email.trim() || !password.trim()) { setError("Email ve şifre gerekli"); return; }
+    if (!email.trim() || !password.trim()) { setError(t("login.emailReq",lang)); return; }
     setLoading(true); setError("");
     const fn = mode === "register" ? registerWithEmail : signInWithEmail;
     const { user, error } = await fn(email, password);
@@ -3057,6 +3323,19 @@ function LoginScreen({ onLogin }) {
   return (
     <NebulaBackground style={{padding:16,cursor:"default"}}>
       <style>{NEBULA_KEYFRAMES}</style>
+      {/* Mini language switcher */}
+      {setLang && (
+        <div style={{position:"absolute",top:16,right:16,display:"flex",gap:4,zIndex:10}}>
+          {LANGUAGES.map(l => (
+            <button key={l.code} onClick={() => setLang(l.code)} style={{
+              background: lang===l.code ? "rgba(99,102,241,0.2)" : "rgba(255,255,255,0.04)",
+              border: lang===l.code ? "1px solid rgba(99,102,241,0.4)" : "1px solid rgba(255,255,255,0.08)",
+              borderRadius: 8, padding: "4px 8px", cursor: "pointer", fontSize: 14,
+              transition: "all .2s",
+            }}>{l.flag}</button>
+          ))}
+        </div>
+      )}
       <div style={{width:"100%",maxWidth:380,animation:"fadeInUp 0.7s ease both"}}>
         {/* Title block */}
         <div style={{textAlign:"center",marginBottom:36}}>
@@ -3071,8 +3350,8 @@ function LoginScreen({ onLogin }) {
             fontSize:14,opacity:.55,marginTop:10,fontStyle:"italic",
             letterSpacing:.5,lineHeight:1.6,
           }}>
-            Kendi destanını yaz.<br/>
-            <span style={{opacity:.7,fontSize:12}}>Write your own epic.</span>
+            {t("splash.motto1",lang)}<br/>
+            <span style={{opacity:.7,fontSize:12}}>{t("splash.motto2",lang)}</span>
           </div>
         </div>
 
@@ -3100,21 +3379,21 @@ function LoginScreen({ onLogin }) {
             opacity:loading?.6:1,transition:"all .2s",
           }}>
             <span style={{fontSize:18,fontWeight:700}}>G</span>
-            Google ile Giriş Yap
+            {t("login.google",lang)}
           </button>
 
           {/* Divider */}
           <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:18}}>
             <div style={{flex:1,height:1,background:"linear-gradient(90deg,transparent,rgba(167,139,250,0.2),transparent)"}}/>
-            <span style={{fontSize:12,opacity:.35,letterSpacing:1}}>veya</span>
+            <span style={{fontSize:12,opacity:.35,letterSpacing:1}}>{t("login.or",lang)}</span>
             <div style={{flex:1,height:1,background:"linear-gradient(90deg,transparent,rgba(167,139,250,0.2),transparent)"}}/>
           </div>
 
           {/* Email/Password */}
-          <input type="email" placeholder="Email adresi" value={email}
+          <input type="email" placeholder={t("login.email",lang)} value={email}
             onChange={e=>setEmail(e.target.value)}
             style={{...inp,marginBottom:8,borderRadius:14,border:"1px solid rgba(255,255,255,0.08)"}} />
-          <input type="password" placeholder="Şifre (en az 6 karakter)" value={password}
+          <input type="password" placeholder={t("login.password",lang)} value={password}
             onChange={e=>setPassword(e.target.value)}
             onKeyDown={e=>e.key==="Enter"&&handleEmail()}
             style={{...inp,borderRadius:14,border:"1px solid rgba(255,255,255,0.08)"}} />
@@ -3123,7 +3402,7 @@ function LoginScreen({ onLogin }) {
             ...btnPrimary,opacity:loading?.6:1,marginBottom:12,borderRadius:14,
             background:"linear-gradient(135deg,#6366f1,#8b5cf6)",
           }}>
-            {loading ? "Bekleyin..." : mode === "register" ? "Kayıt Ol" : "Giriş Yap"}
+            {loading ? t("login.wait",lang) : mode === "register" ? t("login.register",lang) : t("login.signIn",lang)}
           </button>
 
           {/* Toggle mode */}
@@ -3131,7 +3410,7 @@ function LoginScreen({ onLogin }) {
             <button onClick={()=>{setMode(mode==="login"?"register":"login");setError("");}} style={{
               background:"none",border:"none",color:"#a78bfa",fontSize:13,cursor:"pointer",
             }}>
-              {mode === "login" ? "Hesabın yok mu? Kayıt ol" : "Zaten hesabın var mı? Giriş yap"}
+              {mode === "login" ? t("login.noAccount",lang) : t("login.hasAccount",lang)}
             </button>
           </div>
         </div>
@@ -3141,10 +3420,10 @@ function LoginScreen({ onLogin }) {
           <button onClick={handleSkip} style={{
             background:"none",border:"none",color:"rgba(167,139,250,0.45)",fontSize:12,cursor:"pointer",
           }}>
-            Giriş yapmadan devam et →
+            {t("login.skip",lang)}
           </button>
           <div style={{fontSize:10,opacity:.2,marginTop:4}}>
-            Veriler sadece bu cihazda kalır
+            {t("login.skipNote",lang)}
           </div>
         </div>
       </div>
@@ -3161,10 +3440,17 @@ export default function App() {
   const [user, setUser] = useState(undefined);
   const [toast, setToast] = useState({ visible: false, message: "" });
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [lang, setLang] = useState(() => localStorage.getItem("zimu-lang") || "tr");
   const isMobile = useIsMobile();
   const touchStart = useRef(null);
   const touchEnd = useRef(null);
   const scrollRef = useRef(null);
+
+  // Save lang preference
+  useEffect(() => { localStorage.setItem("zimu-lang", lang); }, [lang]);
+
+  // Derived tabs
+  const TABS = getTabs(lang);
 
   // Listen to auth state
   useEffect(() => {
@@ -3272,11 +3558,11 @@ export default function App() {
     setData(null);
   };
 
-  const allTabs = [...TABS, { id: "settings", label: "Ayarlar", icon: "⚙" }];
+  const allTabs = [...TABS, { id: "settings", label: t("tab.settings", lang), icon: "⚙" }];
 
   // Show login screen (after splash, when not authenticated)
   if (!splash && user === undefined && !loading) {
-    return <LoginScreen onLogin={handleLogin} />;
+    return <LoginScreen onLogin={handleLogin} lang={lang} setLang={setLang} />;
   }
 
   if (splash || loading || !data) return (
@@ -3329,10 +3615,10 @@ export default function App() {
       {/* Motivational text */}
       <div style={{textAlign:"center",animation:"subtitleIn 0.8s ease 1s both"}}>
         <div style={{fontSize:16,opacity:.6,fontStyle:"italic",letterSpacing:.5,lineHeight:1.8}}>
-          Kendi destanını yaz.
+          {t("splash.motto1", lang)}
         </div>
         <div style={{fontSize:13,opacity:.35,fontStyle:"italic",letterSpacing:.5}}>
-          Write your own epic.
+          {t("splash.motto2", lang)}
         </div>
       </div>
 
@@ -3342,20 +3628,20 @@ export default function App() {
         fontSize:11,opacity:.2,animation:"shimmer 2s ease-in-out 1.5s infinite",
         letterSpacing:1,
       }}>
-        Devam etmek için dokun
+        {t("splash.tap", lang)}
       </div>
     </NebulaBackground>
   );
 
   const content = () => {
     switch(tab) {
-      case "dashboard": return <Dashboard data={data} setTab={setTab} update={update}/>;
-      case "tasks": return <Tasks data={data} update={update}/>;
-      case "calendar": return <CalendarView data={data} update={update}/>;
-      case "sports": return <Sports data={data} update={update}/>;
-      case "projects": return <Projects data={data} update={update}/>;
-      case "notes": return <Notes data={data} update={update}/>;
-      case "settings": return <Settings data={data} update={update} onImport={d=>{setData(d);showToast("Veriler aktarıldı!")}} user={user} onLogout={handleLogout}/>;
+      case "dashboard": return <Dashboard data={data} setTab={setTab} update={update} lang={lang}/>;
+      case "tasks": return <Tasks data={data} update={update} lang={lang}/>;
+      case "calendar": return <CalendarView data={data} update={update} lang={lang}/>;
+      case "sports": return <Sports data={data} update={update} lang={lang}/>;
+      case "projects": return <Projects data={data} update={update} lang={lang}/>;
+      case "notes": return <Notes data={data} update={update} lang={lang}/>;
+      case "settings": return <Settings data={data} update={update} onImport={d=>{setData(d);showToast(t("set.importDone",lang))}} user={user} onLogout={handleLogout} lang={lang} setLang={setLang}/>;
     }
   };
 
