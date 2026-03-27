@@ -544,15 +544,15 @@ function Dashboard({ data, setTab, update, lang }) {
 
   // ── Task calculations ──
   const allTasks = data.tasks || [];
-  const todayTasks = allTasks.filter(x => x.dueDate === tdydy);
+  const todayTasks = allTasks.filter(x => x.dueDate === tdy);
   const todayDone = todayTasks.filter(x => x.done).length;
   const todayTotal = todayTasks.length;
   const todayProgress = todayTotal > 0 ? Math.round((todayDone / todayTotal) * 100) : 0;
 
   const pending = allTasks.filter(x => !x.done).length;
-  const overdue = allTasks.filter(x => !x.done && x.dueDate && x.dueDate < tdydy).length;
+  const overdue = allTasks.filter(x => !x.done && x.dueDate && x.dueDate < tdy).length;
   const urgentTasks = allTasks
-    .filter(x => !x.done && (x.dueDate === tdydy || x.dueDate === "" || !x.dueDate || x.dueDate <= tdydy))
+    .filter(x => !x.done && (x.dueDate === tdy || x.dueDate === "" || !x.dueDate || x.dueDate <= tdy))
     .sort((a, b) => {
       // Overdue first, then by priority
       const aOver = a.dueDate && a.dueDate < tdy ? -1 : 0;
@@ -584,16 +584,16 @@ function Dashboard({ data, setTab, update, lang }) {
   const streak = calcStreak();
 
   // ── Events ──
-  const todayEv = data.events.filter(e => e.date === tdydydy);
-  const upcoming = data.events.filter(e => e.date >= tdydy).sort((a, b) => a.date.localeCompare(b.date) || (a.time || "").localeCompare(b.time || "")).slice(0, 5);
+  const todayEv = data.events.filter(e => e.date === tdy);
+  const upcoming = data.events.filter(e => e.date >= tdy).sort((a, b) => a.date.localeCompare(b.date) || (a.time || "").localeCompare(b.time || "")).slice(0, 5);
 
   // ── Sports & food ──
   const wkSport = data.sports.filter(s => { const d = (new Date() - new Date(s.date)) / 864e5; return d >= 0 && d <= 7; });
   const wkMin = wkSport.reduce((a, s) => a + (s.duration || 0), 0);
   const wkBurned = wkSport.reduce((a, s) => a + (s.calories || 0), 0);
-  const todayFoods = foods.filter(f => f.date === tdydydy);
+  const todayFoods = foods.filter(f => f.date === tdy);
   const todayCalIn = todayFoods.reduce((a, f) => a + (f.calories || 0), 0);
-  const todayCalOut = data.sports.filter(s => s.date === tdydydy).reduce((a, s) => a + (s.calories || 0), 0);
+  const todayCalOut = data.sports.filter(s => s.date === tdy).reduce((a, s) => a + (s.calories || 0), 0);
 
   // ── Timeline: merge events + due tasks chronologically ──
   const timelineItems = [
@@ -627,7 +627,7 @@ function Dashboard({ data, setTab, update, lang }) {
   const [quickTask, setQuickTask] = useState("");
   const addQuickTask = () => {
     if (!quickTask.trim()) return;
-    update({ ...data, tasks: [{ id: uid(), title: quickTask.trim(), priority: "medium", dueDate: tdy, done: false, createdAt: t }, ...data.tasks] });
+    update({ ...data, tasks: [{ id: uid(), title: quickTask.trim(), priority: "medium", dueDate: tdy, done: false, createdAt: tdy }, ...data.tasks] });
     setQuickTask("");
   };
 
@@ -851,7 +851,7 @@ function Dashboard({ data, setTab, update, lang }) {
 
       {/* ══ UPCOMING TASKS (not today, next 7 days) ══ */}
       {(() => {
-        const nextDays = allTasks.filter(x => !x.done && x.dueDate && x.dueDate > tdydy && x.dueDate <= (() => { const d = new Date(); d.setDate(d.getDate() + 7); return d.toISOString().split("T")[0]; })());
+        const nextDays = allTasks.filter(x => !x.done && x.dueDate && x.dueDate > tdy && x.dueDate <= (() => { const d = new Date(); d.setDate(d.getDate() + 7); return d.toISOString().split("T")[0]; })());
         if (nextDays.length === 0) return null;
         return (
           <div style={{ marginBottom: 14 }}>
@@ -1516,9 +1516,9 @@ function Sports({ data, update, lang="tr" }) {
   const burnedCal=wk.reduce((a,s)=>a+(s.calories||0),0);
   const tDist=wk.reduce((a,s)=>a+(s.distance||0),0);
 
-  const todayFoods=foods.filter(f=>f.date===tdydy);
+  const todayFoods=foods.filter(f=>f.date===tdy);
   const todayCalIn=todayFoods.reduce((a,f)=>a+(f.calories||0),0);
-  const todaySports=data.sports.filter(s=>s.date===tdydy);
+  const todaySports=data.sports.filter(s=>s.date===tdy);
   const todayCalOut=todaySports.reduce((a,s)=>a+(s.calories||0),0);
   const dailyGoal=2000;
   const netCal=todayCalIn-todayCalOut;
