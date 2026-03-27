@@ -3830,8 +3830,8 @@ export default function App() {
   const [tab, setTab] = useState("dashboard");
   const [data, setData] = useState(null);
   const [splash, setSplash] = useState(true);
-  const [user, setUser] = useState(undefined); // undefined=unknown, null=skip, object=firebase user
-  const [authReady, setAuthReady] = useState(false); // true once firebase responds or times out
+  const [user, setUser] = useState(undefined);
+  const [showLogin, setShowLogin] = useState(false);
   const [toast, setToast] = useState({ visible: false, message: "" });
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [lang, setLang] = useState(() => localStorage.getItem("zimu-lang") || "tr");
@@ -3840,59 +3840,48 @@ export default function App() {
   const touchEnd = useRef(null);
   const scrollRef = useRef(null);
 
-  // Save lang preference
   useEffect(() => { localStorage.setItem("zimu-lang", lang); }, [lang]);
-
-  // Derived tabs
   const TABS = getTabs(lang);
 
-  // ── Step 1: Splash timer — always dismiss after 2.5s ──
+  // ── Auth listener ──
   useEffect(() => {
-    const timer = setTimeout(() => setSplash(false), 2500);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // ── Step 2: Listen to Firebase auth ──
-  useEffect(() => {
-    let timeout;
     const unsubscribe = onAuthChange((firebaseUser) => {
-      clearTimeout(timeout);
       if (firebaseUser) {
         setUser(firebaseUser);
       } else {
         const skipped = localStorage.getItem('zimu-skip-login');
-        setUser(skipped ? null : undefined);
+        if (skipped) {
+          setUser(null);
+        } else {
+          // No firebase user and no skip → show login
+          setShowLogin(true);
+        }
       }
-      setAuthReady(true);
     });
-    // If Firebase doesn't respond in 4s, mark auth as ready anyway
-    timeout = setTimeout(() => {
-      setAuthReady(true);
+    // If firebase doesn't respond in 4s, show login
+    const t1 = setTimeout(() => {
+      setUser(prev => {
+        if (prev === undefined) setShowLogin(true);
+        return prev;
+      });
     }, 4000);
-    return () => { unsubscribe(); clearTimeout(timeout); };
+    return () => { unsubscribe(); clearTimeout(t1); };
   }, []);
 
-  // ── Step 3: Load data once user is determined (not undefined) ──
+  // ── Load data when user is known ──
   useEffect(() => {
-    if (user === undefined) return; // still waiting for auth decision
+    if (user === undefined) return;
     const userId = user?.uid || null;
     loadData(userId)
       .then(d => setData(d || DEFAULT_DATA))
       .catch(() => setData(DEFAULT_DATA));
   }, [user]);
 
-  // ── Step 4: Ultimate fallback — if after 8s we still have no data, force it ──
+  // ── Auto dismiss splash after 2.5s ──
   useEffect(() => {
-    const fallback = setTimeout(() => {
-      setAuthReady(true);
-      setSplash(false);
-      if (!data) {
-        if (user === undefined) setUser(null); // force skip mode
-        setData(prev => prev || DEFAULT_DATA);
-      }
-    }, 8000);
-    return () => clearTimeout(fallback);
-  }, [data, user]);
+    const t2 = setTimeout(() => setSplash(false), 2500);
+    return () => clearTimeout(t2);
+  }, []);
 
   // Schedule notifications
   useEffect(() => {
@@ -3947,9 +3936,9 @@ export default function App() {
 
   const handleLogin = (firebaseUser) => {
     if (firebaseUser === null) {
-      // Skip mode
       localStorage.setItem('zimu-skip-login', 'true');
-      setUser(null); // This triggers loadData effect
+      setShowLogin(false);
+      setUser(null);
     }
   };
 
@@ -3958,26 +3947,30 @@ export default function App() {
     localStorage.removeItem('zimu-skip-login');
     setUser(undefined);
     setData(null);
+    setShowLogin(true);
   };
 
   const allTabs = [...TABS, { id: "settings", label: t("tab.settings", lang), icon: "⚙" }];
 
-  // ── RENDER DECISION ──
-  // 1. Splash still showing → splash screen
-  // 2. Auth ready, no user → login screen
-  // 3. Data not loaded yet → loading screen
-  // 4. Everything ready → main app
+  // ── RENDER ──
 
-  // Show login screen (after splash, when not authenticated)
-  if (!splash && authReady && user === undefined) {
+  // 1. Login screen
+  if (!splash && showLogin && !data) {
     return <LoginScreen onLogin={handleLogin} lang={lang} setLang={setLang} />;
   }
 
-  // Splash or loading
+  // 2. Splash or waiting for data
   if (splash || !data) return (
     <NebulaBackground
       onClick={() => {
         setSplash(false);
+        // FORCE OPEN: if stuck, just load default data and skip login
+        if (!data) {
+          localStorage.setItem('zimu-skip-login', 'true');
+          setShowLogin(false);
+          if (user === undefined) setUser(null);
+          setData(DEFAULT_DATA);
+        }
       }}
       style={{cursor:"pointer",userSelect:"none"}}
     >
