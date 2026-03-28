@@ -3206,7 +3206,7 @@ export default function App() {
       <div style={{
         display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",
         textAlign:"center",
-        width:"100%",maxWidth:400,padding:"0 40px",minHeight:"100dvh",
+        width:"100%",maxWidth:400,padding:"0 40px",minHeight:"100dvh",margin:"0 auto",
         animation:"fadeIn .6s ease both",
       }}>
         {/* Zimu title */}
