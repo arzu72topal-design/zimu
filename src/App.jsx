@@ -2902,100 +2902,18 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
 
   const roomIcons=["📂","🎵","👗","📸","🎮","📚","🎨","💼","🏠","✈️","🎯","💡","🛒","🎬","🍳"];
 
-  /* Her oda için özel SVG illüstrasyon arka planı */
-  const RoomIllustration = ({ roomId, color }) => {
-    const c = color || "#8B5CF6";
-    const illustrations = {
-      projects: (
-        <svg width="100%" height="100%" viewBox="0 0 200 130" fill="none" style={{position:"absolute",inset:0}}>
-          <defs><linearGradient id="gp" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor={c} stopOpacity="0.3"/><stop offset="100%" stopColor="#0D0D12" stopOpacity="0.9"/></linearGradient></defs>
-          <rect width="200" height="130" fill="url(#gp)"/>
-          <rect x="30" y="25" width="60" height="45" rx="4" stroke="rgba(255,255,255,0.2)" strokeWidth="1" fill="rgba(255,255,255,0.05)"/>
-          <rect x="35" y="31" width="30" height="2" rx="1" fill="rgba(255,255,255,0.25)"/>
-          <rect x="35" y="37" width="45" height="2" rx="1" fill="rgba(255,255,255,0.15)"/>
-          <rect x="35" y="43" width="38" height="2" rx="1" fill="rgba(255,255,255,0.1)"/>
-          <rect x="35" y="49" width="20" height="2" rx="1" fill="rgba(255,255,255,0.08)"/>
-          <rect x="110" y="35" width="60" height="45" rx="4" stroke="rgba(255,255,255,0.15)" strokeWidth="1" fill="rgba(255,255,255,0.03)"/>
-          <rect x="115" y="41" width="25" height="2" rx="1" fill="rgba(255,255,255,0.2)"/>
-          <rect x="115" y="47" width="40" height="2" rx="1" fill="rgba(255,255,255,0.12)"/>
-          <rect x="115" y="53" width="32" height="2" rx="1" fill="rgba(255,255,255,0.08)"/>
-          <circle cx="155" cy="100" r="12" stroke="rgba(255,255,255,0.1)" strokeWidth="0.8" fill="none"/>
-          <path d="M150 100L153 103L160 96" stroke="rgba(255,255,255,0.2)" strokeWidth="1" strokeLinecap="round"/>
-        </svg>
-      ),
-      news: (
-        <svg width="100%" height="100%" viewBox="0 0 200 130" fill="none" style={{position:"absolute",inset:0}}>
-          <defs><linearGradient id="gn" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor={c} stopOpacity="0.35"/><stop offset="100%" stopColor="#0D0D12" stopOpacity="0.9"/></linearGradient></defs>
-          <rect width="200" height="130" fill="url(#gn)"/>
-          <circle cx="100" cy="60" r="30" stroke="rgba(255,255,255,0.15)" strokeWidth="1" fill="none"/>
-          <ellipse cx="100" cy="60" rx="12" ry="30" stroke="rgba(255,255,255,0.1)" strokeWidth="0.8"/>
-          <path d="M70 60H130" stroke="rgba(255,255,255,0.1)" strokeWidth="0.8"/>
-          <path d="M75 48H125" stroke="rgba(255,255,255,0.07)" strokeWidth="0.8"/>
-          <path d="M75 72H125" stroke="rgba(255,255,255,0.07)" strokeWidth="0.8"/>
-          <circle cx="145" cy="25" r="8" fill="rgba(239,68,68,0.25)" stroke="rgba(239,68,68,0.5)" strokeWidth="0.8"/>
-          <text x="145" y="29" textAnchor="middle" fill="rgba(255,255,255,0.7)" fontSize="10" fontWeight="700">!</text>
-          <path d="M40 95L55 85L70 90L85 80L100 88L115 78L130 85L145 75L160 82" stroke="rgba(255,255,255,0.15)" strokeWidth="1" fill="none" strokeLinecap="round"/>
-        </svg>
-      ),
-      music: (
-        <svg width="100%" height="100%" viewBox="0 0 200 130" fill="none" style={{position:"absolute",inset:0}}>
-          <defs><linearGradient id="gm" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor={c} stopOpacity="0.3"/><stop offset="100%" stopColor="#0D0D12" stopOpacity="0.9"/></linearGradient></defs>
-          <rect width="200" height="130" fill="url(#gm)"/>
-          <circle cx="100" cy="65" r="32" stroke="rgba(255,255,255,0.15)" strokeWidth="1" fill="rgba(255,255,255,0.03)"/>
-          <circle cx="100" cy="65" r="22" stroke="rgba(255,255,255,0.1)" strokeWidth="0.8" fill="none"/>
-          <circle cx="100" cy="65" r="12" stroke="rgba(255,255,255,0.08)" strokeWidth="0.8" fill="none"/>
-          <circle cx="100" cy="65" r="4" fill="rgba(255,255,255,0.15)"/>
-          <line x1="132" y1="65" x2="150" y2="40" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5" strokeLinecap="round"/>
-          <circle cx="150" cy="40" r="3" fill="rgba(255,255,255,0.15)"/>
-          <path d="M35 90Q50 75 65 85Q80 95 95 80" stroke="rgba(255,255,255,0.08)" strokeWidth="1" fill="none"/>
-          <path d="M105 85Q120 70 135 80Q150 90 165 75" stroke="rgba(255,255,255,0.08)" strokeWidth="1" fill="none"/>
-        </svg>
-      ),
-      clothes: (
-        <svg width="100%" height="100%" viewBox="0 0 200 130" fill="none" style={{position:"absolute",inset:0}}>
-          <defs><linearGradient id="gc" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor={c} stopOpacity="0.3"/><stop offset="100%" stopColor="#0D0D12" stopOpacity="0.9"/></linearGradient></defs>
-          <rect width="200" height="130" fill="url(#gc)"/>
-          <line x1="40" y1="20" x2="160" y2="20" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" strokeLinecap="round"/>
-          <path d="M70 20L70 22C70 22 80 28 100 28C120 28 130 22 130 22L130 20" stroke="rgba(255,255,255,0.25)" strokeWidth="1.2" fill="none"/>
-          <circle cx="100" cy="18" r="3" stroke="rgba(255,255,255,0.25)" strokeWidth="1" fill="none"/>
-          <path d="M75 30L75 95L90 95L90 30" stroke="rgba(255,255,255,0.12)" strokeWidth="0.8" fill="rgba(255,255,255,0.04)"/>
-          <path d="M95 28L95 100L125 100L125 28" stroke="rgba(255,255,255,0.18)" strokeWidth="0.8" fill="rgba(255,255,255,0.06)"/>
-          <path d="M130 25L130 85L145 85L145 25" stroke="rgba(255,255,255,0.1)" strokeWidth="0.8" fill="rgba(255,255,255,0.03)"/>
-          <rect x="98" y="35" width="20" height="3" rx="1" fill="rgba(255,255,255,0.1)"/>
-          <rect x="98" y="42" width="15" height="3" rx="1" fill="rgba(255,255,255,0.07)"/>
-        </svg>
-      ),
-      memories: (
-        <svg width="100%" height="100%" viewBox="0 0 200 130" fill="none" style={{position:"absolute",inset:0}}>
-          <defs><linearGradient id="ga" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor={c} stopOpacity="0.3"/><stop offset="100%" stopColor="#0D0D12" stopOpacity="0.9"/></linearGradient></defs>
-          <rect width="200" height="130" fill="url(#ga)"/>
-          <rect x="25" y="25" width="50" height="60" rx="2" stroke="rgba(255,255,255,0.2)" strokeWidth="0.8" fill="rgba(255,255,255,0.05)" transform="rotate(-8 50 55)"/>
-          <rect x="30" y="30" width="40" height="35" rx="1" fill="rgba(255,255,255,0.08)" transform="rotate(-8 50 47)"/>
-          <rect x="75" y="20" width="50" height="60" rx="2" stroke="rgba(255,255,255,0.2)" strokeWidth="0.8" fill="rgba(255,255,255,0.05)" transform="rotate(5 100 50)"/>
-          <rect x="80" y="25" width="40" height="35" rx="1" fill="rgba(255,255,255,0.08)" transform="rotate(5 100 42)"/>
-          <rect x="125" y="30" width="50" height="60" rx="2" stroke="rgba(255,255,255,0.15)" strokeWidth="0.8" fill="rgba(255,255,255,0.04)" transform="rotate(-3 150 60)"/>
-          <rect x="130" y="35" width="40" height="35" rx="1" fill="rgba(255,255,255,0.06)" transform="rotate(-3 150 52)"/>
-          <circle cx="155" cy="105" r="10" stroke="rgba(255,255,255,0.12)" strokeWidth="0.8" fill="none"/>
-          <circle cx="155" cy="105" r="4" stroke="rgba(255,255,255,0.1)" strokeWidth="0.8" fill="none"/>
-          <rect x="153" y="94" width="4" height="3" rx="1" fill="rgba(255,255,255,0.12)"/>
-        </svg>
-      ),
-      healthcoach: (
-        <svg width="100%" height="100%" viewBox="0 0 200 130" fill="none" style={{position:"absolute",inset:0}}>
-          <defs><linearGradient id="gh2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor={c} stopOpacity="0.3"/><stop offset="100%" stopColor="#0D0D12" stopOpacity="0.9"/></linearGradient></defs>
-          <rect width="200" height="130" fill="url(#gh2)"/>
-          <path d="M100 95C100 95 65 75 65 55C65 45 72 38 82 38C90 38 95 44 100 50C105 44 110 38 118 38C128 38 135 45 135 55C135 75 100 95 100 95Z" stroke="rgba(255,255,255,0.2)" strokeWidth="1" fill="rgba(255,255,255,0.06)"/>
-          <path d="M20 80L40 80L50 65L60 85L70 70L80 80L180 80" stroke="rgba(255,255,255,0.15)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-          <circle cx="45" cy="110" r="8" stroke="rgba(255,255,255,0.1)" strokeWidth="0.8" fill="rgba(255,255,255,0.03)"/>
-          <path d="M42 110L44.5 112.5L49 108" stroke="rgba(255,255,255,0.2)" strokeWidth="0.8" strokeLinecap="round"/>
-          <circle cx="155" cy="25" r="12" stroke="rgba(255,255,255,0.08)" strokeWidth="0.8" fill="none"/>
-          <path d="M150 25L153 20L156 25L159 18" stroke="rgba(255,255,255,0.12)" strokeWidth="0.8" strokeLinecap="round" fill="none"/>
-        </svg>
-      ),
-    };
-    return illustrations[roomId] || (
-      <div style={{position:"absolute",inset:0,background:`linear-gradient(145deg,${c}30,${c}08)`}}/>
-    );
+  /* Her oda için Unsplash fotoğrafı — koyu tema, konuyla uyumlu */
+  const ROOM_IMAGES = {
+    projects:    "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=260&fit=crop&q=80",
+    news:        "https://images.unsplash.com/photo-1504711434969-e33886168d8c?w=400&h=260&fit=crop&q=80",
+    music:       "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&h=260&fit=crop&q=80",
+    clothes:     "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=260&fit=crop&q=80",
+    memories:    "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400&h=260&fit=crop&q=80",
+    healthcoach: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=260&fit=crop&q=80",
+  };
+  const getRoomImage = (room) => {
+    if (room.photo) return room.photo;
+    return ROOM_IMAGES[room.id] || null;
   };
 
   if(!activeRoom) return (
@@ -3006,26 +2924,38 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
         </div>
         <p style={{margin:"6px 0 0",fontSize:12,color:"#9CA3AF"}}>Kişisel alanların — odalarına dokun ve keşfet</p>
       </StickyHeader>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:10}}>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:12}}>
         {rooms.map((room,idx)=>{
           const count=room.type==="project"?data.projects.length:room.type==="health"?(data.sports||[]).length:(roomItems[room.id]||[]).length;
+          const photo = getRoomImage(room);
           return (
             <div key={room.id} className={`touch-card stagger-${idx+1}`} onClick={()=>{setActiveRoom(room.id);setRoomSubView(null);}}
               style={{
                 borderRadius:20,overflow:"hidden",cursor:"pointer",
-                position:"relative",minHeight:130,
-                border:`1px solid ${room.color}25`,
+                position:"relative",height:160,
+                border:"0.5px solid rgba(255,255,255,0.12)",
+                background:"#1C1C26",
               }}>
-              {/* SVG illüstrasyon arka plan */}
-              <RoomIllustration roomId={room.id} color={room.color}/>
+              {/* Fotoğraf arka plan */}
+              {photo ? (
+                <img src={photo} alt={room.name} loading="lazy"
+                  style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",display:"block"}}
+                  onError={e=>{e.target.style.display="none";}}/>
+              ) : (
+                <div style={{position:"absolute",inset:0,background:`linear-gradient(135deg,${room.color}25 0%,#1C1C26 100%)`}}/>
+              )}
+              {/* Gradient overlay — alttan koyulaşma */}
+              <div style={{
+                position:"absolute",inset:0,
+                background:"linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.75) 100%)",
+              }}/>
               {/* İçerik — sol alt */}
               <div style={{
-                position:"relative",zIndex:1,
-                padding:"14px 16px",height:"100%",minHeight:130,
-                display:"flex",flexDirection:"column",justifyContent:"flex-end",
+                position:"absolute",bottom:0,left:0,right:0,
+                padding:"14px 16px",zIndex:1,
               }}>
-                <div style={{fontSize:16,fontWeight:700,color:"#F9FAFB",textShadow:"0 1px 6px rgba(0,0,0,0.5)"}}>{room.name}</div>
-                <div style={{fontSize:11,color:`${room.color}`,fontWeight:600,marginTop:3}}>{count} öğe</div>
+                <div style={{fontSize:16,fontWeight:700,color:"#F9FAFB"}}>{room.name}</div>
+                <div style={{fontSize:12,color:room.color,fontWeight:600,marginTop:2}}>{count} öğe</div>
               </div>
             </div>
           );
