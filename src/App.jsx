@@ -22,7 +22,7 @@ const TABS = [
   { id: "tasks", label: "Görevler", icon: "✓" },
   { id: "calendar", label: "Takvim", icon: "◫" },
   { id: "sports", label: "Sağlık", icon: "♦" },
-  { id: "projects", label: "Tarzım", icon: "◈" },
+  { id: "projects", label: "Stilim", icon: "◈" },
   { id: "notes", label: "Notlar", icon: "☰" },
 ];
 
@@ -2362,36 +2362,85 @@ function Projects({ data, update }) {
 
   const roomIcons=["📂","🎵","👗","📸","🎮","📚","🎨","💼","🏠","✈️","🎯","💡","🛒","🎬","🍳"];
 
+  /* Her oda için Unsplash fotoğrafı — id sabit, fallback gradient var */
+  /* picsum.photos — seed ile sabit, hızlı, ücretsiz */
+  const ROOM_PHOTOS = {
+    projects: "https://picsum.photos/seed/workspace/400/220",
+    news:     "https://picsum.photos/seed/newspaper/400/220",
+    music:    "https://picsum.photos/seed/concert/400/220",
+    clothes:  "https://picsum.photos/seed/fashion/400/220",
+    memories: "https://picsum.photos/seed/memories/400/220",
+  };
+  const KEYWORD_PHOTOS = {
+    kitap:   "https://picsum.photos/seed/library/400/220",
+    seyahat: "https://picsum.photos/seed/travel/400/220",
+    yemek:   "https://picsum.photos/seed/food/400/220",
+    spor:    "https://picsum.photos/seed/sport/400/220",
+    oyun:    "https://picsum.photos/seed/gaming/400/220",
+    film:    "https://picsum.photos/seed/cinema/400/220",
+  };
+  const getRoomPhoto = (room) => {
+    if (room.photo) return room.photo; // kullanıcı kendi fotoğrafını yüklemiş
+    if (ROOM_PHOTOS[room.id]) return ROOM_PHOTOS[room.id];
+    const nameLower = room.name.toLowerCase();
+    for (const [kw, url] of Object.entries(KEYWORD_PHOTOS)) {
+      if (nameLower.includes(kw)) return url;
+    }
+    return null; // gradient fallback
+  };
+
   if(!activeRoom) return (
     <div>
       <StickyHeader>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-          <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Tarzım</h3>
+          <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Benim Stilim</h3>
         </div>
         <p style={{margin:"6px 0 0",fontSize:12,opacity:.4}}>Kişisel alanların — odalarına dokun ve keşfet</p>
       </StickyHeader>
       <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:10}}>
         {rooms.map(room=>{
           const count=room.type==="project"?data.projects.length:(roomItems[room.id]||[]).length;
+          const photo = getRoomPhoto(room);
           return (
-            <div key={room.id} onClick={()=>setActiveRoom(room.id)} style={{
-              background:`linear-gradient(145deg,rgba(255,255,255,0.06) 0%,rgba(255,255,255,0.02) 100%)`,
-              backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",
-              borderRadius:20,padding:20,cursor:"pointer",
-              border:`1px solid ${room.color}50`,
-              boxShadow:`0 0 30px ${room.color}25, 0 0 60px ${room.color}10, inset 0 1px 0 rgba(255,255,255,0.08)`,
-              textAlign:"center",minHeight:110,
-              display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:6,
-              transition:"box-shadow .2s, transform .15s",
-            }}
-            onMouseEnter={e=>{e.currentTarget.style.boxShadow=`0 0 40px ${room.color}45, 0 0 80px ${room.color}20, inset 0 1px 0 rgba(255,255,255,0.1)`;e.currentTarget.style.transform="scale(1.02)";}}
-            onMouseLeave={e=>{e.currentTarget.style.boxShadow=`0 0 30px ${room.color}25, 0 0 60px ${room.color}10, inset 0 1px 0 rgba(255,255,255,0.08)`;e.currentTarget.style.transform="scale(1)";}}
-            onTouchStart={e=>{e.currentTarget.style.transform="scale(0.97)";}}
-            onTouchEnd={e=>{e.currentTarget.style.transform="scale(1)";}}
-            >
-              <div style={{fontSize:36,filter:`drop-shadow(0 0 8px ${room.color}66)`}}>{room.icon}</div>
-              <div style={{fontSize:14,fontWeight:700,color:"#fff"}}>{room.name}</div>
-              <div style={{fontSize:11,color:`${room.color}cc`,fontWeight:500}}>{count} öğe</div>
+            <div key={room.id} onClick={()=>setActiveRoom(room.id)}
+              onTouchStart={e=>{e.currentTarget.style.transform="scale(0.97)";}}
+              onTouchEnd={e=>{e.currentTarget.style.transform="scale(1)";}}
+              style={{
+                borderRadius:20,overflow:"hidden",cursor:"pointer",
+                position:"relative",minHeight:130,
+                border:`1px solid ${room.color}40`,
+                boxShadow:`0 0 24px ${room.color}20`,
+                transition:"transform .15s, box-shadow .2s",
+              }}>
+              {/* Fotoğraf ya da gradient arka plan */}
+              {photo ? (
+                <img src={photo} alt={room.name}
+                  style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",display:"block"}}
+                  onError={e=>{e.target.style.display="none";}}
+                />
+              ) : (
+                <div style={{position:"absolute",inset:0,background:`linear-gradient(145deg,${room.color}30,${room.color}08)`}}/>
+              )}
+              {/* Karartma overlay */}
+              <div style={{
+                position:"absolute",inset:0,
+                background:"linear-gradient(160deg,rgba(8,7,26,0.15) 0%,rgba(8,7,26,0.75) 100%)",
+              }}/>
+              {/* Glow border efekti */}
+              <div style={{
+                position:"absolute",inset:0,borderRadius:20,
+                boxShadow:`inset 0 0 0 1px ${room.color}35`,
+              }}/>
+              {/* İçerik */}
+              <div style={{
+                position:"relative",zIndex:1,
+                padding:"12px 14px",height:"100%",minHeight:130,
+                display:"flex",flexDirection:"column",justifyContent:"flex-end",
+              }}>
+                <div style={{fontSize:15,fontWeight:800,color:"#fff",textShadow:"0 1px 8px rgba(0,0,0,0.6)"}}>{room.name}</div>
+                <div style={{fontSize:11,color:`${room.color}ee`,fontWeight:600,marginTop:3,
+                  textShadow:"0 1px 4px rgba(0,0,0,0.8)"}}>{count} öğe</div>
+              </div>
             </div>
           );
         })}
@@ -2399,17 +2448,6 @@ function Projects({ data, update }) {
       <FAB onClick={()=>setRoomModal(true)} color="#f97316"/>
       <Modal open={roomModal} onClose={()=>setRoomModal(false)} title="Yeni Oda">
         <input style={inp} placeholder="Oda adı..." value={roomForm.name} onChange={e=>setRoomForm({...roomForm,name:e.target.value})} autoFocus/>
-        <div style={{fontSize:12,opacity:.5,marginBottom:6}}>İkon seç:</div>
-        <div style={{display:"flex",flexWrap:"wrap",gap:8,marginBottom:12}}>
-          {roomIcons.map(ic=>(
-            <button key={ic} onClick={()=>setRoomForm({...roomForm,icon:ic})} style={{
-              width:40,height:40,borderRadius:10,fontSize:20,cursor:"pointer",
-              background:roomForm.icon===ic?"rgba(59,130,246,0.2)":"rgba(255,255,255,0.04)",
-              border:roomForm.icon===ic?"1px solid rgba(59,130,246,0.3)":"1px solid rgba(255,255,255,0.06)",
-              display:"flex",alignItems:"center",justifyContent:"center",
-            }}>{ic}</button>
-          ))}
-        </div>
         <div style={{fontSize:12,opacity:.5,marginBottom:6}}>Renk seç:</div>
         <div style={{display:"flex",gap:8,marginBottom:14}}>
           {COLORS.map(c=>(
