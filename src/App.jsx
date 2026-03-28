@@ -474,13 +474,16 @@ function Dashboard({ data, setTab, update }) {
       {/* ── MİNİ HABERLER ── */}
       <div style={{marginBottom:14}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
-          <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em"}}>📰 BBC Türkçe Haberler</div>
+          <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em",display:"flex",alignItems:"center",gap:5}}>
+            <svg width="12" height="12" viewBox="0 0 36 36" fill="none"><rect x="4" y="7" width="28" height="22" rx="2" stroke="#ef4444" strokeWidth="2" fill="none"/><line x1="9" y1="13" x2="27" y2="13" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/><line x1="9" y1="18" x2="22" y2="18" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" opacity=".6"/></svg>
+            BBC Türkçe Haberler
+          </div>
           <button onClick={()=>setTab("projects")} style={{background:"none",border:"none",color:"#ef4444",fontSize:12,cursor:"pointer",fontWeight:600}}>Tümü ▶</button>
         </div>
         <div style={{background:"rgba(239,68,68,0.06)",backdropFilter:"blur(12px)",borderRadius:16,padding:"12px 14px",border:"1px solid rgba(239,68,68,0.18)",boxShadow:"0 0 20px rgba(239,68,68,0.06)"}}>
           {headlines.length === 0 ? (
             <div style={{display:"flex",alignItems:"center",gap:10,opacity:.5}}>
-              <span style={{fontSize:20,animation:"pulse 1.5s infinite"}}>📡</span>
+              <svg width="20" height="20" viewBox="0 0 36 36" fill="none" style={{animation:"pulse 1.5s infinite",flexShrink:0}}><circle cx="18" cy="18" r="13" stroke="#ef4444" strokeWidth="1.5" fill="none"/><path d="M14 18 A4 4 0 0 0 22 18" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round"/><line x1="18" y1="5" x2="18" y2="2" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/><line x1="25" y1="7" x2="27" y2="5" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/><line x1="11" y1="7" x2="9" y2="5" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/></svg>
               <span style={{fontSize:13}}>Haberler yükleniyor...</span>
             </div>
           ) : headlines.slice(0,4).map((title,i)=>(
@@ -499,7 +502,10 @@ function Dashboard({ data, setTab, update }) {
       {/* ── MİNİ MÜZİK ── */}
       <div style={{marginBottom:14}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
-          <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em"}}>🎵 Müzik Koleksiyonu</div>
+          <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em",display:"flex",alignItems:"center",gap:5}}>
+            <svg width="12" height="12" viewBox="0 0 36 36" fill="none"><circle cx="12" cy="28" r="5" stroke="#a855f7" strokeWidth="2" fill="none"/><circle cx="28" cy="24" r="5" stroke="#a855f7" strokeWidth="2" fill="none"/><path d="M17 28 L17 8 L33 4 L33 24" stroke="#a855f7" strokeWidth="2" strokeLinecap="round"/><line x1="17" y1="8" x2="33" y2="4" stroke="#a855f7" strokeWidth="1.5"/></svg>
+            Müzik Koleksiyonu
+          </div>
           <button onClick={()=>setTab("projects")} style={{background:"none",border:"none",color:"#a855f7",fontSize:12,cursor:"pointer",fontWeight:600}}>Tümü ▶</button>
         </div>
         {musicItems.length === 0 ? (
@@ -507,7 +513,9 @@ function Dashboard({ data, setTab, update }) {
             background:"rgba(168,85,247,0.06)",border:"1px solid rgba(168,85,247,0.18)",borderRadius:16,
             padding:"16px 18px",cursor:"pointer",display:"flex",alignItems:"center",gap:14,
           }}>
-            <div style={{width:48,height:48,borderRadius:14,background:"rgba(168,85,247,0.15)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0}}>🎧</div>
+            <div style={{width:48,height:48,borderRadius:14,background:"rgba(168,85,247,0.15)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+              <svg width="24" height="24" viewBox="0 0 36 36" fill="none"><path d="M6 18 C6 11 11 6 18 6 C25 6 30 11 30 18" stroke="#a855f7" strokeWidth="1.5" fill="none"/><rect x="4" y="17" width="6" height="10" rx="3" fill="#a855f7" opacity=".7"/><rect x="26" y="17" width="6" height="10" rx="3" fill="#a855f7" opacity=".7"/></svg>
+            </div>
             <div>
               <div style={{fontSize:14,fontWeight:700,color:"#a855f7"}}>Müzik koleksiyonu boş</div>
               <div style={{fontSize:12,opacity:.45,marginTop:3}}>Tarzım → Müziklerim'e git ve ekle</div>
@@ -527,7 +535,7 @@ function Dashboard({ data, setTab, update }) {
                 <div style={{width:44,height:44,borderRadius:10,background:item.albumArt?"#000":"rgba(168,85,247,0.2)",overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center",marginBottom:8}}>
                   {item.albumArt
                     ? <img src={item.albumArt} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
-                    : <span style={{fontSize:20}}>🎵</span>}
+                    : <svg width="20" height="20" viewBox="0 0 36 36" fill="none"><circle cx="11" cy="27" r="5" stroke="#a855f7" strokeWidth="1.5" fill="rgba(168,85,247,0.2)"/><path d="M16 27 L16 9 L30 5 L30 23" stroke="#a855f7" strokeWidth="1.5" strokeLinecap="round"/></svg>}
                 </div>
                 <div style={{fontSize:12,fontWeight:700,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.title||"Parça"}</div>
                 {item.artist&&<div style={{fontSize:10,opacity:.5,marginTop:2,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.artist}</div>}
@@ -1458,15 +1466,89 @@ const NEWS_SOURCES = {
   ],
 };
 
+/* SVG ikonlar — her haber kategorisi için */
+const NEWS_ICONS = {
+  spor: (c) => (
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+      <circle cx="18" cy="18" r="14" stroke={c} strokeWidth="1.5" fill="none"/>
+      <path d="M18 4 C18 4 14 10 14 18 C14 26 18 32 18 32" stroke={c} strokeWidth="1.5"/>
+      <path d="M4 18 C4 18 10 14 18 14 C26 14 32 18 32 18" stroke={c} strokeWidth="1.5"/>
+      <path d="M6 11 C6 11 12 15 18 14 C24 13 28 8 28 8" stroke={c} strokeWidth="1" opacity=".5"/>
+      <path d="M6 25 C6 25 12 21 18 22 C24 23 28 28 28 28" stroke={c} strokeWidth="1" opacity=".5"/>
+    </svg>
+  ),
+  teknoloji: (c) => (
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+      <rect x="4" y="7" width="28" height="18" rx="2" stroke={c} strokeWidth="1.5" fill={c+"15"}/>
+      <path d="M12 29 L24 29" stroke={c} strokeWidth="1.5" strokeLinecap="round"/>
+      <path d="M18 25 L18 29" stroke={c} strokeWidth="1.5"/>
+      <rect x="8" y="11" width="20" height="10" rx="1" fill={c+"20"} stroke={c} strokeWidth="1" opacity=".6"/>
+      <path d="M11 16 L15 13 L18 16 L22 12 L25 16" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+    </svg>
+  ),
+  ekonomi: (c) => (
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+      <path d="M6 28 L11 18 L16 22 L21 12 L26 16 L31 6" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M6 28 L31 28" stroke={c} strokeWidth="1.5" strokeLinecap="round" opacity=".4"/>
+      <circle cx="31" cy="6" r="2.5" fill={c}/>
+      <path d="M26 16 L31 6 L36 16" stroke="none"/>
+    </svg>
+  ),
+  politika: (c) => (
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+      <circle cx="18" cy="18" r="13" stroke={c} strokeWidth="1.5" fill="none"/>
+      <ellipse cx="18" cy="18" rx="6" ry="13" stroke={c} strokeWidth="1.5" fill="none"/>
+      <line x1="5" y1="18" x2="31" y2="18" stroke={c} strokeWidth="1.5" opacity=".5"/>
+      <path d="M7 11 Q18 14 29 11" stroke={c} strokeWidth="1" opacity=".4" fill="none"/>
+      <path d="M7 25 Q18 22 29 25" stroke={c} strokeWidth="1" opacity=".4" fill="none"/>
+    </svg>
+  ),
+  saglik: (c) => (
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+      <path d="M18 30 C18 30 6 22 6 14 C6 9.6 9.6 6 14 6 C16 6 18 8 18 8 C18 8 20 6 22 6 C26.4 6 30 9.6 30 14 C30 22 18 30 18 30Z" stroke={c} strokeWidth="1.5" fill={c+"15"}/>
+      <path d="M14 17 L18 17 L18 13 L20 13 L20 17 L24 17 L24 19 L20 19 L20 23 L18 23 L18 19 L14 19 Z" fill={c} opacity=".8"/>
+    </svg>
+  ),
+  bilim: (c) => (
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+      <circle cx="18" cy="12" r="5" stroke={c} strokeWidth="1.5" fill={c+"15"}/>
+      <line x1="18" y1="5" x2="18" y2="2" stroke={c} strokeWidth="1.5" strokeLinecap="round"/>
+      <line x1="24" y1="7" x2="26" y2="5" stroke={c} strokeWidth="1.5" strokeLinecap="round"/>
+      <line x1="12" y1="7" x2="10" y2="5" stroke={c} strokeWidth="1.5" strokeLinecap="round"/>
+      <path d="M12 17 L8 28 L28 28 L24 17" stroke={c} strokeWidth="1.5" strokeLinejoin="round" fill={c+"08"}/>
+      <line x1="10" y1="23" x2="26" y2="23" stroke={c} strokeWidth="1" opacity=".4"/>
+      <circle cx="18" cy="12" r="2" fill={c} opacity=".6"/>
+    </svg>
+  ),
+  sanat: (c) => (
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+      <circle cx="18" cy="18" r="12" stroke={c} strokeWidth="1.5" fill={c+"10"}/>
+      <circle cx="13" cy="14" r="2.5" fill={c} opacity=".8"/>
+      <circle cx="23" cy="14" r="2.5" fill={c} opacity=".6"/>
+      <circle cx="13" cy="22" r="2.5" fill={c} opacity=".5"/>
+      <circle cx="23" cy="22" r="2.5" fill={c} opacity=".7"/>
+      <circle cx="18" cy="18" r="2.5" fill={c}/>
+    </svg>
+  ),
+  dunya: (c) => (
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+      <circle cx="18" cy="18" r="13" stroke={c} strokeWidth="1.5" fill="none"/>
+      <path d="M12 8 L14 14 L10 16 L8 22 L14 26 L16 30" stroke={c} strokeWidth="1" fill="none" opacity=".6"/>
+      <path d="M24 8 L22 12 L26 16 L28 20 L24 26 L22 30" stroke={c} strokeWidth="1" fill="none" opacity=".6"/>
+      <path d="M5 18 L10 16 L14 18 L18 15 L22 18 L26 16 L31 18" stroke={c} strokeWidth="1.5" fill="none" opacity=".5"/>
+    </svg>
+  ),
+};
+
 const NEWS_CATS = [
-  { id:"spor",      label:"Spor",      icon:"⚽", color:"#ef4444",  desc:"Futbol, basketbol & dünya sporları" },
-  { id:"teknoloji", label:"Teknoloji", icon:"💻", color:"#3b82f6",  desc:"Yapay zeka, gadget & yazılım" },
-  { id:"ekonomi",   label:"Ekonomi",   icon:"📈", color:"#f59e0b",  desc:"Piyasalar, borsa & iş dünyası" },
-  { id:"politika",  label:"Politika",  icon:"🌐", color:"#ef4444",  desc:"Dünya siyaseti & gündem" },
-  { id:"saglik",    label:"Sağlık",    icon:"🏥", color:"#22c55e",  desc:"Tıp, beslenme & wellness" },
-  { id:"bilim",     label:"Bilim",     icon:"🔭", color:"#06b6d4",  desc:"Uzay, keşifler & araştırmalar" },
-  { id:"sanat",     label:"Sanat",     icon:"🎨", color:"#a855f7",  desc:"Kültür, sanat & eğlence" },
-  { id:"dunya",     label:"Dünya",     icon:"🗺", color:"#64748b",  desc:"Dünya haberleri & olaylar" },
+  { id:"spor",      label:"Spor",      color:"#ef4444",  desc:"Futbol, basketbol & dünya sporları" },
+  { id:"teknoloji", label:"Teknoloji", color:"#3b82f6",  desc:"Yapay zeka, gadget & yazılım" },
+  { id:"ekonomi",   label:"Ekonomi",   color:"#f59e0b",  desc:"Piyasalar, borsa & iş dünyası" },
+  { id:"politika",  label:"Politika",  color:"#ef4444",  desc:"Dünya siyaseti & gündem" },
+  { id:"saglik",    label:"Sağlık",    color:"#22c55e",  desc:"Tıp, beslenme & wellness" },
+  { id:"bilim",     label:"Bilim",     color:"#06b6d4",  desc:"Uzay, keşifler & araştırmalar" },
+  { id:"sanat",     label:"Sanat",     color:"#a855f7",  desc:"Kültür, sanat & eğlence" },
+  { id:"dunya",     label:"Dünya",     color:"#64748b",  desc:"Dünya haberleri & olaylar" },
 ];
 
 /* ── NewsRoom: Category grid → drill into article list ── */
@@ -1560,7 +1642,9 @@ function NewsRoom({ room, onBack }) {
             width:34,height:34,borderRadius:10,fontSize:16,cursor:"pointer",
             display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,
           }}>◀</button>
-          <span style={{fontSize:22,filter:`drop-shadow(0 0 6px ${catInfo?.color}88)`}}>{catInfo?.icon}</span>
+          <div style={{filter:`drop-shadow(0 0 6px ${catInfo?.color}88)`,flexShrink:0}}>
+            {NEWS_ICONS[activeCat]?.(catInfo?.color||"#aaa")}
+          </div>
           <div style={{flex:1}}>
             <h3 style={{margin:0,fontSize:18,fontWeight:800,color:catInfo?.color}}>{catInfo?.label}</h3>
             <div style={{fontSize:11,opacity:.4,marginTop:1}}>{catInfo?.desc}</div>
@@ -1586,7 +1670,9 @@ function NewsRoom({ room, onBack }) {
 
       {isLoading&&(
         <div style={{textAlign:"center",padding:"50px 0"}}>
-          <div style={{fontSize:36,marginBottom:10,animation:"pulse 1.5s ease-in-out infinite"}}>{catInfo?.icon}</div>
+          <div style={{margin:"0 auto 10px",animation:"pulse 1.5s ease-in-out infinite",width:40,height:40,display:"flex",alignItems:"center",justifyContent:"center"}}>
+            {NEWS_ICONS[activeCat]?.(catInfo?.color||"#aaa")}
+          </div>
           <div style={{fontSize:13,opacity:.4,marginBottom:4}}>Haberler yükleniyor...</div>
           <div style={{fontSize:11,opacity:.2}}>{NEWS_SOURCES[activeCat]?.map(s=>s.name).join(" · ")}</div>
         </div>
@@ -1670,7 +1756,9 @@ function NewsRoom({ room, onBack }) {
             width:34,height:34,borderRadius:10,fontSize:16,cursor:"pointer",
             display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,
           }}>◀</button>
-          <span style={{fontSize:22}}>📰</span>
+          <span style={{fontSize:22}}>
+            <svg width="22" height="22" viewBox="0 0 36 36" fill="none"><rect x="4" y="7" width="28" height="22" rx="2" stroke="#ef4444" strokeWidth="1.5" fill="rgba(239,68,68,0.1)"/><line x1="9" y1="13" x2="27" y2="13" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round"/><line x1="9" y1="18" x2="27" y2="18" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" opacity=".6"/><line x1="9" y1="23" x2="20" y2="23" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" opacity=".4"/></svg>
+          </span>
           <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>Haberler</h3>
           <span style={{fontSize:11,opacity:.3}}>{NEWS_CATS.length} kategori</span>
         </div>
@@ -1695,11 +1783,9 @@ function NewsRoom({ room, onBack }) {
             onMouseEnter={e=>{e.currentTarget.style.boxShadow=`0 0 40px ${cat.color}40, 0 0 80px ${cat.color}15, inset 0 1px 0 rgba(255,255,255,0.1)`;e.currentTarget.style.transform="scale(1.02)";}}
             onMouseLeave={e=>{e.currentTarget.style.boxShadow=`0 0 28px ${cat.color}22, 0 0 56px ${cat.color}0a, inset 0 1px 0 rgba(255,255,255,0.08)`;e.currentTarget.style.transform="scale(1)";}}
           >
-            <div style={{
-              fontSize:34,
-              filter:`drop-shadow(0 0 10px ${cat.color}88)`,
-              lineHeight:1,
-            }}>{cat.icon}</div>
+            <div style={{filter:`drop-shadow(0 0 10px ${cat.color}88)`,lineHeight:1}}>
+              {NEWS_ICONS[cat.id]?.(cat.color)}
+            </div>
             <div style={{fontSize:14,fontWeight:800,color:"#fff",textAlign:"center"}}>{cat.label}</div>
             <div style={{
               fontSize:10,color:cat.color,opacity:.8,
@@ -2368,7 +2454,7 @@ function Projects({ data, update }) {
     projects: "https://picsum.photos/seed/workspace/400/220",
     news:     "https://picsum.photos/seed/newspaper/400/220",
     music:    "https://picsum.photos/seed/concert/400/220",
-    clothes:  "https://picsum.photos/seed/fashion/400/220",
+    clothes:  "https://picsum.photos/seed/streetfashion/400/220",
     memories: "https://picsum.photos/seed/memories/400/220",
   };
   const KEYWORD_PHOTOS = {
@@ -2467,7 +2553,7 @@ function Projects({ data, update }) {
       <StickyHeader>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
           <button onClick={()=>setActiveRoom(null)} style={{background:"rgba(255,255,255,0.08)",backdropFilter:"blur(4px)",border:"1px solid rgba(255,255,255,0.1)",color:"#ccc",width:34,height:34,borderRadius:10,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>◀</button>
-          <span style={{fontSize:22}}>{room.icon}</span>
+          <div style={{width:28,height:28,borderRadius:8,background:`${room.color}25`,border:`1px solid ${room.color}50`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:room.color,flexShrink:0}}>{room.name[0]}</div>
           <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{room.name}</h3>
         </div>
       </StickyHeader>
@@ -2538,14 +2624,19 @@ function Projects({ data, update }) {
       <StickyHeader>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
           <button onClick={()=>setActiveRoom(null)} style={{background:"rgba(255,255,255,0.08)",backdropFilter:"blur(4px)",border:"1px solid rgba(255,255,255,0.1)",color:"#ccc",width:34,height:34,borderRadius:10,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>◀</button>
-          <span style={{fontSize:22}}>{room.icon}</span>
+          <div style={{width:28,height:28,borderRadius:8,background:`${room.color}25`,border:`1px solid ${room.color}50`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:room.color,flexShrink:0}}>{room.name[0]}</div>
           <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{room.name}</h3>
           <button onClick={()=>delRoom(activeRoom)} style={{background:"none",border:"none",color:"#ef4444",fontSize:11,cursor:"pointer",opacity:.5}}>Sil</button>
         </div>
       </StickyHeader>
       {items.length===0&&(
         <div style={{textAlign:"center",padding:"40px 20px"}}>
-          <div style={{fontSize:40,marginBottom:8}}>📦</div>
+          <svg width="52" height="52" viewBox="0 0 52 52" fill="none" style={{margin:"0 auto 12px",display:"block",opacity:.3}}>
+            <rect x="6" y="20" width="40" height="26" rx="3" stroke="#e0e0e0" strokeWidth="1.5" fill="none"/>
+            <path d="M6 26 L26 33 L46 26" stroke="#e0e0e0" strokeWidth="1.5"/>
+            <path d="M18 20 L18 10 L34 10 L34 20" stroke="#e0e0e0" strokeWidth="1.5" fill="none"/>
+            <path d="M20 15 L32 15" stroke="#e0e0e0" strokeWidth="1.5" strokeLinecap="round" opacity=".5"/>
+          </svg>
           <div style={{fontSize:14,fontWeight:600,opacity:.4,marginBottom:4}}>Bu oda boş</div>
           <div style={{fontSize:12,opacity:.25}}>+ ile öğe ekle</div>
         </div>
