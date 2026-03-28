@@ -20,10 +20,7 @@ import {
 const TABS = [
   { id: "dashboard", label: "Ana Sayfa", icon: "⌂" },
   { id: "tasks", label: "Görevler", icon: "✓" },
-  { id: "calendar", label: "Takvim", icon: "◫" },
-  { id: "sports", label: "Sağlık", icon: "♦" },
-  { id: "projects", label: "Stilim", icon: "◈" },
-  { id: "notes", label: "Notlar", icon: "☰" },
+  { id: "lifestyle", label: "Life Style", icon: "◈" },
 ];
 
 const SPORT_TYPES = ["Koşu","Yüzme","Bisiklet","Yoga","Ağırlık","Yürüyüş","Diğer"];
@@ -42,6 +39,7 @@ const DEFAULT_ROOMS = [
   { id: "music", name: "Müziklerim", icon: "🎵", color: "#a855f7", type: "collection" },
   { id: "clothes", name: "Kıyafetlerim", icon: "👗", color: "#f97316", type: "collection" },
   { id: "memories", name: "Anılar", icon: "📸", color: "#22c55e", type: "collection" },
+  { id: "healthcoach", name: "Sağlık Koçu", icon: "♥", color: "#14b8a6", type: "health" },
 ];
 
 const COMMON_FOODS = {
@@ -348,53 +346,87 @@ function Dashboard({ data, setTab, update }) {
 
   return (
     <div>
-      {/* HERO */}
-      <div style={{
-        background:"linear-gradient(135deg,rgba(26,36,72,0.9) 0%,rgba(28,28,46,0.7) 60%,rgba(31,26,46,0.9) 100%)",
-        backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",
-        borderRadius:20,padding:"20px 18px 18px",marginBottom:14,
-        border:"1px solid rgba(255,255,255,0.1)",
-        boxShadow:"0 0 40px rgba(59,130,246,0.08), 0 8px 32px rgba(0,0,0,0.4)",
-      }}>
+      {/* HERO - Greeting */}
+      <div style={{marginBottom:14}}>
         <h2 style={{margin:0,fontSize:23,fontWeight:800,letterSpacing:-.5}}>{greeting}! 👋</h2>
-        <p style={{margin:"4px 0 16px",opacity:.45,fontSize:13}}>
+        <p style={{margin:"4px 0 0",opacity:.45,fontSize:13}}>
           {new Date().toLocaleDateString("tr-TR",{weekday:"long",day:"numeric",month:"long"})}
         </p>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
-          {[
-            {label:"Bekleyen görev",val:pending,color:"#3b82f6",tab:"tasks"},
-            {label:"Bugün etkinlik",val:todayEv.length,color:"#a855f7",tab:"calendar"},
-            {label:"kcal alındı",val:todayCalIn,color:"#f97316",tab:"sports"},
-            {label:"Aktif proje",val:activeProjects,color:"#22c55e",tab:"projects"},
-          ].map(s=>(
-            <div key={s.tab} onClick={()=>setTab(s.tab)} style={{
-              background:`linear-gradient(135deg,${s.color}18,${s.color}08)`,
-              backdropFilter:"blur(8px)",
-              borderRadius:14,padding:"12px 14px",cursor:"pointer",
-              border:`1px solid ${s.color}40`,
-              boxShadow:`0 0 20px ${s.color}15, inset 0 1px 0 ${s.color}20`,
-              transition:"transform .15s, box-shadow .15s",
-            }}>
-              <div style={{fontSize:24,fontWeight:800,color:s.color,letterSpacing:-.5}}>{s.val}</div>
-              <div style={{fontSize:11,color:s.color,opacity:.8,marginTop:2}}>{s.label}</div>
-            </div>
-          ))}
+      </div>
+
+      {/* 3 AKILLI KART */}
+      {/* Kart 1: Görev + Etkinlik + Proje */}
+      <div onClick={()=>setTab("tasks")} style={{
+        ...glowCard("#3b82f6"),cursor:"pointer",marginBottom:10,
+      }}>
+        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
+          <div style={{width:36,height:36,borderRadius:10,background:"rgba(59,130,246,0.15)",border:"1px solid rgba(59,130,246,0.3)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 11l3 3L22 4" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </div>
+          <div style={{flex:1}}>
+            <div style={{fontSize:14,fontWeight:700}}>Görev Durumu</div>
+            <div style={{fontSize:11,opacity:.4}}>Bugünün özeti</div>
+          </div>
+          <span style={{fontSize:14,opacity:.2}}>▶</span>
+        </div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
+          <div style={{background:"rgba(59,130,246,0.1)",borderRadius:10,padding:"10px 8px",textAlign:"center"}}>
+            <div style={{fontSize:22,fontWeight:800,color:"#3b82f6"}}>{pending}</div>
+            <div style={{fontSize:10,color:"#3b82f6",opacity:.7,marginTop:2}}>Bekleyen</div>
+          </div>
+          <div style={{background:"rgba(168,85,247,0.1)",borderRadius:10,padding:"10px 8px",textAlign:"center"}}>
+            <div style={{fontSize:22,fontWeight:800,color:"#a855f7"}}>{todayEv.length}</div>
+            <div style={{fontSize:10,color:"#a855f7",opacity:.7,marginTop:2}}>Etkinlik</div>
+          </div>
+          <div style={{background:"rgba(34,197,94,0.1)",borderRadius:10,padding:"10px 8px",textAlign:"center"}}>
+            <div style={{fontSize:22,fontWeight:800,color:"#22c55e"}}>{activeProjects}</div>
+            <div style={{fontSize:10,color:"#22c55e",opacity:.7,marginTop:2}}>Proje</div>
+          </div>
         </div>
       </div>
 
-      {/* Quick actions */}
-      <div style={{display:"flex",gap:8,marginBottom:14}}>
-        {[
-          {label:"+ Görev",tab:"tasks",color:"#3b82f6"},
-          {label:"+ Yemek",tab:"sports",color:"#f97316"},
-          {label:"+ Spor",tab:"sports",color:"#22c55e"},
-        ].map(a=>(
-          <button key={a.label} onClick={()=>setTab(a.tab)} style={{
-            flex:1,background:`${a.color}12`,backdropFilter:"blur(8px)",color:a.color,border:`1px solid ${a.color}40`,
-            borderRadius:12,padding:"10px 4px",fontSize:12,fontWeight:700,cursor:"pointer",
-            boxShadow:`0 0 16px ${a.color}15`,
-          }}>{a.label}</button>
-        ))}
+      {/* Kart 2: Kalori + Yemek/Spor butonları */}
+      <div style={{...glowCard("#f97316"),marginBottom:10}}>
+        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
+          <div style={{width:36,height:36,borderRadius:10,background:"rgba(249,115,22,0.15)",border:"1px solid rgba(249,115,22,0.3)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" stroke="#f97316" strokeWidth="2" fill="none"/><path d="M12 6v6l4 2" stroke="#f97316" strokeWidth="2" strokeLinecap="round"/></svg>
+          </div>
+          <div style={{flex:1}}>
+            <div style={{fontSize:14,fontWeight:700}}>Kalori Takibi</div>
+            <div style={{fontSize:11,opacity:.4}}>Bugün: {todayCalIn} kcal alındı · {todayCalOut} kcal yakıldı</div>
+          </div>
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
+          <div style={{flex:1,height:8,background:"rgba(255,255,255,0.08)",borderRadius:4,overflow:"hidden"}}>
+            <div style={{height:"100%",borderRadius:4,width:`${Math.min(100,Math.round(todayCalIn/2000*100))}%`,background:"linear-gradient(90deg,#f97316,#ef4444)",transition:"width .5s"}}/>
+          </div>
+          <span style={{fontSize:11,color:"#f97316",fontWeight:600,flexShrink:0}}>{Math.round(todayCalIn/2000*100)}%</span>
+        </div>
+        <div style={{display:"flex",gap:8}}>
+          <button onClick={()=>setTab("lifestyle")} style={{
+            flex:1,background:"rgba(249,115,22,0.12)",color:"#f97316",border:"1px solid rgba(249,115,22,0.3)",
+            borderRadius:10,padding:"9px 4px",fontSize:12,fontWeight:700,cursor:"pointer",
+          }}>+ Yemek</button>
+          <button onClick={()=>setTab("lifestyle")} style={{
+            flex:1,background:"rgba(34,197,94,0.12)",color:"#22c55e",border:"1px solid rgba(34,197,94,0.3)",
+            borderRadius:10,padding:"9px 4px",fontSize:12,fontWeight:700,cursor:"pointer",
+          }}>+ Spor</button>
+        </div>
+      </div>
+
+      {/* Kart 3: Stil Motivasyon */}
+      <div onClick={()=>setTab("lifestyle")} style={{
+        ...glowCard("#a855f7"),cursor:"pointer",marginBottom:14,
+        display:"flex",alignItems:"center",gap:14,
+      }}>
+        <div style={{width:44,height:44,borderRadius:12,background:"rgba(168,85,247,0.15)",border:"1px solid rgba(168,85,247,0.3)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+          <svg width="22" height="22" viewBox="0 0 32 32" fill="none"><path d="M9 4C9 4 6 5 4 8L2 13L8 15L8 12L10 12L10 28L22 28L22 12L24 12L24 15L30 13L28 8C26 5 23 4 23 4C23 4 21 7 16 7C11 7 9 4 9 4Z" stroke="#a855f7" strokeWidth="1.5" fill="rgba(168,85,247,0.15)" strokeLinejoin="round"/></svg>
+        </div>
+        <div style={{flex:1}}>
+          <div style={{fontSize:14,fontWeight:700,color:"#c4b5fd"}}>Bugün harika görüneceksin!</div>
+          <div style={{fontSize:11,opacity:.45,marginTop:3}}>Hava durumuna göre stil önerilerin hazır</div>
+        </div>
+        <span style={{fontSize:14,opacity:.2}}>▶</span>
       </div>
 
       {overdue>0&&(
@@ -417,7 +449,7 @@ function Dashboard({ data, setTab, update }) {
         <div style={{marginBottom:14}}>
           <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em",marginBottom:8}}>Bugünün Programı</div>
           {scheduleItems.map(item=>(
-            <div key={item.id} onClick={()=>setTab(item.type==="task"?"tasks":"calendar")} style={{
+            <div key={item.id} onClick={()=>setTab("tasks")} style={{
               ...cardStyle,padding:"13px 14px",marginBottom:6,
               display:"flex",alignItems:"center",gap:12,cursor:"pointer",minHeight:54,
               border:`1px solid ${item.color}25`,boxShadow:`0 0 16px ${item.color}10`,
@@ -478,7 +510,7 @@ function Dashboard({ data, setTab, update }) {
             <svg width="12" height="12" viewBox="0 0 36 36" fill="none"><rect x="4" y="7" width="28" height="22" rx="2" stroke="#ef4444" strokeWidth="2" fill="none"/><line x1="9" y1="13" x2="27" y2="13" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/><line x1="9" y1="18" x2="22" y2="18" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" opacity=".6"/></svg>
             BBC Türkçe Haberler
           </div>
-          <button onClick={()=>setTab("projects")} style={{background:"none",border:"none",color:"#ef4444",fontSize:12,cursor:"pointer",fontWeight:600}}>Tümü ▶</button>
+          <button onClick={()=>setTab("lifestyle")} style={{background:"none",border:"none",color:"#ef4444",fontSize:12,cursor:"pointer",fontWeight:600}}>Tümü ▶</button>
         </div>
         <div style={{background:"rgba(239,68,68,0.06)",backdropFilter:"blur(12px)",borderRadius:16,padding:"12px 14px",border:"1px solid rgba(239,68,68,0.18)",boxShadow:"0 0 20px rgba(239,68,68,0.06)"}}>
           {headlines.length === 0 ? (
@@ -506,10 +538,10 @@ function Dashboard({ data, setTab, update }) {
             <svg width="12" height="12" viewBox="0 0 36 36" fill="none"><circle cx="12" cy="28" r="5" stroke="#a855f7" strokeWidth="2" fill="none"/><circle cx="28" cy="24" r="5" stroke="#a855f7" strokeWidth="2" fill="none"/><path d="M17 28 L17 8 L33 4 L33 24" stroke="#a855f7" strokeWidth="2" strokeLinecap="round"/><line x1="17" y1="8" x2="33" y2="4" stroke="#a855f7" strokeWidth="1.5"/></svg>
             Müzik Koleksiyonu
           </div>
-          <button onClick={()=>setTab("projects")} style={{background:"none",border:"none",color:"#a855f7",fontSize:12,cursor:"pointer",fontWeight:600}}>Tümü ▶</button>
+          <button onClick={()=>setTab("lifestyle")} style={{background:"none",border:"none",color:"#a855f7",fontSize:12,cursor:"pointer",fontWeight:600}}>Tümü ▶</button>
         </div>
         {musicItems.length === 0 ? (
-          <div onClick={()=>setTab("projects")} style={{
+          <div onClick={()=>setTab("lifestyle")} style={{
             background:"rgba(168,85,247,0.06)",border:"1px solid rgba(168,85,247,0.18)",borderRadius:16,
             padding:"16px 18px",cursor:"pointer",display:"flex",alignItems:"center",gap:14,
           }}>
@@ -549,11 +581,11 @@ function Dashboard({ data, setTab, update }) {
         <div>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
             <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em"}}>Son Notlar</div>
-            <button onClick={()=>setTab("notes")} style={{background:"none",border:"none",color:"#3b82f6",fontSize:12,cursor:"pointer",fontWeight:600}}>Tümü ▶</button>
+            <button onClick={()=>setTab("tasks")} style={{background:"none",border:"none",color:"#3b82f6",fontSize:12,cursor:"pointer",fontWeight:600}}>Tümü ▶</button>
           </div>
           <div style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:4,WebkitOverflowScrolling:"touch"}}>
             {data.notes.slice(0,5).map(n=>(
-              <div key={n.id} onClick={()=>setTab("notes")} style={{
+              <div key={n.id} onClick={()=>setTab("tasks")} style={{
                 background:"rgba(255,255,255,0.04)",backdropFilter:"blur(8px)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:14,padding:"10px 12px",
                 minWidth:130,maxWidth:160,cursor:"pointer",flexShrink:0,
                 borderTop:`3px solid ${n.color||"#14b8a6"}`,
@@ -2606,6 +2638,7 @@ function Projects({ data, update }) {
     music:    "https://picsum.photos/seed/concert/400/220",
     clothes:  "https://picsum.photos/seed/streetfashion/400/220",
     memories: "https://picsum.photos/seed/memories/400/220",
+    healthcoach: "https://picsum.photos/seed/wellness/400/220",
   };
   const KEYWORD_PHOTOS = {
     kitap:   "https://picsum.photos/seed/library/400/220",
@@ -2629,7 +2662,7 @@ function Projects({ data, update }) {
     <div>
       <StickyHeader>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-          <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Benim Stilim</h3>
+          <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Life Style</h3>
         </div>
         <p style={{margin:"6px 0 0",fontSize:12,opacity:.4}}>Kişisel alanların — odalarına dokun ve keşfet</p>
       </StickyHeader>
@@ -2769,6 +2802,23 @@ function Projects({ data, update }) {
   if(activeRoom==="news" || room.type==="news") return <NewsRoom room={room} onBack={()=>setActiveRoom(null)} />;
   if(activeRoom==="music" || room.name==="Müziklerim") return <MusicRoom room={room} items={items} onBack={()=>setActiveRoom(null)} onAdd={(item)=>{const cur=roomItems[activeRoom]||[];update({...data,roomItems:{...roomItems,[activeRoom]:[item,...cur]}});}} onDel={(id)=>delItem(activeRoom,id)} />;
   if(activeRoom==="clothes" || room.name==="Kıyafetlerim") return <BenimStilimRoom data={data} update={update} onBack={()=>setActiveRoom(null)} />;
+  if(activeRoom==="healthcoach" || room.type==="health") return (
+    <div>
+      <StickyHeader>
+        <div style={{display:"flex",alignItems:"center",gap:10}}>
+          <button onClick={()=>setActiveRoom(null)} style={{background:"rgba(255,255,255,0.08)",backdropFilter:"blur(4px)",border:"1px solid rgba(255,255,255,0.1)",color:"#ccc",width:34,height:34,borderRadius:10,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>◀</button>
+          <div style={{width:28,height:28,borderRadius:8,background:"rgba(20,184,166,0.2)",border:"1px solid rgba(20,184,166,0.4)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 21C12 21 4 15 4 9C4 5.69 6.69 3 10 3C11.5 3 12.5 4 12 4.5C12 4.5 12.5 3 14 3C17.31 3 20 5.69 20 9C20 15 12 21 12 21Z" stroke="#14b8a6" strokeWidth="1.5" fill="rgba(20,184,166,0.2)"/></svg>
+          </div>
+          <div>
+            <div style={{fontSize:18,fontWeight:800,background:"linear-gradient(135deg,#5eead4,#14b8a6)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>Sağlık Koçu</div>
+            <div style={{fontSize:10,opacity:.35}}>Beslenme & spor takibi</div>
+          </div>
+        </div>
+      </StickyHeader>
+      <Sports data={data} update={update}/>
+    </div>
+  );
 
   return (
     <div>
@@ -2883,6 +2933,41 @@ function Notes({ data, update }) {
         </div>
         <button style={btnPrimary} onClick={save2}>{editing?"Güncelle":"Kaydet"}</button>
       </Modal>
+    </div>
+  );
+}
+
+/* ═══════════ TASKS HUB (Görevler + Takvim + Notlar) ═══════════ */
+function TasksHub({ data, update }) {
+  const [subTab, setSubTab] = useState("tasks");
+  return (
+    <div>
+      <div style={{
+        display:"flex",gap:6,marginBottom:2,
+        background:"rgba(6,6,17,0.7)",
+        backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",
+        padding:"10px 4px 8px",
+        borderRadius:14,
+        position:"sticky",top:0,zIndex:60,
+      }}>
+        {[["tasks","Görevler","✓"],["calendar","Takvim","◫"],["notes","Notlar","☰"]].map(([k,v,icon])=>(
+          <button key={k} onClick={()=>setSubTab(k)} style={{
+            flex:1,
+            background:subTab===k?"rgba(59,130,246,0.15)":"rgba(255,255,255,0.04)",
+            color:subTab===k?"#3b82f6":"#666",
+            border:subTab===k?"1px solid rgba(59,130,246,0.3)":"1px solid rgba(255,255,255,0.06)",
+            padding:"10px 4px",borderRadius:10,fontSize:12,fontWeight:subTab===k?700:500,
+            cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:3,
+            transition:"all .15s",
+          }}>
+            <span style={{fontSize:16}}>{icon}</span>
+            {v}
+          </button>
+        ))}
+      </div>
+      {subTab==="tasks" && <Tasks data={data} update={update}/>}
+      {subTab==="calendar" && <CalendarView data={data} update={update}/>}
+      {subTab==="notes" && <Notes data={data} update={update}/>}
     </div>
   );
 }
@@ -3540,11 +3625,8 @@ export default function App() {
   const content = () => {
     switch(tab) {
       case "dashboard": return <Dashboard data={data} setTab={setTab} update={update}/>;
-      case "tasks": return <Tasks data={data} update={update}/>;
-      case "calendar": return <CalendarView data={data} update={update}/>;
-      case "sports": return <Sports data={data} update={update}/>;
-      case "projects": return <Projects data={data} update={update}/>;
-      case "notes": return <Notes data={data} update={update}/>;
+      case "tasks": return <TasksHub data={data} update={update}/>;
+      case "lifestyle": return <Projects data={data} update={update}/>;
       case "settings": return <Settings data={data} update={update} onImport={d=>{setData(d);showToast("Veriler aktarıldı!")}} user={user} onLogout={handleLogout}/>;
     }
   };
