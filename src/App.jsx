@@ -84,7 +84,7 @@ function useIsMobile() {
 const inp = {
   width:"100%",
   background:"#2A2A35",
-  border:"1px solid rgba(255,255,255,0.06)",
+  border:"1px solid rgba(255,255,255,0.05)",
   borderRadius:12,padding:"12px 14px",color:"#F9FAFB",fontSize:15,
   marginBottom:10,outline:"none",boxSizing:"border-box",WebkitAppearance:"none",
 };
@@ -665,16 +665,15 @@ function Tasks({ data, update }) {
 
   const TaskCard = ({ task }) => (
     <div style={{...cardStyle,display:"flex",alignItems:"center",gap:12,minHeight:52,opacity:task.done?.5:1,
-      border:`1px solid ${task.done?"rgba(34,197,94,0.15)":PCOL[task.priority]+"20"}`,
-      boxShadow:task.done?"none":`0 0 16px ${PCOL[task.priority]}12`,
+      border:`1px solid ${task.done?"rgba(16,185,129,0.1)":PCOL[task.priority]+"15"}`,
     }}>
       <button onClick={()=>toggle(task.id)} style={checkBtnStyle(task.done)}>{task.done&&"✓"}</button>
       <div style={{flex:1,minWidth:0,cursor:"pointer"}} onClick={()=>setDetail(detail===task.id?null:task.id)}>
-        <div style={{fontSize:15,fontWeight:600,textDecoration:task.done?"line-through":"none",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{task.title}</div>
+        <div style={{fontSize:14,fontWeight:600,color:"#F9FAFB",textDecoration:task.done?"line-through":"none",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{task.title}</div>
         <div style={{display:"flex",gap:6,marginTop:4,flexWrap:"wrap",alignItems:"center"}}>
-          {task.priority&&<span style={{background:`${PCOL[task.priority]}20`,color:PCOL[task.priority],padding:"2px 8px",borderRadius:6,fontSize:11,fontWeight:600}}>{PRIORITIES[task.priority]}</span>}
-          {task.category&&<span style={{background:"rgba(59,130,246,0.12)",color:"#3b82f6",padding:"2px 8px",borderRadius:6,fontSize:11}}>{task.category}</span>}
-          {task.dueDate&&<span style={{fontSize:11,color:!task.done&&task.dueDate<t?"#ef4444":"#6B7280"}}>{formatDate(task.dueDate)}</span>}
+          {task.priority&&<span style={{background:`${PCOL[task.priority]}15`,color:PCOL[task.priority],padding:"2px 8px",borderRadius:6,fontSize:11,fontWeight:600}}>{PRIORITIES[task.priority]}</span>}
+          {task.category&&<span style={{background:"rgba(59,130,246,0.1)",color:"#3b82f6",padding:"2px 8px",borderRadius:6,fontSize:11}}>{task.category}</span>}
+          {task.dueDate&&<span style={{fontSize:11,color:!task.done&&task.dueDate<t?"#ef4444":"#9CA3AF"}}>{formatDate(task.dueDate)}</span>}
         </div>
       </div>
       <button onClick={()=>del(task.id)} style={delBtnStyle}>✕</button>
@@ -686,7 +685,7 @@ function Tasks({ data, update }) {
       <StickyHeader>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
           <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Görevler</h3>
-          <span style={{fontSize:12,opacity:.4,fontWeight:500}}>{pending} bekliyor</span>
+          <span style={{fontSize:12,color:"#9CA3AF",fontWeight:500}}>{pending} bekliyor</span>
         </div>
         <div style={{display:"flex",gap:6,overflowX:"auto",paddingBottom:2,WebkitOverflowScrolling:"touch"}}>
           {[["all","Tümü"],["pending","Bekleyen"],["done","Bitti"],["high","Öncelikli"],["overdue","Gecikmiş"]].map(([k,v])=>(
@@ -700,8 +699,8 @@ function Tasks({ data, update }) {
           ? (
             <div style={{textAlign:"center",padding:"40px 20px"}}>
               <div style={{fontSize:40,marginBottom:8}}>✅</div>
-              <div style={{fontSize:14,fontWeight:600,opacity:.4,marginBottom:4}}>Tüm görevler tamamlandı!</div>
-              <div style={{fontSize:12,opacity:.25}}>+ ile yeni görev ekle</div>
+              <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:4}}>Tüm görevler tamamlandı!</div>
+              <div style={{fontSize:12,color:"#4B5563"}}>+ ile yeni görev ekle</div>
             </div>
           )
           : groups.map(group=>(
@@ -715,8 +714,8 @@ function Tasks({ data, update }) {
           ? (
             <div style={{textAlign:"center",padding:"40px 20px"}}>
               <div style={{fontSize:40,marginBottom:8}}>✅</div>
-              <div style={{fontSize:14,fontWeight:600,opacity:.4,marginBottom:4}}>Tüm görevler tamamlandı!</div>
-              <div style={{fontSize:12,opacity:.25}}>+ ile yeni görev ekle</div>
+              <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:4}}>Tüm görevler tamamlandı!</div>
+              <div style={{fontSize:12,color:"#4B5563"}}>+ ile yeni görev ekle</div>
             </div>
           )
           : list.map(task=><TaskCard key={task.id} task={task}/>)
@@ -752,13 +751,13 @@ function Tasks({ data, update }) {
         <textarea style={{...inp,minHeight:80,resize:"vertical",fontFamily:"inherit",lineHeight:1.5}} placeholder="Açıklama (opsiyonel)..." value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/>
         <input style={inp} placeholder="Kategori (opsiyonel)" value={form.category} onChange={e=>setForm({...form,category:e.target.value})}/>
         <div style={{marginBottom:10}}>
-          <div style={{fontSize:12,opacity:.5,marginBottom:6}}>Tarih seç:</div>
+          <div style={{fontSize:12,color:"#9CA3AF",marginBottom:6}}>Tarih seç:</div>
           <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:8}}>
             {quickDates.map(q=>(
               <button key={q.label} onClick={()=>setForm({...form,dueDate:q.val})} style={{
                 background:form.dueDate===q.val?"rgba(59,130,246,0.2)":"#2A2A35",
                 color:form.dueDate===q.val?"#3b82f6":"#aaa",
-                border:form.dueDate===q.val?"1px solid rgba(59,130,246,0.3)":"1px solid rgba(255,255,255,0.06)",
+                border:form.dueDate===q.val?"1px solid rgba(59,130,246,0.3)":"1px solid rgba(255,255,255,0.05)",
                 padding:"8px 12px",borderRadius:10,fontSize:13,cursor:"pointer",
               }}>{q.icon} {q.label}</button>
             ))}
@@ -773,14 +772,14 @@ function Tasks({ data, update }) {
           </div>
         </div>
         <div style={{marginBottom:12}}>
-          <div style={{fontSize:12,opacity:.5,marginBottom:6}}>Öncelik:</div>
+          <div style={{fontSize:12,color:"#9CA3AF",marginBottom:6}}>Öncelik:</div>
           <div style={{display:"flex",gap:6}}>
             {Object.entries(PRIORITIES).map(([k,v])=>(
               <button key={k} onClick={()=>setForm({...form,priority:k})} style={{
                 flex:1,padding:"10px",borderRadius:10,fontSize:13,cursor:"pointer",textAlign:"center",fontWeight:600,
                 background:form.priority===k?`${PCOL[k]}20`:"#2A2A35",
                 color:form.priority===k?PCOL[k]:"#9CA3AF",
-                border:`1px solid ${form.priority===k?PCOL[k]+"40":"rgba(255,255,255,0.06)"}`,
+                border:`1px solid ${form.priority===k?PCOL[k]+"40":"rgba(255,255,255,0.05)"}`,
               }}>
                 <span style={{display:"block",width:8,height:8,borderRadius:"50%",background:PCOL[k],margin:"0 auto 4px"}}/>
                 {v}
@@ -844,21 +843,21 @@ function CalendarView({ data, update }) {
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
           <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Takvim</h3>
           <div style={{display:"flex",alignItems:"center",gap:6}}>
-            <button onClick={()=>setVd(new Date(y,m-1))} style={{background:"rgba(255,255,255,0.05)",backdropFilter:"blur(4px)",border:"1px solid rgba(255,255,255,0.1)",color:"#9CA3AF",width:32,height:32,borderRadius:10,fontSize:16,cursor:"pointer"}}>◀</button>
+            <button onClick={()=>setVd(new Date(y,m-1))} style={{background:"#2A2A35",border:"1px solid rgba(255,255,255,0.05)",color:"#9CA3AF",width:32,height:32,borderRadius:10,fontSize:16,cursor:"pointer"}}>◀</button>
             <span style={{fontWeight:700,fontSize:14,minWidth:105,textAlign:"center"}}>{MN[m]} {y}</span>
-            <button onClick={()=>setVd(new Date(y,m+1))} style={{background:"rgba(255,255,255,0.05)",backdropFilter:"blur(4px)",border:"1px solid rgba(255,255,255,0.1)",color:"#9CA3AF",width:32,height:32,borderRadius:10,fontSize:16,cursor:"pointer"}}>▶</button>
+            <button onClick={()=>setVd(new Date(y,m+1))} style={{background:"#2A2A35",border:"1px solid rgba(255,255,255,0.05)",color:"#9CA3AF",width:32,height:32,borderRadius:10,fontSize:16,cursor:"pointer"}}>▶</button>
           </div>
         </div>
       </StickyHeader>
       <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:3}}>
-        {DN.map(d=><div key={d} style={{textAlign:"center",fontSize:11,fontWeight:700,opacity:.4,padding:"6px 0"}}>{d}</div>)}
+        {DN.map(d=><div key={d} style={{textAlign:"center",fontSize:11,fontWeight:700,color:"#9CA3AF",padding:"6px 0"}}>{d}</div>)}
         {cells.map((d,i)=>{
           const isToday=d&&ds(d)===t;
           const ev=d?evOn(d):[];
           const isSel=d&&selDay===d;
           return (
             <div key={i} onClick={()=>d&&setSelDay(selDay===d?null:d)} style={{
-              background:isToday?"rgba(59,130,246,0.2)":isSel?"rgba(59,130,246,0.1)":"rgba(255,255,255,0.03)",
+              background:isToday?"rgba(59,130,246,0.2)":isSel?"rgba(59,130,246,0.1)":"#1C1C26",
               borderRadius:10,minHeight:48,padding:4,cursor:d?"pointer":"default",
               display:"flex",flexDirection:"column",alignItems:"center",gap:2,
               border:isToday?"1.5px solid #3b82f6":isSel?"1.5px solid rgba(59,130,246,0.3)":"1.5px solid transparent",
@@ -879,14 +878,14 @@ function CalendarView({ data, update }) {
             <h4 style={{margin:0,fontSize:15,fontWeight:700}}>{selDay} {MN[m]}</h4>
             <button onClick={openAdd} style={{background:"rgba(59,130,246,0.15)",color:"#3b82f6",border:"none",borderRadius:8,padding:"6px 14px",fontSize:12,cursor:"pointer",fontWeight:600}}>+ Ekle</button>
           </div>
-          {evOn(selDay).length===0&&<p style={{opacity:.3,fontSize:13,margin:0}}>Etkinlik yok</p>}
+          {evOn(selDay).length===0&&<p style={{color:"#9CA3AF",fontSize:13,margin:0}}>Etkinlik yok</p>}
           {evOn(selDay).map((e,idx)=>(
             <div key={idx} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 0",borderBottom:"1px solid rgba(255,255,255,0.05)"}}>
               <span style={{width:10,height:10,borderRadius:"50%",background:e.color||"#3b82f6",flexShrink:0}}/>
               <div style={{flex:1}}>
-                <div style={{fontSize:14,fontWeight:500}}>{e.title} {e.recurring&&e.recurring!=="none"&&<span style={{fontSize:10,opacity:.4}}>🔁</span>}</div>
-                {e.time&&<div style={{fontSize:12,opacity:.5}}>🕐 {e.time}</div>}
-                {e.description&&<div style={{fontSize:12,opacity:.5}}>{e.description}</div>}
+                <div style={{fontSize:14,fontWeight:500}}>{e.title} {e.recurring&&e.recurring!=="none"&&<span style={{fontSize:10,color:"#9CA3AF"}}>🔁</span>}</div>
+                {e.time&&<div style={{fontSize:12,color:"#9CA3AF"}}>🕐 {e.time}</div>}
+                {e.description&&<div style={{fontSize:12,color:"#9CA3AF"}}>{e.description}</div>}
               </div>
               <button onClick={()=>del(e.id)} style={delBtnStyle}>✕</button>
             </div>
@@ -905,7 +904,7 @@ function CalendarView({ data, update }) {
                 <span style={{width:10,height:10,borderRadius:"50%",background:e.color||"#a855f7",flexShrink:0}}/>
                 <div style={{flex:1,minWidth:0}}>
                   <div style={{fontSize:14,fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{e.title}</div>
-                  <div style={{fontSize:11,opacity:.45,marginTop:2}}>{e.date}{e.time?` · ${e.time}`:""}</div>
+                  <div style={{fontSize:11,color:"#9CA3AF",marginTop:2}}>{e.date}{e.time?` · ${e.time}`:""}</div>
                 </div>
                 <button onClick={()=>update({...data,events:data.events.filter(ev=>ev.id!==e.id)})} style={delBtnStyle}>✕</button>
               </div>
@@ -1178,23 +1177,23 @@ function Sports({ data, update, initialView, onBack }) {
         <div style={{display:"flex",justifyContent:"space-around",textAlign:"center",marginBottom:10}}>
           <div>
             <div style={{fontSize:22,fontWeight:800,color:"#f97316"}}>{todayCalIn}</div>
-            <div style={{fontSize:10,opacity:.5}}>Alınan</div>
+            <div style={{fontSize:10,color:"#9CA3AF"}}>Alınan</div>
           </div>
           <div style={{fontSize:18,opacity:.2,alignSelf:"center"}}>−</div>
           <div>
             <div style={{fontSize:22,fontWeight:800,color:"#22c55e"}}>{todayCalOut}</div>
-            <div style={{fontSize:10,opacity:.5}}>Yakılan</div>
+            <div style={{fontSize:10,color:"#9CA3AF"}}>Yakılan</div>
           </div>
           <div style={{fontSize:18,opacity:.2,alignSelf:"center"}}>=</div>
           <div>
             <div style={{fontSize:22,fontWeight:800,color:netCal>dailyGoal?"#ef4444":"#3b82f6"}}>{netCal}</div>
-            <div style={{fontSize:10,opacity:.5}}>Net</div>
+            <div style={{fontSize:10,color:"#9CA3AF"}}>Net</div>
           </div>
         </div>
-        <div style={{height:6,background:"rgba(255,255,255,0.05)",borderRadius:3,overflow:"hidden"}}>
+        <div style={{height:6,background:"#2A2A35",borderRadius:3,overflow:"hidden"}}>
           <div style={{height:"100%",background:netCal>dailyGoal?"#ef4444":"#3b82f6",borderRadius:3,width:`${Math.min(100,netCal/dailyGoal*100)}%`,transition:"width .3s"}}/>
         </div>
-        <div style={{fontSize:10,opacity:.3,marginTop:4,textAlign:"center"}}>Hedef: {dailyGoal} kcal</div>
+        <div style={{fontSize:10,color:"#9CA3AF",marginTop:4,textAlign:"center"}}>Hedef: {dailyGoal} kcal</div>
       </div>
 
       {/* +Yemek / +Spor butonları */}
@@ -1256,9 +1255,9 @@ function Sports({ data, update, initialView, onBack }) {
 
       {/* ── Bugünün Yemekleri ── */}
       <div style={{marginBottom:14}}>
-        <div style={{fontSize:12,fontWeight:700,opacity:.5,textTransform:"uppercase",letterSpacing:".06em",marginBottom:8}}>Bugünün Yemekleri</div>
+        <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:8}}>Bugünün Yemekleri</div>
         {todayFoods.length===0 ? (
-          <div style={{textAlign:"center",padding:"20px",opacity:.3,fontSize:13}}>Henüz yemek kaydı yok</div>
+          <div style={{textAlign:"center",padding:"20px",color:"#9CA3AF",fontSize:13}}>Henüz yemek kaydı yok</div>
         ) : mealGroups.map(meal=>{
           const mealFoods=todayFoods.filter(f=>f.meal===meal);
           if(mealFoods.length===0)return null;
@@ -1283,15 +1282,15 @@ function Sports({ data, update, initialView, onBack }) {
 
       {/* ── Bugünün Sporları ── */}
       <div style={{marginBottom:14}}>
-        <div style={{fontSize:12,fontWeight:700,opacity:.5,textTransform:"uppercase",letterSpacing:".06em",marginBottom:8}}>Bugünün Sporları</div>
+        <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:8}}>Bugünün Sporları</div>
         {todaySports.length===0 ? (
-          <div style={{textAlign:"center",padding:"20px",opacity:.3,fontSize:13}}>Henüz spor kaydı yok</div>
+          <div style={{textAlign:"center",padding:"20px",color:"#9CA3AF",fontSize:13}}>Henüz spor kaydı yok</div>
         ) : todaySports.map(s=>(
           <div key={s.id} style={{...cardStyle,display:"flex",alignItems:"center",gap:10,padding:"10px 14px"}}>
             <div style={{fontSize:20,width:36,height:36,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(34,197,94,0.1)",borderRadius:10}}>{SPORT_EMOJI[s.type]||"⚡"}</div>
             <div style={{flex:1,minWidth:0}}>
               <div style={{fontSize:14,fontWeight:600}}>{s.type}</div>
-              <div style={{fontSize:11,opacity:.5}}>{s.duration}dk {s.distance>0&&`· ${s.distance}km`} · {s.calories||calcSportCal(s.type,s.duration)} kcal</div>
+              <div style={{fontSize:11,color:"#9CA3AF"}}>{s.duration}dk {s.distance>0&&`· ${s.distance}km`} · {s.calories||calcSportCal(s.type,s.duration)} kcal</div>
             </div>
             <button onClick={()=>delSport(s.id)} style={delBtnStyle}>✕</button>
           </div>
@@ -1300,7 +1299,7 @@ function Sports({ data, update, initialView, onBack }) {
 
       {/* ── Haftalık Özet ── */}
       <div style={{marginBottom:14}}>
-        <div style={{fontSize:12,fontWeight:700,opacity:.5,textTransform:"uppercase",letterSpacing:".06em",marginBottom:8}}>Bu Hafta</div>
+        <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:8}}>Bu Hafta</div>
         <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:8}}>
           {[
             {icon:"⏱",val:`${tMin} dk`,label:"Spor süresi",color:"#3b82f6"},
@@ -1309,7 +1308,7 @@ function Sports({ data, update, initialView, onBack }) {
             {icon:"💪",val:wk.length,label:"Antrenman",color:"#f97316"},
           ].map((s,i)=>(
             <div key={i} style={{...cardStyle,padding:"12px",borderLeft:`3px solid ${s.color}`,boxShadow:`0 0 12px ${s.color}15`}}>
-              <div style={{fontSize:10,opacity:.5}}>{s.icon} {s.label}</div>
+              <div style={{fontSize:10,color:"#9CA3AF"}}>{s.icon} {s.label}</div>
               <div style={{fontSize:18,fontWeight:800,color:s.color,marginTop:3}}>{s.val}</div>
             </div>
           ))}
@@ -1324,7 +1323,7 @@ function Sports({ data, update, initialView, onBack }) {
               <button key={m} onClick={()=>setFoodForm({...foodForm,meal:m})} style={{
                 background:foodForm.meal===m?"rgba(59,130,246,0.2)":"#2A2A35",
                 color:foodForm.meal===m?"#3b82f6":"#aaa",
-                border:foodForm.meal===m?"1px solid rgba(59,130,246,0.3)":"1px solid rgba(255,255,255,0.06)",
+                border:foodForm.meal===m?"1px solid rgba(59,130,246,0.3)":"1px solid rgba(255,255,255,0.05)",
                 padding:"7px 12px",borderRadius:10,fontSize:13,cursor:"pointer",
               }}>{m}</button>
             ))}
@@ -1339,12 +1338,12 @@ function Sports({ data, update, initialView, onBack }) {
           {(foodSearch||!foodForm.name)&&(
             <div style={{maxHeight:180,overflow:"auto",marginBottom:10}}>
               {!foodSearch&&Object.keys(myFoods).length>0&&(
-                <div style={{fontSize:10,opacity:.4,padding:"4px 8px",fontWeight:700}}>⭐ Benim Yemeklerim</div>
+                <div style={{fontSize:10,color:"#9CA3AF",padding:"4px 8px",fontWeight:700}}>⭐ Benim Yemeklerim</div>
               )}
               {filteredFoods.map(([name,cal,source])=>(
                 <div key={name} onClick={()=>selectCommonFood(name,cal)} style={{
                   display:"flex",justifyContent:"space-between",alignItems:"center",padding:"9px 10px",cursor:"pointer",
-                  borderRadius:8,background:"rgba(255,255,255,0.03)",marginBottom:2,
+                  borderRadius:8,background:"#1C1C26",marginBottom:2,
                 }}>
                   <div style={{display:"flex",alignItems:"center",gap:6}}>
                     {(source==="my"||myFoods[name])&&<span style={{fontSize:10,color:"#f59e0b"}}>⭐</span>}
@@ -1355,14 +1354,14 @@ function Sports({ data, update, initialView, onBack }) {
               ))}
               {noResults&&(
                 <div style={{textAlign:"center",padding:12}}>
-                  <p style={{fontSize:12,opacity:.4,margin:"0 0 8px"}}>"{foodSearch}" bulunamadı</p>
+                  <p style={{fontSize:12,color:"#9CA3AF",margin:"0 0 8px"}}>"{foodSearch}" bulunamadı</p>
                   {hasAI?(
                     <button onClick={()=>askAiCalorie(foodSearch)} disabled={aiLookup} style={{
                       background:"rgba(34,197,94,0.15)",color:"#22c55e",border:"1px solid rgba(34,197,94,0.3)",
                       padding:"8px 16px",borderRadius:10,fontSize:13,cursor:"pointer",fontWeight:600,
                     }}>{aiLookup?"🔄 AI hesaplıyor...":"🤖 AI'a Kaloriyi Sor"}</button>
                   ):(
-                    <p style={{fontSize:11,opacity:.3}}>Kaloriyi elle gir veya Ayarlar'dan AI aç</p>
+                    <p style={{fontSize:11,color:"#4B5563"}}>Kaloriyi elle gir veya Ayarlar'dan AI aç</p>
                   )}
                 </div>
               )}
@@ -1381,7 +1380,7 @@ function Sports({ data, update, initialView, onBack }) {
             </div>
           </div>
           {foodForm.name&&foodForm.calories&&!allFoodDB[foodForm.name.trim()]&&(
-            <div style={{fontSize:10,opacity:.4,marginBottom:8,display:"flex",alignItems:"center",gap:4}}>
+            <div style={{fontSize:10,color:"#9CA3AF",marginBottom:8,display:"flex",alignItems:"center",gap:4}}>
               <span>⭐</span> "{foodForm.name}" kişisel listene kaydedilecek
             </div>
           )}
@@ -1397,7 +1396,7 @@ function Sports({ data, update, initialView, onBack }) {
             <button key={s} onClick={()=>setForm({...form,type:s})} style={{
               background:form.type===s?"rgba(34,197,94,0.2)":"#2A2A35",
               color:form.type===s?"#22c55e":"#aaa",
-              border:form.type===s?"1px solid rgba(34,197,94,0.3)":"1px solid rgba(255,255,255,0.06)",
+              border:form.type===s?"1px solid rgba(34,197,94,0.3)":"1px solid rgba(255,255,255,0.05)",
               padding:"7px 14px",borderRadius:10,fontSize:13,cursor:"pointer",
               display:"flex",alignItems:"center",gap:4,
             }}><span>{SPORT_EMOJI[s]}</span>{s}</button>
@@ -1640,10 +1639,10 @@ function NewsRoom({ room, onBack }) {
           </div>
           <div style={{flex:1}}>
             <h3 style={{margin:0,fontSize:18,fontWeight:800,color:catInfo?.color}}>{catInfo?.label}</h3>
-            <div style={{fontSize:11,opacity:.4,marginTop:1}}>{catInfo?.desc}</div>
+            <div style={{fontSize:11,color:"#9CA3AF",marginTop:1}}>{catInfo?.desc}</div>
           </div>
           <button onClick={()=>fetchCategory(activeCat,true)} style={{
-            background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",
+            background:"#2A2A35",border:"1px solid rgba(255,255,255,0.1)",
             color:"#9CA3AF",width:34,height:34,borderRadius:10,fontSize:14,cursor:"pointer",
             display:"flex",alignItems:"center",justifyContent:"center",
           }}>↻</button>
@@ -1666,14 +1665,14 @@ function NewsRoom({ room, onBack }) {
           <div style={{margin:"0 auto 10px",animation:"pulse 1.5s ease-in-out infinite",width:40,height:40,display:"flex",alignItems:"center",justifyContent:"center"}}>
             {NEWS_ICONS[activeCat]?.(catInfo?.color||"#aaa")}
           </div>
-          <div style={{fontSize:13,opacity:.4,marginBottom:4}}>Haberler yükleniyor...</div>
+          <div style={{fontSize:13,color:"#9CA3AF",marginBottom:4}}>Haberler yükleniyor...</div>
           <div style={{fontSize:11,opacity:.2}}>{NEWS_SOURCES[activeCat]?.map(s=>s.name).join(" · ")}</div>
         </div>
       )}
 
       {!isLoading&&list.length>0&&(
         <div>
-          <div style={{fontSize:11,opacity:.3,marginBottom:12,display:"flex",alignItems:"center",gap:6}}>
+          <div style={{fontSize:11,color:"#4B5563",marginBottom:12,display:"flex",alignItems:"center",gap:6}}>
             <span style={{width:5,height:5,borderRadius:"50%",background:catInfo?.color,display:"inline-block"}}/>
             <span>{list.length} haber</span>
           </div>
@@ -1699,7 +1698,7 @@ function NewsRoom({ room, onBack }) {
                     WebkitBoxOrient:"vertical",overflow:"hidden",
                   }}>{article.title}</div>
                   {!article.thumb&&article.summary&&(
-                    <div style={{fontSize:12,opacity:.45,lineHeight:1.45,marginBottom:6,
+                    <div style={{fontSize:12,color:"#9CA3AF"5,lineHeight:1.45,marginBottom:6,
                       display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",overflow:"hidden",
                     }}>{article.summary}</div>
                   )}
@@ -1710,7 +1709,7 @@ function NewsRoom({ room, onBack }) {
                       background:`${article.sourceColor}18`,
                       padding:"2px 8px",borderRadius:5,
                     }}>{article.source}</span>
-                    {article.pubDate&&<span style={{fontSize:10,opacity:.3}}>{timeAgo(article.pubDate)}</span>}
+                    {article.pubDate&&<span style={{fontSize:10,color:"#4B5563"}}>{timeAgo(article.pubDate)}</span>}
                     <span style={{fontSize:10,opacity:.2,marginLeft:"auto"}}>↗ Habere git</span>
                   </div>
                 </div>
@@ -1723,8 +1722,8 @@ function NewsRoom({ room, onBack }) {
       {!isLoading&&list.length===0&&loaded[activeCat]&&(
         <div style={{textAlign:"center",padding:"40px 20px"}}>
           <div style={{fontSize:40,marginBottom:10}}>📡</div>
-          <div style={{fontSize:14,fontWeight:600,opacity:.4,marginBottom:6}}>Haber yüklenemedi</div>
-          <div style={{fontSize:12,opacity:.25,marginBottom:16}}>İnternet bağlantını kontrol et</div>
+          <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:6}}>Haber yüklenemedi</div>
+          <div style={{fontSize:12,color:"#4B5563",marginBottom:16}}>İnternet bağlantını kontrol et</div>
           <button onClick={()=>fetchCategory(activeCat,true)} style={{
             background:`${catInfo?.color}20`,color:catInfo?.color,
             border:`1px solid ${catInfo?.color}40`,borderRadius:10,
@@ -1745,17 +1744,17 @@ function NewsRoom({ room, onBack }) {
             <svg width="22" height="22" viewBox="0 0 36 36" fill="none"><rect x="4" y="7" width="28" height="22" rx="2" stroke="#ef4444" strokeWidth="1.5" fill="rgba(239,68,68,0.1)"/><line x1="9" y1="13" x2="27" y2="13" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round"/><line x1="9" y1="18" x2="27" y2="18" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" opacity=".6"/><line x1="9" y1="23" x2="20" y2="23" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" opacity=".4"/></svg>
           </span>
           <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>Haberler</h3>
-          <span style={{fontSize:11,opacity:.3}}>{NEWS_CATS.length} kategori</span>
+          <span style={{fontSize:11,color:"#4B5563"}}>{NEWS_CATS.length} kategori</span>
         </div>
-        <p style={{margin:"6px 0 0",fontSize:12,opacity:.35}}>Bir kategoriye dokun ve haberleri keşfet</p>
+        <p style={{margin:"6px 0 0",fontSize:12,color:"#4B5563"5}}>Bir kategoriye dokun ve haberleri keşfet</p>
       </StickyHeader>
 
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
         {NEWS_CATS.map((cat,idx)=>(
           <div key={cat.id} className={`touch-card stagger-${Math.min(idx+1,6)}`} onClick={()=>openCat(cat.id)}
             style={{
-              background:`linear-gradient(145deg,rgba(255,255,255,0.06) 0%,rgba(255,255,255,0.02) 100%)`,
-              backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",
+              background:`linear-gradient(145deg,rgba(255,255,255,0.05) 0%,rgba(255,255,255,0.02) 100%)`,
+              
               borderRadius:20,padding:"20px 16px",cursor:"pointer",
               border:`1px solid ${cat.color}45`,
               boxShadow:`0 0 28px ${cat.color}22, 0 0 56px ${cat.color}0a, inset 0 1px 0 rgba(255,255,255,0.05)`,
@@ -1778,7 +1777,7 @@ function NewsRoom({ room, onBack }) {
               </div>
             )}
             {loading[cat.id]&&(
-              <div style={{fontSize:10,opacity:.4,animation:"pulse 1s ease-in-out infinite"}}>yükleniyor...</div>
+              <div style={{fontSize:10,color:"#9CA3AF",animation:"pulse 1s ease-in-out infinite"}}>yükleniyor...</div>
             )}
           </div>
         ))}
@@ -2020,10 +2019,10 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
           <button className="back-btn" onClick={onBack}>◀</button>
           <span style={{fontSize:22}}>🎵</span>
           <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{room.name}</h3>
-          <span style={{fontSize:12,opacity:.4}}>{items.length} parça</span>
+          <span style={{fontSize:12,color:"#9CA3AF"}}>{items.length} parça</span>
         </div>
         {/* Tab switcher — 4 tabs */}
-        <div style={{background:"#2A2A35",backdropFilter:"blur(8px)",borderRadius:12,padding:3,display:"flex",gap:1}}>
+        <div style={{background:"#2A2A35",borderRadius:12,padding:3,display:"flex",gap:1}}>
           {[["collection","Benim"],["charts","Top 🏆"],["search","Ara"],["link","Link"]].map(([k,v])=>(
             <button key={k} onClick={()=>setTab(k)} style={{
               flex:1,padding:"8px 2px",borderRadius:9,border:"none",cursor:"pointer",
@@ -2040,8 +2039,8 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
         items.length===0 ? (
           <div style={{textAlign:"center",padding:"40px 20px"}}>
             <div style={{fontSize:44,marginBottom:10}}>🎵</div>
-            <div style={{fontSize:15,fontWeight:700,opacity:.5,marginBottom:6}}>Koleksiyonun boş</div>
-            <div style={{fontSize:12,opacity:.3,marginBottom:20}}>Deezer'dan ara veya link yapıştır</div>
+            <div style={{fontSize:15,fontWeight:700,color:"#9CA3AF",marginBottom:6}}>Koleksiyonun boş</div>
+            <div style={{fontSize:12,color:"#4B5563",marginBottom:20}}>Deezer'dan ara veya link yapıştır</div>
             <div style={{display:"flex",gap:8,justifyContent:"center"}}>
               <button onClick={()=>setTab("search")} style={{background:"rgba(162,56,255,0.15)",color:"#a238ff",border:"1px solid rgba(162,56,255,0.3)",borderRadius:12,padding:"10px 20px",fontSize:13,fontWeight:700,cursor:"pointer"}}>🔍 Deezer'da Ara</button>
               <button onClick={()=>setTab("link")} style={{background:"rgba(59,130,246,0.15)",color:"#3b82f6",border:"1px solid rgba(59,130,246,0.3)",borderRadius:12,padding:"10px 20px",fontSize:13,fontWeight:700,cursor:"pointer"}}>🔗 Link Ekle</button>
@@ -2066,8 +2065,8 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
               </div>
               <div style={{flex:1,minWidth:0}}>
                 <div style={{fontSize:14,fontWeight:700,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.title}</div>
-                {item.artist&&<div style={{fontSize:12,opacity:.5,marginTop:2}}>{item.artist}</div>}
-                <div style={{fontSize:11,opacity:.35,marginTop:2,display:"flex",alignItems:"center",gap:4}}>
+                {item.artist&&<div style={{fontSize:12,color:"#9CA3AF",marginTop:2}}>{item.artist}</div>}
+                <div style={{fontSize:11,color:"#4B5563"5,marginTop:2,display:"flex",alignItems:"center",gap:4}}>
                   <span>{platformIcon(item)}</span>
                   <span>{item.platform||item.source||"Müzik"}</span>
                 </div>
@@ -2087,7 +2086,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
               {item.link&&(
                 <a href={item.link} target="_blank" rel="noopener noreferrer" style={{
                   width:36,height:36,borderRadius:"50%",
-                  background:"rgba(255,255,255,0.05)",
+                  background:"#2A2A35",
                   display:"flex",alignItems:"center",justifyContent:"center",
                   textDecoration:"none",fontSize:14,flexShrink:0,
                 }}>↗</a>
@@ -2112,15 +2111,15 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
             {searching?"Aranıyor...":"Deezer'da Ara"}
           </button>
           {searching&&(
-            <div style={{textAlign:"center",padding:20,opacity:.4,fontSize:13}}>🎵 Aranıyor...</div>
+            <div style={{textAlign:"center",padding:20,color:"#9CA3AF",fontSize:13}}>🎵 Aranıyor...</div>
           )}
           {!searching&&searchResults.length===0&&searchQ&&(
-            <div style={{textAlign:"center",padding:"20px 0",opacity:.4,fontSize:13}}>Sonuç bulunamadı</div>
+            <div style={{textAlign:"center",padding:"20px 0",color:"#9CA3AF",fontSize:13}}>Sonuç bulunamadı</div>
           )}
           {!searching&&searchResults.length===0&&!searchQ&&(
             <div style={{textAlign:"center",padding:"20px 0"}}>
               <div style={{fontSize:32,marginBottom:8}}>🎧</div>
-              <div style={{fontSize:13,opacity:.4}}>Deezer veritabanında 90M+ parça</div>
+              <div style={{fontSize:13,color:"#9CA3AF"}}>Deezer veritabanında 90M+ parça</div>
               <div style={{fontSize:11,opacity:.25,marginTop:4}}>Arama yap → 30 sn önizleme dinle → Ekle</div>
             </div>
           )}
@@ -2140,7 +2139,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
                 </div>
                 <div style={{flex:1,minWidth:0}}>
                   <div style={{fontSize:13,fontWeight:700,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{track.title}</div>
-                  <div style={{fontSize:11,opacity:.5,marginTop:1}}>{track.artist?.name}</div>
+                  <div style={{fontSize:11,color:"#9CA3AF",marginTop:1}}>{track.artist?.name}</div>
                   {track.preview&&(
                     <div style={{fontSize:10,color:"#a238ff",marginTop:1,opacity:.7}}>▶ 30sn önizleme var</div>
                   )}
@@ -2172,7 +2171,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
       {/* ── LINK ── */}
       {tab==="link"&&(
         <div>
-          <div style={{fontSize:12,opacity:.5,marginBottom:8,lineHeight:1.5}}>
+          <div style={{fontSize:12,color:"#9CA3AF",marginBottom:8,lineHeight:1.5}}>
             Spotify, YouTube, SoundCloud, Apple Music veya herhangi bir müzik linkini yapıştır.
           </div>
           <input
@@ -2198,10 +2197,10 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
           </div>
 
           {/* Link preview card */}
-          {linkFetching&&<div style={{textAlign:"center",opacity:.4,fontSize:13,padding:12}}>Kontrol ediliyor...</div>}
+          {linkFetching&&<div style={{textAlign:"center",color:"#9CA3AF",fontSize:13,padding:12}}>Kontrol ediliyor...</div>}
           {linkPreview&&(
             <div style={{background:"rgba(59,130,246,0.08)",border:"1px solid rgba(59,130,246,0.2)",borderRadius:14,padding:14,marginBottom:12}}>
-              <div style={{fontSize:11,opacity:.5,marginBottom:4}}>{linkPreview.icon} {linkPreview.platform}</div>
+              <div style={{fontSize:11,color:"#9CA3AF",marginBottom:4}}>{linkPreview.icon} {linkPreview.platform}</div>
               <div style={{fontSize:14,fontWeight:700}}>{linkPreview.title}</div>
             </div>
           )}
@@ -2220,9 +2219,9 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
             opacity:linkInput.trim()?1:.5,
           }}>Koleksiyona Ekle</button>
 
-          <div style={{marginTop:16,background:"rgba(255,255,255,0.03)",borderRadius:12,padding:12}}>
-            <div style={{fontSize:11,fontWeight:700,opacity:.4,marginBottom:6,textTransform:"uppercase",letterSpacing:".05em"}}>Nasıl kullanılır?</div>
-            <div style={{fontSize:11,opacity:.4,lineHeight:1.7}}>
+          <div style={{marginTop:16,background:"#1C1C26",borderRadius:12,padding:12}}>
+            <div style={{fontSize:11,fontWeight:700,color:"#9CA3AF",marginBottom:6,textTransform:"uppercase",letterSpacing:".05em"}}>Nasıl kullanılır?</div>
+            <div style={{fontSize:11,color:"#9CA3AF",lineHeight:1.7}}>
               1. Spotify'dan bir parça aç → 3 nokta → "Paylaş" → "Linki kopyala"<br/>
               2. Yukarıdaki kutuya yapıştır<br/>
               3. "Koleksiyona Ekle" ye bas
@@ -2262,7 +2261,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
           )}
 
           {/* Source label */}
-          <div style={{fontSize:11,opacity:.4,marginBottom:10,display:"flex",alignItems:"center",gap:6}}>
+          <div style={{fontSize:11,color:"#9CA3AF",marginBottom:10,display:"flex",alignItems:"center",gap:6}}>
             <span>
               {chartSource==="tr"&&"🍎 Apple Music Türkiye · Güncel Top 25"}
               {chartSource==="global"&&"🟣 Deezer Global · Top 25 · 30sn önizleme"}
@@ -2274,7 +2273,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
           {chartLoading&&(
             <div style={{textAlign:"center",padding:"30px 0"}}>
               <div style={{fontSize:32,marginBottom:8,animation:"pulse 1.5s ease-in-out infinite"}}>🎵</div>
-              <div style={{fontSize:13,opacity:.4}}>Liste yükleniyor...</div>
+              <div style={{fontSize:13,color:"#9CA3AF"}}>Liste yükleniyor...</div>
             </div>
           )}
 
@@ -2304,7 +2303,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
                 {/* Info */}
                 <div style={{flex:1,minWidth:0}}>
                   <div style={{fontSize:13,fontWeight:700,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{track.title}</div>
-                  <div style={{fontSize:11,opacity:.5,marginTop:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{track.artist}</div>
+                  <div style={{fontSize:11,color:"#9CA3AF",marginTop:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{track.artist}</div>
                   {track.preview&&<div style={{fontSize:10,color:"#a238ff",opacity:.7,marginTop:1}}>▶ önizleme</div>}
                 </div>
                 {/* Preview button */}
@@ -2322,7 +2321,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
                 {track.link&&!track.preview&&(
                   <a href={track.link} target="_blank" rel="noopener noreferrer" style={{
                     width:32,height:32,borderRadius:"50%",flexShrink:0,
-                    background:"rgba(255,255,255,0.05)",
+                    background:"#2A2A35",
                     display:"flex",alignItems:"center",justifyContent:"center",
                     textDecoration:"none",fontSize:13,color:"#9CA3AF",
                   }}>↗</a>
@@ -2354,7 +2353,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
           {!chartLoading&&chartTracks.length===0&&(
             <div style={{textAlign:"center",padding:"30px 0"}}>
               <div style={{fontSize:32,marginBottom:8}}>📡</div>
-              <div style={{fontSize:13,opacity:.4}}>Liste yüklenemedi</div>
+              <div style={{fontSize:13,color:"#9CA3AF"}}>Liste yüklenemedi</div>
               <div style={{fontSize:11,opacity:.25,marginTop:4}}>İnternet bağlantını kontrol et</div>
               <button onClick={()=>{setChartLoaded("");fetchCharts(chartSource,chartGenre);}} style={{
                 marginTop:12,background:"rgba(162,56,255,0.15)",color:"#a238ff",
@@ -2422,35 +2421,35 @@ function BenimStilimRoom({data,update,onBack}){
           <button className="back-btn" onClick={onBack}>◀</button>
           <div>
             <div style={{fontSize:18,fontWeight:900,background:"linear-gradient(135deg,#e0d5f5,#a78bfa)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>Benim Stilim</div>
-            <div style={{fontSize:10,opacity:.35}}>Kişisel stil & moodboard</div>
+            <div style={{fontSize:10,color:"#4B5563"5}}>Kişisel stil & moodboard</div>
           </div>
         </div>
       </StickyHeader>
       <div style={{background:"linear-gradient(135deg,rgba(59,130,246,0.1),rgba(99,102,241,0.1))",border:"1px solid rgba(59,130,246,0.2)",borderRadius:16,padding:"14px 16px",marginBottom:16}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-          <div><div style={{fontSize:10,fontWeight:700,opacity:.5,letterSpacing:1,textTransform:"uppercase"}}>Bugünün Havası</div><div style={{fontSize:12,opacity:.55,marginTop:2}}>İstanbul, Türkiye</div></div>
-          <div style={{textAlign:"right"}}>{wxLoad?<div style={{fontSize:12,opacity:.4,animation:"pulse 1.5s infinite"}}>Yükleniyor...</div>:weather?<><div style={{fontSize:26,fontWeight:800,color:"#e0d5f5"}}>{weather.temp}°C</div><div style={{fontSize:11,opacity:.5}}>{weather.desc}</div></>:<div style={{fontSize:11,opacity:.4}}>Veri alınamadı</div>}</div>
+          <div><div style={{fontSize:10,fontWeight:700,color:"#9CA3AF",letterSpacing:1,textTransform:"uppercase"}}>Bugünün Havası</div><div style={{fontSize:12,color:"#9CA3AF"5,marginTop:2}}>İstanbul, Türkiye</div></div>
+          <div style={{textAlign:"right"}}>{wxLoad?<div style={{fontSize:12,color:"#9CA3AF",animation:"pulse 1.5s infinite"}}>Yükleniyor...</div>:weather?<><div style={{fontSize:26,fontWeight:800,color:"#e0d5f5"}}>{weather.temp}°C</div><div style={{fontSize:11,color:"#9CA3AF"}}>{weather.desc}</div></>:<div style={{fontSize:11,color:"#9CA3AF"}}>Veri alınamadı</div>}</div>
         </div>
-        {weather&&<div style={{marginTop:8,paddingTop:8,borderTop:"1px solid rgba(255,255,255,0.05)",display:"flex",gap:16}}><div style={{fontSize:10,opacity:.4}}>{weather.wind} km/s rüzgar</div><div style={{fontSize:10,opacity:.4}}>%{weather.humid} nem</div><div style={{fontSize:10,opacity:.4}}>{weather.feel}°C hissedilen</div></div>}
-        <div style={{marginTop:10,background:"rgba(255,255,255,0.05)",borderRadius:10,padding:"8px 12px"}}><div style={{fontSize:10,opacity:.45,marginBottom:3}}>Stil Önerisi</div><div style={{fontSize:13,color:"#c4b5fd",fontWeight:600}}>{wxLoad?"Hesaplanıyor...":weather?getStyleHint(weather.temp):"Hava bilgisi mevcut değil"}</div></div>
+        {weather&&<div style={{marginTop:8,paddingTop:8,borderTop:"1px solid rgba(255,255,255,0.05)",display:"flex",gap:16}}><div style={{fontSize:10,color:"#9CA3AF"}}>{weather.wind} km/s rüzgar</div><div style={{fontSize:10,color:"#9CA3AF"}}>%{weather.humid} nem</div><div style={{fontSize:10,color:"#9CA3AF"}}>{weather.feel}°C hissedilen</div></div>}
+        <div style={{marginTop:10,background:"#2A2A35",borderRadius:10,padding:"8px 12px"}}><div style={{fontSize:10,color:"#9CA3AF"5,marginBottom:3}}>Stil Önerisi</div><div style={{fontSize:13,color:"#c4b5fd",fontWeight:600}}>{wxLoad?"Hesaplanıyor...":weather?getStyleHint(weather.temp):"Hava bilgisi mevcut değil"}</div></div>
       </div>
-      <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,opacity:.4,textTransform:"uppercase",marginBottom:10}}>Bugün İçin Görünümler</div>
+      <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,color:"#9CA3AF",textTransform:"uppercase",marginBottom:10}}>Bugün İçin Görünümler</div>
       <div style={{display:"flex",gap:8,marginBottom:16}}>
         {looks.map((look,i)=>(
           <div key={i} onClick={()=>setActiveLook(i)} style={{background:activeLook===i?"rgba(167,139,250,0.1)":"#2A2A35",border:`1px solid ${activeLook===i?"rgba(167,139,250,0.5)":"rgba(255,255,255,0.05)"}`,borderRadius:14,padding:"12px 8px",cursor:"pointer",flex:1,minWidth:0,transition:"all .2s"}}>
             <div style={{marginBottom:6,display:"flex",justifyContent:"center"}}><ClothingIcon type={look.icon} size={26} color={activeLook===i?"#a78bfa":"#6B7280"}/></div>
             <div style={{fontSize:11,fontWeight:700,marginBottom:4,textAlign:"center",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{look.name}</div>
             <div style={{display:"flex",flexWrap:"wrap",gap:2,justifyContent:"center"}}>{look.tags.map((t,ti)=><span key={ti} style={{fontSize:9,fontWeight:600,padding:"2px 5px",borderRadius:20,background:TAG_COL[t.c]?.bg,color:TAG_COL[t.c]?.text}}>{t.l}</span>)}</div>
-            <div style={{fontSize:9,opacity:.4,marginTop:4,textAlign:"center"}}>{look.mood}</div>
+            <div style={{fontSize:9,color:"#9CA3AF",marginTop:4,textAlign:"center"}}>{look.mood}</div>
           </div>
         ))}
       </div>
-      <div style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.05)",borderRadius:16,padding:"14px 16px",marginBottom:12}}>
-        <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,opacity:.4,textTransform:"uppercase",marginBottom:12}}>Stil Kuralları & Sınırlar</div>
+      <div style={{background:"#1C1C26",border:"1px solid rgba(255,255,255,0.05)",borderRadius:16,padding:"14px 16px",marginBottom:12}}>
+        <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,color:"#9CA3AF",textTransform:"uppercase",marginBottom:12}}>Stil Kuralları & Sınırlar</div>
         <div style={{marginBottom:14}}>
           <div style={{display:"flex",justifyContent:"space-between",fontSize:12,opacity:.7,marginBottom:4}}><span>Giyim Sıklığı Skoru</span><span style={{color:"#a78bfa",fontWeight:700}}>{freqScore}%</span></div>
-          <div style={{height:6,borderRadius:3,background:"rgba(255,255,255,0.05)"}}><div style={{height:"100%",borderRadius:3,background:"linear-gradient(90deg,#6366f1,#a78bfa)",width:`${freqScore}%`,transition:"width .8s"}}/></div>
-          <div style={{fontSize:10,opacity:.3,marginTop:4}}>{freqScore<50?"Dolapta bekleyen parçalar var":freqScore<80?"Optimum aralıkta":"Mükemmel, aktif dolap!"}</div>
+          <div style={{height:6,borderRadius:3,background:"#2A2A35"}}><div style={{height:"100%",borderRadius:3,background:"linear-gradient(90deg,#6366f1,#a78bfa)",width:`${freqScore}%`,transition:"width .8s"}}/></div>
+          <div style={{fontSize:10,color:"#9CA3AF",marginTop:4}}>{freqScore<50?"Dolapta bekleyen parçalar var":freqScore<80?"Optimum aralıkta":"Mükemmel, aktif dolap!"}</div>
         </div>
         {rules.map(r=>(
           <div key={r.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"9px 0",borderBottom:"1px solid rgba(255,255,255,0.05)"}}>
@@ -2461,35 +2460,35 @@ function BenimStilimRoom({data,update,onBack}){
           </div>
         ))}
       </div>
-      <div style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.05)",borderRadius:16,padding:"14px 16px",marginBottom:12}}>
-        <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,opacity:.4,textTransform:"uppercase",marginBottom:12}}>Renk Paleti Disiplini</div>
+      <div style={{background:"#1C1C26",border:"1px solid rgba(255,255,255,0.05)",borderRadius:16,padding:"14px 16px",marginBottom:12}}>
+        <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,color:"#9CA3AF",textTransform:"uppercase",marginBottom:12}}>Renk Paleti Disiplini</div>
         <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
           {PALETTE_COLS.map(p=>(<div key={p.hex} title={p.name} onClick={()=>togglePalette(p.hex)} style={{width:36,height:36,borderRadius:10,background:p.hex,cursor:"pointer",flexShrink:0,transition:"transform .15s",outline:paletteActive.includes(p.hex)?"2.5px solid rgba(167,139,250,0.9)":"none",transform:paletteActive.includes(p.hex)?"scale(1.12)":"scale(1)"}}/>))}
-          <div style={{width:36,height:36,borderRadius:10,border:"1.5px dashed rgba(255,255,255,0.2)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,opacity:.4,cursor:"pointer"}}>+</div>
+          <div style={{width:36,height:36,borderRadius:10,border:"1.5px dashed rgba(255,255,255,0.2)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,color:"#9CA3AF",cursor:"pointer"}}>+</div>
         </div>
-        <div style={{fontSize:10,opacity:.3,marginTop:8}}>{paletteActive.length===0?"Renklere dokun — aktif paletini belirle":`${paletteActive.length} renk seçili — disiplin aktif`}</div>
+        <div style={{fontSize:10,color:"#4B5563",marginTop:8}}>{paletteActive.length===0?"Renklere dokun — aktif paletini belirle":`${paletteActive.length} renk seçili — disiplin aktif`}</div>
       </div>
       <div style={{marginBottom:12}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-          <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,opacity:.4,textTransform:"uppercase"}}>Dolabım</div>
+          <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,color:"#9CA3AF",textTransform:"uppercase"}}>Dolabım</div>
           <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
             {[{id:"all",l:"Tümü"},{id:"top",l:"Üst"},{id:"alt",l:"Alt"},{id:"dis",l:"Dış"},{id:"elbise",l:"Elbise"}].map(f=>(
               <button key={f.id} onClick={()=>setWardFilter(f.id)} style={{background:wardFilter===f.id?"rgba(167,139,250,0.15)":"#2A2A35",border:`1px solid ${wardFilter===f.id?"rgba(167,139,250,0.4)":"rgba(255,255,255,0.05)"}`,color:wardFilter===f.id?"#c4b5fd":"#6B7280",borderRadius:20,padding:"4px 10px",fontSize:10,cursor:"pointer",fontWeight:wardFilter===f.id?700:400}}>{f.l}</button>
             ))}
           </div>
         </div>
-        {filtered.length===0&&<div style={{textAlign:"center",padding:"30px 0",opacity:.3,fontSize:13}}>Bu kategoride kıyafet yok</div>}
+        {filtered.length===0&&<div style={{textAlign:"center",padding:"30px 0",color:"#9CA3AF",fontSize:13}}>Bu kategoride kıyafet yok</div>}
         {filtered.map(item=>{
           const fc=CLOTH_FREQ[item.freqStatus]||CLOTH_FREQ.new;
           return(
-            <div key={item.id} style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.05)",borderRadius:14,padding:"10px 12px",display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
+            <div key={item.id} style={{background:"#1C1C26",border:"1px solid rgba(255,255,255,0.05)",borderRadius:14,padding:"10px 12px",display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
               <div style={{width:44,height:44,borderRadius:12,background:(item.color||"#a78bfa")+"25",border:`1px solid ${(item.color||"#a78bfa")}40`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
                 <ClothingIcon type={catIconMap[item.cat]||"smart"} size={24} color={item.color||"#a78bfa"}/>
               </div>
               <div style={{flex:1,minWidth:0}}>
                 <div style={{fontSize:13,fontWeight:600}}>{item.name}</div>
-                <div style={{fontSize:10,opacity:.4,marginTop:2}}>{item.wornCount} kez giyildi · {item.lastWorn}</div>
-                <div style={{height:5,borderRadius:3,background:"rgba(255,255,255,0.05)",marginTop:5}}><div style={{height:"100%",borderRadius:3,width:`${item.freq}%`,background:item.freqStatus==="favorite"?"linear-gradient(90deg,#22c55e,#14b8a6)":item.freqStatus==="waiting"?"linear-gradient(90deg,#f59e0b,#ef4444)":"linear-gradient(90deg,#6366f1,#a78bfa)",transition:"width .6s"}}/></div>
+                <div style={{fontSize:10,color:"#9CA3AF",marginTop:2}}>{item.wornCount} kez giyildi · {item.lastWorn}</div>
+                <div style={{height:5,borderRadius:3,background:"#2A2A35",marginTop:5}}><div style={{height:"100%",borderRadius:3,width:`${item.freq}%`,background:item.freqStatus==="favorite"?"linear-gradient(90deg,#22c55e,#14b8a6)":item.freqStatus==="waiting"?"linear-gradient(90deg,#f59e0b,#ef4444)":"linear-gradient(90deg,#6366f1,#a78bfa)",transition:"width .6s"}}/></div>
               </div>
               <div style={{display:"flex",flexDirection:"column",gap:4,alignItems:"flex-end"}}>
                 <div style={{background:fc.bg,border:`1px solid ${fc.border}`,color:fc.text,fontSize:10,padding:"2px 8px",borderRadius:20,whiteSpace:"nowrap"}}>{fc.label}</div>
@@ -2506,11 +2505,11 @@ function BenimStilimRoom({data,update,onBack}){
       </button>
       <Modal open={addModal} onClose={()=>setAddModal(false)} title="Kıyafet Ekle">
         <input style={inp} placeholder="Kıyafet adı (örn: Lacivert Blazer)" value={addForm.name} onChange={e=>setAddForm({...addForm,name:e.target.value})} autoFocus/>
-        <div style={{fontSize:12,opacity:.5,marginBottom:6}}>Kategori:</div>
+        <div style={{fontSize:12,color:"#9CA3AF",marginBottom:6}}>Kategori:</div>
         <div style={{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap"}}>
           {CLOTH_CATS.map(c=>(<button key={c.id} onClick={()=>setAddForm({...addForm,cat:c.id})} style={{background:addForm.cat===c.id?`${c.color}25`:"#2A2A35",border:`1px solid ${addForm.cat===c.id?c.color+"60":"rgba(255,255,255,0.05)"}`,color:addForm.cat===c.id?c.color:"#777",borderRadius:10,padding:"6px 12px",fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",gap:6}}><ClothingIcon type={c.svgType} size={14} color={addForm.cat===c.id?c.color:"#6B7280"}/>{c.label}</button>))}
         </div>
-        <div style={{fontSize:12,opacity:.5,marginBottom:6}}>Kıyafet rengi:</div>
+        <div style={{fontSize:12,color:"#9CA3AF",marginBottom:6}}>Kıyafet rengi:</div>
         <div style={{display:"flex",gap:6,marginBottom:16,flexWrap:"wrap"}}>
           {PALETTE_COLS.map(p=>(<div key={p.hex} title={p.name} onClick={()=>setAddForm({...addForm,color:p.hex})} style={{width:30,height:30,borderRadius:8,background:p.hex,cursor:"pointer",outline:addForm.color===p.hex?"2.5px solid #a78bfa":"none",transform:addForm.color===p.hex?"scale(1.15)":"scale(1)",transition:"all .15s"}}/>))}
         </div>
@@ -2635,7 +2634,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
           <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Yaşam Tarzı</h3>
         </div>
-        <p style={{margin:"6px 0 0",fontSize:12,opacity:.4}}>Kişisel alanların — odalarına dokun ve keşfet</p>
+        <p style={{margin:"6px 0 0",fontSize:12,color:"#9CA3AF"}}>Kişisel alanların — odalarına dokun ve keşfet</p>
       </StickyHeader>
       <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:10}}>
         {rooms.map((room,idx)=>{
@@ -2685,7 +2684,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
       <FAB onClick={()=>setRoomModal(true)} color="#f97316"/>
       <Modal open={roomModal} onClose={()=>setRoomModal(false)} title="Yeni Oda">
         <input style={inp} placeholder="Oda adı..." value={roomForm.name} onChange={e=>setRoomForm({...roomForm,name:e.target.value})} autoFocus/>
-        <div style={{fontSize:12,opacity:.5,marginBottom:6}}>Renk seç:</div>
+        <div style={{fontSize:12,color:"#9CA3AF",marginBottom:6}}>Renk seç:</div>
         <div style={{display:"flex",gap:8,marginBottom:14}}>
           {COLORS.map(c=>(
             <button key={c} onClick={()=>setRoomForm({...roomForm,color:c})} style={{width:30,height:30,borderRadius:"50%",background:c,border:roomForm.color===c?"3px solid #fff":"3px solid transparent",cursor:"pointer"}}/>
@@ -2708,7 +2707,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
           <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{room.name}</h3>
         </div>
       </StickyHeader>
-      {data.projects.length===0&&<p style={{textAlign:"center",opacity:.3,fontSize:14,padding:40}}>Henüz proje yok</p>}
+      {data.projects.length===0&&<p style={{textAlign:"center",color:"#9CA3AF",fontSize:14,padding:40}}>Henüz proje yok</p>}
       {data.projects.map(p=>{
         const tasks=p.tasks||[];const d=tasks.filter(t=>t.done).length;
         const pct=tasks.length?Math.round(d/tasks.length*100):0;const open=exp===p.id;
@@ -2718,7 +2717,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
               <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8}}>
                 <div style={{flex:1,minWidth:0}}>
                   <div style={{fontSize:16,fontWeight:700}}>{p.name}</div>
-                  <div style={{fontSize:11,opacity:.5,marginTop:4,display:"flex",gap:6,flexWrap:"wrap"}}>
+                  <div style={{fontSize:11,color:"#9CA3AF",marginTop:4,display:"flex",gap:6,flexWrap:"wrap"}}>
                     {p.tags?.map(t=><span key={t} style={{background:"rgba(59,130,246,0.12)",color:"#3b82f6",padding:"1px 8px",borderRadius:6,fontSize:10}}>{t}</span>)}
                     {p.deadline&&<span>📅 {p.deadline}</span>}
                   </div>
@@ -2726,16 +2725,16 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
                 <span style={{fontSize:11,fontWeight:600,color:stCol(p.status),background:`${stCol(p.status)}20`,padding:"4px 10px",borderRadius:8}}>{p.status}</span>
               </div>
               {tasks.length>0&&(<div style={{marginTop:10}}>
-                <div style={{height:6,background:"rgba(255,255,255,0.05)",borderRadius:3,overflow:"hidden"}}>
+                <div style={{height:6,background:"#2A2A35",borderRadius:3,overflow:"hidden"}}>
                   <div style={{height:"100%",background:"#3b82f6",borderRadius:3,width:`${pct}%`,transition:"width .3s"}}/>
                 </div>
-                <div style={{fontSize:11,opacity:.4,marginTop:4}}>{d}/{tasks.length} — %{pct}</div>
+                <div style={{fontSize:11,color:"#9CA3AF",marginTop:4}}>{d}/{tasks.length} — %{pct}</div>
               </div>)}
             </div>
-            {open&&(<div style={{marginTop:12,paddingTop:12,borderTop:"1px solid rgba(255,255,255,0.06)"}}>
+            {open&&(<div style={{marginTop:12,paddingTop:12,borderTop:"1px solid rgba(255,255,255,0.05)"}}>
               {p.description&&<p style={{fontSize:13,opacity:.6,margin:"0 0 10px"}}>{p.description}</p>}
               <div style={{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap"}}>
-                {PROJECT_STATUSES.map(s=>(<button key={s} onClick={()=>upSt(p.id,s)} style={{background:p.status===s?`${stCol(s)}20`:"#2A2A35",color:p.status===s?stCol(s):"#9CA3AF",border:`1px solid ${p.status===s?stCol(s)+"40":"rgba(255,255,255,0.06)"}`,padding:"7px 14px",borderRadius:8,fontSize:12,cursor:"pointer"}}>{s}</button>))}
+                {PROJECT_STATUSES.map(s=>(<button key={s} onClick={()=>upSt(p.id,s)} style={{background:p.status===s?`${stCol(s)}20`:"#2A2A35",color:p.status===s?stCol(s):"#9CA3AF",border:`1px solid ${p.status===s?stCol(s)+"40":"rgba(255,255,255,0.05)"}`,padding:"7px 14px",borderRadius:8,fontSize:12,cursor:"pointer"}}>{s}</button>))}
               </div>
               {tasks.map(t=>(<div key={t.id} style={{display:"flex",alignItems:"center",gap:10,padding:"7px 0"}}>
                 <button onClick={()=>togPT(p.id,t.id)} style={checkBtnStyle(t.done)}>{t.done&&"✓"}</button>
@@ -2783,7 +2782,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
           <button className="back-btn" onClick={()=>setActiveRoom(null)}>◀</button>
           <div style={{width:28,height:28,borderRadius:8,background:`${room.color}25`,border:`1px solid ${room.color}50`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:room.color,flexShrink:0}}>{room.name[0]}</div>
           <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{room.name}</h3>
-          <button onClick={()=>delRoom(activeRoom)} style={{background:"none",border:"none",color:"#ef4444",fontSize:11,cursor:"pointer",opacity:.5}}>Sil</button>
+          <button onClick={()=>delRoom(activeRoom)} style={{background:"none",border:"none",color:"#ef4444",fontSize:11,cursor:"pointer"}}>Sil</button>
         </div>
       </StickyHeader>
       {items.length===0&&(
@@ -2794,8 +2793,8 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
             <path d="M18 20 L18 10 L34 10 L34 20" stroke="#6B7280" strokeWidth="1.5" fill="none"/>
             <path d="M20 15 L32 15" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round" opacity=".5"/>
           </svg>
-          <div style={{fontSize:14,fontWeight:600,opacity:.4,marginBottom:4}}>Bu oda boş</div>
-          <div style={{fontSize:12,opacity:.25}}>+ ile öğe ekle</div>
+          <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:4}}>Bu oda boş</div>
+          <div style={{fontSize:12,color:"#4B5563"}}>+ ile öğe ekle</div>
         </div>
       )}
       {items.map(item=>(
@@ -2803,7 +2802,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"start"}}>
             <div style={{flex:1,minWidth:0}}>
               <div style={{fontSize:15,fontWeight:600}}>{item.title}</div>
-              {item.description&&<div style={{fontSize:12,opacity:.5,marginTop:4,lineHeight:1.4}}>{item.description}</div>}
+              {item.description&&<div style={{fontSize:12,color:"#9CA3AF",marginTop:4,lineHeight:1.4}}>{item.description}</div>}
               {item.tags?.length>0&&(<div style={{display:"flex",gap:4,marginTop:6,flexWrap:"wrap"}}>
                 {item.tags.map(t=><span key={t} style={{background:`${room.color}20`,color:room.color,padding:"1px 8px",borderRadius:6,fontSize:10}}>{t}</span>)}
               </div>)}
@@ -2850,10 +2849,10 @@ function Notes({ data, update }) {
       <StickyHeader>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
           <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Notlar</h3>
-          <span style={{fontSize:12,opacity:.4}}>{data.notes.length} not</span>
+          <span style={{fontSize:12,color:"#9CA3AF"}}>{data.notes.length} not</span>
         </div>
         <input
-          style={{...inp,marginBottom:0,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.06)"}}
+          style={{...inp,marginBottom:0,background:"#2A2A35",border:"1px solid rgba(255,255,255,0.05)"}}
           placeholder="🔍 Notlarda ara..."
           value={search}
           onChange={e=>setSearch(e.target.value)}
@@ -2863,8 +2862,8 @@ function Notes({ data, update }) {
         {filtered.length===0&&(
           <div style={{gridColumn:"1/-1",textAlign:"center",padding:"40px 20px"}}>
             <div style={{fontSize:40,marginBottom:8}}>📝</div>
-            <div style={{fontSize:14,fontWeight:600,opacity:.4,marginBottom:4}}>{data.notes.length===0?"Henüz not yok":"Arama sonucu bulunamadı"}</div>
-            {data.notes.length===0&&<div style={{fontSize:12,opacity:.25}}>+ butonuna basarak ilk notunu yaz</div>}
+            <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:4}}>{data.notes.length===0?"Henüz not yok":"Arama sonucu bulunamadı"}</div>
+            {data.notes.length===0&&<div style={{fontSize:12,color:"#4B5563"}}>+ butonuna basarak ilk notunu yaz</div>}
           </div>
         )}
         {filtered.map(n=>(
@@ -2873,7 +2872,7 @@ function Notes({ data, update }) {
               <h4 style={{margin:0,fontSize:14,fontWeight:700,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{n.title}</h4>
               <button onClick={e=>{e.stopPropagation();del(n.id);}} style={{...delBtnStyle,fontSize:14,marginLeft:4}}>✕</button>
             </div>
-            <p style={{fontSize:12,opacity:.5,margin:"8px 0 0",whiteSpace:"pre-wrap",maxHeight:70,overflow:"hidden",lineHeight:1.4}}>{n.content}</p>
+            <p style={{fontSize:12,color:"#9CA3AF",margin:"8px 0 0",whiteSpace:"pre-wrap",maxHeight:70,overflow:"hidden",lineHeight:1.4}}>{n.content}</p>
             <div style={{fontSize:10,opacity:.25,marginTop:8}}>{n.updatedAt}</div>
           </div>
         ))}
@@ -2912,8 +2911,8 @@ function TasksHub({ data, update, initialSubTab, onSubTabConsumed }) {
     <div>
       <div style={{
         display:"flex",gap:6,marginBottom:2,
-        background:"rgba(6,6,17,0.7)",
-        backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",
+        background:"rgba(13,13,18,0.92)",
+        
         padding:"10px 4px 8px",
         borderRadius:14,
         position:"sticky",top:0,zIndex:60,
@@ -2923,7 +2922,7 @@ function TasksHub({ data, update, initialSubTab, onSubTabConsumed }) {
             flex:1,
             background:subTab===k?"rgba(59,130,246,0.15)":"#2A2A35",
             color:subTab===k?"#3b82f6":"#6B7280",
-            border:subTab===k?"1px solid rgba(59,130,246,0.3)":"1px solid rgba(255,255,255,0.06)",
+            border:subTab===k?"1px solid rgba(59,130,246,0.3)":"1px solid rgba(255,255,255,0.05)",
             padding:"10px 4px",borderRadius:10,fontSize:12,fontWeight:subTab===k?700:500,
             cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:3,
           }}>
@@ -3015,14 +3014,14 @@ function Settings({ data, update, onImport, user, onLogout }) {
               )}
               <div>
                 {user.displayName && <div style={{fontSize:14,fontWeight:600}}>{user.displayName}</div>}
-                <div style={{fontSize:12,opacity:.5}}>{user.email}</div>
+                <div style={{fontSize:12,color:"#9CA3AF"}}>{user.email}</div>
               </div>
             </div>
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
               <span style={{width:8,height:8,borderRadius:"50%",background:"#22c55e"}}/>
               <span style={{fontSize:12,color:"#22c55e"}}>Bulut senkronizasyon aktif</span>
             </div>
-            <p style={{fontSize:11,opacity:.4,margin:"0 0 12px"}}>Veriler tüm cihazlarında otomatik senkronize edilir</p>
+            <p style={{fontSize:11,color:"#9CA3AF",margin:"0 0 12px"}}>Veriler tüm cihazlarında otomatik senkronize edilir</p>
             <button onClick={onLogout} style={{...btnPrimary,marginTop:0,background:"rgba(239,68,68,0.15)",color:"#ef4444",border:"1px solid rgba(239,68,68,0.2)"}}>
               Çıkış Yap
             </button>
@@ -3033,7 +3032,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
               <span style={{width:8,height:8,borderRadius:"50%",background:"#f59e0b"}}/>
               <span style={{fontSize:12,color:"#f59e0b"}}>Misafir modu</span>
             </div>
-            <p style={{fontSize:11,opacity:.4,margin:"0 0 12px"}}>Veriler sadece bu cihazda saklanıyor. Giriş yaparak tüm cihazlarında senkronize edebilirsin.</p>
+            <p style={{fontSize:11,color:"#9CA3AF",margin:"0 0 12px"}}>Veriler sadece bu cihazda saklanıyor. Giriş yaparak tüm cihazlarında senkronize edebilirsin.</p>
             <button onClick={onLogout} style={{...btnPrimary,marginTop:0,background:"#3b82f6"}}>
               Giriş Yap / Kayıt Ol
             </button>
@@ -3045,14 +3044,14 @@ function Settings({ data, update, onImport, user, onLogout }) {
       <div style={{background:"#1C1C26",borderRadius:14,padding:16,marginBottom:12}}>
         <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>🔔 Bildirimler</h4>
         {!isNotificationSupported() ? (
-          <p style={{fontSize:13,opacity:.5}}>Bu tarayıcı bildirimleri desteklemiyor</p>
+          <p style={{fontSize:13,color:"#9CA3AF"}}>Bu tarayıcı bildirimleri desteklemiyor</p>
         ) : notifStatus === "granted" ? (
           <div>
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
               <span style={{width:10,height:10,borderRadius:"50%",background:"#22c55e"}}/>
               <span style={{fontSize:13,color:"#22c55e"}}>Bildirimler aktif</span>
             </div>
-            <p style={{fontSize:12,opacity:.5,margin:0}}>Etkinlik ve görev hatırlatmaları otomatik olarak gönderilecek</p>
+            <p style={{fontSize:12,color:"#9CA3AF",margin:0}}>Etkinlik ve görev hatırlatmaları otomatik olarak gönderilecek</p>
           </div>
         ) : notifStatus === "denied" ? (
           <p style={{fontSize:13,color:"#ef4444"}}>Bildirimler engellendi. Tarayıcı ayarlarından izin verin.</p>
@@ -3081,7 +3080,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
       {/* Import / Export */}
       <div style={{background:"#1C1C26",borderRadius:14,padding:16,marginBottom:12}}>
         <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>💾 Veri Yönetimi</h4>
-        <p style={{fontSize:12,opacity:.5,margin:"0 0 12px"}}>Bilgisayarınızdan veri aktarabilir veya yedeğinizi indirebilirsiniz</p>
+        <p style={{fontSize:12,color:"#9CA3AF",margin:"0 0 12px"}}>Bilgisayarınızdan veri aktarabilir veya yedeğinizi indirebilirsiniz</p>
         <button onClick={handleExport} style={{...btnPrimary,marginTop:0,marginBottom:8,background:"#14b8a6"}}>
           📥 Yedek İndir (JSON)
         </button>
@@ -3094,7 +3093,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
       {/* AI Kalori Asistanı */}
       <div style={{background:"#1C1C26",borderRadius:14,padding:16,marginBottom:12}}>
         <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>🤖 AI Kalori Asistanı</h4>
-        <p style={{fontSize:12,opacity:.5,margin:"0 0 12px"}}>Yemek fotoğrafı çekerek kalori hesaplatabilirsin. Kendi AI hesabını seç ve API anahtarını gir.</p>
+        <p style={{fontSize:12,color:"#9CA3AF",margin:"0 0 12px"}}>Yemek fotoğrafı çekerek kalori hesaplatabilirsin. Kendi AI hesabını seç ve API anahtarını gir.</p>
 
         {/* Provider selection */}
         <div style={{display:"flex",flexDirection:"column",gap:6,marginBottom:12}}>
@@ -3114,7 +3113,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
                 <span style={{fontSize:20}}>{p.icon}</span>
                 <div style={{flex:1}}>
                   <div style={{fontSize:13,fontWeight:600,color:selected?p.color:"#9CA3AF"}}>{p.name}</div>
-                  <div style={{fontSize:10,opacity:.5}}>{p.desc}</div>
+                  <div style={{fontSize:10,color:"#9CA3AF"}}>{p.desc}</div>
                 </div>
                 {selected&&<span style={{color:p.color,fontSize:16}}>●</span>}
               </div>
@@ -3136,7 +3135,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
               <span style={{fontSize:11,color:"#f59e0b"}}>Anahtar gerekli</span></>
             )}
           </div>
-          <div style={{fontSize:10,opacity:.3,marginBottom:10}}>🔒 Anahtarın sadece senin telefonunda saklanır, sunucuya gönderilmez</div>
+          <div style={{fontSize:10,color:"#4B5563",marginBottom:10}}>🔒 Anahtarın sadece senin telefonunda saklanır, sunucuya gönderilmez</div>
 
           {/* Guide button */}
           <button onClick={()=>setMsg(
@@ -3267,7 +3266,7 @@ function LoginScreen({ onLogin }) {
 
   const glassInp = {
     width:"100%",
-    background:"rgba(255,255,255,0.05)",
+    background:"#2A2A35",
     backdropFilter:"blur(10px)",WebkitBackdropFilter:"blur(10px)",
     border:"1px solid rgba(167,139,250,0.18)",
     borderRadius:14,padding:"13px 16px",color:"#F9FAFB",fontSize:15,
@@ -3302,7 +3301,7 @@ function LoginScreen({ onLogin }) {
           <div style={{fontSize:15,fontStyle:"italic",opacity:.7,lineHeight:1.7,letterSpacing:.3}}>
             Kendi destanını yaz.
           </div>
-          <div style={{fontSize:13,fontStyle:"italic",opacity:.35,marginTop:2,letterSpacing:.2}}>
+          <div style={{fontSize:13,fontStyle:"italic",color:"#9CA3AF",marginTop:2,letterSpacing:.2}}>
             Write your own epic.
           </div>
         </div>
@@ -3344,9 +3343,9 @@ function LoginScreen({ onLogin }) {
 
           {/* Divider */}
           <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:16}}>
-            <div style={{flex:1,height:1,background:"rgba(255,255,255,0.05)"}}/>
-            <span style={{fontSize:12,opacity:.35,letterSpacing:.5}}>veya</span>
-            <div style={{flex:1,height:1,background:"rgba(255,255,255,0.05)"}}/>
+            <div style={{flex:1,height:1,background:"#2A2A35"}}/>
+            <span style={{fontSize:12,color:"#4B5563"5,letterSpacing:.5}}>veya</span>
+            <div style={{flex:1,height:1,background:"#2A2A35"}}/>
           </div>
 
           <input type="email" placeholder="Email adresi" value={email}
@@ -3845,7 +3844,7 @@ export default function App() {
         input[type="date"]::-webkit-calendar-picker-indicator { filter:invert(0.7); }
         html, body { margin:0; padding:0; overscroll-behavior:none; background:#0D0D12; overflow:auto; height:auto; }
         #root { height:auto; }
-        select option { background:#1C1C26; color:#e0e0e0; }
+        select option { background:#1C1C26; color:#F9FAFB; }
         @media(display-mode:standalone){ 
           html, body { background:#0D0D12; overflow:auto; height:auto; }
           #root { height:auto; }
