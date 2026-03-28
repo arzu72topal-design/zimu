@@ -2905,7 +2905,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
   /* Her oda için Unsplash fotoğrafı — koyu tema, konuyla uyumlu */
   const ROOM_IMAGES = {
     projects:    "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=260&fit=crop&q=80",
-    news:        "https://images.unsplash.com/photo-1504711434969-e33886168d8c?w=400&h=260&fit=crop&q=80",
+    news:        "https://images.unsplash.com/photo-1495020689067-958852a7765e?w=400&h=260&fit=crop&q=80",
     music:       "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&h=260&fit=crop&q=80",
     clothes:     "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=260&fit=crop&q=80",
     memories:    "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400&h=260&fit=crop&q=80",
