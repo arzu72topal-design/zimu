@@ -80,6 +80,272 @@ function useIsMobile() {
   return m;
 }
 
+/* ── Speech Recognition Hook ── */
+const SpeechRecognition = typeof window !== "undefined" && (window.SpeechRecognition || window.webkitSpeechRecognition);
+const hasSpeech = !!SpeechRecognition;
+
+function useSpeech(lang = "tr-TR") {
+  const [listening, setListening] = useState(false);
+  const [transcript, setTranscript] = useState("");
+  const recRef = useRef(null);
+
+  const start = useCallback((onResult, onEnd) => {
+    if (!hasSpeech || listening) return;
+    const rec = new SpeechRecognition();
+    rec.lang = lang;
+    rec.interimResults = true;
+    rec.maxAlternatives = 1;
+    rec.continuous = false;
+    recRef.current = rec;
+    setTranscript("");
+    setListening(true);
+
+    rec.onresult = (e) => {
+      const t = Array.from(e.results).map(r => r[0].transcript).join("");
+      setTranscript(t);
+      if (e.results[0].isFinal) {
+        onResult?.(t.trim());
+      }
+    };
+    rec.onerror = () => { setListening(false); onEnd?.(); };
+    rec.onend = () => { setListening(false); onEnd?.(); };
+    rec.start();
+  }, [lang, listening]);
+
+  const stop = useCallback(() => {
+    recRef.current?.stop();
+    setListening(false);
+  }, []);
+
+  return { listening, transcript, start, stop, supported: hasSpeech };
+}
+
+/* ── VoiceMic: küçük mikrofon butonu (input yanına) ── */
+function VoiceMic({ onResult, size = 32, color = "#3b82f6" }) {
+  const { listening, start, stop, supported } = useSpeech();
+  if (!supported) return null;
+
+  const handleClick = () => {
+    if (listening) { stop(); return; }
+    start((text) => { onResult?.(text); });
+  };
+
+  return (
+    <button onClick={handleClick} style={{
+      width:size,height:size,borderRadius:size/2,
+      background:listening ? "rgba(239,68,68,0.2)" : "#2A2A35",
+      border:`1px solid ${listening ? "rgba(239,68,68,0.4)" : "rgba(255,255,255,0.05)"}`,
+      color:listening ? "#ef4444" : color,
+      cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",
+      flexShrink:0,padding:0,
+      animation:listening ? "pulse 1s ease-in-out infinite" : "none",
+      transition:"all .2s",
+    }} title={listening ? "Dinleniyor..." : "Sesli giriş"}>
+      <svg width={size*0.5} height={size*0.5} viewBox="0 0 24 24" fill="none">
+        {listening ? (
+          <>
+            <rect x="6" y="4" width="12" height="16" rx="2" fill="currentColor" opacity=".3"/>
+            <rect x="9" y="8" width="6" height="8" rx="1" fill="currentColor"/>
+          </>
+        ) : (
+          <>
+            <rect x="9" y="2" width="6" height="12" rx="3" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+            <path d="M5 11a7 7 0 0014 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            <line x1="12" y1="18" x2="12" y2="22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            <line x1="8" y1="22" x2="16" y2="22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+          </>
+        )}
+      </svg>
+    </button>
+  );
+}
+
+/* ── VoiceCommand: akıllı sesli komut FAB ── */
+function VoiceCommand({ data, update, goTo, showToast }) {
+  const { listening, transcript, start, stop, supported } = useSpeech();
+  const [open, setOpen] = useState(false);
+  const [result, setResult] = useState(null);
+
+  if (!supported) return null;
+
+  const parseCommand = (text) => {
+    const t = text.toLowerCase().trim();
+
+    // Görev ekleme
+    if (t.startsWith("görev ekle") || t.startsWith("görev:") || t.startsWith("task")) {
+      const title = text.replace(/^(görev ekle[: ]*|görev[: ]*|task[: ]*)/i, "").trim();
+      if (title) {
+        const tasks = [...data.tasks, { id: uid(), title, priority: "medium", done: false, dueDate: "", category: "", description: "", createdAt: today() }];
+        update({ ...data, tasks });
+        return { type: "success", msg: `Görev eklendi: "${title}"` };
+      }
+    }
+
+    // Not ekleme
+    if (t.startsWith("not ekle") || t.startsWith("not:") || t.startsWith("note")) {
+      const title = text.replace(/^(not ekle[: ]*|not[: ]*|note[: ]*)/i, "").trim();
+      if (title) {
+        const notes = [{ id: uid(), title, content: "", color: "#3b82f6", createdAt: today(), updatedAt: today() }, ...data.notes];
+        update({ ...data, notes });
+        return { type: "success", msg: `Not eklendi: "${title}"` };
+      }
+    }
+
+    // Yemek ekleme — "yemek ekle: pilav 200 kalori" veya "yemek: çay 30"
+    if (t.startsWith("yemek ekle") || t.startsWith("yemek:") || t.startsWith("food")) {
+      const raw = text.replace(/^(yemek ekle[: ]*|yemek[: ]*|food[: ]*)/i, "").trim();
+      const calMatch = raw.match(/(\d+)\s*(kalori|kcal|cal)?/i);
+      const cal = calMatch ? parseInt(calMatch[1]) : 0;
+      const name = raw.replace(/\d+\s*(kalori|kcal|cal)?/i, "").trim() || raw;
+      if (name) {
+        const foods = [...(data.foods || []), { id: uid(), name, calories: cal || 100, meal: "Öğle", date: today() }];
+        update({ ...data, foods });
+        return { type: "success", msg: `Yemek eklendi: "${name}" ${cal || 100} kcal` };
+      }
+    }
+
+    // Spor ekleme — "spor ekle: 30 dakika koşu"
+    if (t.startsWith("spor ekle") || t.startsWith("spor:") || t.startsWith("sport")) {
+      const raw = text.replace(/^(spor ekle[: ]*|spor[: ]*|sport[: ]*)/i, "").trim();
+      const durMatch = raw.match(/(\d+)\s*(dk|dakika|min)?/i);
+      const duration = durMatch ? parseInt(durMatch[1]) : 30;
+      const typeMatch = raw.match(/(koşu|yüzme|bisiklet|yoga|ağırlık|yürüyüş)/i);
+      const type = typeMatch ? typeMatch[1].charAt(0).toUpperCase() + typeMatch[1].slice(1) : "Diğer";
+      const cal = calcSportCal(type, duration);
+      const sports = [...data.sports, { id: uid(), type, duration, distance: 0, calories: cal, date: today(), notes: "" }];
+      update({ ...data, sports });
+      return { type: "success", msg: `Spor eklendi: ${type} ${duration}dk (${cal} kcal)` };
+    }
+
+    // Etkinlik ekleme — "etkinlik ekle: yarın toplantı"
+    if (t.startsWith("etkinlik ekle") || t.startsWith("etkinlik:") || t.startsWith("event")) {
+      const title = text.replace(/^(etkinlik ekle[: ]*|etkinlik[: ]*|event[: ]*)/i, "").trim();
+      if (title) {
+        const events = [...data.events, { id: uid(), title, date: today(), time: "", color: "#8B5CF6", description: "", recurring: "none" }];
+        update({ ...data, events });
+        return { type: "success", msg: `Etkinlik eklendi: "${title}"` };
+      }
+    }
+
+    // Sayfa navigasyonu
+    if (t.includes("görevler") || t.includes("tasks")) { goTo("tasks"); return { type: "nav", msg: "Görevler'e gidiliyor" }; }
+    if (t.includes("takvim") || t.includes("calendar")) { goTo("tasks", "calendar"); return { type: "nav", msg: "Takvim'e gidiliyor" }; }
+    if (t.includes("notlar")) { goTo("tasks", "notes"); return { type: "nav", msg: "Notlar'a gidiliyor" }; }
+    if (t.includes("sağlık") || t.includes("yemek") || t.includes("spor")) { goTo("lifestyle", "healthcoach"); return { type: "nav", msg: "Sağlık Koçu'na gidiliyor" }; }
+    if (t.includes("stilim") || t.includes("kıyafet")) { goTo("lifestyle", "clothes"); return { type: "nav", msg: "Kıyafetlerim'e gidiliyor" }; }
+    if (t.includes("haber")) { goTo("lifestyle", "news"); return { type: "nav", msg: "Haberler'e gidiliyor" }; }
+    if (t.includes("müzik")) { goTo("lifestyle", "music"); return { type: "nav", msg: "Müziklerim'e gidiliyor" }; }
+    if (t.includes("ayarlar")) { goTo("settings"); return { type: "nav", msg: "Ayarlar'a gidiliyor" }; }
+
+    return { type: "unknown", msg: `Anlaşılamadı: "${text}"` };
+  };
+
+  const handleStart = () => {
+    setResult(null);
+    setOpen(true);
+    start((text) => {
+      const r = parseCommand(text);
+      setResult(r);
+      if (r.type === "success") showToast?.(r.msg);
+      setTimeout(() => setOpen(false), r.type === "success" ? 1500 : 3000);
+    }, () => {
+      // onEnd — listening bitti ama sonuç gelmezse
+    });
+  };
+
+  return (
+    <>
+      {/* FAB mikrofon butonu */}
+      <button className="touch-card" onClick={open && listening ? stop : handleStart} style={{
+        position:"fixed",left:20,bottom:100,
+        width:52,height:52,borderRadius:"50%",
+        background:listening ? "#ef4444" : "linear-gradient(135deg,#3b82f6,#6366f1)",
+        color:"#fff",border:"none",
+        fontSize:22,cursor:"pointer",
+        display:"flex",alignItems:"center",justifyContent:"center",
+        boxShadow:listening ? "0 0 0 8px rgba(239,68,68,0.2), 0 4px 20px rgba(239,68,68,0.4)" : "0 4px 20px rgba(59,130,246,0.4)",
+        zIndex:900,
+        animation:listening ? "pulse 1s ease-in-out infinite" : "none",
+      }}>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <rect x="9" y="2" width="6" height="12" rx="3" stroke="#fff" strokeWidth="1.5" fill={listening ? "rgba(255,255,255,0.3)" : "none"}/>
+          <path d="M5 11a7 7 0 0014 0" stroke="#fff" strokeWidth="1.5" strokeLinecap="round"/>
+          <line x1="12" y1="18" x2="12" y2="22" stroke="#fff" strokeWidth="1.5" strokeLinecap="round"/>
+        </svg>
+      </button>
+
+      {/* Dinleme overlay */}
+      {open && (
+        <div style={{
+          position:"fixed",inset:0,background:"rgba(0,0,0,0.7)",
+          display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",
+          zIndex:9998,gap:16,padding:40,
+          animation:"modalOverlayIn .2s ease both",
+        }} onClick={() => { stop(); setOpen(false); }}>
+          <div onClick={e => e.stopPropagation()} style={{
+            background:"#1C1C26",borderRadius:20,padding:"28px 24px",
+            maxWidth:340,width:"100%",textAlign:"center",
+            border:"1px solid rgba(255,255,255,0.05)",
+            animation:"modalSlideUp .3s cubic-bezier(.22,1,.36,1) both",
+          }}>
+            {/* Animasyonlu dalga */}
+            {listening && !result && (
+              <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:4,marginBottom:16,height:40}}>
+                {[0,1,2,3,4].map(i => (
+                  <div key={i} style={{
+                    width:4,borderRadius:2,background:"#3b82f6",
+                    animation:`voiceWave .8s ease-in-out ${i*0.1}s infinite alternate`,
+                  }}/>
+                ))}
+              </div>
+            )}
+
+            {/* Durum */}
+            {listening && !result && (
+              <>
+                <div style={{fontSize:16,fontWeight:600,color:"#F9FAFB",marginBottom:6}}>Dinliyorum...</div>
+                <div style={{fontSize:13,color:"#9CA3AF",marginBottom:transcript ? 12 : 0}}>
+                  {transcript || "Konuşmaya başlayın"}
+                </div>
+                {transcript && (
+                  <div style={{background:"#2A2A35",borderRadius:10,padding:"10px 14px",fontSize:14,color:"#F9FAFB",fontStyle:"italic"}}>
+                    "{transcript}"
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* Sonuç */}
+            {result && (
+              <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:8}}>
+                <div style={{
+                  width:48,height:48,borderRadius:"50%",
+                  background:result.type === "success" ? "rgba(16,185,129,0.15)" : result.type === "nav" ? "rgba(59,130,246,0.15)" : "rgba(239,68,68,0.15)",
+                  display:"flex",alignItems:"center",justifyContent:"center",
+                }}>
+                  {result.type === "success" ? (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#10B981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  ) : result.type === "nav" ? (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  ) : (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/></svg>
+                  )}
+                </div>
+                <div style={{fontSize:14,fontWeight:600,color:"#F9FAFB"}}>{result.msg}</div>
+                {result.type === "unknown" && (
+                  <div style={{fontSize:12,color:"#9CA3AF",marginTop:4,lineHeight:1.4}}>
+                    Komutlar: "görev ekle: ...", "not ekle: ...", "yemek ekle: ...", "spor ekle: ...", "etkinlik ekle: ..."
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 /* ── Styles ── */
 const inp = {
   width:"100%",
@@ -758,7 +1024,11 @@ function Tasks({ data, update }) {
       <FAB onClick={openNew}/>
 
       <Modal open={modal} onClose={()=>{setModal(false);setEditingId(null);}} title={editingId?"Görevi Düzenle":"Yeni Görev"}>
-        <input style={inp} placeholder="Görev başlığı..." value={form.title} onChange={e=>setForm({...form,title:e.target.value})} autoFocus/>
+        <div style={{display:"flex",gap:8,alignItems:"center"}}>
+          <input style={{...inp,flex:1,marginBottom:0}} placeholder="Görev başlığı..." value={form.title} onChange={e=>setForm({...form,title:e.target.value})} autoFocus/>
+          <VoiceMic onResult={(t)=>setForm(f=>({...f,title:t}))}/>
+        </div>
+        <div style={{height:10}}/>
         <textarea style={{...inp,minHeight:80,resize:"vertical",fontFamily:"inherit",lineHeight:1.5}} placeholder="Açıklama (opsiyonel)..." value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/>
         <input style={inp} placeholder="Kategori (opsiyonel)" value={form.category} onChange={e=>setForm({...form,category:e.target.value})}/>
         <div style={{marginBottom:10}}>
@@ -927,7 +1197,11 @@ function CalendarView({ data, update }) {
       <FAB onClick={openAdd} color="#a855f7"/>
 
       <Modal open={modal} onClose={()=>setModal(false)} title="Yeni Etkinlik">
-        <input style={inp} placeholder="Etkinlik adı..." value={form.title} onChange={e=>setForm({...form,title:e.target.value})} autoFocus/>
+        <div style={{display:"flex",gap:8,alignItems:"center"}}>
+          <input style={{...inp,flex:1,marginBottom:0}} placeholder="Etkinlik adı..." value={form.title} onChange={e=>setForm({...form,title:e.target.value})} autoFocus/>
+          <VoiceMic onResult={(t)=>setForm(f=>({...f,title:t}))} color="#8B5CF6"/>
+        </div>
+        <div style={{height:10}}/>
         <div style={{display:"flex",gap:8}}>
           <input style={{...inp,flex:1}} type="date" value={form.date} onChange={e=>setForm({...form,date:e.target.value})}/>
           <input style={{...inp,flex:1}} type="time" value={form.time} onChange={e=>setForm({...form,time:e.target.value})}/>
@@ -1339,13 +1613,17 @@ function Sports({ data, update, initialView, onBack }) {
               }}>{m}</button>
             ))}
           </div>
-          <input style={inp} placeholder="🔍 Yemek ara (pancake, pilav, salata...)" value={foodSearch||foodForm.name}
-            onChange={e=>{
-              const v=e.target.value;
-              setFoodSearch(v);
-              const exactMatch = allFoodDB[v];
-              setFoodForm({...foodForm,name:v,calories:exactMatch?String(exactMatch):""});
-            }}/>
+          <div style={{display:"flex",gap:8,alignItems:"center"}}>
+            <input style={{...inp,flex:1,marginBottom:0}} placeholder="Yemek ara (pancake, pilav...)" value={foodSearch||foodForm.name}
+              onChange={e=>{
+                const v=e.target.value;
+                setFoodSearch(v);
+                const exactMatch = allFoodDB[v];
+                setFoodForm({...foodForm,name:v,calories:exactMatch?String(exactMatch):""});
+              }}/>
+            <VoiceMic onResult={(t)=>{setFoodSearch(t);const m=allFoodDB[t];setFoodForm({...foodForm,name:t,calories:m?String(m):""});}} color="#F59E0B"/>
+          </div>
+          <div style={{height:10}}/>
           {(foodSearch||!foodForm.name)&&(
             <div style={{maxHeight:180,overflow:"auto",marginBottom:10}}>
               {!foodSearch&&Object.keys(myFoods).length>0&&(
@@ -2762,7 +3040,11 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
       })}
       <FAB onClick={()=>setModal(true)}/>
       <Modal open={modal} onClose={()=>setModal(false)} title="Yeni Proje">
-        <input style={inp} placeholder="Proje adı..." value={form.name} onChange={e=>setForm({...form,name:e.target.value})} autoFocus/>
+        <div style={{display:"flex",gap:8,alignItems:"center"}}>
+          <input style={{...inp,flex:1,marginBottom:0}} placeholder="Proje adı..." value={form.name} onChange={e=>setForm({...form,name:e.target.value})} autoFocus/>
+          <VoiceMic onResult={(t)=>setForm(f=>({...f,name:t}))}/>
+        </div>
+        <div style={{height:10}}/>
         <input style={inp} placeholder="Açıklama..." value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/>
         <div style={{display:"flex",gap:8}}>
           <select style={{...inp,flex:1}} value={form.status} onChange={e=>setForm({...form,status:e.target.value})}>{PROJECT_STATUSES.map(s=><option key={s}>{s}</option>)}</select>
@@ -2862,12 +3144,15 @@ function Notes({ data, update }) {
           <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Notlar</h3>
           <span style={{fontSize:12,color:"#9CA3AF"}}>{data.notes.length} not</span>
         </div>
-        <input
-          style={{...inp,marginBottom:0,background:"#2A2A35",border:"1px solid rgba(255,255,255,0.05)"}}
-          placeholder="🔍 Notlarda ara..."
-          value={search}
-          onChange={e=>setSearch(e.target.value)}
-        />
+        <div style={{display:"flex",gap:8,alignItems:"center"}}>
+          <input
+            style={{...inp,flex:1,marginBottom:0,background:"#2A2A35",border:"1px solid rgba(255,255,255,0.05)"}}
+            placeholder="Notlarda ara..."
+            value={search}
+            onChange={e=>setSearch(e.target.value)}
+          />
+          <VoiceMic onResult={(t)=>setSearch(t)} color="#14b8a6" size={34}/>
+        </div>
       </StickyHeader>
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(155px,1fr))",gap:10}}>
         {filtered.length===0&&(
@@ -2890,7 +3175,11 @@ function Notes({ data, update }) {
       </div>
       <FAB onClick={()=>{setEditing(null);setForm({title:"",content:"",color:"#3b82f6"});setModal(true);}} color="#14b8a6"/>
       <Modal open={modal} onClose={()=>{setModal(false);setEditing(null);}} title={editing?"Notu Düzenle":"Yeni Not"}>
-        <input style={inp} placeholder="Başlık..." value={form.title} onChange={e=>setForm({...form,title:e.target.value})} autoFocus/>
+        <div style={{display:"flex",gap:8,alignItems:"center"}}>
+          <input style={{...inp,flex:1,marginBottom:0}} placeholder="Başlık..." value={form.title} onChange={e=>setForm({...form,title:e.target.value})} autoFocus/>
+          <VoiceMic onResult={(t)=>setForm(f=>({...f,title:t}))} color="#14b8a6"/>
+        </div>
+        <div style={{height:10}}/>
         <textarea style={{...inp,minHeight:140,resize:"vertical",fontFamily:"inherit",lineHeight:1.5}} placeholder="İçerik yazın..." value={form.content} onChange={e=>setForm({...form,content:e.target.value})}/>
         <div style={{display:"flex",gap:8,marginBottom:14}}>
           {COLORS.map(c=>(
@@ -3727,6 +4016,9 @@ export default function App() {
         }}>▲</button>
       )}
 
+      {/* Voice Command FAB */}
+      {data && <VoiceCommand data={data} update={update} goTo={goTo} showToast={showToast}/>}
+
       {/* Bottom nav bar */}
       <div style={{
         position:"fixed",
@@ -3838,6 +4130,7 @@ export default function App() {
         /* ── MODAL TRANSITIONS ── */
         @keyframes modalOverlayIn { from { opacity:0 } to { opacity:1 } }
         @keyframes modalSlideUp { from { transform:translateY(100%); opacity:0 } to { transform:translateY(0); opacity:1 } }
+        @keyframes voiceWave { from { height:8px } to { height:32px } }
 
         /* ── BOTTOM NAV TRANSITION ── */
         .nav-item {
