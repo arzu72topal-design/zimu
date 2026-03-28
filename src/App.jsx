@@ -1154,7 +1154,6 @@ function Sports({ data, update, initialView, onBack }) {
   const noResults = foodSearch && filteredFoods.length === 0;
 
   const mealGroups = ["Kahvaltı","Öğle","Akşam","Atıştırma"];
-  const todaySports = data.sports.filter(s=>s.date===today());
 
   return (
     <div>
