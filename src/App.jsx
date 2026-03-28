@@ -564,10 +564,7 @@ function Dashboard({ data, setTab, goTo, update }) {
 
   const musicItems = (data.roomItems || {})["music"] || [];
 
-  const scheduleItems = [
-    ...urgentTasks.slice(0,2).map(tk=>({ type:"task", id:tk.id, title:tk.title, sub:PRIORITIES[tk.priority]+" öncelik", color:PCOL[tk.priority] })),
-    ...upcoming.slice(0,2).map(e=>({ type:"event", id:e.id, title:e.title, sub:e.time||e.date.slice(5), color:e.color||"#a855f7" })),
-  ].slice(0,4);
+  const scheduleItems = upcoming.slice(0,4).map(e=>({ type:"event", id:e.id, title:e.title, sub:e.time||e.date.slice(5), color:e.color||"#8B5CF6" }));
 
   const hourIcon = hour<6 ? "moon" : hour<12 ? "sunrise" : hour<18 ? "sun" : "moon";
 
@@ -598,9 +595,36 @@ function Dashboard({ data, setTab, goTo, update }) {
         </div>
       </div>
 
+
+      {/* Kart 3: Stil Motivasyon */}
+      <div className="stagger-2 touch-card" onClick={()=>goTo("lifestyle","clothes")} style={{
+        background:"linear-gradient(135deg,#1C1C26 0%,rgba(139,92,246,0.12) 100%)",
+        borderRadius:16,padding:"16px",marginBottom:16,
+        border:"1px solid rgba(139,92,246,0.15)",
+        cursor:"pointer",display:"flex",alignItems:"center",gap:14,
+      }}>
+        <div style={{width:48,height:48,borderRadius:14,background:"rgba(139,92,246,0.15)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+          <svg width="28" height="28" viewBox="0 0 36 36" fill="none">
+            <path d="M11 8C11 8 14 4 18 4C22 4 25 8 25 8" stroke="#c4b5fd" strokeWidth="1.5" strokeLinecap="round"/>
+            <circle cx="18" cy="4" r="2" stroke="#c4b5fd" strokeWidth="1.2" fill="none"/>
+            <path d="M6 18L18 14L30 18" stroke="#8B5CF6" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+            <line x1="18" y1="8" x2="18" y2="14" stroke="#c4b5fd" strokeWidth="1.3" strokeLinecap="round"/>
+            <path d="M8 26C8 23 11 21 15 21C17 21 18 23 21 23C25 23 28 23 28 26" stroke="#8B5CF6" strokeWidth="1.2" strokeLinecap="round" fill="rgba(139,92,246,0.08)"/>
+            <circle cx="28" cy="10" r="4" stroke="#9CA3AF" strokeWidth="1" fill="none"/>
+            <circle cx="24" cy="8" r="2.5" stroke="#9CA3AF" strokeWidth="1" fill="none"/>
+            <path d="M22 11C22 11 24 13 28 13C30 13 32 12 32 10" stroke="#9CA3AF" strokeWidth="0.8" fill="none"/>
+          </svg>
+        </div>
+        <div style={{flex:1}}>
+          <div style={{fontSize:16,fontWeight:600,color:"#F9FAFB"}}>Bugün harika görüneceksin!</div>
+          <div style={{fontSize:13,color:"#c4b5fd",marginTop:3}}>Hava durumuna göre stil önerilerin hazır</div>
+        </div>
+        <span style={{fontSize:14,color:"#8B5CF6"}}>▶</span>
+      </div>
+
       {/* 3 AKILLI KART */}
       {/* Kart 1: Görev + Etkinlik + Proje */}
-      <div className="stagger-2 touch-card" onClick={()=>setTab("tasks")} style={{
+      <div className="stagger-3 touch-card" onClick={()=>setTab("tasks")} style={{
         ...glowCard("#3b82f6"),cursor:"pointer",marginBottom:12,
       }}>
         <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
@@ -629,8 +653,58 @@ function Dashboard({ data, setTab, goTo, update }) {
         </div>
       </div>
 
+
+      {overdue>0&&(
+        <div onClick={()=>setTab("tasks")} style={{
+          background:"rgba(239,68,68,0.1)",border:"1px solid rgba(239,68,68,0.15)",
+          borderRadius:16,padding:"14px 16px",marginBottom:16,
+          display:"flex",alignItems:"center",gap:12,cursor:"pointer",
+        }}>
+          <div style={{width:36,height:36,borderRadius:10,background:"rgba(239,68,68,0.15)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </div>
+          <div style={{flex:1}}>
+            <div style={{fontSize:14,fontWeight:600,color:"#EF4444"}}>{overdue} gecikmiş görev!</div>
+            <div style={{fontSize:13,color:"#9CA3AF"}}>Hemen kontrol et</div>
+          </div>
+          <span style={{fontSize:14,color:"#9CA3AF"}}>▶</span>
+        </div>
+      )}
+
+      {/* Bugünün Programı — sadece etkinlikler */}
+      <div style={{marginBottom:16}}>
+        <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:10}}>Bugünün Programı</div>
+        {scheduleItems.length > 0 ? scheduleItems.map(item=>(
+          <div key={item.id} onClick={()=>goTo("tasks","calendar")} className="touch-card" style={{
+            ...cardStyle,padding:"14px 16px",marginBottom:8,
+            display:"flex",alignItems:"center",gap:12,cursor:"pointer",minHeight:54,
+          }}>
+            <div style={{width:3,height:36,background:item.color,borderRadius:2,flexShrink:0}}/>
+            <div style={{flex:1,minWidth:0}}>
+              <div style={{fontSize:14,fontWeight:600,color:"#F9FAFB",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.title}</div>
+              <div style={{fontSize:13,color:"#9CA3AF",marginTop:2}}>Etkinlik · {item.sub}</div>
+            </div>
+            <span style={{fontSize:11,color:"#9CA3AF"}}>▶</span>
+          </div>
+        )) : (
+          <div onClick={()=>goTo("tasks","calendar")} className="touch-card" style={{
+            ...cardStyle,padding:"20px 16px",cursor:"pointer",
+            display:"flex",flexDirection:"column",alignItems:"center",gap:8,
+          }}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="4" width="18" height="18" rx="2" stroke="#9CA3AF" strokeWidth="1.2" fill="none"/>
+              <line x1="3" y1="9" x2="21" y2="9" stroke="#9CA3AF" strokeWidth="1"/>
+              <line x1="8" y1="2" x2="8" y2="6" stroke="#9CA3AF" strokeWidth="1.2" strokeLinecap="round"/>
+              <line x1="16" y1="2" x2="16" y2="6" stroke="#9CA3AF" strokeWidth="1.2" strokeLinecap="round"/>
+            </svg>
+            <div style={{fontSize:13,color:"#9CA3AF"}}>Bugün planlanmış etkinlik yok</div>
+            <div style={{fontSize:11,color:"#4B5563"}}>Takvim'e git ve etkinlik ekle</div>
+          </div>
+        )}
+      </div>
+
       {/* Kart 2: Kalori + Yemek/Spor butonları */}
-      <div className="stagger-3" style={{...glowCard("#f97316"),marginBottom:12}}>
+      <div className="stagger-4" style={{...glowCard("#f97316"),marginBottom:12}}>
         <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
           <div style={{width:36,height:36,borderRadius:10,background:"rgba(245,158,11,0.12)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 22c-4.97 0-9-4.03-9-9 0-4 3-7.5 5-9.5.5 3 2 4 3.5 4.5C13 7 12.5 4 14 2c2.5 3.5 7 7.5 7 11 0 4.97-4.03 9-9 9z" stroke="#F59E0B" strokeWidth="1.5" fill="rgba(245,158,11,0.1)"/></svg>
@@ -659,96 +733,6 @@ function Dashboard({ data, setTab, goTo, update }) {
             flex:1,background:"rgba(16,185,129,0.1)",color:"#10B981",border:"1px solid rgba(16,185,129,0.2)",
             borderRadius:12,padding:"11px 4px",fontSize:13,fontWeight:600,cursor:"pointer",
           }}>+ Spor</button>
-        </div>
-      </div>
-
-      {/* Kart 3: Stil Motivasyon */}
-      <div className="stagger-4 touch-card" onClick={()=>goTo("lifestyle","clothes")} style={{
-        background:"linear-gradient(135deg,#1C1C26 0%,rgba(139,92,246,0.12) 100%)",
-        borderRadius:16,padding:"16px",marginBottom:16,
-        border:"1px solid rgba(139,92,246,0.15)",
-        cursor:"pointer",display:"flex",alignItems:"center",gap:14,
-      }}>
-        <div style={{width:48,height:48,borderRadius:14,background:"rgba(139,92,246,0.15)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-          <svg width="28" height="28" viewBox="0 0 36 36" fill="none">
-            <path d="M11 8C11 8 14 4 18 4C22 4 25 8 25 8" stroke="#c4b5fd" strokeWidth="1.5" strokeLinecap="round"/>
-            <circle cx="18" cy="4" r="2" stroke="#c4b5fd" strokeWidth="1.2" fill="none"/>
-            <path d="M6 18L18 14L30 18" stroke="#8B5CF6" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-            <line x1="18" y1="8" x2="18" y2="14" stroke="#c4b5fd" strokeWidth="1.3" strokeLinecap="round"/>
-            <path d="M8 26C8 23 11 21 15 21C17 21 18 23 21 23C25 23 28 23 28 26" stroke="#8B5CF6" strokeWidth="1.2" strokeLinecap="round" fill="rgba(139,92,246,0.08)"/>
-            <circle cx="28" cy="10" r="4" stroke="#9CA3AF" strokeWidth="1" fill="none"/>
-            <circle cx="24" cy="8" r="2.5" stroke="#9CA3AF" strokeWidth="1" fill="none"/>
-            <path d="M22 11C22 11 24 13 28 13C30 13 32 12 32 10" stroke="#9CA3AF" strokeWidth="0.8" fill="none"/>
-          </svg>
-        </div>
-        <div style={{flex:1}}>
-          <div style={{fontSize:16,fontWeight:600,color:"#F9FAFB"}}>Bugün harika görüneceksin!</div>
-          <div style={{fontSize:13,color:"#c4b5fd",marginTop:3}}>Hava durumuna göre stil önerilerin hazır</div>
-        </div>
-        <span style={{fontSize:14,color:"#8B5CF6"}}>▶</span>
-      </div>
-
-      {overdue>0&&(
-        <div onClick={()=>setTab("tasks")} style={{
-          background:"rgba(239,68,68,0.1)",border:"1px solid rgba(239,68,68,0.15)",
-          borderRadius:16,padding:"14px 16px",marginBottom:16,
-          display:"flex",alignItems:"center",gap:12,cursor:"pointer",
-        }}>
-          <div style={{width:36,height:36,borderRadius:10,background:"rgba(239,68,68,0.15)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-          </div>
-          <div style={{flex:1}}>
-            <div style={{fontSize:14,fontWeight:600,color:"#EF4444"}}>{overdue} gecikmiş görev!</div>
-            <div style={{fontSize:13,color:"#9CA3AF"}}>Hemen kontrol et</div>
-          </div>
-          <span style={{fontSize:14,color:"#9CA3AF"}}>▶</span>
-        </div>
-      )}
-
-      {scheduleItems.length>0&&(
-        <div style={{marginBottom:16}}>
-          <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:10}}>Bugünün Programı</div>
-          {scheduleItems.map(item=>(
-            <div key={item.id} onClick={()=>setTab("tasks")} style={{
-              ...cardStyle,padding:"14px 16px",marginBottom:8,
-              display:"flex",alignItems:"center",gap:12,cursor:"pointer",minHeight:54,
-            }}>
-              <div style={{width:3,height:36,background:item.color,borderRadius:2,flexShrink:0}}/>
-              <div style={{flex:1,minWidth:0}}>
-                <div style={{fontSize:14,fontWeight:600,color:"#F9FAFB",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.title}</div>
-                <div style={{fontSize:13,color:"#9CA3AF",marginTop:2}}>{item.type==="task"?"Görev":"Etkinlik"} · {item.sub}</div>
-              </div>
-              <span style={{fontSize:11,color:"#9CA3AF"}}>▶</span>
-            </div>
-          ))}
-        </div>
-      )}
-
-      <div style={{marginBottom:16}}>
-        <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:12}}>Bu Hafta</div>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10}}>
-          {[
-            {val:wkSport.length,label:"Antrenman",color:"#3B82F6",max:7},
-            {val:wkBurned,label:"kcal yakıldı",color:"#EF4444",max:Math.max(wkBurned,2000)},
-            {val:done,label:"Görev bitti",color:"#10B981",max:Math.max(done,10)},
-          ].map((s,i)=>{
-            const pct = s.max > 0 ? Math.min(100, (s.val / s.max) * 100) : 0;
-            const r = 20; const circ = 2 * Math.PI * r;
-            const offset = circ - (pct / 100) * circ;
-            return (
-              <div key={i} style={{background:"#1C1C26",border:"1px solid rgba(255,255,255,0.05)",borderRadius:16,padding:"16px 8px",textAlign:"center"}}>
-                <svg width="52" height="52" viewBox="0 0 52 52" style={{display:"block",margin:"0 auto 8px"}}>
-                  <circle cx="26" cy="26" r={r} fill="none" stroke="#2A2A35" strokeWidth="4"/>
-                  <circle cx="26" cy="26" r={r} fill="none" stroke={s.color} strokeWidth="4"
-                    strokeDasharray={circ} strokeDashoffset={offset}
-                    strokeLinecap="round" transform="rotate(-90 26 26)"
-                    style={{transition:"stroke-dashoffset .6s ease"}}/>
-                </svg>
-                <div style={{fontSize:20,fontWeight:700,color:s.color}}>{s.val}</div>
-                <div style={{fontSize:10,color:"#9CA3AF",marginTop:2,lineHeight:1.2}}>{s.label}</div>
-              </div>
-            );
-          })}
         </div>
       </div>
 
@@ -849,6 +833,35 @@ function Dashboard({ data, setTab, goTo, update }) {
           </div>
         )}
       </div>
+
+      <div style={{marginBottom:16}}>
+        <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:12}}>Bu Hafta</div>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10}}>
+          {[
+            {val:wkSport.length,label:"Antrenman",color:"#3B82F6",max:7},
+            {val:wkBurned,label:"kcal yakıldı",color:"#EF4444",max:Math.max(wkBurned,2000)},
+            {val:done,label:"Görev bitti",color:"#10B981",max:Math.max(done,10)},
+          ].map((s,i)=>{
+            const pct = s.max > 0 ? Math.min(100, (s.val / s.max) * 100) : 0;
+            const r = 20; const circ = 2 * Math.PI * r;
+            const offset = circ - (pct / 100) * circ;
+            return (
+              <div key={i} style={{background:"#1C1C26",border:"1px solid rgba(255,255,255,0.05)",borderRadius:16,padding:"16px 8px",textAlign:"center"}}>
+                <svg width="52" height="52" viewBox="0 0 52 52" style={{display:"block",margin:"0 auto 8px"}}>
+                  <circle cx="26" cy="26" r={r} fill="none" stroke="#2A2A35" strokeWidth="4"/>
+                  <circle cx="26" cy="26" r={r} fill="none" stroke={s.color} strokeWidth="4"
+                    strokeDasharray={circ} strokeDashoffset={offset}
+                    strokeLinecap="round" transform="rotate(-90 26 26)"
+                    style={{transition:"stroke-dashoffset .6s ease"}}/>
+                </svg>
+                <div style={{fontSize:20,fontWeight:700,color:s.color}}>{s.val}</div>
+                <div style={{fontSize:10,color:"#9CA3AF",marginTop:2,lineHeight:1.2}}>{s.label}</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
 
       {data.notes.length>0&&(
         <div style={{marginBottom:16}}>
