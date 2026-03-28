@@ -275,7 +275,7 @@ function FAB({ onClick, color="#3b82f6" }) {
 }
 
 /* ═══════════ DASHBOARD ═══════════ */
-function Dashboard({ data, setTab, update }) {
+function Dashboard({ data, setTab, goTo, update }) {
   const t = today();
   const foods = data.foods || [];
   const rooms = data.rooms || [...DEFAULT_ROOMS];
@@ -399,11 +399,11 @@ function Dashboard({ data, setTab, update }) {
           <span style={{fontSize:11,color:"#f97316",fontWeight:600,flexShrink:0}}>{Math.round(todayCalIn/2000*100)}%</span>
         </div>
         <div style={{display:"flex",gap:8}}>
-          <button onClick={()=>setTab("lifestyle")} style={{
+          <button onClick={()=>goTo("lifestyle","healthcoach")} style={{
             flex:1,background:"rgba(249,115,22,0.12)",color:"#f97316",border:"1px solid rgba(249,115,22,0.3)",
             borderRadius:10,padding:"9px 4px",fontSize:12,fontWeight:700,cursor:"pointer",
           }}>+ Yemek</button>
-          <button onClick={()=>setTab("lifestyle")} style={{
+          <button onClick={()=>goTo("lifestyle","healthcoach")} style={{
             flex:1,background:"rgba(34,197,94,0.12)",color:"#22c55e",border:"1px solid rgba(34,197,94,0.3)",
             borderRadius:10,padding:"9px 4px",fontSize:12,fontWeight:700,cursor:"pointer",
           }}>+ Spor</button>
@@ -411,7 +411,7 @@ function Dashboard({ data, setTab, update }) {
       </div>
 
       {/* Kart 3: Stil Motivasyon */}
-      <div className="stagger-3 touch-card" onClick={()=>setTab("lifestyle")} style={{
+      <div className="stagger-3 touch-card" onClick={()=>goTo("lifestyle","clothes")} style={{
         ...glowCard("#a855f7"),cursor:"pointer",marginBottom:14,
         display:"flex",alignItems:"center",gap:14,
       }}>
@@ -506,7 +506,7 @@ function Dashboard({ data, setTab, update }) {
             <svg width="12" height="12" viewBox="0 0 36 36" fill="none"><rect x="4" y="7" width="28" height="22" rx="2" stroke="#ef4444" strokeWidth="2" fill="none"/><line x1="9" y1="13" x2="27" y2="13" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/><line x1="9" y1="18" x2="22" y2="18" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" opacity=".6"/></svg>
             BBC Türkçe Haberler
           </div>
-          <button onClick={()=>setTab("lifestyle")} style={{background:"none",border:"none",color:"#ef4444",fontSize:12,cursor:"pointer",fontWeight:600}}>Tümü ▶</button>
+          <button onClick={()=>goTo("lifestyle","news")} style={{background:"none",border:"none",color:"#ef4444",fontSize:12,cursor:"pointer",fontWeight:600}}>Tümü ▶</button>
         </div>
         <div style={{background:"rgba(239,68,68,0.06)",backdropFilter:"blur(12px)",borderRadius:16,padding:"12px 14px",border:"1px solid rgba(239,68,68,0.18)",boxShadow:"0 0 20px rgba(239,68,68,0.06)"}}>
           {headlines.length === 0 ? (
@@ -534,10 +534,10 @@ function Dashboard({ data, setTab, update }) {
             <svg width="12" height="12" viewBox="0 0 36 36" fill="none"><circle cx="12" cy="28" r="5" stroke="#a855f7" strokeWidth="2" fill="none"/><circle cx="28" cy="24" r="5" stroke="#a855f7" strokeWidth="2" fill="none"/><path d="M17 28 L17 8 L33 4 L33 24" stroke="#a855f7" strokeWidth="2" strokeLinecap="round"/><line x1="17" y1="8" x2="33" y2="4" stroke="#a855f7" strokeWidth="1.5"/></svg>
             Müzik Koleksiyonu
           </div>
-          <button onClick={()=>setTab("lifestyle")} style={{background:"none",border:"none",color:"#a855f7",fontSize:12,cursor:"pointer",fontWeight:600}}>Tümü ▶</button>
+          <button onClick={()=>goTo("lifestyle","music")} style={{background:"none",border:"none",color:"#a855f7",fontSize:12,cursor:"pointer",fontWeight:600}}>Tümü ▶</button>
         </div>
         {musicItems.length === 0 ? (
-          <div onClick={()=>setTab("lifestyle")} style={{
+          <div onClick={()=>goTo("lifestyle","music")} style={{
             background:"rgba(168,85,247,0.06)",border:"1px solid rgba(168,85,247,0.18)",borderRadius:16,
             padding:"16px 18px",cursor:"pointer",display:"flex",alignItems:"center",gap:14,
           }}>
@@ -577,11 +577,11 @@ function Dashboard({ data, setTab, update }) {
         <div>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
             <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em"}}>Son Notlar</div>
-            <button onClick={()=>setTab("tasks")} style={{background:"none",border:"none",color:"#3b82f6",fontSize:12,cursor:"pointer",fontWeight:600}}>Tümü ▶</button>
+            <button onClick={()=>goTo("tasks","notes")} style={{background:"none",border:"none",color:"#3b82f6",fontSize:12,cursor:"pointer",fontWeight:600}}>Tümü ▶</button>
           </div>
           <div style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:4,WebkitOverflowScrolling:"touch"}}>
             {data.notes.slice(0,5).map(n=>(
-              <div key={n.id} onClick={()=>setTab("tasks")} style={{
+              <div key={n.id} onClick={()=>goTo("tasks","notes")} style={{
                 background:"rgba(255,255,255,0.04)",backdropFilter:"blur(8px)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:14,padding:"10px 12px",
                 minWidth:130,maxWidth:160,cursor:"pointer",flexShrink:0,
                 borderTop:`3px solid ${n.color||"#14b8a6"}`,
@@ -2550,7 +2550,7 @@ function BenimStilimRoom({data,update,onBack}){
   );
 }
 /* ═══════════ TARZIM ═══════════ */
-function Projects({ data, update }) {
+function Projects({ data, update, initialRoom, onRoomConsumed }) {
   const [activeRoom,setActiveRoom]=useState(null);
   const [modal,setModal]=useState(false);
   const [roomModal,setRoomModal]=useState(false);
@@ -2560,6 +2560,14 @@ function Projects({ data, update }) {
   const [itemForm,setItemForm]=useState({title:"",description:"",tags:""});
   const [exp,setExp]=useState(null);
   const [tf,setTf]=useState({title:""});
+
+  // Dashboard'dan gelen oda yönlendirmesini yakala
+  useEffect(() => {
+    if (initialRoom) {
+      setActiveRoom(initialRoom);
+      onRoomConsumed?.();
+    }
+  }, [initialRoom]);
 
   const rooms = data.rooms || [...DEFAULT_ROOMS];
   const roomItems = data.roomItems || {};
@@ -2913,8 +2921,16 @@ function Notes({ data, update }) {
 }
 
 /* ═══════════ TASKS HUB (Görevler + Takvim + Notlar) ═══════════ */
-function TasksHub({ data, update }) {
+function TasksHub({ data, update, initialSubTab, onSubTabConsumed }) {
   const [subTab, setSubTab] = useState("tasks");
+
+  // Dashboard'dan gelen sub-tab yönlendirmesini yakala
+  useEffect(() => {
+    if (initialSubTab) {
+      setSubTab(initialSubTab);
+      onSubTabConsumed?.();
+    }
+  }, [initialSubTab]);
   return (
     <div>
       <div style={{
@@ -3401,7 +3417,25 @@ function LoginScreen({ onLogin }) {
 /* ═══════════════════ MAIN APP ═══════════════════ */
 export default function App() {
   const [tab, setTab] = useState("dashboard");
+  const [pendingRoom, setPendingRoom] = useState(null);
+  const [pendingSubTab, setPendingSubTab] = useState(null);
   const [data, setData] = useState(null);
+
+  // Navigate to a tab, optionally opening a specific room or sub-tab
+  const goTo = useCallback((tabId, roomOrSubTab) => {
+    if (tabId === "lifestyle") {
+      setPendingRoom(roomOrSubTab || null);
+      setPendingSubTab(null);
+    } else if (tabId === "tasks" && roomOrSubTab) {
+      setPendingSubTab(roomOrSubTab);
+      setPendingRoom(null);
+    } else {
+      setPendingRoom(null);
+      setPendingSubTab(null);
+    }
+    setTab(tabId);
+    window.scrollTo({ top: 0 });
+  }, []);
   const [loading, setLoading] = useState(true);
   const [splash, setSplash] = useState(true);
   const [user, setUser] = useState(undefined);
@@ -3600,9 +3634,9 @@ export default function App() {
 
   const content = () => {
     switch(tab) {
-      case "dashboard": return <Dashboard data={data} setTab={setTab} update={update}/>;
-      case "tasks": return <TasksHub data={data} update={update}/>;
-      case "lifestyle": return <Projects data={data} update={update}/>;
+      case "dashboard": return <Dashboard data={data} setTab={setTab} goTo={goTo} update={update}/>;
+      case "tasks": return <TasksHub data={data} update={update} initialSubTab={pendingSubTab} onSubTabConsumed={()=>setPendingSubTab(null)}/>;
+      case "lifestyle": return <Projects data={data} update={update} initialRoom={pendingRoom} onRoomConsumed={()=>setPendingRoom(null)}/>;
       case "settings": return <Settings data={data} update={update} onImport={d=>{setData(d);showToast("Veriler aktarıldı!")}} user={user} onLogout={handleLogout}/>;
     }
   };
