@@ -83,10 +83,9 @@ function useIsMobile() {
 /* ── Styles ── */
 const inp = {
   width:"100%",
-  background:"rgba(255,255,255,0.06)",
-  backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)",
-  border:"1px solid rgba(255,255,255,0.1)",
-  borderRadius:12,padding:"12px 14px",color:"#e0e0e0",fontSize:15,
+  background:"#2A2A35",
+  border:"1px solid rgba(255,255,255,0.06)",
+  borderRadius:12,padding:"12px 14px",color:"#F9FAFB",fontSize:15,
   marginBottom:10,outline:"none",boxSizing:"border-box",WebkitAppearance:"none",
 };
 const btnPrimary = {
@@ -101,32 +100,28 @@ const addBtnStyle = {
   padding:"8px 16px",fontSize:13,fontWeight:600,cursor:"pointer",
 };
 const filterBtnStyle = (active) => ({
-  background: active ? "rgba(59,130,246,0.2)" : "rgba(255,255,255,0.04)",
-  color: active ? "#3b82f6" : "#888",
-  border: active ? "1px solid rgba(59,130,246,0.3)" : "1px solid rgba(255,255,255,0.06)",
+  background: active ? "rgba(59,130,246,0.15)" : "#2A2A35",
+  color: active ? "#3b82f6" : "#9CA3AF",
+  border: active ? "1px solid rgba(59,130,246,0.3)" : "1px solid rgba(255,255,255,0.05)",
   padding:"7px 14px",borderRadius:20,fontSize:13,cursor:"pointer",whiteSpace:"nowrap",
   fontWeight: active ? 600 : 400,
 });
 const cardStyle = {
-  background:"rgba(255,255,255,0.04)",
-  backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",
-  borderRadius:16,padding:"14px 16px",marginBottom:8,
-  border:"1px solid rgba(255,255,255,0.07)",
-  boxShadow:"0 4px 24px rgba(0,0,0,0.3)",
+  background:"#1C1C26",
+  borderRadius:16,padding:"16px",marginBottom:8,
+  border:"1px solid rgba(255,255,255,0.05)",
 };
-/* Glow card helper: cardStyle + colored glow border */
+/* Glow card helper: cardStyle + subtle colored accent */
 const glowCard = (color) => ({
   ...cardStyle,
-  border:`1px solid ${color}40`,
-  boxShadow:`0 0 20px ${color}22, 0 4px 24px rgba(0,0,0,0.35), inset 0 0 20px ${color}08`,
+  border:`1px solid ${color}20`,
 });
 const delBtnStyle = {
-  background:"rgba(255,255,255,0.06)",
-  border:"1px solid rgba(255,255,255,0.08)",
-  color:"#666",fontSize:14,
+  background:"#2A2A35",
+  border:"1px solid rgba(255,255,255,0.05)",
+  color:"#9CA3AF",fontSize:14,
   cursor:"pointer",padding:0,width:32,height:32,borderRadius:8,
   display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,
-  backdropFilter:"blur(4px)",
 };
 const sectionHeader = {
   display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14,
@@ -150,7 +145,7 @@ function Modal({ open, onClose, title, children }) {
       animation:"modalOverlayIn .2s ease both",
     }}>
       <div onClick={e=>e.stopPropagation()} style={{
-        background:"rgba(18,18,32,0.98)",
+        background:"#1C1C26",
         backdropFilter:"blur(24px)",WebkitBackdropFilter:"blur(24px)",
         width:"100%",maxWidth:480,
         maxHeight:"85dvh",
@@ -159,10 +154,10 @@ function Modal({ open, onClose, title, children }) {
         animation:"modalSlideUp .3s cubic-bezier(.22,1,.36,1) both",
       }}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",
-          padding:"14px 20px",borderBottom:"1px solid rgba(255,255,255,0.07)",
+          padding:"16px 20px",borderBottom:"1px solid rgba(255,255,255,0.05)",
           flexShrink:0,
         }}>
-          <h3 style={{margin:0,fontSize:16,fontWeight:700}}>{title}</h3>
+          <h3 style={{margin:0,fontSize:16,fontWeight:600,color:"#F9FAFB"}}>{title}</h3>
           <button className="back-btn" onClick={onClose} style={{width:32,height:32,fontSize:14}}>✕</button>
         </div>
         <div style={{
@@ -196,13 +191,13 @@ function StickyHeader({ children }) {
   return (
     <div style={{
       position:"sticky",top:0,zIndex:50,
-      background:"rgba(6,6,17,0.85)",
+      background:"rgba(13,13,18,0.92)",
       backdropFilter:"blur(20px) saturate(180%)",
       WebkitBackdropFilter:"blur(20px) saturate(180%)",
-      marginLeft:-16,marginRight:-16,
-      padding:"14px 16px 12px",
-      borderBottom:"1px solid rgba(255,255,255,0.08)",
-      marginBottom:14,
+      marginLeft:-20,marginRight:-20,
+      padding:"14px 20px 12px",
+      borderBottom:"1px solid rgba(255,255,255,0.05)",
+      marginBottom:16,
     }}>
       {children}
     </div>
@@ -213,7 +208,7 @@ function GroupLabel({ label, count, color }) {
   return (
     <div style={{
       display:"flex",alignItems:"center",gap:6,
-      fontSize:11,fontWeight:700,color:"#666",
+      fontSize:11,fontWeight:700,color:"#6B7280",
       textTransform:"uppercase",letterSpacing:".07em",
       marginBottom:8,marginTop:4,
     }}>
@@ -308,157 +303,195 @@ function Dashboard({ data, setTab, goTo, update }) {
     ...upcoming.slice(0,2).map(e=>({ type:"event", id:e.id, title:e.title, sub:e.time||e.date.slice(5), color:e.color||"#a855f7" })),
   ].slice(0,4);
 
+  const hourIcon = hour<6 ? "moon" : hour<12 ? "sunrise" : hour<18 ? "sun" : "moon";
+
   return (
     <div>
       {/* HERO - Greeting */}
-      <div style={{marginBottom:14}}>
-        <h2 style={{margin:0,fontSize:23,fontWeight:800,letterSpacing:-.5}}>{greeting}! 👋</h2>
-        <p style={{margin:"4px 0 0",opacity:.45,fontSize:13}}>
-          {new Date().toLocaleDateString("tr-TR",{weekday:"long",day:"numeric",month:"long"})}
-        </p>
+      <div className="stagger-1" style={{
+        background:"#1C1C26",
+        borderRadius:16,padding:"20px",marginBottom:16,
+        border:"1px solid rgba(255,255,255,0.05)",
+      }}>
+        <div style={{display:"flex",alignItems:"center",gap:14}}>
+          <div style={{width:44,height:44,borderRadius:12,background:"#2A2A35",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+            {hourIcon==="moon" ? (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="#a5b4fc" strokeWidth="1.5" fill="rgba(165,180,252,0.15)"/></svg>
+            ) : hourIcon==="sunrise" ? (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="#fbbf24" strokeWidth="1.5" fill="rgba(251,191,36,0.15)"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" stroke="#fbbf24" strokeWidth="1.5" strokeLinecap="round"/></svg>
+            ) : (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="5" stroke="#f59e0b" strokeWidth="1.5" fill="rgba(245,158,11,0.15)"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="#f59e0b" strokeWidth="1.5" strokeLinecap="round"/></svg>
+            )}
+          </div>
+          <div style={{flex:1}}>
+            <h2 style={{margin:0,fontSize:28,fontWeight:700,letterSpacing:-.5,color:"#F9FAFB",lineHeight:1.2}}>{greeting}!</h2>
+            <p style={{margin:"4px 0 0",color:"#9CA3AF",fontSize:13}}>
+              {new Date().toLocaleDateString("tr-TR",{weekday:"long",day:"numeric",month:"long"})}
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* 3 AKILLI KART */}
       {/* Kart 1: Görev + Etkinlik + Proje */}
-      <div className="stagger-1 touch-card" onClick={()=>setTab("tasks")} style={{
-        ...glowCard("#3b82f6"),cursor:"pointer",marginBottom:10,
+      <div className="stagger-2 touch-card" onClick={()=>setTab("tasks")} style={{
+        ...glowCard("#3b82f6"),cursor:"pointer",marginBottom:12,
       }}>
-        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
-          <div style={{width:36,height:36,borderRadius:10,background:"rgba(59,130,246,0.15)",border:"1px solid rgba(59,130,246,0.3)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
+          <div style={{width:36,height:36,borderRadius:10,background:"rgba(59,130,246,0.12)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 11l3 3L22 4" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </div>
           <div style={{flex:1}}>
-            <div style={{fontSize:14,fontWeight:700}}>Görev Durumu</div>
-            <div style={{fontSize:11,opacity:.4}}>Bugünün özeti</div>
+            <div style={{fontSize:16,fontWeight:600,color:"#F9FAFB"}}>Görev Durumu</div>
+            <div style={{fontSize:13,color:"#9CA3AF"}}>Bugünün özeti</div>
           </div>
-          <span style={{fontSize:14,opacity:.2}}>▶</span>
+          <span style={{fontSize:14,color:"#9CA3AF"}}>▶</span>
         </div>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
-          <div style={{background:"rgba(59,130,246,0.1)",borderRadius:10,padding:"10px 8px",textAlign:"center"}}>
-            <div style={{fontSize:22,fontWeight:800,color:"#3b82f6"}}>{pending}</div>
-            <div style={{fontSize:10,color:"#3b82f6",opacity:.7,marginTop:2}}>Bekleyen</div>
+          <div style={{background:"#2A2A35",borderRadius:12,padding:"12px 8px",textAlign:"center"}}>
+            <div style={{fontSize:24,fontWeight:700,color:"#3b82f6"}}>{pending}</div>
+            <div style={{fontSize:11,color:"#9CA3AF",marginTop:2}}>Bekleyen</div>
           </div>
-          <div style={{background:"rgba(168,85,247,0.1)",borderRadius:10,padding:"10px 8px",textAlign:"center"}}>
-            <div style={{fontSize:22,fontWeight:800,color:"#a855f7"}}>{todayEv.length}</div>
-            <div style={{fontSize:10,color:"#a855f7",opacity:.7,marginTop:2}}>Etkinlik</div>
+          <div style={{background:"#2A2A35",borderRadius:12,padding:"12px 8px",textAlign:"center"}}>
+            <div style={{fontSize:24,fontWeight:700,color:"#8B5CF6"}}>{todayEv.length}</div>
+            <div style={{fontSize:11,color:"#9CA3AF",marginTop:2}}>Etkinlik</div>
           </div>
-          <div style={{background:"rgba(34,197,94,0.1)",borderRadius:10,padding:"10px 8px",textAlign:"center"}}>
-            <div style={{fontSize:22,fontWeight:800,color:"#22c55e"}}>{activeProjects}</div>
-            <div style={{fontSize:10,color:"#22c55e",opacity:.7,marginTop:2}}>Proje</div>
+          <div style={{background:"#2A2A35",borderRadius:12,padding:"12px 8px",textAlign:"center"}}>
+            <div style={{fontSize:24,fontWeight:700,color:"#10B981"}}>{activeProjects}</div>
+            <div style={{fontSize:11,color:"#9CA3AF",marginTop:2}}>Proje</div>
           </div>
         </div>
       </div>
 
       {/* Kart 2: Kalori + Yemek/Spor butonları */}
-      <div className="stagger-2" style={{...glowCard("#f97316"),marginBottom:10}}>
-        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
-          <div style={{width:36,height:36,borderRadius:10,background:"rgba(249,115,22,0.15)",border:"1px solid rgba(249,115,22,0.3)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" stroke="#f97316" strokeWidth="2" fill="none"/><path d="M12 6v6l4 2" stroke="#f97316" strokeWidth="2" strokeLinecap="round"/></svg>
+      <div className="stagger-3" style={{...glowCard("#f97316"),marginBottom:12}}>
+        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
+          <div style={{width:36,height:36,borderRadius:10,background:"rgba(245,158,11,0.12)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 22c-4.97 0-9-4.03-9-9 0-4 3-7.5 5-9.5.5 3 2 4 3.5 4.5C13 7 12.5 4 14 2c2.5 3.5 7 7.5 7 11 0 4.97-4.03 9-9 9z" stroke="#F59E0B" strokeWidth="1.5" fill="rgba(245,158,11,0.1)"/></svg>
           </div>
           <div style={{flex:1}}>
-            <div style={{fontSize:14,fontWeight:700}}>Kalori Takibi</div>
-            <div style={{fontSize:11,opacity:.4}}>Bugün: {todayCalIn} kcal alındı · {todayCalOut} kcal yakıldı</div>
+            <div style={{fontSize:16,fontWeight:600,color:"#F9FAFB"}}>Kalori Takibi</div>
+            <div style={{fontSize:13,color:"#9CA3AF"}}>Bugün: {todayCalIn} alındı · {todayCalOut} yakıldı</div>
           </div>
         </div>
-        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
-          <div style={{flex:1,height:8,background:"rgba(255,255,255,0.08)",borderRadius:4,overflow:"hidden"}}>
-            <div style={{height:"100%",borderRadius:4,width:`${Math.min(100,Math.round(todayCalIn/2000*100))}%`,background:"linear-gradient(90deg,#f97316,#ef4444)",transition:"width .5s"}}/>
+        {todayCalIn > 0 ? (
+          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
+            <div style={{flex:1,height:8,background:"#2A2A35",borderRadius:8,overflow:"hidden"}}>
+              <div style={{height:"100%",borderRadius:8,width:`${Math.min(100,Math.round(todayCalIn/2000*100))}%`,background:"#10B981",transition:"width .5s"}}/>
+            </div>
+            <span style={{fontSize:12,color:"#F59E0B",fontWeight:600,flexShrink:0}}>{Math.round(todayCalIn/2000*100)}%</span>
           </div>
-          <span style={{fontSize:11,color:"#f97316",fontWeight:600,flexShrink:0}}>{Math.round(todayCalIn/2000*100)}%</span>
-        </div>
+        ) : (
+          <div style={{fontSize:13,color:"#9CA3AF",textAlign:"center",padding:"8px 0",marginBottom:12}}>Henüz bugün yemek kaydı yok</div>
+        )}
         <div style={{display:"flex",gap:8}}>
           <button onClick={()=>goTo("lifestyle","healthcoach:food")} style={{
-            flex:1,background:"rgba(249,115,22,0.12)",color:"#f97316",border:"1px solid rgba(249,115,22,0.3)",
-            borderRadius:10,padding:"9px 4px",fontSize:12,fontWeight:700,cursor:"pointer",
+            flex:1,background:"rgba(245,158,11,0.1)",color:"#F59E0B",border:"1px solid rgba(245,158,11,0.2)",
+            borderRadius:12,padding:"11px 4px",fontSize:13,fontWeight:600,cursor:"pointer",
           }}>+ Yemek</button>
           <button onClick={()=>goTo("lifestyle","healthcoach:sport")} style={{
-            flex:1,background:"rgba(34,197,94,0.12)",color:"#22c55e",border:"1px solid rgba(34,197,94,0.3)",
-            borderRadius:10,padding:"9px 4px",fontSize:12,fontWeight:700,cursor:"pointer",
+            flex:1,background:"rgba(16,185,129,0.1)",color:"#10B981",border:"1px solid rgba(16,185,129,0.2)",
+            borderRadius:12,padding:"11px 4px",fontSize:13,fontWeight:600,cursor:"pointer",
           }}>+ Spor</button>
         </div>
       </div>
 
       {/* Kart 3: Stil Motivasyon */}
-      <div className="stagger-3 touch-card" onClick={()=>goTo("lifestyle","clothes")} style={{
-        ...glowCard("#a855f7"),cursor:"pointer",marginBottom:14,
+      <div className="stagger-4 touch-card" onClick={()=>goTo("lifestyle","clothes")} style={{
+        ...glowCard("#a855f7"),cursor:"pointer",marginBottom:16,
         display:"flex",alignItems:"center",gap:14,
       }}>
-        <div style={{width:44,height:44,borderRadius:12,background:"rgba(168,85,247,0.15)",border:"1px solid rgba(168,85,247,0.3)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-          <svg width="22" height="22" viewBox="0 0 32 32" fill="none"><path d="M9 4C9 4 6 5 4 8L2 13L8 15L8 12L10 12L10 28L22 28L22 12L24 12L24 15L30 13L28 8C26 5 23 4 23 4C23 4 21 7 16 7C11 7 9 4 9 4Z" stroke="#a855f7" strokeWidth="1.5" fill="rgba(168,85,247,0.15)" strokeLinejoin="round"/></svg>
+        <div style={{width:44,height:44,borderRadius:12,background:"rgba(139,92,246,0.12)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+          <svg width="22" height="22" viewBox="0 0 32 32" fill="none"><path d="M9 4C9 4 6 5 4 8L2 13L8 15L8 12L10 12L10 28L22 28L22 12L24 12L24 15L30 13L28 8C26 5 23 4 23 4C23 4 21 7 16 7C11 7 9 4 9 4Z" stroke="#8B5CF6" strokeWidth="1.5" fill="rgba(139,92,246,0.1)" strokeLinejoin="round"/></svg>
         </div>
         <div style={{flex:1}}>
-          <div style={{fontSize:14,fontWeight:700,color:"#c4b5fd"}}>Bugün harika görüneceksin!</div>
-          <div style={{fontSize:11,opacity:.45,marginTop:3}}>Hava durumuna göre stil önerilerin hazır</div>
+          <div style={{fontSize:16,fontWeight:600,color:"#F9FAFB"}}>Bugün harika görüneceksin!</div>
+          <div style={{fontSize:13,color:"#9CA3AF",marginTop:3}}>Hava durumuna göre stil önerilerin hazır</div>
         </div>
-        <span style={{fontSize:14,opacity:.2}}>▶</span>
+        <span style={{fontSize:14,color:"#9CA3AF"}}>▶</span>
       </div>
 
       {overdue>0&&(
         <div onClick={()=>setTab("tasks")} style={{
-          background:"rgba(239,68,68,0.1)",backdropFilter:"blur(8px)",border:"1px solid rgba(239,68,68,0.3)",
-          borderRadius:14,padding:"12px 14px",marginBottom:12,
-          display:"flex",alignItems:"center",gap:10,cursor:"pointer",
-          boxShadow:"0 0 20px rgba(239,68,68,0.1)",
+          background:"rgba(239,68,68,0.1)",border:"1px solid rgba(239,68,68,0.15)",
+          borderRadius:16,padding:"14px 16px",marginBottom:16,
+          display:"flex",alignItems:"center",gap:12,cursor:"pointer",
         }}>
-          <span style={{fontSize:20}}>🚨</span>
-          <div style={{flex:1}}>
-            <div style={{fontSize:14,fontWeight:700,color:"#ef4444"}}>{overdue} gecikmiş görev!</div>
-            <div style={{fontSize:11,opacity:.5}}>Hemen kontrol et</div>
+          <div style={{width:36,height:36,borderRadius:10,background:"rgba(239,68,68,0.15)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </div>
-          <span style={{fontSize:14,opacity:.3}}>▶</span>
+          <div style={{flex:1}}>
+            <div style={{fontSize:14,fontWeight:600,color:"#EF4444"}}>{overdue} gecikmiş görev!</div>
+            <div style={{fontSize:13,color:"#9CA3AF"}}>Hemen kontrol et</div>
+          </div>
+          <span style={{fontSize:14,color:"#9CA3AF"}}>▶</span>
         </div>
       )}
 
       {scheduleItems.length>0&&(
-        <div style={{marginBottom:14}}>
-          <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em",marginBottom:8}}>Bugünün Programı</div>
+        <div style={{marginBottom:16}}>
+          <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:10}}>Bugünün Programı</div>
           {scheduleItems.map(item=>(
             <div key={item.id} onClick={()=>setTab("tasks")} style={{
-              ...cardStyle,padding:"13px 14px",marginBottom:6,
+              ...cardStyle,padding:"14px 16px",marginBottom:8,
               display:"flex",alignItems:"center",gap:12,cursor:"pointer",minHeight:54,
-              border:`1px solid ${item.color}25`,boxShadow:`0 0 16px ${item.color}10`,
             }}>
               <div style={{width:3,height:36,background:item.color,borderRadius:2,flexShrink:0}}/>
               <div style={{flex:1,minWidth:0}}>
-                <div style={{fontSize:14,fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.title}</div>
-                <div style={{fontSize:11,opacity:.4,marginTop:2}}>{item.type==="task"?"Görev":"Etkinlik"} · {item.sub}</div>
+                <div style={{fontSize:14,fontWeight:600,color:"#F9FAFB",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.title}</div>
+                <div style={{fontSize:13,color:"#9CA3AF",marginTop:2}}>{item.type==="task"?"Görev":"Etkinlik"} · {item.sub}</div>
               </div>
-              <span style={{fontSize:11,opacity:.2}}>▶</span>
+              <span style={{fontSize:11,color:"#9CA3AF"}}>▶</span>
             </div>
           ))}
         </div>
       )}
 
-      <div style={{marginBottom:14}}>
-        <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em",marginBottom:8}}>Bu Hafta</div>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8}}>
+      <div style={{marginBottom:16}}>
+        <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:12}}>Bu Hafta</div>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10}}>
           {[
-            {val:wkSport.length,label:"Antrenman",color:"#3b82f6"},
-            {val:wkBurned,label:"kcal yakıldı",color:"#ef4444"},
-            {val:done,label:"Görev bitti",color:"#22c55e"},
-          ].map((s,i)=>(
-            <div key={i} style={{background:"rgba(255,255,255,0.04)",backdropFilter:"blur(8px)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:14,padding:"12px 10px",textAlign:"center",boxShadow:"0 4px 16px rgba(0,0,0,0.2)"}}>
-              <div style={{fontSize:20,fontWeight:800,color:s.color,letterSpacing:-.5}}>{s.val}</div>
-              <div style={{fontSize:10,opacity:.4,marginTop:3,lineHeight:1.2}}>{s.label}</div>
-            </div>
-          ))}
+            {val:wkSport.length,label:"Antrenman",color:"#3B82F6",max:7},
+            {val:wkBurned,label:"kcal yakıldı",color:"#EF4444",max:Math.max(wkBurned,2000)},
+            {val:done,label:"Görev bitti",color:"#10B981",max:Math.max(done,10)},
+          ].map((s,i)=>{
+            const pct = s.max > 0 ? Math.min(100, (s.val / s.max) * 100) : 0;
+            const r = 20; const circ = 2 * Math.PI * r;
+            const offset = circ - (pct / 100) * circ;
+            return (
+              <div key={i} style={{background:"#1C1C26",border:"1px solid rgba(255,255,255,0.05)",borderRadius:16,padding:"16px 8px",textAlign:"center"}}>
+                <svg width="52" height="52" viewBox="0 0 52 52" style={{display:"block",margin:"0 auto 8px"}}>
+                  <circle cx="26" cy="26" r={r} fill="none" stroke="#2A2A35" strokeWidth="4"/>
+                  <circle cx="26" cy="26" r={r} fill="none" stroke={s.color} strokeWidth="4"
+                    strokeDasharray={circ} strokeDashoffset={offset}
+                    strokeLinecap="round" transform="rotate(-90 26 26)"
+                    style={{transition:"stroke-dashoffset .6s ease"}}/>
+                </svg>
+                <div style={{fontSize:20,fontWeight:700,color:s.color}}>{s.val}</div>
+                <div style={{fontSize:10,color:"#9CA3AF",marginTop:2,lineHeight:1.2}}>{s.label}</div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
       {/* ── KAFAMDAKILER ── */}
-      <div style={{marginBottom:14}}>
-        <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em",marginBottom:8}}>☁️ Bugün Kafamı Kurcalayanlar</div>
-        <div style={{background:"rgba(255,255,255,0.04)",backdropFilter:"blur(12px)",borderRadius:16,padding:"12px 14px",border:"1px solid rgba(20,184,166,0.2)",boxShadow:"0 0 20px rgba(20,184,166,0.08)"}}>
+      <div style={{marginBottom:16}}>
+        <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:12,display:"flex",alignItems:"center",gap:6}}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M17.5 19H9.5a7 7 0 117.9-10.5 5 5 0 110 10.5z" stroke="#14b8a6" strokeWidth="1.5" fill="rgba(20,184,166,0.1)"/></svg>
+          Bugün Kafamı Kurcalayanlar
+        </div>
+        <div style={{background:"#1C1C26",borderRadius:16,padding:"14px 16px",border:"1px solid rgba(255,255,255,0.05)"}}>
           {[0,1,2].map(i=>(
-            <div key={i} style={{display:"flex",alignItems:"center",gap:10,marginBottom:i<2?8:0}}>
-              <span style={{fontSize:13,opacity:.35,flexShrink:0,fontWeight:700}}>{i+1}.</span>
+            <div key={i} style={{display:"flex",alignItems:"center",gap:10,marginBottom:i<2?10:0}}>
+              <span style={{fontSize:13,color:"#9CA3AF",flexShrink:0,fontWeight:700}}>{i+1}.</span>
               <input
                 value={thoughts[i]||""}
                 onChange={e=>updateThought(i,e.target.value)}
                 placeholder={["Bugün en çok düşündüğüm şey...","Kafamı karıştıran bir şey...","Çözmek istediğim bir sorun..."][i]}
                 style={{
-                  flex:1,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.07)",
-                  borderRadius:10,padding:"9px 12px",color:"#e0e0e0",fontSize:13,outline:"none",
+                  flex:1,background:"#2A2A35",border:"1px solid rgba(255,255,255,0.05)",
+                  borderRadius:10,padding:"10px 12px",color:"#F9FAFB",fontSize:13,outline:"none",
                   WebkitAppearance:"none",boxSizing:"border-box",
                 }}
               />
@@ -468,17 +501,17 @@ function Dashboard({ data, setTab, goTo, update }) {
       </div>
 
       {/* ── MİNİ HABERLER ── */}
-      <div style={{marginBottom:14}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
-          <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em",display:"flex",alignItems:"center",gap:5}}>
+      <div style={{marginBottom:16}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+          <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",display:"flex",alignItems:"center",gap:5}}>
             <svg width="12" height="12" viewBox="0 0 36 36" fill="none"><rect x="4" y="7" width="28" height="22" rx="2" stroke="#ef4444" strokeWidth="2" fill="none"/><line x1="9" y1="13" x2="27" y2="13" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/><line x1="9" y1="18" x2="22" y2="18" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" opacity=".6"/></svg>
             BBC Türkçe Haberler
           </div>
           <button onClick={()=>goTo("lifestyle","news")} style={{background:"none",border:"none",color:"#ef4444",fontSize:12,cursor:"pointer",fontWeight:600}}>Tümü ▶</button>
         </div>
-        <div style={{background:"rgba(239,68,68,0.06)",backdropFilter:"blur(12px)",borderRadius:16,padding:"12px 14px",border:"1px solid rgba(239,68,68,0.18)",boxShadow:"0 0 20px rgba(239,68,68,0.06)"}}>
+        <div style={{background:"#1C1C26",borderRadius:16,padding:"14px 16px",border:"1px solid rgba(255,255,255,0.05)"}}>
           {headlines.length === 0 ? (
-            <div style={{display:"flex",alignItems:"center",gap:10,opacity:.5}}>
+            <div style={{display:"flex",alignItems:"center",gap:10,color:"#9CA3AF"}}>
               <svg width="20" height="20" viewBox="0 0 36 36" fill="none" style={{animation:"pulse 1.5s infinite",flexShrink:0}}><circle cx="18" cy="18" r="13" stroke="#ef4444" strokeWidth="1.5" fill="none"/><path d="M14 18 A4 4 0 0 0 22 18" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round"/><line x1="18" y1="5" x2="18" y2="2" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/><line x1="25" y1="7" x2="27" y2="5" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/><line x1="11" y1="7" x2="9" y2="5" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/></svg>
               <span style={{fontSize:13}}>Haberler yükleniyor...</span>
             </div>
@@ -486,37 +519,37 @@ function Dashboard({ data, setTab, goTo, update }) {
             <div key={i} style={{display:"flex",alignItems:"flex-start",gap:10,
               paddingBottom: i < headlines.slice(0,4).length-1 ? 8 : 0,
               marginBottom: i < headlines.slice(0,4).length-1 ? 8 : 0,
-              borderBottom: i < headlines.slice(0,4).length-1 ? "1px solid rgba(239,68,68,0.1)" : "none",
+              borderBottom: i < headlines.slice(0,4).length-1 ? "1px solid rgba(255,255,255,0.05)" : "none",
             }}>
-              <span style={{fontSize:10,color:"#ef4444",fontWeight:800,marginTop:3,flexShrink:0,minWidth:16}}>{i+1}</span>
-              <span style={{fontSize:13,lineHeight:1.4,opacity:.85}}>{title}</span>
+              <span style={{fontSize:10,color:"#ef4444",fontWeight:700,marginTop:3,flexShrink:0,minWidth:16}}>{i+1}</span>
+              <span style={{fontSize:13,lineHeight:1.4,color:"#F9FAFB",opacity:.85}}>{title}</span>
             </div>
           ))}
         </div>
       </div>
 
       {/* ── MİNİ MÜZİK ── */}
-      <div style={{marginBottom:14}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
-          <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em",display:"flex",alignItems:"center",gap:5}}>
-            <svg width="12" height="12" viewBox="0 0 36 36" fill="none"><circle cx="12" cy="28" r="5" stroke="#a855f7" strokeWidth="2" fill="none"/><circle cx="28" cy="24" r="5" stroke="#a855f7" strokeWidth="2" fill="none"/><path d="M17 28 L17 8 L33 4 L33 24" stroke="#a855f7" strokeWidth="2" strokeLinecap="round"/><line x1="17" y1="8" x2="33" y2="4" stroke="#a855f7" strokeWidth="1.5"/></svg>
+      <div style={{marginBottom:16}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+          <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",display:"flex",alignItems:"center",gap:5}}>
+            <svg width="12" height="12" viewBox="0 0 36 36" fill="none"><circle cx="12" cy="28" r="5" stroke="#8B5CF6" strokeWidth="2" fill="none"/><circle cx="28" cy="24" r="5" stroke="#8B5CF6" strokeWidth="2" fill="none"/><path d="M17 28 L17 8 L33 4 L33 24" stroke="#8B5CF6" strokeWidth="2" strokeLinecap="round"/><line x1="17" y1="8" x2="33" y2="4" stroke="#8B5CF6" strokeWidth="1.5"/></svg>
             Müzik Koleksiyonu
           </div>
-          <button onClick={()=>goTo("lifestyle","music")} style={{background:"none",border:"none",color:"#a855f7",fontSize:12,cursor:"pointer",fontWeight:600}}>Tümü ▶</button>
+          <button onClick={()=>goTo("lifestyle","music")} style={{background:"none",border:"none",color:"#8B5CF6",fontSize:12,cursor:"pointer",fontWeight:600}}>Tümü ▶</button>
         </div>
         {musicItems.length === 0 ? (
           <div onClick={()=>goTo("lifestyle","music")} style={{
-            background:"rgba(168,85,247,0.06)",border:"1px solid rgba(168,85,247,0.18)",borderRadius:16,
+            background:"#1C1C26",border:"1px solid rgba(255,255,255,0.05)",borderRadius:16,
             padding:"16px 18px",cursor:"pointer",display:"flex",alignItems:"center",gap:14,
           }}>
-            <div style={{width:48,height:48,borderRadius:14,background:"rgba(168,85,247,0.15)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-              <svg width="24" height="24" viewBox="0 0 36 36" fill="none"><path d="M6 18 C6 11 11 6 18 6 C25 6 30 11 30 18" stroke="#a855f7" strokeWidth="1.5" fill="none"/><rect x="4" y="17" width="6" height="10" rx="3" fill="#a855f7" opacity=".7"/><rect x="26" y="17" width="6" height="10" rx="3" fill="#a855f7" opacity=".7"/></svg>
+            <div style={{width:48,height:48,borderRadius:14,background:"#2A2A35",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+              <svg width="24" height="24" viewBox="0 0 36 36" fill="none"><path d="M6 18 C6 11 11 6 18 6 C25 6 30 11 30 18" stroke="#8B5CF6" strokeWidth="1.5" fill="none"/><rect x="4" y="17" width="6" height="10" rx="3" fill="#8B5CF6" opacity=".7"/><rect x="26" y="17" width="6" height="10" rx="3" fill="#8B5CF6" opacity=".7"/></svg>
             </div>
             <div>
-              <div style={{fontSize:14,fontWeight:700,color:"#a855f7"}}>Müzik koleksiyonu boş</div>
-              <div style={{fontSize:12,opacity:.45,marginTop:3}}>Tarzım → Müziklerim'e git ve ekle</div>
+              <div style={{fontSize:14,fontWeight:600,color:"#F9FAFB"}}>Müzik koleksiyonu boş</div>
+              <div style={{fontSize:13,color:"#9CA3AF",marginTop:3}}>Yaşam Tarzı → Müziklerim'e git ve ekle</div>
             </div>
-            <span style={{marginLeft:"auto",opacity:.3,fontSize:16}}>▶</span>
+            <span style={{marginLeft:"auto",color:"#9CA3AF",fontSize:16}}>▶</span>
           </div>
         ) : (
           <div style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:6,WebkitOverflowScrolling:"touch"}}>
@@ -524,17 +557,16 @@ function Dashboard({ data, setTab, goTo, update }) {
               <div key={item.id||i}
                 onClick={()=>item.link&&window.open(item.link,"_blank")}
                 style={{
-                  background:"rgba(168,85,247,0.08)",border:"1px solid rgba(168,85,247,0.18)",borderRadius:14,
+                  background:"#1C1C26",border:"1px solid rgba(255,255,255,0.05)",borderRadius:14,
                   padding:"10px 12px",minWidth:120,maxWidth:140,flexShrink:0,cursor:"pointer",
-                  boxShadow:"0 0 12px rgba(168,85,247,0.1)",
                 }}>
-                <div style={{width:44,height:44,borderRadius:10,background:item.albumArt?"#000":"rgba(168,85,247,0.2)",overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center",marginBottom:8}}>
+                <div style={{width:44,height:44,borderRadius:10,background:item.albumArt?"#000":"#2A2A35",overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center",marginBottom:8}}>
                   {item.albumArt
                     ? <img src={item.albumArt} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
-                    : <svg width="20" height="20" viewBox="0 0 36 36" fill="none"><circle cx="11" cy="27" r="5" stroke="#a855f7" strokeWidth="1.5" fill="rgba(168,85,247,0.2)"/><path d="M16 27 L16 9 L30 5 L30 23" stroke="#a855f7" strokeWidth="1.5" strokeLinecap="round"/></svg>}
+                    : <svg width="20" height="20" viewBox="0 0 36 36" fill="none"><circle cx="11" cy="27" r="5" stroke="#8B5CF6" strokeWidth="1.5" fill="rgba(139,92,246,0.15)"/><path d="M16 27 L16 9 L30 5 L30 23" stroke="#8B5CF6" strokeWidth="1.5" strokeLinecap="round"/></svg>}
                 </div>
-                <div style={{fontSize:12,fontWeight:700,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.title||"Parça"}</div>
-                {item.artist&&<div style={{fontSize:10,opacity:.5,marginTop:2,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.artist}</div>}
+                <div style={{fontSize:12,fontWeight:600,color:"#F9FAFB",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.title||"Parça"}</div>
+                {item.artist&&<div style={{fontSize:10,color:"#9CA3AF",marginTop:2,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.artist}</div>}
               </div>
             ))}
           </div>
@@ -542,20 +574,20 @@ function Dashboard({ data, setTab, goTo, update }) {
       </div>
 
       {data.notes.length>0&&(
-        <div>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
-            <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em"}}>Son Notlar</div>
+        <div style={{marginBottom:16}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+            <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px"}}>Son Notlar</div>
             <button onClick={()=>goTo("tasks","notes")} style={{background:"none",border:"none",color:"#3b82f6",fontSize:12,cursor:"pointer",fontWeight:600}}>Tümü ▶</button>
           </div>
           <div style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:4,WebkitOverflowScrolling:"touch"}}>
             {data.notes.slice(0,5).map(n=>(
               <div key={n.id} onClick={()=>goTo("tasks","notes")} style={{
-                background:"rgba(255,255,255,0.04)",backdropFilter:"blur(8px)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:14,padding:"10px 12px",
+                background:"#1C1C26",border:"1px solid rgba(255,255,255,0.05)",borderRadius:14,padding:"12px",
                 minWidth:130,maxWidth:160,cursor:"pointer",flexShrink:0,
                 borderTop:`3px solid ${n.color||"#14b8a6"}`,
               }}>
-                <div style={{fontSize:12,fontWeight:700,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{n.title}</div>
-                {n.content&&<div style={{fontSize:11,opacity:.4,marginTop:4,overflow:"hidden",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",lineHeight:1.4}}>{n.content}</div>}
+                <div style={{fontSize:12,fontWeight:600,color:"#F9FAFB",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{n.title}</div>
+                {n.content&&<div style={{fontSize:11,color:"#9CA3AF",marginTop:4,overflow:"hidden",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",lineHeight:1.4}}>{n.content}</div>}
               </div>
             ))}
           </div>
@@ -627,7 +659,7 @@ function Tasks({ data, update }) {
     {key:"overdue",label:"Gecikmiş",color:"#ef4444",tasks:list.filter(x=>!x.done&&x.dueDate&&x.dueDate<t)},
     {key:"today",label:"Bugün",color:"#3b82f6",tasks:list.filter(x=>!x.done&&x.dueDate===t)},
     {key:"week",label:"Bu Hafta",color:"#a855f7",tasks:list.filter(x=>!x.done&&x.dueDate&&x.dueDate>t&&x.dueDate<=weekEnd)},
-    {key:"pending",label:"Bekleyen",color:"#888",tasks:list.filter(x=>!x.done&&(!x.dueDate||x.dueDate>weekEnd))},
+    {key:"pending",label:"Bekleyen",color:"#9CA3AF",tasks:list.filter(x=>!x.done&&(!x.dueDate||x.dueDate>weekEnd))},
     {key:"done",label:"Tamamlanan",color:"#22c55e",tasks:list.filter(x=>x.done)},
   ].filter(g=>g.tasks.length>0) : null;
 
@@ -642,7 +674,7 @@ function Tasks({ data, update }) {
         <div style={{display:"flex",gap:6,marginTop:4,flexWrap:"wrap",alignItems:"center"}}>
           {task.priority&&<span style={{background:`${PCOL[task.priority]}20`,color:PCOL[task.priority],padding:"2px 8px",borderRadius:6,fontSize:11,fontWeight:600}}>{PRIORITIES[task.priority]}</span>}
           {task.category&&<span style={{background:"rgba(59,130,246,0.12)",color:"#3b82f6",padding:"2px 8px",borderRadius:6,fontSize:11}}>{task.category}</span>}
-          {task.dueDate&&<span style={{fontSize:11,color:!task.done&&task.dueDate<t?"#ef4444":"#666"}}>{formatDate(task.dueDate)}</span>}
+          {task.dueDate&&<span style={{fontSize:11,color:!task.done&&task.dueDate<t?"#ef4444":"#6B7280"}}>{formatDate(task.dueDate)}</span>}
         </div>
       </div>
       <button onClick={()=>del(task.id)} style={delBtnStyle}>✕</button>
@@ -694,12 +726,12 @@ function Tasks({ data, update }) {
         const task = data.tasks.find(tk=>tk.id===detail);
         if(!task) return null;
         return (
-          <div style={{background:"rgba(255,255,255,0.04)",borderRadius:16,padding:16,marginTop:8,border:"1px solid rgba(59,130,246,0.2)"}}>
+          <div style={{background:"#1C1C26",borderRadius:16,padding:16,marginTop:8,border:"1px solid rgba(59,130,246,0.2)"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
               <h4 style={{margin:0,fontSize:16,fontWeight:700}}>{task.title}</h4>
               <div style={{display:"flex",gap:6}}>
                 <button onClick={()=>openEdit(task)} style={{background:"rgba(59,130,246,0.15)",color:"#3b82f6",border:"none",borderRadius:8,padding:"6px 12px",fontSize:12,cursor:"pointer",fontWeight:600}}>Düzenle</button>
-                <button onClick={()=>setDetail(null)} style={{background:"rgba(255,255,255,0.06)",color:"#888",border:"none",borderRadius:8,padding:"6px 10px",fontSize:14,cursor:"pointer"}}>✕</button>
+                <button onClick={()=>setDetail(null)} style={{background:"#2A2A35",color:"#9CA3AF",border:"none",borderRadius:8,padding:"6px 10px",fontSize:14,cursor:"pointer"}}>✕</button>
               </div>
             </div>
             {task.description&&<p style={{fontSize:13,opacity:.7,margin:"0 0 10px",whiteSpace:"pre-wrap",lineHeight:1.5}}>{task.description}</p>}
@@ -724,7 +756,7 @@ function Tasks({ data, update }) {
           <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:8}}>
             {quickDates.map(q=>(
               <button key={q.label} onClick={()=>setForm({...form,dueDate:q.val})} style={{
-                background:form.dueDate===q.val?"rgba(59,130,246,0.2)":"rgba(255,255,255,0.04)",
+                background:form.dueDate===q.val?"rgba(59,130,246,0.2)":"#2A2A35",
                 color:form.dueDate===q.val?"#3b82f6":"#aaa",
                 border:form.dueDate===q.val?"1px solid rgba(59,130,246,0.3)":"1px solid rgba(255,255,255,0.06)",
                 padding:"8px 12px",borderRadius:10,fontSize:13,cursor:"pointer",
@@ -746,8 +778,8 @@ function Tasks({ data, update }) {
             {Object.entries(PRIORITIES).map(([k,v])=>(
               <button key={k} onClick={()=>setForm({...form,priority:k})} style={{
                 flex:1,padding:"10px",borderRadius:10,fontSize:13,cursor:"pointer",textAlign:"center",fontWeight:600,
-                background:form.priority===k?`${PCOL[k]}20`:"rgba(255,255,255,0.04)",
-                color:form.priority===k?PCOL[k]:"#888",
+                background:form.priority===k?`${PCOL[k]}20`:"#2A2A35",
+                color:form.priority===k?PCOL[k]:"#9CA3AF",
                 border:`1px solid ${form.priority===k?PCOL[k]+"40":"rgba(255,255,255,0.06)"}`,
               }}>
                 <span style={{display:"block",width:8,height:8,borderRadius:"50%",background:PCOL[k],margin:"0 auto 4px"}}/>
@@ -812,9 +844,9 @@ function CalendarView({ data, update }) {
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
           <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Takvim</h3>
           <div style={{display:"flex",alignItems:"center",gap:6}}>
-            <button onClick={()=>setVd(new Date(y,m-1))} style={{background:"rgba(255,255,255,0.08)",backdropFilter:"blur(4px)",border:"1px solid rgba(255,255,255,0.1)",color:"#aaa",width:32,height:32,borderRadius:10,fontSize:16,cursor:"pointer"}}>◀</button>
+            <button onClick={()=>setVd(new Date(y,m-1))} style={{background:"rgba(255,255,255,0.05)",backdropFilter:"blur(4px)",border:"1px solid rgba(255,255,255,0.1)",color:"#9CA3AF",width:32,height:32,borderRadius:10,fontSize:16,cursor:"pointer"}}>◀</button>
             <span style={{fontWeight:700,fontSize:14,minWidth:105,textAlign:"center"}}>{MN[m]} {y}</span>
-            <button onClick={()=>setVd(new Date(y,m+1))} style={{background:"rgba(255,255,255,0.08)",backdropFilter:"blur(4px)",border:"1px solid rgba(255,255,255,0.1)",color:"#aaa",width:32,height:32,borderRadius:10,fontSize:16,cursor:"pointer"}}>▶</button>
+            <button onClick={()=>setVd(new Date(y,m+1))} style={{background:"rgba(255,255,255,0.05)",backdropFilter:"blur(4px)",border:"1px solid rgba(255,255,255,0.1)",color:"#9CA3AF",width:32,height:32,borderRadius:10,fontSize:16,cursor:"pointer"}}>▶</button>
           </div>
         </div>
       </StickyHeader>
@@ -842,14 +874,14 @@ function CalendarView({ data, update }) {
         })}
       </div>
       {selDay&&(
-        <div style={{background:"rgba(255,255,255,0.04)",borderRadius:14,padding:16,marginTop:12}}>
+        <div style={{background:"#1C1C26",borderRadius:14,padding:16,marginTop:12}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
             <h4 style={{margin:0,fontSize:15,fontWeight:700}}>{selDay} {MN[m]}</h4>
             <button onClick={openAdd} style={{background:"rgba(59,130,246,0.15)",color:"#3b82f6",border:"none",borderRadius:8,padding:"6px 14px",fontSize:12,cursor:"pointer",fontWeight:600}}>+ Ekle</button>
           </div>
           {evOn(selDay).length===0&&<p style={{opacity:.3,fontSize:13,margin:0}}>Etkinlik yok</p>}
           {evOn(selDay).map((e,idx)=>(
-            <div key={idx} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 0",borderBottom:"1px solid rgba(255,255,255,0.04)"}}>
+            <div key={idx} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 0",borderBottom:"1px solid rgba(255,255,255,0.05)"}}>
               <span style={{width:10,height:10,borderRadius:"50%",background:e.color||"#3b82f6",flexShrink:0}}/>
               <div style={{flex:1}}>
                 <div style={{fontSize:14,fontWeight:500}}>{e.title} {e.recurring&&e.recurring!=="none"&&<span style={{fontSize:10,opacity:.4}}>🔁</span>}</div>
@@ -1142,7 +1174,7 @@ function Sports({ data, update, initialView, onBack }) {
       </div>
 
       {/* Kalori denge kartı */}
-      <div className="stagger-2" style={{background:"rgba(255,255,255,0.04)",borderRadius:14,padding:"14px 16px",marginBottom:12}}>
+      <div className="stagger-2" style={{background:"#1C1C26",borderRadius:14,padding:"14px 16px",marginBottom:12}}>
         <div style={{display:"flex",justifyContent:"space-around",textAlign:"center",marginBottom:10}}>
           <div>
             <div style={{fontSize:22,fontWeight:800,color:"#f97316"}}>{todayCalIn}</div>
@@ -1159,7 +1191,7 @@ function Sports({ data, update, initialView, onBack }) {
             <div style={{fontSize:10,opacity:.5}}>Net</div>
           </div>
         </div>
-        <div style={{height:6,background:"rgba(255,255,255,0.08)",borderRadius:3,overflow:"hidden"}}>
+        <div style={{height:6,background:"rgba(255,255,255,0.05)",borderRadius:3,overflow:"hidden"}}>
           <div style={{height:"100%",background:netCal>dailyGoal?"#ef4444":"#3b82f6",borderRadius:3,width:`${Math.min(100,netCal/dailyGoal*100)}%`,transition:"width .3s"}}/>
         </div>
         <div style={{fontSize:10,opacity:.3,marginTop:4,textAlign:"center"}}>Hedef: {dailyGoal} kcal</div>
@@ -1188,7 +1220,7 @@ function Sports({ data, update, initialView, onBack }) {
       {hasAI&&(
         <div style={{marginBottom:12}}>
           <button onClick={()=>photoRef.current?.click()} disabled={analyzing} style={{
-            ...addBtnStyle,background:analyzing?"#555":"#22c55e",width:"100%",padding:"12px",borderRadius:12,fontSize:14,
+            ...addBtnStyle,background:analyzing?"#6B7280":"#22c55e",width:"100%",padding:"12px",borderRadius:12,fontSize:14,
           }}>{analyzing?"🔄 Analiz ediliyor...":"📸 Fotoğrafla Kalori Hesapla"}</button>
           <input ref={photoRef} type="file" accept="image/*" capture="environment"
             onChange={e=>{if(e.target.files?.[0])analyzePhoto(e.target.files[0]);e.target.value="";}}
@@ -1224,7 +1256,7 @@ function Sports({ data, update, initialView, onBack }) {
 
       {/* ── Bugünün Yemekleri ── */}
       <div style={{marginBottom:14}}>
-        <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em",marginBottom:8}}>Bugünün Yemekleri</div>
+        <div style={{fontSize:12,fontWeight:700,opacity:.5,textTransform:"uppercase",letterSpacing:".06em",marginBottom:8}}>Bugünün Yemekleri</div>
         {todayFoods.length===0 ? (
           <div style={{textAlign:"center",padding:"20px",opacity:.3,fontSize:13}}>Henüz yemek kaydı yok</div>
         ) : mealGroups.map(meal=>{
@@ -1251,7 +1283,7 @@ function Sports({ data, update, initialView, onBack }) {
 
       {/* ── Bugünün Sporları ── */}
       <div style={{marginBottom:14}}>
-        <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em",marginBottom:8}}>Bugünün Sporları</div>
+        <div style={{fontSize:12,fontWeight:700,opacity:.5,textTransform:"uppercase",letterSpacing:".06em",marginBottom:8}}>Bugünün Sporları</div>
         {todaySports.length===0 ? (
           <div style={{textAlign:"center",padding:"20px",opacity:.3,fontSize:13}}>Henüz spor kaydı yok</div>
         ) : todaySports.map(s=>(
@@ -1268,7 +1300,7 @@ function Sports({ data, update, initialView, onBack }) {
 
       {/* ── Haftalık Özet ── */}
       <div style={{marginBottom:14}}>
-        <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em",marginBottom:8}}>Bu Hafta</div>
+        <div style={{fontSize:12,fontWeight:700,opacity:.5,textTransform:"uppercase",letterSpacing:".06em",marginBottom:8}}>Bu Hafta</div>
         <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:8}}>
           {[
             {icon:"⏱",val:`${tMin} dk`,label:"Spor süresi",color:"#3b82f6"},
@@ -1290,7 +1322,7 @@ function Sports({ data, update, initialView, onBack }) {
           <div style={{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap"}}>
             {mealGroups.map(m=>(
               <button key={m} onClick={()=>setFoodForm({...foodForm,meal:m})} style={{
-                background:foodForm.meal===m?"rgba(59,130,246,0.2)":"rgba(255,255,255,0.04)",
+                background:foodForm.meal===m?"rgba(59,130,246,0.2)":"#2A2A35",
                 color:foodForm.meal===m?"#3b82f6":"#aaa",
                 border:foodForm.meal===m?"1px solid rgba(59,130,246,0.3)":"1px solid rgba(255,255,255,0.06)",
                 padding:"7px 12px",borderRadius:10,fontSize:13,cursor:"pointer",
@@ -1363,7 +1395,7 @@ function Sports({ data, update, initialView, onBack }) {
         <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:12}}>
           {SPORT_TYPES.map(s=>(
             <button key={s} onClick={()=>setForm({...form,type:s})} style={{
-              background:form.type===s?"rgba(34,197,94,0.2)":"rgba(255,255,255,0.04)",
+              background:form.type===s?"rgba(34,197,94,0.2)":"#2A2A35",
               color:form.type===s?"#22c55e":"#aaa",
               border:form.type===s?"1px solid rgba(34,197,94,0.3)":"1px solid rgba(255,255,255,0.06)",
               padding:"7px 14px",borderRadius:10,fontSize:13,cursor:"pointer",
@@ -1611,8 +1643,8 @@ function NewsRoom({ room, onBack }) {
             <div style={{fontSize:11,opacity:.4,marginTop:1}}>{catInfo?.desc}</div>
           </div>
           <button onClick={()=>fetchCategory(activeCat,true)} style={{
-            background:"rgba(255,255,255,0.07)",border:"1px solid rgba(255,255,255,0.1)",
-            color:"#aaa",width:34,height:34,borderRadius:10,fontSize:14,cursor:"pointer",
+            background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",
+            color:"#9CA3AF",width:34,height:34,borderRadius:10,fontSize:14,cursor:"pointer",
             display:"flex",alignItems:"center",justifyContent:"center",
           }}>↻</button>
         </div>
@@ -1623,7 +1655,7 @@ function NewsRoom({ room, onBack }) {
               padding:"5px 12px",borderRadius:10,border:"none",cursor:"pointer",
               fontSize:11,fontWeight:langFilter===k?700:400,
               background:langFilter===k?`${catInfo?.color}25`:"rgba(255,255,255,0.05)",
-              color:langFilter===k?catInfo?.color:"#555",
+              color:langFilter===k?catInfo?.color:"#6B7280",
             }}>{v}</button>
           ))}
         </div>
@@ -1726,7 +1758,7 @@ function NewsRoom({ room, onBack }) {
               backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",
               borderRadius:20,padding:"20px 16px",cursor:"pointer",
               border:`1px solid ${cat.color}45`,
-              boxShadow:`0 0 28px ${cat.color}22, 0 0 56px ${cat.color}0a, inset 0 1px 0 rgba(255,255,255,0.08)`,
+              boxShadow:`0 0 28px ${cat.color}22, 0 0 56px ${cat.color}0a, inset 0 1px 0 rgba(255,255,255,0.05)`,
               minHeight:110,
               display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:8,
             }}
@@ -1991,13 +2023,13 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
           <span style={{fontSize:12,opacity:.4}}>{items.length} parça</span>
         </div>
         {/* Tab switcher — 4 tabs */}
-        <div style={{background:"rgba(255,255,255,0.06)",backdropFilter:"blur(8px)",borderRadius:12,padding:3,display:"flex",gap:1}}>
+        <div style={{background:"#2A2A35",backdropFilter:"blur(8px)",borderRadius:12,padding:3,display:"flex",gap:1}}>
           {[["collection","Benim"],["charts","Top 🏆"],["search","Ara"],["link","Link"]].map(([k,v])=>(
             <button key={k} onClick={()=>setTab(k)} style={{
               flex:1,padding:"8px 2px",borderRadius:9,border:"none",cursor:"pointer",
               fontSize:11,fontWeight:tab===k?700:500,
               background:tab===k?"rgba(255,255,255,0.12)":"transparent",
-              color:tab===k?"#e0e0e0":"#666",transition:"all .2s",
+              color:tab===k?"#F9FAFB":"#6B7280",transition:"all .2s",
             }}>{v}</button>
           ))}
         </div>
@@ -2044,7 +2076,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
               {item.preview&&(
                 <button onClick={()=>togglePreview(item)} style={{
                   width:36,height:36,borderRadius:"50%",
-                  background:preview?.id===item.id?"rgba(162,56,255,0.9)":"rgba(255,255,255,0.08)",
+                  background:preview?.id===item.id?"rgba(162,56,255,0.9)":"rgba(255,255,255,0.05)",
                   border:"none",color:"#fff",fontSize:14,cursor:"pointer",
                   display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,
                 }}>
@@ -2096,7 +2128,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
             const inColl = items.some(i=>i.link===track.link);
             return (
               <div key={track.id} style={{
-                background:"rgba(255,255,255,0.04)",borderRadius:16,padding:"10px 12px",marginBottom:6,
+                background:"#1C1C26",borderRadius:16,padding:"10px 12px",marginBottom:6,
                 display:"flex",alignItems:"center",gap:10,minHeight:60,
                 opacity:inColl?.6:1,
               }}>
@@ -2159,7 +2191,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
               {name:"Apple Music",color:"#FC3C44",icon:"⚪"},
               {name:"Deezer",color:"#A238FF",icon:"🟣"},
             ].map(p=>(
-              <div key={p.name} style={{display:"flex",alignItems:"center",gap:4,background:"rgba(255,255,255,0.04)",borderRadius:8,padding:"4px 10px",fontSize:11,opacity:.6}}>
+              <div key={p.name} style={{display:"flex",alignItems:"center",gap:4,background:"#1C1C26",borderRadius:8,padding:"4px 10px",fontSize:11,opacity:.6}}>
                 <span>{p.icon}</span><span>{p.name}</span>
               </div>
             ))}
@@ -2179,7 +2211,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
             style={inp}
             placeholder="Parça adı (opsiyonel, otomatik doldurulamadıysa)"
             value={linkPreview?.title||""}
-            onChange={e=>setLinkPreview(lp=>lp?{...lp,title:e.target.value}:{title:e.target.value,url:linkInput,platform:"Müzik",color:"#888"})}
+            onChange={e=>setLinkPreview(lp=>lp?{...lp,title:e.target.value}:{title:e.target.value,url:linkInput,platform:"Müzik",color:"#9CA3AF"})}
           />
 
           <button onClick={addFromLink} disabled={!linkInput.trim()} style={{
@@ -2209,7 +2241,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
                 flex:1,padding:"9px 4px",borderRadius:12,border:"none",cursor:"pointer",
                 fontSize:12,fontWeight:chartSource===k?700:500,
                 background:chartSource===k?"rgba(162,56,255,0.25)":"rgba(255,255,255,0.05)",
-                color:chartSource===k?"#c084fc":"#666",
+                color:chartSource===k?"#c084fc":"#6B7280",
                 transition:"all .2s",
               }}>{v}</button>
             ))}
@@ -2223,7 +2255,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
                   padding:"6px 14px",borderRadius:20,border:"none",cursor:"pointer",whiteSpace:"nowrap",
                   fontSize:12,fontWeight:chartGenre===k?700:400,
                   background:chartGenre===k?"rgba(162,56,255,0.25)":"rgba(255,255,255,0.05)",
-                  color:chartGenre===k?"#c084fc":"#666",
+                  color:chartGenre===k?"#c084fc":"#6B7280",
                 }}>{v}</button>
               ))}
             </div>
@@ -2251,16 +2283,16 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
             const inColl = items.some(it=>it.link===track.link||it.title===track.title);
             return (
               <div key={track.id||i} style={{
-                background:"rgba(255,255,255,0.04)",borderRadius:16,padding:"10px 12px",marginBottom:6,
+                background:"#1C1C26",borderRadius:16,padding:"10px 12px",marginBottom:6,
                 display:"flex",alignItems:"center",gap:10,minHeight:60,
               }}>
                 {/* Rank */}
                 <div style={{
                   width:26,height:26,borderRadius:8,flexShrink:0,
-                  background:i<3?"rgba(162,56,255,0.2)":"rgba(255,255,255,0.04)",
+                  background:i<3?"rgba(162,56,255,0.2)":"#2A2A35",
                   display:"flex",alignItems:"center",justifyContent:"center",
                   fontSize:11,fontWeight:700,
-                  color:i<3?"#c084fc":"#666",
+                  color:i<3?"#c084fc":"#6B7280",
                 }}>{i+1}</div>
                 {/* Album art */}
                 <div style={{width:42,height:42,borderRadius:8,overflow:"hidden",flexShrink:0,background:"#111"}}>
@@ -2292,7 +2324,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
                     width:32,height:32,borderRadius:"50%",flexShrink:0,
                     background:"rgba(255,255,255,0.05)",
                     display:"flex",alignItems:"center",justifyContent:"center",
-                    textDecoration:"none",fontSize:13,color:"#aaa",
+                    textDecoration:"none",fontSize:13,color:"#9CA3AF",
                   }}>↗</a>
                 )}
                 {/* Add to collection */}
@@ -2399,29 +2431,29 @@ function BenimStilimRoom({data,update,onBack}){
           <div><div style={{fontSize:10,fontWeight:700,opacity:.5,letterSpacing:1,textTransform:"uppercase"}}>Bugünün Havası</div><div style={{fontSize:12,opacity:.55,marginTop:2}}>İstanbul, Türkiye</div></div>
           <div style={{textAlign:"right"}}>{wxLoad?<div style={{fontSize:12,opacity:.4,animation:"pulse 1.5s infinite"}}>Yükleniyor...</div>:weather?<><div style={{fontSize:26,fontWeight:800,color:"#e0d5f5"}}>{weather.temp}°C</div><div style={{fontSize:11,opacity:.5}}>{weather.desc}</div></>:<div style={{fontSize:11,opacity:.4}}>Veri alınamadı</div>}</div>
         </div>
-        {weather&&<div style={{marginTop:8,paddingTop:8,borderTop:"1px solid rgba(255,255,255,0.07)",display:"flex",gap:16}}><div style={{fontSize:10,opacity:.4}}>{weather.wind} km/s rüzgar</div><div style={{fontSize:10,opacity:.4}}>%{weather.humid} nem</div><div style={{fontSize:10,opacity:.4}}>{weather.feel}°C hissedilen</div></div>}
+        {weather&&<div style={{marginTop:8,paddingTop:8,borderTop:"1px solid rgba(255,255,255,0.05)",display:"flex",gap:16}}><div style={{fontSize:10,opacity:.4}}>{weather.wind} km/s rüzgar</div><div style={{fontSize:10,opacity:.4}}>%{weather.humid} nem</div><div style={{fontSize:10,opacity:.4}}>{weather.feel}°C hissedilen</div></div>}
         <div style={{marginTop:10,background:"rgba(255,255,255,0.05)",borderRadius:10,padding:"8px 12px"}}><div style={{fontSize:10,opacity:.45,marginBottom:3}}>Stil Önerisi</div><div style={{fontSize:13,color:"#c4b5fd",fontWeight:600}}>{wxLoad?"Hesaplanıyor...":weather?getStyleHint(weather.temp):"Hava bilgisi mevcut değil"}</div></div>
       </div>
       <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,opacity:.4,textTransform:"uppercase",marginBottom:10}}>Bugün İçin Görünümler</div>
       <div style={{display:"flex",gap:8,marginBottom:16}}>
         {looks.map((look,i)=>(
-          <div key={i} onClick={()=>setActiveLook(i)} style={{background:activeLook===i?"rgba(167,139,250,0.1)":"rgba(255,255,255,0.04)",border:`1px solid ${activeLook===i?"rgba(167,139,250,0.5)":"rgba(255,255,255,0.08)"}`,borderRadius:14,padding:"12px 8px",cursor:"pointer",flex:1,minWidth:0,transition:"all .2s"}}>
-            <div style={{marginBottom:6,display:"flex",justifyContent:"center"}}><ClothingIcon type={look.icon} size={26} color={activeLook===i?"#a78bfa":"#555"}/></div>
+          <div key={i} onClick={()=>setActiveLook(i)} style={{background:activeLook===i?"rgba(167,139,250,0.1)":"#2A2A35",border:`1px solid ${activeLook===i?"rgba(167,139,250,0.5)":"rgba(255,255,255,0.05)"}`,borderRadius:14,padding:"12px 8px",cursor:"pointer",flex:1,minWidth:0,transition:"all .2s"}}>
+            <div style={{marginBottom:6,display:"flex",justifyContent:"center"}}><ClothingIcon type={look.icon} size={26} color={activeLook===i?"#a78bfa":"#6B7280"}/></div>
             <div style={{fontSize:11,fontWeight:700,marginBottom:4,textAlign:"center",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{look.name}</div>
             <div style={{display:"flex",flexWrap:"wrap",gap:2,justifyContent:"center"}}>{look.tags.map((t,ti)=><span key={ti} style={{fontSize:9,fontWeight:600,padding:"2px 5px",borderRadius:20,background:TAG_COL[t.c]?.bg,color:TAG_COL[t.c]?.text}}>{t.l}</span>)}</div>
             <div style={{fontSize:9,opacity:.4,marginTop:4,textAlign:"center"}}>{look.mood}</div>
           </div>
         ))}
       </div>
-      <div style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:16,padding:"14px 16px",marginBottom:12}}>
+      <div style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.05)",borderRadius:16,padding:"14px 16px",marginBottom:12}}>
         <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,opacity:.4,textTransform:"uppercase",marginBottom:12}}>Stil Kuralları & Sınırlar</div>
         <div style={{marginBottom:14}}>
           <div style={{display:"flex",justifyContent:"space-between",fontSize:12,opacity:.7,marginBottom:4}}><span>Giyim Sıklığı Skoru</span><span style={{color:"#a78bfa",fontWeight:700}}>{freqScore}%</span></div>
-          <div style={{height:6,borderRadius:3,background:"rgba(255,255,255,0.08)"}}><div style={{height:"100%",borderRadius:3,background:"linear-gradient(90deg,#6366f1,#a78bfa)",width:`${freqScore}%`,transition:"width .8s"}}/></div>
+          <div style={{height:6,borderRadius:3,background:"rgba(255,255,255,0.05)"}}><div style={{height:"100%",borderRadius:3,background:"linear-gradient(90deg,#6366f1,#a78bfa)",width:`${freqScore}%`,transition:"width .8s"}}/></div>
           <div style={{fontSize:10,opacity:.3,marginTop:4}}>{freqScore<50?"Dolapta bekleyen parçalar var":freqScore<80?"Optimum aralıkta":"Mükemmel, aktif dolap!"}</div>
         </div>
         {rules.map(r=>(
-          <div key={r.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"9px 0",borderBottom:"1px solid rgba(255,255,255,0.04)"}}>
+          <div key={r.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"9px 0",borderBottom:"1px solid rgba(255,255,255,0.05)"}}>
             <span style={{fontSize:13,opacity:.85}}>{r.label}</span>
             <div onClick={()=>toggleRule(r.id)} style={{width:38,height:22,borderRadius:11,cursor:"pointer",position:"relative",background:r.on?"rgba(167,139,250,0.7)":"rgba(255,255,255,0.1)",transition:"background .2s",flexShrink:0}}>
               <div style={{position:"absolute",width:16,height:16,borderRadius:"50%",background:"#fff",top:3,left:r.on?19:3,transition:"left .2s"}}/>
@@ -2429,7 +2461,7 @@ function BenimStilimRoom({data,update,onBack}){
           </div>
         ))}
       </div>
-      <div style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:16,padding:"14px 16px",marginBottom:12}}>
+      <div style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.05)",borderRadius:16,padding:"14px 16px",marginBottom:12}}>
         <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,opacity:.4,textTransform:"uppercase",marginBottom:12}}>Renk Paleti Disiplini</div>
         <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
           {PALETTE_COLS.map(p=>(<div key={p.hex} title={p.name} onClick={()=>togglePalette(p.hex)} style={{width:36,height:36,borderRadius:10,background:p.hex,cursor:"pointer",flexShrink:0,transition:"transform .15s",outline:paletteActive.includes(p.hex)?"2.5px solid rgba(167,139,250,0.9)":"none",transform:paletteActive.includes(p.hex)?"scale(1.12)":"scale(1)"}}/>))}
@@ -2442,7 +2474,7 @@ function BenimStilimRoom({data,update,onBack}){
           <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,opacity:.4,textTransform:"uppercase"}}>Dolabım</div>
           <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
             {[{id:"all",l:"Tümü"},{id:"top",l:"Üst"},{id:"alt",l:"Alt"},{id:"dis",l:"Dış"},{id:"elbise",l:"Elbise"}].map(f=>(
-              <button key={f.id} onClick={()=>setWardFilter(f.id)} style={{background:wardFilter===f.id?"rgba(167,139,250,0.15)":"rgba(255,255,255,0.04)",border:`1px solid ${wardFilter===f.id?"rgba(167,139,250,0.4)":"rgba(255,255,255,0.07)"}`,color:wardFilter===f.id?"#c4b5fd":"#555",borderRadius:20,padding:"4px 10px",fontSize:10,cursor:"pointer",fontWeight:wardFilter===f.id?700:400}}>{f.l}</button>
+              <button key={f.id} onClick={()=>setWardFilter(f.id)} style={{background:wardFilter===f.id?"rgba(167,139,250,0.15)":"#2A2A35",border:`1px solid ${wardFilter===f.id?"rgba(167,139,250,0.4)":"rgba(255,255,255,0.05)"}`,color:wardFilter===f.id?"#c4b5fd":"#6B7280",borderRadius:20,padding:"4px 10px",fontSize:10,cursor:"pointer",fontWeight:wardFilter===f.id?700:400}}>{f.l}</button>
             ))}
           </div>
         </div>
@@ -2450,14 +2482,14 @@ function BenimStilimRoom({data,update,onBack}){
         {filtered.map(item=>{
           const fc=CLOTH_FREQ[item.freqStatus]||CLOTH_FREQ.new;
           return(
-            <div key={item.id} style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:14,padding:"10px 12px",display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
+            <div key={item.id} style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.05)",borderRadius:14,padding:"10px 12px",display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
               <div style={{width:44,height:44,borderRadius:12,background:(item.color||"#a78bfa")+"25",border:`1px solid ${(item.color||"#a78bfa")}40`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
                 <ClothingIcon type={catIconMap[item.cat]||"smart"} size={24} color={item.color||"#a78bfa"}/>
               </div>
               <div style={{flex:1,minWidth:0}}>
                 <div style={{fontSize:13,fontWeight:600}}>{item.name}</div>
                 <div style={{fontSize:10,opacity:.4,marginTop:2}}>{item.wornCount} kez giyildi · {item.lastWorn}</div>
-                <div style={{height:5,borderRadius:3,background:"rgba(255,255,255,0.08)",marginTop:5}}><div style={{height:"100%",borderRadius:3,width:`${item.freq}%`,background:item.freqStatus==="favorite"?"linear-gradient(90deg,#22c55e,#14b8a6)":item.freqStatus==="waiting"?"linear-gradient(90deg,#f59e0b,#ef4444)":"linear-gradient(90deg,#6366f1,#a78bfa)",transition:"width .6s"}}/></div>
+                <div style={{height:5,borderRadius:3,background:"rgba(255,255,255,0.05)",marginTop:5}}><div style={{height:"100%",borderRadius:3,width:`${item.freq}%`,background:item.freqStatus==="favorite"?"linear-gradient(90deg,#22c55e,#14b8a6)":item.freqStatus==="waiting"?"linear-gradient(90deg,#f59e0b,#ef4444)":"linear-gradient(90deg,#6366f1,#a78bfa)",transition:"width .6s"}}/></div>
               </div>
               <div style={{display:"flex",flexDirection:"column",gap:4,alignItems:"flex-end"}}>
                 <div style={{background:fc.bg,border:`1px solid ${fc.border}`,color:fc.text,fontSize:10,padding:"2px 8px",borderRadius:20,whiteSpace:"nowrap"}}>{fc.label}</div>
@@ -2476,7 +2508,7 @@ function BenimStilimRoom({data,update,onBack}){
         <input style={inp} placeholder="Kıyafet adı (örn: Lacivert Blazer)" value={addForm.name} onChange={e=>setAddForm({...addForm,name:e.target.value})} autoFocus/>
         <div style={{fontSize:12,opacity:.5,marginBottom:6}}>Kategori:</div>
         <div style={{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap"}}>
-          {CLOTH_CATS.map(c=>(<button key={c.id} onClick={()=>setAddForm({...addForm,cat:c.id})} style={{background:addForm.cat===c.id?`${c.color}25`:"rgba(255,255,255,0.04)",border:`1px solid ${addForm.cat===c.id?c.color+"60":"rgba(255,255,255,0.08)"}`,color:addForm.cat===c.id?c.color:"#777",borderRadius:10,padding:"6px 12px",fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",gap:6}}><ClothingIcon type={c.svgType} size={14} color={addForm.cat===c.id?c.color:"#666"}/>{c.label}</button>))}
+          {CLOTH_CATS.map(c=>(<button key={c.id} onClick={()=>setAddForm({...addForm,cat:c.id})} style={{background:addForm.cat===c.id?`${c.color}25`:"#2A2A35",border:`1px solid ${addForm.cat===c.id?c.color+"60":"rgba(255,255,255,0.05)"}`,color:addForm.cat===c.id?c.color:"#777",borderRadius:10,padding:"6px 12px",fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",gap:6}}><ClothingIcon type={c.svgType} size={14} color={addForm.cat===c.id?c.color:"#6B7280"}/>{c.label}</button>))}
         </div>
         <div style={{fontSize:12,opacity:.5,marginBottom:6}}>Kıyafet rengi:</div>
         <div style={{display:"flex",gap:6,marginBottom:16,flexWrap:"wrap"}}>
@@ -2565,7 +2597,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
   const togPT=(pid,tid)=>{
     update({...data,projects:data.projects.map(p=>p.id===pid?{...p,tasks:(p.tasks||[]).map(t=>t.id===tid?{...t,done:!t.done}:t)}:p)});
   };
-  const stCol=s=>s==="Tamamlandı"?"#22c55e":s==="Devam Ediyor"?"#3b82f6":s==="Test"?"#f59e0b":"#888";
+  const stCol=s=>s==="Tamamlandı"?"#22c55e":s==="Devam Ediyor"?"#3b82f6":s==="Test"?"#f59e0b":"#9CA3AF";
 
   const roomIcons=["📂","🎵","👗","📸","🎮","📚","🎨","💼","🏠","✈️","🎯","💡","🛒","🎬","🍳"];
 
@@ -2681,7 +2713,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
         const tasks=p.tasks||[];const d=tasks.filter(t=>t.done).length;
         const pct=tasks.length?Math.round(d/tasks.length*100):0;const open=exp===p.id;
         return (
-          <div key={p.id} style={{background:"rgba(255,255,255,0.04)",borderRadius:14,padding:16,marginBottom:8}}>
+          <div key={p.id} style={{background:"#1C1C26",borderRadius:14,padding:16,marginBottom:8}}>
             <div onClick={()=>setExp(open?null:p.id)} style={{cursor:"pointer"}}>
               <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8}}>
                 <div style={{flex:1,minWidth:0}}>
@@ -2694,7 +2726,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
                 <span style={{fontSize:11,fontWeight:600,color:stCol(p.status),background:`${stCol(p.status)}20`,padding:"4px 10px",borderRadius:8}}>{p.status}</span>
               </div>
               {tasks.length>0&&(<div style={{marginTop:10}}>
-                <div style={{height:6,background:"rgba(255,255,255,0.08)",borderRadius:3,overflow:"hidden"}}>
+                <div style={{height:6,background:"rgba(255,255,255,0.05)",borderRadius:3,overflow:"hidden"}}>
                   <div style={{height:"100%",background:"#3b82f6",borderRadius:3,width:`${pct}%`,transition:"width .3s"}}/>
                 </div>
                 <div style={{fontSize:11,opacity:.4,marginTop:4}}>{d}/{tasks.length} — %{pct}</div>
@@ -2703,7 +2735,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
             {open&&(<div style={{marginTop:12,paddingTop:12,borderTop:"1px solid rgba(255,255,255,0.06)"}}>
               {p.description&&<p style={{fontSize:13,opacity:.6,margin:"0 0 10px"}}>{p.description}</p>}
               <div style={{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap"}}>
-                {PROJECT_STATUSES.map(s=>(<button key={s} onClick={()=>upSt(p.id,s)} style={{background:p.status===s?`${stCol(s)}20`:"rgba(255,255,255,0.04)",color:p.status===s?stCol(s):"#888",border:`1px solid ${p.status===s?stCol(s)+"40":"rgba(255,255,255,0.06)"}`,padding:"7px 14px",borderRadius:8,fontSize:12,cursor:"pointer"}}>{s}</button>))}
+                {PROJECT_STATUSES.map(s=>(<button key={s} onClick={()=>upSt(p.id,s)} style={{background:p.status===s?`${stCol(s)}20`:"#2A2A35",color:p.status===s?stCol(s):"#9CA3AF",border:`1px solid ${p.status===s?stCol(s)+"40":"rgba(255,255,255,0.06)"}`,padding:"7px 14px",borderRadius:8,fontSize:12,cursor:"pointer"}}>{s}</button>))}
               </div>
               {tasks.map(t=>(<div key={t.id} style={{display:"flex",alignItems:"center",gap:10,padding:"7px 0"}}>
                 <button onClick={()=>togPT(p.id,t.id)} style={checkBtnStyle(t.done)}>{t.done&&"✓"}</button>
@@ -2757,17 +2789,17 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
       {items.length===0&&(
         <div style={{textAlign:"center",padding:"40px 20px"}}>
           <svg width="52" height="52" viewBox="0 0 52 52" fill="none" style={{margin:"0 auto 12px",display:"block",opacity:.3}}>
-            <rect x="6" y="20" width="40" height="26" rx="3" stroke="#e0e0e0" strokeWidth="1.5" fill="none"/>
-            <path d="M6 26 L26 33 L46 26" stroke="#e0e0e0" strokeWidth="1.5"/>
-            <path d="M18 20 L18 10 L34 10 L34 20" stroke="#e0e0e0" strokeWidth="1.5" fill="none"/>
-            <path d="M20 15 L32 15" stroke="#e0e0e0" strokeWidth="1.5" strokeLinecap="round" opacity=".5"/>
+            <rect x="6" y="20" width="40" height="26" rx="3" stroke="#6B7280" strokeWidth="1.5" fill="none"/>
+            <path d="M6 26 L26 33 L46 26" stroke="#6B7280" strokeWidth="1.5"/>
+            <path d="M18 20 L18 10 L34 10 L34 20" stroke="#6B7280" strokeWidth="1.5" fill="none"/>
+            <path d="M20 15 L32 15" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round" opacity=".5"/>
           </svg>
           <div style={{fontSize:14,fontWeight:600,opacity:.4,marginBottom:4}}>Bu oda boş</div>
           <div style={{fontSize:12,opacity:.25}}>+ ile öğe ekle</div>
         </div>
       )}
       {items.map(item=>(
-        <div key={item.id} style={{background:"rgba(255,255,255,0.04)",borderRadius:16,padding:14,marginBottom:8,borderLeft:`3px solid ${room.color}`}}>
+        <div key={item.id} style={{background:"#1C1C26",borderRadius:16,padding:14,marginBottom:8,borderLeft:`3px solid ${room.color}`}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"start"}}>
             <div style={{flex:1,minWidth:0}}>
               <div style={{fontSize:15,fontWeight:600}}>{item.title}</div>
@@ -2889,8 +2921,8 @@ function TasksHub({ data, update, initialSubTab, onSubTabConsumed }) {
         {[["tasks","Görevler","✓"],["calendar","Takvim","◫"],["notes","Notlar","☰"]].map(([k,v,icon])=>(
           <button key={k} className="nav-item" onClick={()=>setSubTab(k)} style={{
             flex:1,
-            background:subTab===k?"rgba(59,130,246,0.15)":"rgba(255,255,255,0.04)",
-            color:subTab===k?"#3b82f6":"#666",
+            background:subTab===k?"rgba(59,130,246,0.15)":"#2A2A35",
+            color:subTab===k?"#3b82f6":"#6B7280",
             border:subTab===k?"1px solid rgba(59,130,246,0.3)":"1px solid rgba(255,255,255,0.06)",
             padding:"10px 4px",borderRadius:10,fontSize:12,fontWeight:subTab===k?700:500,
             cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:3,
@@ -2969,7 +3001,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
       {msg && <div style={{background:"rgba(59,130,246,0.15)",border:"1px solid rgba(59,130,246,0.3)",borderRadius:12,padding:"10px 14px",marginBottom:12,fontSize:13,color:"#3b82f6"}}>{msg}</div>}
 
       {/* User info */}
-      <div style={{background:"rgba(255,255,255,0.04)",borderRadius:14,padding:16,marginBottom:12}}>
+      <div style={{background:"#1C1C26",borderRadius:14,padding:16,marginBottom:12}}>
         <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>👤 Hesap</h4>
         {user ? (
           <div>
@@ -3010,7 +3042,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
       </div>
 
       {/* Notifications */}
-      <div style={{background:"rgba(255,255,255,0.04)",borderRadius:14,padding:16,marginBottom:12}}>
+      <div style={{background:"#1C1C26",borderRadius:14,padding:16,marginBottom:12}}>
         <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>🔔 Bildirimler</h4>
         {!isNotificationSupported() ? (
           <p style={{fontSize:13,opacity:.5}}>Bu tarayıcı bildirimleri desteklemiyor</p>
@@ -3030,7 +3062,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
       </div>
 
       {/* Data Stats */}
-      <div style={{background:"rgba(255,255,255,0.04)",borderRadius:14,padding:16,marginBottom:12}}>
+      <div style={{background:"#1C1C26",borderRadius:14,padding:16,marginBottom:12}}>
         <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>📊 Veri Özeti</h4>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
           {[
@@ -3038,7 +3070,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
             {l:"Spor Kaydı",v:sportCount},{l:"Proje",v:projectCount},
             {l:"Not",v:noteCount},{l:"Toplam",v:taskCount+eventCount+sportCount+projectCount+noteCount},
           ].map((s,i)=>(
-            <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"6px 0",borderBottom:"1px solid rgba(255,255,255,0.04)"}}>
+            <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"6px 0",borderBottom:"1px solid rgba(255,255,255,0.05)"}}>
               <span style={{fontSize:13,opacity:.6}}>{s.l}</span>
               <span style={{fontSize:13,fontWeight:600}}>{s.v}</span>
             </div>
@@ -3047,7 +3079,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
       </div>
 
       {/* Import / Export */}
-      <div style={{background:"rgba(255,255,255,0.04)",borderRadius:14,padding:16,marginBottom:12}}>
+      <div style={{background:"#1C1C26",borderRadius:14,padding:16,marginBottom:12}}>
         <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>💾 Veri Yönetimi</h4>
         <p style={{fontSize:12,opacity:.5,margin:"0 0 12px"}}>Bilgisayarınızdan veri aktarabilir veya yedeğinizi indirebilirsiniz</p>
         <button onClick={handleExport} style={{...btnPrimary,marginTop:0,marginBottom:8,background:"#14b8a6"}}>
@@ -3060,14 +3092,14 @@ function Settings({ data, update, onImport, user, onLogout }) {
       </div>
 
       {/* AI Kalori Asistanı */}
-      <div style={{background:"rgba(255,255,255,0.04)",borderRadius:14,padding:16,marginBottom:12}}>
+      <div style={{background:"#1C1C26",borderRadius:14,padding:16,marginBottom:12}}>
         <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>🤖 AI Kalori Asistanı</h4>
         <p style={{fontSize:12,opacity:.5,margin:"0 0 12px"}}>Yemek fotoğrafı çekerek kalori hesaplatabilirsin. Kendi AI hesabını seç ve API anahtarını gir.</p>
 
         {/* Provider selection */}
         <div style={{display:"flex",flexDirection:"column",gap:6,marginBottom:12}}>
           {[
-            {id:"none",name:"Manuel Giriş",desc:"AI kullanma, kalorileri kendim girerim",icon:"✏️",color:"#888"},
+            {id:"none",name:"Manuel Giriş",desc:"AI kullanma, kalorileri kendim girerim",icon:"✏️",color:"#9CA3AF"},
             {id:"gemini",name:"Google Gemini",desc:"Ücretsiz, günde 60 istek",icon:"✨",color:"#3b82f6"},
             {id:"claude",name:"Claude (Anthropic)",desc:"En akıllı analiz, ücretli",icon:"🧠",color:"#a855f7"},
             {id:"openai",name:"OpenAI (ChatGPT)",desc:"Popüler, ücretli",icon:"🤖",color:"#22c55e"},
@@ -3077,11 +3109,11 @@ function Settings({ data, update, onImport, user, onLogout }) {
               <div key={p.id} onClick={()=>update({...data,settings:{...data.settings,aiProvider:p.id}})} style={{
                 display:"flex",alignItems:"center",gap:10,padding:"10px 12px",borderRadius:12,cursor:"pointer",
                 background:selected?`${p.color}15`:"rgba(255,255,255,0.02)",
-                border:selected?`1px solid ${p.color}40`:"1px solid rgba(255,255,255,0.04)",
+                border:selected?`1px solid ${p.color}40`:"1px solid rgba(255,255,255,0.05)",
               }}>
                 <span style={{fontSize:20}}>{p.icon}</span>
                 <div style={{flex:1}}>
-                  <div style={{fontSize:13,fontWeight:600,color:selected?p.color:"#ccc"}}>{p.name}</div>
+                  <div style={{fontSize:13,fontWeight:600,color:selected?p.color:"#9CA3AF"}}>{p.name}</div>
                   <div style={{fontSize:10,opacity:.5}}>{p.desc}</div>
                 </div>
                 {selected&&<span style={{color:p.color,fontSize:16}}>●</span>}
@@ -3123,7 +3155,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
       </div>
 
       {/* Danger zone */}
-      <div style={{background:"rgba(255,255,255,0.04)",borderRadius:14,padding:16}}>
+      <div style={{background:"#1C1C26",borderRadius:14,padding:16}}>
         <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700,color:"#ef4444"}}>⚠️ Tehlikeli Bölge</h4>
         <button onClick={clearAll} style={{...btnPrimary,marginTop:0,background:"#ef4444"}}>
           Tüm Verileri Sil
@@ -3172,7 +3204,7 @@ function NebulaBackground({ children, style }) {
     <div style={{
       minHeight:"100dvh", background:"#08071a",
       display:"flex", alignItems:"center", justifyContent:"center",
-      color:"#e0e0e0", fontFamily:"'SF Pro Display',-apple-system,sans-serif",
+      color:"#F9FAFB", fontFamily:"'SF Pro Display',-apple-system,sans-serif",
       position:"relative", overflow:"hidden", ...style,
     }}>
       {/* Orbs */}
@@ -3238,7 +3270,7 @@ function LoginScreen({ onLogin }) {
     background:"rgba(255,255,255,0.05)",
     backdropFilter:"blur(10px)",WebkitBackdropFilter:"blur(10px)",
     border:"1px solid rgba(167,139,250,0.18)",
-    borderRadius:14,padding:"13px 16px",color:"#e0e0e0",fontSize:15,
+    borderRadius:14,padding:"13px 16px",color:"#F9FAFB",fontSize:15,
     marginBottom:10,outline:"none",boxSizing:"border-box",
     transition:"border-color .2s",
   };
@@ -3277,11 +3309,11 @@ function LoginScreen({ onLogin }) {
 
         {/* Glass card */}
         <div style={{
-          background:"rgba(255,255,255,0.04)",
+          background:"#1C1C26",
           backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",
           border:"1px solid rgba(167,139,250,0.15)",
           borderRadius:24,padding:"26px 22px",
-          boxShadow:"0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.07)",
+          boxShadow:"0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)",
           animation:"glassIn .8s ease .2s both",
         }}>
           {error && (
@@ -3296,7 +3328,7 @@ function LoginScreen({ onLogin }) {
             width:"100%",padding:"14px",borderRadius:14,
             border:"1px solid rgba(167,139,250,0.25)",
             background:"rgba(99,102,241,0.08)",
-            color:"#e0e0e0",fontSize:15,fontWeight:600,cursor:"pointer",
+            color:"#F9FAFB",fontSize:15,fontWeight:600,cursor:"pointer",
             display:"flex",alignItems:"center",justifyContent:"center",gap:10,marginBottom:18,
             opacity:loading?.6:1,transition:"all .2s",
             backdropFilter:"blur(8px)",
@@ -3312,9 +3344,9 @@ function LoginScreen({ onLogin }) {
 
           {/* Divider */}
           <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:16}}>
-            <div style={{flex:1,height:1,background:"rgba(255,255,255,0.07)"}}/>
+            <div style={{flex:1,height:1,background:"rgba(255,255,255,0.05)"}}/>
             <span style={{fontSize:12,opacity:.35,letterSpacing:.5}}>veya</span>
-            <div style={{flex:1,height:1,background:"rgba(255,255,255,0.07)"}}/>
+            <div style={{flex:1,height:1,background:"rgba(255,255,255,0.05)"}}/>
           </div>
 
           <input type="email" placeholder="Email adresi" value={email}
@@ -3348,7 +3380,7 @@ function LoginScreen({ onLogin }) {
         {/* Skip */}
         <div style={{textAlign:"center",marginTop:20}}>
           <button onClick={handleSkip} style={{
-            background:"none",border:"none",color:"#555",fontSize:12,cursor:"pointer",
+            background:"none",border:"none",color:"#6B7280",fontSize:12,cursor:"pointer",
           }}>
             Giriş yapmadan devam et →
           </button>
@@ -3633,7 +3665,7 @@ export default function App() {
     <div style={{
       width:"100%",
       minHeight:isMobile?"100dvh":"100vh",
-      background:"#060611",color:"#e0e0e0",
+      background:"#0D0D12",color:"#F9FAFB",
       fontFamily:"'SF Pro Display',-apple-system,'Segoe UI',sans-serif",
       position:"relative",
     }}>
@@ -3657,7 +3689,7 @@ export default function App() {
         onTouchEnd={handleTouchEnd}
         onScroll={handleScroll}
         style={{
-          padding:`16px ${isMobile?"16px":"clamp(16px, 5vw, 60px)"} ${CONTENT_PAD_BOTTOM}px`,
+          padding:`16px ${isMobile?"20px":"clamp(20px, 5vw, 60px)"} ${CONTENT_PAD_BOTTOM}px`,
           minHeight: isMobile ? "100dvh" : "100vh",
           maxWidth: isMobile ? undefined : 800,
           margin: isMobile ? undefined : "0 auto",
@@ -3690,10 +3722,10 @@ export default function App() {
         position:"fixed",
         bottom:0,
         left:0,right:0,
-        background:"rgba(4,4,14,0.95)",
+        background:"rgba(13,13,18,0.95)",
         backdropFilter:"blur(24px) saturate(180%)",
         WebkitBackdropFilter:"blur(24px) saturate(180%)",
-        borderTop:"1px solid rgba(255,255,255,0.1)",
+        borderTop:"1px solid rgba(255,255,255,0.05)",
         display:"flex",justifyContent:"center",alignItems:"center",
         height:NAV_HEIGHT,
         paddingTop:4,
@@ -3712,7 +3744,7 @@ export default function App() {
             padding:isMobile?"10px 6px":"8px 12px",
             minWidth:isMobile?52:50,
             borderRadius:14,
-            color:tab===t.id?"#3b82f6":"#555",
+            color:tab===t.id?"#3b82f6":"#6B7280",
             flex:1,
           }}>
             <span style={{fontSize:isMobile?22:18,lineHeight:1}}>{t.icon}</span>
@@ -3778,7 +3810,7 @@ export default function App() {
 
         /* ── BACK BUTTON ── */
         .back-btn {
-          background: rgba(255,255,255,0.08);
+          background: rgba(255,255,255,0.05);
           backdrop-filter: blur(4px);
           -webkit-backdrop-filter: blur(4px);
           border: 1px solid rgba(255,255,255,0.1);
@@ -3811,11 +3843,11 @@ export default function App() {
         ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.12);border-radius:4px; }
         ::-webkit-scrollbar-track { background:transparent; }
         input[type="date"]::-webkit-calendar-picker-indicator { filter:invert(0.7); }
-        html, body { margin:0; padding:0; overscroll-behavior:none; background:#060611; overflow:auto; height:auto; }
+        html, body { margin:0; padding:0; overscroll-behavior:none; background:#0D0D12; overflow:auto; height:auto; }
         #root { height:auto; }
-        select option { background:#1a1a2e; color:#e0e0e0; }
+        select option { background:#1C1C26; color:#e0e0e0; }
         @media(display-mode:standalone){ 
-          html, body { background:#060611; overflow:auto; height:auto; }
+          html, body { background:#0D0D12; overflow:auto; height:auto; }
           #root { height:auto; }
           body { padding-top: env(safe-area-inset-top); } 
         }
