@@ -3204,7 +3204,8 @@ export default function App() {
 
       {/* Center content */}
       <div style={{
-        display:"flex",flexDirection:"column",alignItems:"flex-start",justifyContent:"center",
+        display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",
+        textAlign:"center",
         width:"100%",maxWidth:400,padding:"0 40px",minHeight:"100dvh",
         animation:"fadeIn .6s ease both",
       }}>
@@ -3219,8 +3220,8 @@ export default function App() {
 
         {/* Decorative line */}
         <div style={{
-          height:1,width:"60%",marginBottom:20,
-          background:"linear-gradient(90deg,rgba(167,139,250,0.7),transparent)",
+          height:1,width:"60%",marginBottom:20,margin:"0 auto 20px",
+          background:"linear-gradient(90deg,transparent,rgba(167,139,250,0.7),transparent)",
           animation:"lineExpand 1s ease .2s both",
         }}/>
 
