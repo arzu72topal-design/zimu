@@ -1698,7 +1698,7 @@ function NewsRoom({ room, onBack }) {
                     WebkitBoxOrient:"vertical",overflow:"hidden",
                   }}>{article.title}</div>
                   {!article.thumb&&article.summary&&(
-                    <div style={{fontSize:12,color:"#9CA3AF"5,lineHeight:1.45,marginBottom:6,
+                    <div style={{fontSize:12,color:"#9CA3AF",lineHeight:1.45,marginBottom:6,
                       display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",overflow:"hidden",
                     }}>{article.summary}</div>
                   )}
@@ -1746,7 +1746,7 @@ function NewsRoom({ room, onBack }) {
           <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>Haberler</h3>
           <span style={{fontSize:11,color:"#4B5563"}}>{NEWS_CATS.length} kategori</span>
         </div>
-        <p style={{margin:"6px 0 0",fontSize:12,color:"#4B5563"5}}>Bir kategoriye dokun ve haberleri keşfet</p>
+        <p style={{margin:"6px 0 0",fontSize:12,color:"#4B5563"}}>Bir kategoriye dokun ve haberleri keşfet</p>
       </StickyHeader>
 
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
@@ -2066,7 +2066,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
               <div style={{flex:1,minWidth:0}}>
                 <div style={{fontSize:14,fontWeight:700,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.title}</div>
                 {item.artist&&<div style={{fontSize:12,color:"#9CA3AF",marginTop:2}}>{item.artist}</div>}
-                <div style={{fontSize:11,color:"#4B5563"5,marginTop:2,display:"flex",alignItems:"center",gap:4}}>
+                <div style={{fontSize:11,color:"#4B5563",marginTop:2,display:"flex",alignItems:"center",gap:4}}>
                   <span>{platformIcon(item)}</span>
                   <span>{item.platform||item.source||"Müzik"}</span>
                 </div>
@@ -2421,17 +2421,17 @@ function BenimStilimRoom({data,update,onBack}){
           <button className="back-btn" onClick={onBack}>◀</button>
           <div>
             <div style={{fontSize:18,fontWeight:900,background:"linear-gradient(135deg,#e0d5f5,#a78bfa)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>Benim Stilim</div>
-            <div style={{fontSize:10,color:"#4B5563"5}}>Kişisel stil & moodboard</div>
+            <div style={{fontSize:10,color:"#4B5563"}}>Kişisel stil & moodboard</div>
           </div>
         </div>
       </StickyHeader>
       <div style={{background:"linear-gradient(135deg,rgba(59,130,246,0.1),rgba(99,102,241,0.1))",border:"1px solid rgba(59,130,246,0.2)",borderRadius:16,padding:"14px 16px",marginBottom:16}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-          <div><div style={{fontSize:10,fontWeight:700,color:"#9CA3AF",letterSpacing:1,textTransform:"uppercase"}}>Bugünün Havası</div><div style={{fontSize:12,color:"#9CA3AF"5,marginTop:2}}>İstanbul, Türkiye</div></div>
+          <div><div style={{fontSize:10,fontWeight:700,color:"#9CA3AF",letterSpacing:1,textTransform:"uppercase"}}>Bugünün Havası</div><div style={{fontSize:12,color:"#9CA3AF",marginTop:2}}>İstanbul, Türkiye</div></div>
           <div style={{textAlign:"right"}}>{wxLoad?<div style={{fontSize:12,color:"#9CA3AF",animation:"pulse 1.5s infinite"}}>Yükleniyor...</div>:weather?<><div style={{fontSize:26,fontWeight:800,color:"#e0d5f5"}}>{weather.temp}°C</div><div style={{fontSize:11,color:"#9CA3AF"}}>{weather.desc}</div></>:<div style={{fontSize:11,color:"#9CA3AF"}}>Veri alınamadı</div>}</div>
         </div>
         {weather&&<div style={{marginTop:8,paddingTop:8,borderTop:"1px solid rgba(255,255,255,0.05)",display:"flex",gap:16}}><div style={{fontSize:10,color:"#9CA3AF"}}>{weather.wind} km/s rüzgar</div><div style={{fontSize:10,color:"#9CA3AF"}}>%{weather.humid} nem</div><div style={{fontSize:10,color:"#9CA3AF"}}>{weather.feel}°C hissedilen</div></div>}
-        <div style={{marginTop:10,background:"#2A2A35",borderRadius:10,padding:"8px 12px"}}><div style={{fontSize:10,color:"#9CA3AF"5,marginBottom:3}}>Stil Önerisi</div><div style={{fontSize:13,color:"#c4b5fd",fontWeight:600}}>{wxLoad?"Hesaplanıyor...":weather?getStyleHint(weather.temp):"Hava bilgisi mevcut değil"}</div></div>
+        <div style={{marginTop:10,background:"#2A2A35",borderRadius:10,padding:"8px 12px"}}><div style={{fontSize:10,color:"#9CA3AF",marginBottom:3}}>Stil Önerisi</div><div style={{fontSize:13,color:"#c4b5fd",fontWeight:600}}>{wxLoad?"Hesaplanıyor...":weather?getStyleHint(weather.temp):"Hava bilgisi mevcut değil"}</div></div>
       </div>
       <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,color:"#9CA3AF",textTransform:"uppercase",marginBottom:10}}>Bugün İçin Görünümler</div>
       <div style={{display:"flex",gap:8,marginBottom:16}}>
@@ -3344,7 +3344,7 @@ function LoginScreen({ onLogin }) {
           {/* Divider */}
           <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:16}}>
             <div style={{flex:1,height:1,background:"#2A2A35"}}/>
-            <span style={{fontSize:12,color:"#4B5563"5,letterSpacing:.5}}>veya</span>
+            <span style={{fontSize:12,color:"#4B5563",letterSpacing:.5}}>veya</span>
             <div style={{flex:1,height:1,background:"#2A2A35"}}/>
           </div>
 
