@@ -348,17 +348,17 @@ function Dashboard({ data, setTab, goTo, update }) {
           <span style={{fontSize:14,color:"#9CA3AF"}}>▶</span>
         </div>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
-          <div style={{background:"#2A2A35",borderRadius:12,padding:"12px 8px",textAlign:"center"}}>
-            <div style={{fontSize:24,fontWeight:700,color:"#3b82f6"}}>{pending}</div>
-            <div style={{fontSize:11,color:"#9CA3AF",marginTop:2}}>Bekleyen</div>
+          <div style={{background:"#3b82f6",borderRadius:12,padding:"14px 8px",textAlign:"center"}}>
+            <div style={{fontSize:24,fontWeight:700,color:"#fff"}}>{pending}</div>
+            <div style={{fontSize:11,color:"rgba(255,255,255,0.75)",marginTop:2}}>Bekleyen</div>
           </div>
-          <div style={{background:"#2A2A35",borderRadius:12,padding:"12px 8px",textAlign:"center"}}>
-            <div style={{fontSize:24,fontWeight:700,color:"#8B5CF6"}}>{todayEv.length}</div>
-            <div style={{fontSize:11,color:"#9CA3AF",marginTop:2}}>Etkinlik</div>
+          <div style={{background:"#8B5CF6",borderRadius:12,padding:"14px 8px",textAlign:"center"}}>
+            <div style={{fontSize:24,fontWeight:700,color:"#fff"}}>{todayEv.length}</div>
+            <div style={{fontSize:11,color:"rgba(255,255,255,0.75)",marginTop:2}}>Etkinlik</div>
           </div>
-          <div style={{background:"#2A2A35",borderRadius:12,padding:"12px 8px",textAlign:"center"}}>
-            <div style={{fontSize:24,fontWeight:700,color:"#10B981"}}>{activeProjects}</div>
-            <div style={{fontSize:11,color:"#9CA3AF",marginTop:2}}>Proje</div>
+          <div style={{background:"#10B981",borderRadius:12,padding:"14px 8px",textAlign:"center"}}>
+            <div style={{fontSize:24,fontWeight:700,color:"#fff"}}>{activeProjects}</div>
+            <div style={{fontSize:11,color:"rgba(255,255,255,0.75)",marginTop:2}}>Proje</div>
           </div>
         </div>
       </div>
@@ -398,17 +398,28 @@ function Dashboard({ data, setTab, goTo, update }) {
 
       {/* Kart 3: Stil Motivasyon */}
       <div className="stagger-4 touch-card" onClick={()=>goTo("lifestyle","clothes")} style={{
-        ...glowCard("#a855f7"),cursor:"pointer",marginBottom:16,
-        display:"flex",alignItems:"center",gap:14,
+        background:"linear-gradient(135deg,#1C1C26 0%,rgba(139,92,246,0.12) 100%)",
+        borderRadius:16,padding:"16px",marginBottom:16,
+        border:"1px solid rgba(139,92,246,0.15)",
+        cursor:"pointer",display:"flex",alignItems:"center",gap:14,
       }}>
-        <div style={{width:44,height:44,borderRadius:12,background:"rgba(139,92,246,0.12)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-          <svg width="22" height="22" viewBox="0 0 32 32" fill="none"><path d="M9 4C9 4 6 5 4 8L2 13L8 15L8 12L10 12L10 28L22 28L22 12L24 12L24 15L30 13L28 8C26 5 23 4 23 4C23 4 21 7 16 7C11 7 9 4 9 4Z" stroke="#8B5CF6" strokeWidth="1.5" fill="rgba(139,92,246,0.1)" strokeLinejoin="round"/></svg>
+        <div style={{width:48,height:48,borderRadius:14,background:"rgba(139,92,246,0.15)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+          <svg width="28" height="28" viewBox="0 0 36 36" fill="none">
+            <path d="M11 8C11 8 14 4 18 4C22 4 25 8 25 8" stroke="#c4b5fd" strokeWidth="1.5" strokeLinecap="round"/>
+            <circle cx="18" cy="4" r="2" stroke="#c4b5fd" strokeWidth="1.2" fill="none"/>
+            <path d="M6 18L18 14L30 18" stroke="#8B5CF6" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+            <line x1="18" y1="8" x2="18" y2="14" stroke="#c4b5fd" strokeWidth="1.3" strokeLinecap="round"/>
+            <path d="M8 26C8 23 11 21 15 21C17 21 18 23 21 23C25 23 28 23 28 26" stroke="#8B5CF6" strokeWidth="1.2" strokeLinecap="round" fill="rgba(139,92,246,0.08)"/>
+            <circle cx="28" cy="10" r="4" stroke="#9CA3AF" strokeWidth="1" fill="none"/>
+            <circle cx="24" cy="8" r="2.5" stroke="#9CA3AF" strokeWidth="1" fill="none"/>
+            <path d="M22 11C22 11 24 13 28 13C30 13 32 12 32 10" stroke="#9CA3AF" strokeWidth="0.8" fill="none"/>
+          </svg>
         </div>
         <div style={{flex:1}}>
           <div style={{fontSize:16,fontWeight:600,color:"#F9FAFB"}}>Bugün harika görüneceksin!</div>
-          <div style={{fontSize:13,color:"#9CA3AF",marginTop:3}}>Hava durumuna göre stil önerilerin hazır</div>
+          <div style={{fontSize:13,color:"#c4b5fd",marginTop:3}}>Hava durumuna göre stil önerilerin hazır</div>
         </div>
-        <span style={{fontSize:14,color:"#9CA3AF"}}>▶</span>
+        <span style={{fontSize:14,color:"#8B5CF6"}}>▶</span>
       </div>
 
       {overdue>0&&(
