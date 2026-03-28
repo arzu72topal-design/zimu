@@ -20,7 +20,7 @@ import {
 const TABS = [
   { id: "dashboard", label: "Ana Sayfa", icon: "⌂" },
   { id: "tasks", label: "Görevler", icon: "✓" },
-  { id: "lifestyle", label: "Life Style", icon: "◈" },
+  { id: "lifestyle", label: "Yaşam Tarzı", icon: "◈" },
 ];
 
 const SPORT_TYPES = ["Koşu","Yüzme","Bisiklet","Yoga","Ağırlık","Yürüyüş","Diğer"];
@@ -2601,7 +2601,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
     <div>
       <StickyHeader>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-          <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Life Style</h3>
+          <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Yaşam Tarzı</h3>
         </div>
         <p style={{margin:"6px 0 0",fontSize:12,opacity:.4}}>Kişisel alanların — odalarına dokun ve keşfet</p>
       </StickyHeader>
