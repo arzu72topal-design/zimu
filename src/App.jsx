@@ -2832,8 +2832,82 @@ function Settings({ data, update, onImport, user, onLogout }) {
 }
 
 /* ═══════════ LOGIN SCREEN ═══════════ */
+/* ── Nebula background shared by splash + login ── */
+const NEBULA_STARS = Array.from({length:28},(_,i)=>({
+  id:i,
+  size: i%5===0?3:i%3===0?2:1.5,
+  color: i%3===0?"#a78bfa":i%3===1?"#6366f1":"#c4b5fd",
+  left: 4+((i*37)%92),
+  top: 3+((i*53)%94),
+  dur: 2.5+((i*17)%30)/10,
+  delay: ((i*23)%30)/10,
+  twinkle: i%4===0,
+}));
+
+const NEBULA_KEYFRAMES = `
+  @keyframes fadeInUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeIn   { from{opacity:0} to{opacity:1} }
+  @keyframes starFloat {
+    0%,100%{transform:translateY(0) scale(1);opacity:.7}
+    50%{transform:translateY(-8px) scale(1.3);opacity:1}
+  }
+  @keyframes starTwinkle {
+    0%,100%{opacity:.3;transform:scale(.8)}
+    50%{opacity:1;transform:scale(1.4)}
+  }
+  @keyframes nebulaOrb1 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(25px,-18px) scale(1.08)} }
+  @keyframes nebulaOrb2 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(-18px,22px) scale(1.05)} }
+  @keyframes nebulaOrb3 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(12px,16px) scale(1.06)} }
+  @keyframes zimuGlow  { 0%,100%{filter:drop-shadow(0 0 18px rgba(167,139,250,.45))} 50%{filter:drop-shadow(0 0 36px rgba(167,139,250,.85))} }
+  @keyframes lineExpand { from{width:0;opacity:0} to{width:100%;opacity:1} }
+  @keyframes shimmer   { 0%,100%{opacity:.45} 50%{opacity:.9} }
+  @keyframes tapBlink  { 0%,100%{opacity:.25} 50%{opacity:.55} }
+  @keyframes glassIn   { from{opacity:0;transform:translateY(30px) scale(.97)} to{opacity:1;transform:translateY(0) scale(1)} }
+`;
+
+function NebulaBackground({ children, style }) {
+  return (
+    <div style={{
+      minHeight:"100dvh", background:"#08071a",
+      display:"flex", alignItems:"center", justifyContent:"center",
+      color:"#e0e0e0", fontFamily:"'SF Pro Display',-apple-system,sans-serif",
+      position:"relative", overflow:"hidden", ...style,
+    }}>
+      {/* Orbs */}
+      <div style={{position:"absolute",inset:0,pointerEvents:"none",zIndex:0}}>
+        <div style={{position:"absolute",width:420,height:420,borderRadius:"50%",
+          background:"radial-gradient(circle,rgba(99,102,241,0.18) 0%,transparent 70%)",
+          top:"-120px",left:"-80px",animation:"nebulaOrb1 14s ease-in-out infinite"}}/>
+        <div style={{position:"absolute",width:340,height:340,borderRadius:"50%",
+          background:"radial-gradient(circle,rgba(167,139,250,0.14) 0%,transparent 70%)",
+          bottom:"5%",right:"-60px",animation:"nebulaOrb2 18s ease-in-out infinite"}}/>
+        <div style={{position:"absolute",width:260,height:260,borderRadius:"50%",
+          background:"radial-gradient(circle,rgba(139,92,246,0.10) 0%,transparent 70%)",
+          top:"40%",left:"50%",animation:"nebulaOrb3 22s ease-in-out infinite"}}/>
+      </div>
+      {/* Stars */}
+      <div style={{position:"absolute",inset:0,pointerEvents:"none",zIndex:0}}>
+        {NEBULA_STARS.map(s=>(
+          <div key={s.id} style={{
+            position:"absolute",
+            width:s.size,height:s.size,borderRadius:"50%",
+            background:s.color,
+            boxShadow:`0 0 ${s.size*3}px ${s.color}`,
+            left:`${s.left}%`,top:`${s.top}%`,
+            animation:`${s.twinkle?"starTwinkle":"starFloat"} ${s.dur}s ease-in-out ${s.delay}s infinite`,
+          }}/>
+        ))}
+      </div>
+      {/* Content */}
+      <div style={{position:"relative",zIndex:1,width:"100%"}}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
 function LoginScreen({ onLogin }) {
-  const [mode, setMode] = useState("login"); // login, register
+  const [mode, setMode] = useState("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -2857,84 +2931,129 @@ function LoginScreen({ onLogin }) {
 
   const handleSkip = () => { onLogin(null); };
 
+  const glassInp = {
+    width:"100%",
+    background:"rgba(255,255,255,0.05)",
+    backdropFilter:"blur(10px)",WebkitBackdropFilter:"blur(10px)",
+    border:"1px solid rgba(167,139,250,0.18)",
+    borderRadius:14,padding:"13px 16px",color:"#e0e0e0",fontSize:15,
+    marginBottom:10,outline:"none",boxSizing:"border-box",
+    transition:"border-color .2s",
+  };
+
   return (
-    <div style={{
-      minHeight:"100vh",minHeight:"100dvh",background:"#0f0f1a",
-      display:"flex",alignItems:"center",justifyContent:"center",
-      color:"#e0e0e0",fontFamily:"'SF Pro Display',-apple-system,sans-serif",
-      padding:16,
-    }}>
-      <div style={{width:"100%",maxWidth:360}}>
-        {/* Logo */}
-        <div style={{textAlign:"center",marginBottom:32}}>
-          <MascotImage src="/zimu-mascot.png" style={{width:120,height:120,objectFit:"contain",marginBottom:12,display:"block",margin:"0 auto 12px"}} />
-          <div style={{fontSize:28,fontWeight:800,letterSpacing:-1}}>Zimu</div>
-          <div style={{fontSize:13,opacity:.4,marginTop:4}}>Hayatını yönet</div>
-        </div>
+    <NebulaBackground>
+      <style>{NEBULA_KEYFRAMES}</style>
+      <div style={{
+        width:"100%",maxWidth:380,margin:"0 auto",padding:"24px 20px",
+        animation:"fadeInUp .7s ease both",
+      }}>
+        {/* Title */}
+        <div style={{textAlign:"center",marginBottom:40}}>
+          <div style={{
+            fontSize:62,fontWeight:900,letterSpacing:-3,lineHeight:1,
+            background:"linear-gradient(135deg,#e0d5f5 0%,#a78bfa 35%,#6366f1 65%,#818cf8 100%)",
+            WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",
+            animation:"zimuGlow 4s ease-in-out infinite",
+            display:"inline-block",
+          }}>Zimu</div>
 
-        {/* Error */}
-        {error && (
-          <div style={{background:"rgba(239,68,68,0.1)",border:"1px solid rgba(239,68,68,0.2)",
-            borderRadius:12,padding:"10px 14px",marginBottom:12,fontSize:13,color:"#ef4444",textAlign:"center"}}>
-            {error}
+          {/* Decorative line */}
+          <div style={{
+            height:1,margin:"14px auto 16px",
+            background:"linear-gradient(90deg,transparent,rgba(167,139,250,0.6),transparent)",
+            animation:"lineExpand 1s ease .3s both",
+          }}/>
+
+          <div style={{fontSize:15,fontStyle:"italic",opacity:.7,lineHeight:1.7,letterSpacing:.3}}>
+            Kendi destanını yaz.
           </div>
-        )}
-
-        {/* Google Sign In */}
-        <button onClick={handleGoogle} disabled={loading} style={{
-          width:"100%",padding:"14px",borderRadius:12,border:"1px solid rgba(255,255,255,0.1)",
-          background:"rgba(255,255,255,0.04)",color:"#e0e0e0",fontSize:15,fontWeight:600,cursor:"pointer",
-          display:"flex",alignItems:"center",justifyContent:"center",gap:10,marginBottom:16,
-          opacity:loading?.6:1,
-        }}>
-          <span style={{fontSize:18}}>G</span>
-          Google ile Giriş Yap
-        </button>
-
-        {/* Divider */}
-        <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:16}}>
-          <div style={{flex:1,height:1,background:"rgba(255,255,255,0.08)"}}/>
-          <span style={{fontSize:12,opacity:.4}}>veya</span>
-          <div style={{flex:1,height:1,background:"rgba(255,255,255,0.08)"}}/>
+          <div style={{fontSize:13,fontStyle:"italic",opacity:.35,marginTop:2,letterSpacing:.2}}>
+            Write your own epic.
+          </div>
         </div>
 
-        {/* Email/Password */}
-        <input type="email" placeholder="Email adresi" value={email}
-          onChange={e=>setEmail(e.target.value)}
-          style={{...inp,marginBottom:8}} />
-        <input type="password" placeholder="Şifre (en az 6 karakter)" value={password}
-          onChange={e=>setPassword(e.target.value)}
-          onKeyDown={e=>e.key==="Enter"&&handleEmail()}
-          style={inp} />
-
-        <button onClick={handleEmail} disabled={loading} style={{
-          ...btnPrimary,opacity:loading?.6:1,marginBottom:12,
+        {/* Glass card */}
+        <div style={{
+          background:"rgba(255,255,255,0.04)",
+          backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",
+          border:"1px solid rgba(167,139,250,0.15)",
+          borderRadius:24,padding:"26px 22px",
+          boxShadow:"0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.07)",
+          animation:"glassIn .8s ease .2s both",
         }}>
-          {loading ? "Bekleyin..." : mode === "register" ? "Kayıt Ol" : "Giriş Yap"}
-        </button>
+          {error && (
+            <div style={{background:"rgba(239,68,68,0.1)",border:"1px solid rgba(239,68,68,0.25)",
+              borderRadius:12,padding:"10px 14px",marginBottom:14,fontSize:13,color:"#f87171",textAlign:"center"}}>
+              {error}
+            </div>
+          )}
 
-        {/* Toggle mode */}
-        <div style={{textAlign:"center",marginBottom:20}}>
-          <button onClick={()=>{setMode(mode==="login"?"register":"login");setError("");}} style={{
-            background:"none",border:"none",color:"#3b82f6",fontSize:13,cursor:"pointer",
+          {/* Google */}
+          <button onClick={handleGoogle} disabled={loading} style={{
+            width:"100%",padding:"14px",borderRadius:14,
+            border:"1px solid rgba(167,139,250,0.25)",
+            background:"rgba(99,102,241,0.08)",
+            color:"#e0e0e0",fontSize:15,fontWeight:600,cursor:"pointer",
+            display:"flex",alignItems:"center",justifyContent:"center",gap:10,marginBottom:18,
+            opacity:loading?.6:1,transition:"all .2s",
+            backdropFilter:"blur(8px)",
           }}>
-            {mode === "login" ? "Hesabın yok mu? Kayıt ol" : "Zaten hesabın var mı? Giriş yap"}
+            <svg width="18" height="18" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Google ile Giriş Yap
           </button>
+
+          {/* Divider */}
+          <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:16}}>
+            <div style={{flex:1,height:1,background:"rgba(255,255,255,0.07)"}}/>
+            <span style={{fontSize:12,opacity:.35,letterSpacing:.5}}>veya</span>
+            <div style={{flex:1,height:1,background:"rgba(255,255,255,0.07)"}}/>
+          </div>
+
+          <input type="email" placeholder="Email adresi" value={email}
+            onChange={e=>setEmail(e.target.value)}
+            style={glassInp} />
+          <input type="password" placeholder="Şifre (en az 6 karakter)" value={password}
+            onChange={e=>setPassword(e.target.value)}
+            onKeyDown={e=>e.key==="Enter"&&handleEmail()}
+            style={glassInp} />
+
+          <button onClick={handleEmail} disabled={loading} style={{
+            width:"100%",
+            background:"linear-gradient(135deg,#6366f1,#a78bfa)",
+            color:"#fff",border:"none",borderRadius:14,
+            padding:"14px",cursor:"pointer",fontSize:15,fontWeight:700,marginTop:4,
+            boxShadow:"0 4px 24px rgba(99,102,241,0.45)",
+            opacity:loading?.6:1,transition:"all .2s",letterSpacing:.3,
+          }}>
+            {loading ? "Bekleyin..." : mode === "register" ? "Kayıt Ol" : "Giriş Yap"}
+          </button>
+
+          <div style={{textAlign:"center",marginTop:16}}>
+            <button onClick={()=>{setMode(mode==="login"?"register":"login");setError("");}} style={{
+              background:"none",border:"none",color:"#a78bfa",fontSize:13,cursor:"pointer",opacity:.8,
+            }}>
+              {mode === "login" ? "Hesabın yok mu? Kayıt ol" : "Zaten hesabın var mı? Giriş yap"}
+            </button>
+          </div>
         </div>
 
-        {/* Skip - use without login */}
-        <div style={{textAlign:"center"}}>
+        {/* Skip */}
+        <div style={{textAlign:"center",marginTop:20}}>
           <button onClick={handleSkip} style={{
-            background:"none",border:"none",color:"#666",fontSize:12,cursor:"pointer",
+            background:"none",border:"none",color:"#555",fontSize:12,cursor:"pointer",
           }}>
             Giriş yapmadan devam et →
           </button>
-          <div style={{fontSize:10,opacity:.3,marginTop:4}}>
-            Veriler sadece bu cihazda kalır
-          </div>
+          <div style={{fontSize:10,opacity:.25,marginTop:4}}>Veriler sadece bu cihazda kalır</div>
         </div>
       </div>
-    </div>
+    </NebulaBackground>
   );
 }
 
@@ -3066,76 +3185,75 @@ export default function App() {
   }
 
   if (splash || loading || !data) return (
-    <div
+    <NebulaBackground style={{cursor:"pointer",userSelect:"none",flexDirection:"column"}}
       onClick={() => {
         setSplash(false);
         setLoading(false);
-        // data yoksa boş yükle (Firebase cevap vermediyse)
         if (!data) {
-          const uid2 = null;
-          loadData(uid2).then(d => setData(d)).catch(() => {
+          loadData(null).then(d => setData(d)).catch(() => {
             import("./db.js").then(m => setData(m.getDefaultData ? m.getDefaultData() : {tasks:[],events:[],sports:[],projects:[],notes:[],foods:[],rooms:[],roomItems:{},settings:{},dailyThoughts:["","",""]}));
           });
         }
-      }}
-      style={{
-        minHeight:"100vh",minHeight:"100dvh",background:"#060611",
-        display:"flex",alignItems:"center",justifyContent:"center",
-        color:"#e0e0e0",fontFamily:"'SF Pro Display',-apple-system,sans-serif",
-        flexDirection:"column",overflow:"hidden",position:"relative",
-        cursor:"pointer",userSelect:"none",
       }}>
       <style>{`
-        @keyframes walkAcross { 
-          0% { transform: translateX(-120px) scaleX(1); }
-          45% { transform: translateX(40px) scaleX(1); }
-          50% { transform: translateX(40px) scaleX(-1); }
-          95% { transform: translateX(-40px) scaleX(-1); }
-          100% { transform: translateX(-40px) scaleX(1); }
-        }
-        @keyframes bobWalk {
-          0%,100% { transform: translateY(0) rotate(-3deg); }
-          25% { transform: translateY(-12px) rotate(3deg); }
-          50% { transform: translateY(0) rotate(-3deg); }
-          75% { transform: translateY(-12px) rotate(3deg); }
-        }
-        @keyframes fadeInUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+        ${NEBULA_KEYFRAMES}
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
         @keyframes checkPop { 0%{transform:scale(1)} 40%{transform:scale(1.25)} 70%{transform:scale(0.9)} 100%{transform:scale(1)} }
         .task-check-done { animation: checkPop .3s ease; }
-        @keyframes shimmer { 0%{opacity:.4} 50%{opacity:1} 100%{opacity:.4} }
-        @keyframes groundDraw { from{width:0} to{width:80%} }
       `}</style>
 
-      {/* Walking mascot — canvas ile beyaz kağıt arka planı kaldırıldı */}
+      {/* Center content */}
       <div style={{
-        animation:"walkAcross 4s ease-in-out infinite",
-        marginBottom:8,
+        display:"flex",flexDirection:"column",alignItems:"flex-start",justifyContent:"center",
+        width:"100%",maxWidth:400,padding:"0 40px",minHeight:"100dvh",
+        animation:"fadeIn .6s ease both",
       }}>
-        <div style={{animation:"bobWalk 0.6s ease-in-out infinite"}}>
-          <MascotImage src="/zimu-mascot.png" style={{
-            width:280,height:280,objectFit:"contain",
-            filter:"drop-shadow(0 12px 32px rgba(59,130,246,0.35))",
-            display:"block",
-          }}/>
+        {/* Zimu title */}
+        <div style={{
+          fontSize:72,fontWeight:900,letterSpacing:-4,lineHeight:1,
+          background:"linear-gradient(135deg,#e0d5f5 0%,#a78bfa 30%,#6366f1 60%,#818cf8 100%)",
+          WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",
+          animation:"zimuGlow 4s ease-in-out infinite",
+          display:"inline-block",marginBottom:16,
+        }}>Zimu</div>
+
+        {/* Decorative line */}
+        <div style={{
+          height:1,width:"60%",marginBottom:20,
+          background:"linear-gradient(90deg,rgba(167,139,250,0.7),transparent)",
+          animation:"lineExpand 1s ease .2s both",
+        }}/>
+
+        {/* Tagline */}
+        <div style={{
+          fontSize:17,fontStyle:"italic",
+          color:"rgba(196,181,253,0.85)",
+          letterSpacing:.4,lineHeight:1.6,
+          animation:"fadeInUp .8s ease .4s both",
+        }}>
+          Kendi destanını yaz.
+        </div>
+        <div style={{
+          fontSize:14,fontStyle:"italic",
+          color:"rgba(167,139,250,0.45)",
+          letterSpacing:.3,marginTop:4,
+          animation:"fadeInUp .8s ease .55s both",
+        }}>
+          Write your own epic.
         </div>
       </div>
 
-      {/* Ground line */}
+      {/* Bottom tap hint */}
       <div style={{
-        width:"80%",maxWidth:360,height:2,
-        background:"linear-gradient(90deg, transparent, rgba(59,130,246,0.3), rgba(59,130,246,0.5), rgba(59,130,246,0.3), transparent)",
-        borderRadius:1,marginBottom:24,
-        animation:"groundDraw 1s ease-out",
-      }}/>
-
-      {/* Text */}
-      <div style={{animation:"fadeInUp 0.8s ease 0.3s both",textAlign:"center"}}>
-        <div style={{fontSize:32,fontWeight:800,letterSpacing:-1,marginBottom:6}}>Zimu</div>
-        <div style={{fontSize:14,opacity:.4,animation:"shimmer 2s ease-in-out infinite"}}>Hayatını yönet...</div>
-        <div style={{fontSize:11,opacity:.2,marginTop:16}}>Devam etmek için dokun</div>
+        position:"absolute",bottom:44,left:0,right:0,
+        textAlign:"center",
+        fontSize:13,color:"rgba(196,181,253,0.45)",
+        letterSpacing:.5,
+        animation:"tapBlink 2.5s ease-in-out infinite",
+      }}>
+        Devam etmek için dokun
       </div>
-    </div>
+    </NebulaBackground>
   );
 
   const content = () => {
