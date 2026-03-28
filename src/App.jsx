@@ -399,11 +399,11 @@ function Dashboard({ data, setTab, goTo, update }) {
           <span style={{fontSize:11,color:"#f97316",fontWeight:600,flexShrink:0}}>{Math.round(todayCalIn/2000*100)}%</span>
         </div>
         <div style={{display:"flex",gap:8}}>
-          <button onClick={()=>goTo("lifestyle","healthcoach")} style={{
+          <button onClick={()=>goTo("lifestyle","healthcoach:food")} style={{
             flex:1,background:"rgba(249,115,22,0.12)",color:"#f97316",border:"1px solid rgba(249,115,22,0.3)",
             borderRadius:10,padding:"9px 4px",fontSize:12,fontWeight:700,cursor:"pointer",
           }}>+ Yemek</button>
-          <button onClick={()=>goTo("lifestyle","healthcoach")} style={{
+          <button onClick={()=>goTo("lifestyle","healthcoach:sport")} style={{
             flex:1,background:"rgba(34,197,94,0.12)",color:"#22c55e",border:"1px solid rgba(34,197,94,0.3)",
             borderRadius:10,padding:"9px 4px",fontSize:12,fontWeight:700,cursor:"pointer",
           }}>+ Spor</button>
@@ -942,8 +942,8 @@ function CalendarView({ data, update }) {
 
 /* ═══════════ SPORTS ═══════════ */
 /* ═══════════ SAĞLIK (Health Coach) ═══════════ */
-function Sports({ data, update }) {
-  const [view,setView]=useState("overview"); // overview, sport, food
+function Sports({ data, update, initialView }) {
+  const [view,setView]=useState(initialView || "overview"); // overview, sport, food
   const [modal,setModal]=useState(false);
   const [foodModal,setFoodModal]=useState(false);
   const [form,setForm]=useState({type:"Koşu",duration:"",distance:"",calories:"",date:today(),notes:""});
@@ -952,6 +952,16 @@ function Sports({ data, update }) {
   const [analyzing,setAnalyzing]=useState(false);
   const [aiResult,setAiResult]=useState(null);
   const photoRef=useRef(null);
+
+  // Dashboard'dan gelen view yönlendirmesi
+  useEffect(() => {
+    if (initialView && (initialView === "food" || initialView === "sport")) {
+      setView(initialView);
+      // "+" ile geliyorsa ekleme modalını da aç
+      if (initialView === "food") setTimeout(() => setFoodModal(true), 350);
+      if (initialView === "sport") setTimeout(() => setModal(true), 350);
+    }
+  }, [initialView]);
 
   const foods = data.foods || [];
   const aiProvider = data.settings?.aiProvider||"none";
@@ -2552,6 +2562,7 @@ function BenimStilimRoom({data,update,onBack}){
 /* ═══════════ TARZIM ═══════════ */
 function Projects({ data, update, initialRoom, onRoomConsumed }) {
   const [activeRoom,setActiveRoom]=useState(null);
+  const [roomSubView,setRoomSubView]=useState(null);
   const [modal,setModal]=useState(false);
   const [roomModal,setRoomModal]=useState(false);
   const [itemModal,setItemModal]=useState(false);
@@ -2561,10 +2572,12 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
   const [exp,setExp]=useState(null);
   const [tf,setTf]=useState({title:""});
 
-  // Dashboard'dan gelen oda yönlendirmesini yakala
+  // Dashboard'dan gelen oda yönlendirmesini yakala (format: "roomId" veya "roomId:subView")
   useEffect(() => {
     if (initialRoom) {
-      setActiveRoom(initialRoom);
+      const parts = initialRoom.split(":");
+      setActiveRoom(parts[0]);
+      setRoomSubView(parts[1] || null);
       onRoomConsumed?.();
     }
   }, [initialRoom]);
@@ -2657,7 +2670,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
           const count=room.type==="project"?data.projects.length:room.type==="health"?(data.sports||[]).length:(roomItems[room.id]||[]).length;
           const photo = getRoomPhoto(room);
           return (
-            <div key={room.id} className={`touch-card stagger-${idx+1}`} onClick={()=>setActiveRoom(room.id)}
+            <div key={room.id} className={`touch-card stagger-${idx+1}`} onClick={()=>{setActiveRoom(room.id);setRoomSubView(null);}}
               style={{
                 borderRadius:20,overflow:"hidden",cursor:"pointer",
                 position:"relative",minHeight:130,
@@ -2799,7 +2812,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
           </div>
         </div>
       </StickyHeader>
-      <Sports data={data} update={update}/>
+      <Sports data={data} update={update} initialView={roomSubView}/>
     </div>
   );
 
