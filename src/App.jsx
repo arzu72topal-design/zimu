@@ -379,7 +379,7 @@ const NEBULA_KEYFRAMES = `
 function NebulaBackground({ children, onClick, style }) {
   return (
     <div onClick={onClick} style={{
-      minHeight:"100vh", minHeight:"100dvh",
+      minHeight:"100dvh",
       background:"radial-gradient(ellipse at 20% 50%, #1a0533 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, #0c1445 0%, transparent 50%), radial-gradient(ellipse at 50% 80%, #1e0a2e 0%, transparent 50%), #060611",
       backgroundSize:"200% 200%",
       animation:"nebulaShift 20s ease-in-out infinite",
