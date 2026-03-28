@@ -179,24 +179,23 @@ function Modal({ open, onClose, title, children }) {
       position:"fixed",inset:0,background:"rgba(0,0,0,0.8)",display:"flex",
       alignItems:"flex-end",justifyContent:"center",zIndex:9999,
       padding:0,
+      animation:"modalOverlayIn .2s ease both",
     }}>
       <div onClick={e=>e.stopPropagation()} style={{
-        background:"rgba(255,255,255,0.04)",width:"100%",maxWidth:480,
+        background:"rgba(18,18,32,0.98)",
+        backdropFilter:"blur(24px)",WebkitBackdropFilter:"blur(24px)",
+        width:"100%",maxWidth:480,
         maxHeight:"85dvh",
         borderRadius:"20px 20px 0 0",
         display:"flex",flexDirection:"column",
-        animation:"slideUp .25s ease",
+        animation:"modalSlideUp .3s cubic-bezier(.22,1,.36,1) both",
       }}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",
           padding:"14px 20px",borderBottom:"1px solid rgba(255,255,255,0.07)",
           flexShrink:0,
         }}>
           <h3 style={{margin:0,fontSize:16,fontWeight:700}}>{title}</h3>
-          <button onClick={onClose} style={{
-            background:"rgba(255,255,255,0.08)",border:"none",color:"#aaa",
-            width:32,height:32,borderRadius:10,fontSize:16,cursor:"pointer",
-            display:"flex",alignItems:"center",justifyContent:"center",
-          }}>✕</button>
+          <button className="back-btn" onClick={onClose} style={{width:32,height:32,fontSize:14}}>✕</button>
         </div>
         <div style={{
           padding:"16px 20px 32px",
@@ -260,6 +259,7 @@ function GroupLabel({ label, count, color }) {
 function FAB({ onClick, color="#3b82f6" }) {
   return (
     <button
+      className="touch-card"
       onClick={onClick}
       style={{
         position:"fixed",right:20,bottom:100,
@@ -268,12 +268,8 @@ function FAB({ onClick, color="#3b82f6" }) {
         fontSize:28,fontWeight:300,lineHeight:1,cursor:"pointer",
         display:"flex",alignItems:"center",justifyContent:"center",
         boxShadow:`0 0 0 1px ${color}30, 0 4px 24px ${color}66, 0 0 50px ${color}33`,
-        zIndex:900,transition:"transform .1s, box-shadow .2s",
+        zIndex:900,
       }}
-      onMouseDown={e=>e.currentTarget.style.transform="scale(0.93)"}
-      onMouseUp={e=>e.currentTarget.style.transform="scale(1)"}
-      onTouchStart={e=>e.currentTarget.style.transform="scale(0.93)"}
-      onTouchEnd={e=>e.currentTarget.style.transform="scale(1)"}
     >+</button>
   );
 }
@@ -356,7 +352,7 @@ function Dashboard({ data, setTab, update }) {
 
       {/* 3 AKILLI KART */}
       {/* Kart 1: Görev + Etkinlik + Proje */}
-      <div onClick={()=>setTab("tasks")} style={{
+      <div className="stagger-1 touch-card" onClick={()=>setTab("tasks")} style={{
         ...glowCard("#3b82f6"),cursor:"pointer",marginBottom:10,
       }}>
         <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
@@ -386,7 +382,7 @@ function Dashboard({ data, setTab, update }) {
       </div>
 
       {/* Kart 2: Kalori + Yemek/Spor butonları */}
-      <div style={{...glowCard("#f97316"),marginBottom:10}}>
+      <div className="stagger-2" style={{...glowCard("#f97316"),marginBottom:10}}>
         <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
           <div style={{width:36,height:36,borderRadius:10,background:"rgba(249,115,22,0.15)",border:"1px solid rgba(249,115,22,0.3)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" stroke="#f97316" strokeWidth="2" fill="none"/><path d="M12 6v6l4 2" stroke="#f97316" strokeWidth="2" strokeLinecap="round"/></svg>
@@ -415,7 +411,7 @@ function Dashboard({ data, setTab, update }) {
       </div>
 
       {/* Kart 3: Stil Motivasyon */}
-      <div onClick={()=>setTab("lifestyle")} style={{
+      <div className="stagger-3 touch-card" onClick={()=>setTab("lifestyle")} style={{
         ...glowCard("#a855f7"),cursor:"pointer",marginBottom:14,
         display:"flex",alignItems:"center",gap:14,
       }}>
@@ -1665,15 +1661,10 @@ function NewsRoom({ room, onBack }) {
 
   /* ── CATEGORY ARTICLE VIEW ── */
   if(activeCat) return (
-    <div>
+    <div className="room-enter">
       <StickyHeader>
         <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
-          <button onClick={()=>setActiveCat(null)} style={{
-            background:"rgba(255,255,255,0.08)",backdropFilter:"blur(4px)",
-            border:"1px solid rgba(255,255,255,0.1)",color:"#ccc",
-            width:34,height:34,borderRadius:10,fontSize:16,cursor:"pointer",
-            display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,
-          }}>◀</button>
+          <button className="back-btn" onClick={()=>setActiveCat(null)}>◀</button>
           <div style={{filter:`drop-shadow(0 0 6px ${catInfo?.color}88)`,flexShrink:0}}>
             {NEWS_ICONS[activeCat]?.(catInfo?.color||"#aaa")}
           </div>
@@ -1719,14 +1710,11 @@ function NewsRoom({ room, onBack }) {
           {list.map((article,i)=>(
             <a key={article.id||i} href={article.link} target="_blank" rel="noopener noreferrer"
               style={{textDecoration:"none",color:"inherit",display:"block"}}>
-              <div style={{
+              <div className="touch-card" style={{
                 ...cardStyle,padding:0,marginBottom:10,overflow:"hidden",
                 border:`1px solid ${catInfo?.color}25`,
                 boxShadow:`0 0 20px ${catInfo?.color}10`,
-                transition:"transform .15s, box-shadow .15s",
               }}
-              onTouchStart={e=>{e.currentTarget.style.transform="scale(0.98)";}}
-              onTouchEnd={e=>{e.currentTarget.style.transform="scale(1)";}}
               >
                 {/* Thumbnail — full width if present */}
                 {article.thumb&&(
@@ -1782,12 +1770,7 @@ function NewsRoom({ room, onBack }) {
     <div>
       <StickyHeader>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
-          <button onClick={onBack} style={{
-            background:"rgba(255,255,255,0.08)",backdropFilter:"blur(4px)",
-            border:"1px solid rgba(255,255,255,0.1)",color:"#ccc",
-            width:34,height:34,borderRadius:10,fontSize:16,cursor:"pointer",
-            display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,
-          }}>◀</button>
+          <button className="back-btn" onClick={onBack}>◀</button>
           <span style={{fontSize:22}}>
             <svg width="22" height="22" viewBox="0 0 36 36" fill="none"><rect x="4" y="7" width="28" height="22" rx="2" stroke="#ef4444" strokeWidth="1.5" fill="rgba(239,68,68,0.1)"/><line x1="9" y1="13" x2="27" y2="13" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round"/><line x1="9" y1="18" x2="27" y2="18" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" opacity=".6"/><line x1="9" y1="23" x2="20" y2="23" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" opacity=".4"/></svg>
           </span>
@@ -1798,8 +1781,8 @@ function NewsRoom({ room, onBack }) {
       </StickyHeader>
 
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
-        {NEWS_CATS.map(cat=>(
-          <div key={cat.id} onClick={()=>openCat(cat.id)}
+        {NEWS_CATS.map((cat,idx)=>(
+          <div key={cat.id} className={`touch-card stagger-${Math.min(idx+1,6)}`} onClick={()=>openCat(cat.id)}
             style={{
               background:`linear-gradient(145deg,rgba(255,255,255,0.06) 0%,rgba(255,255,255,0.02) 100%)`,
               backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",
@@ -1808,12 +1791,7 @@ function NewsRoom({ room, onBack }) {
               boxShadow:`0 0 28px ${cat.color}22, 0 0 56px ${cat.color}0a, inset 0 1px 0 rgba(255,255,255,0.08)`,
               minHeight:110,
               display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:8,
-              transition:"transform .15s, box-shadow .2s",
             }}
-            onTouchStart={e=>{e.currentTarget.style.transform="scale(0.96)";}}
-            onTouchEnd={e=>{e.currentTarget.style.transform="scale(1)";}}
-            onMouseEnter={e=>{e.currentTarget.style.boxShadow=`0 0 40px ${cat.color}40, 0 0 80px ${cat.color}15, inset 0 1px 0 rgba(255,255,255,0.1)`;e.currentTarget.style.transform="scale(1.02)";}}
-            onMouseLeave={e=>{e.currentTarget.style.boxShadow=`0 0 28px ${cat.color}22, 0 0 56px ${cat.color}0a, inset 0 1px 0 rgba(255,255,255,0.08)`;e.currentTarget.style.transform="scale(1)";}}
           >
             <div style={{filter:`drop-shadow(0 0 10px ${cat.color}88)`,lineHeight:1}}>
               {NEWS_ICONS[cat.id]?.(cat.color)}
@@ -2069,7 +2047,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
       <audio ref={audioRef} onEnded={()=>setPreview(null)} style={{display:"none"}}/>
       <StickyHeader>
         <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
-          <button onClick={onBack} style={{background:"rgba(255,255,255,0.08)",backdropFilter:"blur(4px)",border:"1px solid rgba(255,255,255,0.1)",color:"#ccc",width:34,height:34,borderRadius:10,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>◀</button>
+          <button className="back-btn" onClick={onBack}>◀</button>
           <span style={{fontSize:22}}>🎵</span>
           <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{room.name}</h3>
           <span style={{fontSize:12,opacity:.4}}>{items.length} parça</span>
@@ -2471,7 +2449,7 @@ function BenimStilimRoom({data,update,onBack}){
     <div>
       <StickyHeader>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
-          <button onClick={onBack} style={{background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.1)",color:"#ccc",width:34,height:34,borderRadius:10,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>◀</button>
+          <button className="back-btn" onClick={onBack}>◀</button>
           <div>
             <div style={{fontSize:18,fontWeight:900,background:"linear-gradient(135deg,#e0d5f5,#a78bfa)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>Benim Stilim</div>
             <div style={{fontSize:10,opacity:.35}}>Kişisel stil & moodboard</div>
@@ -2667,19 +2645,16 @@ function Projects({ data, update }) {
         <p style={{margin:"6px 0 0",fontSize:12,opacity:.4}}>Kişisel alanların — odalarına dokun ve keşfet</p>
       </StickyHeader>
       <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:10}}>
-        {rooms.map(room=>{
-          const count=room.type==="project"?data.projects.length:(roomItems[room.id]||[]).length;
+        {rooms.map((room,idx)=>{
+          const count=room.type==="project"?data.projects.length:room.type==="health"?(data.sports||[]).length:(roomItems[room.id]||[]).length;
           const photo = getRoomPhoto(room);
           return (
-            <div key={room.id} onClick={()=>setActiveRoom(room.id)}
-              onTouchStart={e=>{e.currentTarget.style.transform="scale(0.97)";}}
-              onTouchEnd={e=>{e.currentTarget.style.transform="scale(1)";}}
+            <div key={room.id} className={`touch-card stagger-${idx+1}`} onClick={()=>setActiveRoom(room.id)}
               style={{
                 borderRadius:20,overflow:"hidden",cursor:"pointer",
                 position:"relative",minHeight:130,
                 border:`1px solid ${room.color}40`,
                 boxShadow:`0 0 24px ${room.color}20`,
-                transition:"transform .15s, box-shadow .2s",
               }}>
               {/* Fotoğraf ya da gradient arka plan */}
               {photo ? (
@@ -2732,10 +2707,10 @@ function Projects({ data, update }) {
   if(!room){setActiveRoom(null);return null;}
 
   if(room.type==="project"||activeRoom==="projects") return (
-    <div>
+    <div className="room-enter">
       <StickyHeader>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
-          <button onClick={()=>setActiveRoom(null)} style={{background:"rgba(255,255,255,0.08)",backdropFilter:"blur(4px)",border:"1px solid rgba(255,255,255,0.1)",color:"#ccc",width:34,height:34,borderRadius:10,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>◀</button>
+          <button className="back-btn" onClick={()=>setActiveRoom(null)}>◀</button>
           <div style={{width:28,height:28,borderRadius:8,background:`${room.color}25`,border:`1px solid ${room.color}50`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:room.color,flexShrink:0}}>{room.name[0]}</div>
           <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{room.name}</h3>
         </div>
@@ -2799,14 +2774,14 @@ function Projects({ data, update }) {
   const items=roomItems[activeRoom]||[];
 
   /* ── SPECIAL ROOM RENDERERS ── */
-  if(activeRoom==="news" || room.type==="news") return <NewsRoom room={room} onBack={()=>setActiveRoom(null)} />;
-  if(activeRoom==="music" || room.name==="Müziklerim") return <MusicRoom room={room} items={items} onBack={()=>setActiveRoom(null)} onAdd={(item)=>{const cur=roomItems[activeRoom]||[];update({...data,roomItems:{...roomItems,[activeRoom]:[item,...cur]}});}} onDel={(id)=>delItem(activeRoom,id)} />;
-  if(activeRoom==="clothes" || room.name==="Kıyafetlerim") return <BenimStilimRoom data={data} update={update} onBack={()=>setActiveRoom(null)} />;
+  if(activeRoom==="news" || room.type==="news") return <div className="room-enter"><NewsRoom room={room} onBack={()=>setActiveRoom(null)} /></div>;
+  if(activeRoom==="music" || room.name==="Müziklerim") return <div className="room-enter"><MusicRoom room={room} items={items} onBack={()=>setActiveRoom(null)} onAdd={(item)=>{const cur=roomItems[activeRoom]||[];update({...data,roomItems:{...roomItems,[activeRoom]:[item,...cur]}});}} onDel={(id)=>delItem(activeRoom,id)} /></div>;
+  if(activeRoom==="clothes" || room.name==="Kıyafetlerim") return <div className="room-enter"><BenimStilimRoom data={data} update={update} onBack={()=>setActiveRoom(null)} /></div>;
   if(activeRoom==="healthcoach" || room.type==="health") return (
-    <div>
+    <div className="room-enter">
       <StickyHeader>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
-          <button onClick={()=>setActiveRoom(null)} style={{background:"rgba(255,255,255,0.08)",backdropFilter:"blur(4px)",border:"1px solid rgba(255,255,255,0.1)",color:"#ccc",width:34,height:34,borderRadius:10,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>◀</button>
+          <button className="back-btn" onClick={()=>setActiveRoom(null)}>◀</button>
           <div style={{width:28,height:28,borderRadius:8,background:"rgba(20,184,166,0.2)",border:"1px solid rgba(20,184,166,0.4)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 21C12 21 4 15 4 9C4 5.69 6.69 3 10 3C11.5 3 12.5 4 12 4.5C12 4.5 12.5 3 14 3C17.31 3 20 5.69 20 9C20 15 12 21 12 21Z" stroke="#14b8a6" strokeWidth="1.5" fill="rgba(20,184,166,0.2)"/></svg>
           </div>
@@ -2821,10 +2796,10 @@ function Projects({ data, update }) {
   );
 
   return (
-    <div>
+    <div className="room-enter">
       <StickyHeader>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
-          <button onClick={()=>setActiveRoom(null)} style={{background:"rgba(255,255,255,0.08)",backdropFilter:"blur(4px)",border:"1px solid rgba(255,255,255,0.1)",color:"#ccc",width:34,height:34,borderRadius:10,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>◀</button>
+          <button className="back-btn" onClick={()=>setActiveRoom(null)}>◀</button>
           <div style={{width:28,height:28,borderRadius:8,background:`${room.color}25`,border:`1px solid ${room.color}50`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:room.color,flexShrink:0}}>{room.name[0]}</div>
           <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{room.name}</h3>
           <button onClick={()=>delRoom(activeRoom)} style={{background:"none",border:"none",color:"#ef4444",fontSize:11,cursor:"pointer",opacity:.5}}>Sil</button>
@@ -2951,23 +2926,24 @@ function TasksHub({ data, update }) {
         position:"sticky",top:0,zIndex:60,
       }}>
         {[["tasks","Görevler","✓"],["calendar","Takvim","◫"],["notes","Notlar","☰"]].map(([k,v,icon])=>(
-          <button key={k} onClick={()=>setSubTab(k)} style={{
+          <button key={k} className="nav-item" onClick={()=>setSubTab(k)} style={{
             flex:1,
             background:subTab===k?"rgba(59,130,246,0.15)":"rgba(255,255,255,0.04)",
             color:subTab===k?"#3b82f6":"#666",
             border:subTab===k?"1px solid rgba(59,130,246,0.3)":"1px solid rgba(255,255,255,0.06)",
             padding:"10px 4px",borderRadius:10,fontSize:12,fontWeight:subTab===k?700:500,
             cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:3,
-            transition:"all .15s",
           }}>
             <span style={{fontSize:16}}>{icon}</span>
             {v}
           </button>
         ))}
       </div>
-      {subTab==="tasks" && <Tasks data={data} update={update}/>}
-      {subTab==="calendar" && <CalendarView data={data} update={update}/>}
-      {subTab==="notes" && <Notes data={data} update={update}/>}
+      <div key={subTab} className="page-enter">
+        {subTab==="tasks" && <Tasks data={data} update={update}/>}
+        {subTab==="calendar" && <CalendarView data={data} update={update}/>}
+        {subTab==="notes" && <Notes data={data} update={update}/>}
+      </div>
     </div>
   );
 }
@@ -3698,7 +3674,9 @@ export default function App() {
           margin: isMobile ? undefined : "0 auto",
         }}
       >
-        {content()}
+        <div key={tab} className="page-enter">
+          {content()}
+        </div>
       </div>
 
       {/* Scroll to top button */}
@@ -3736,7 +3714,7 @@ export default function App() {
       }}>
         <div style={{display:"flex",justifyContent:"space-around",alignItems:"center",width:"100%",maxWidth:isMobile?undefined:600}}>
         {allTabs.map(t=>(
-          <button key={t.id} onClick={()=>setTab(t.id)} style={{
+          <button key={t.id} className="nav-item" onClick={()=>setTab(t.id)} style={{
             background:tab===t.id?"rgba(59,130,246,0.15)":"none",
             boxShadow:tab===t.id?"0 0 20px rgba(59,130,246,0.25)":undefined,
             border:"none",cursor:"pointer",
@@ -3746,7 +3724,6 @@ export default function App() {
             minWidth:isMobile?52:50,
             borderRadius:14,
             color:tab===t.id?"#3b82f6":"#555",
-            transition:"all .15s",
             flex:1,
           }}>
             <span style={{fontSize:isMobile?22:18,lineHeight:1}}>{t.icon}</span>
@@ -3768,6 +3745,77 @@ export default function App() {
         @keyframes glowPulse { 0%,100%{opacity:0.6} 50%{opacity:1} }
         @keyframes orb1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(30px,-20px)} }
         @keyframes orb2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-20px,30px)} }
+
+        /* ── PAGE TRANSITIONS ── */
+        @keyframes pageFadeIn { 
+          from { opacity:0; transform:translateY(12px) } 
+          to { opacity:1; transform:translateY(0) } 
+        }
+        @keyframes slideInRight { 
+          from { opacity:0; transform:translateX(60px) } 
+          to { opacity:1; transform:translateX(0) } 
+        }
+        @keyframes slideOutRight { 
+          from { opacity:1; transform:translateX(0) } 
+          to { opacity:0; transform:translateX(60px) } 
+        }
+        
+        /* ── STAGGERED CARD ANIMATIONS ── */
+        @keyframes cardStagger { 
+          from { opacity:0; transform:translateY(18px) scale(0.97) } 
+          to { opacity:1; transform:translateY(0) scale(1) } 
+        }
+        .stagger-1 { animation: cardStagger .3s cubic-bezier(.22,1,.36,1) .05s both }
+        .stagger-2 { animation: cardStagger .3s cubic-bezier(.22,1,.36,1) .1s both }
+        .stagger-3 { animation: cardStagger .3s cubic-bezier(.22,1,.36,1) .15s both }
+        .stagger-4 { animation: cardStagger .3s cubic-bezier(.22,1,.36,1) .2s both }
+        .stagger-5 { animation: cardStagger .3s cubic-bezier(.22,1,.36,1) .25s both }
+        .stagger-6 { animation: cardStagger .3s cubic-bezier(.22,1,.36,1) .3s both }
+
+        /* ── PAGE WRAPPER ── */
+        .page-enter { animation: pageFadeIn .28s cubic-bezier(.22,1,.36,1) both }
+        .room-enter { animation: slideInRight .3s cubic-bezier(.22,1,.36,1) both }
+
+        /* ── INTERACTIVE CARD ── */
+        .touch-card {
+          transition: transform .15s cubic-bezier(.22,1,.36,1), box-shadow .2s ease;
+          cursor: pointer;
+          -webkit-user-select: none;
+          user-select: none;
+        }
+        .touch-card:active {
+          transform: scale(0.97) !important;
+        }
+
+        /* ── BACK BUTTON ── */
+        .back-btn {
+          background: rgba(255,255,255,0.08);
+          backdrop-filter: blur(4px);
+          -webkit-backdrop-filter: blur(4px);
+          border: 1px solid rgba(255,255,255,0.1);
+          color: #ccc;
+          width: 36px; height: 36px;
+          border-radius: 10px;
+          font-size: 16px;
+          cursor: pointer;
+          display: flex; align-items: center; justify-content: center;
+          flex-shrink: 0;
+          transition: background .15s, transform .1s;
+        }
+        .back-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.15); }
+
+        /* ── MODAL TRANSITIONS ── */
+        @keyframes modalOverlayIn { from { opacity:0 } to { opacity:1 } }
+        @keyframes modalSlideUp { from { transform:translateY(100%); opacity:0 } to { transform:translateY(0); opacity:1 } }
+
+        /* ── BOTTOM NAV TRANSITION ── */
+        .nav-item {
+          transition: all .2s cubic-bezier(.22,1,.36,1);
+        }
+        .nav-item:active {
+          transform: scale(0.88);
+        }
+
         .task-check-done { animation: checkPop .3s ease; }
         * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
         ::-webkit-scrollbar { width:4px; }
