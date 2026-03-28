@@ -943,7 +943,6 @@ function CalendarView({ data, update }) {
 /* ═══════════ SPORTS ═══════════ */
 /* ═══════════ SAĞLIK (Health Coach) ═══════════ */
 function Sports({ data, update, initialView, onBack }) {
-  const [view,setView]=useState(initialView || "overview"); // overview, sport, food
   const [modal,setModal]=useState(false);
   const [foodModal,setFoodModal]=useState(false);
   const [form,setForm]=useState({type:"Koşu",duration:"",distance:"",calories:"",date:today(),notes:""});
@@ -953,18 +952,16 @@ function Sports({ data, update, initialView, onBack }) {
   const [aiResult,setAiResult]=useState(null);
   const photoRef=useRef(null);
 
-  // Dashboard'dan gelen view yönlendirmesi + scroll sıfırlama
+  // Dashboard'dan gelen yönlendirme — modalı otomatik aç
   useEffect(() => {
-    if (initialView && (initialView === "food" || initialView === "sport")) {
-      setView(initialView);
+    if (initialView === "food") {
+      const t = setTimeout(() => setFoodModal(true), 300);
+      return () => clearTimeout(t);
     }
-    // Mount olunca scroll sıfırla (gecikmeyle React render'ı bekle)
-    const t = setTimeout(() => {
-      window.scrollTo(0, 0);
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
-    }, 80);
-    return () => clearTimeout(t);
+    if (initialView === "sport") {
+      const t = setTimeout(() => setModal(true), 300);
+      return () => clearTimeout(t);
+    }
   }, [initialView]);
 
   const foods = data.foods || [];
@@ -1157,309 +1154,266 @@ function Sports({ data, update, initialView, onBack }) {
   const noResults = foodSearch && filteredFoods.length === 0;
 
   const mealGroups = ["Kahvaltı","Öğle","Akşam","Atıştırma"];
+  const todaySports = data.sports.filter(s=>s.date===today());
 
   return (
     <div>
       <StickyHeader>
-        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
+        <div style={{display:"flex",alignItems:"center",gap:10}}>
           {onBack && <button className="back-btn" onClick={onBack}>◀</button>}
           <h3 style={{margin:0,fontSize:20,fontWeight:800,flex:1}}>Sağlık Koçu</h3>
         </div>
-        <div style={{background:"rgba(255,255,255,0.06)",backdropFilter:"blur(8px)",borderRadius:12,padding:3,display:"flex"}}>
-          {[["overview","Özet"],["sport","Spor"],["food","Beslenme"]].map(([k,v])=>(
-            <button key={k} onClick={()=>setView(k)} style={{
-              flex:1,padding:"9px 6px",borderRadius:9,border:"none",cursor:"pointer",
-              fontSize:13,fontWeight:view===k?700:500,letterSpacing:-.2,
-              background:view===k?"rgba(255,255,255,0.12)":"transparent",
-              color:view===k?"#e0e0e0":"#666",transition:"all .2s",
-            }}>{v}</button>
-          ))}
-        </div>
       </StickyHeader>
 
-      {/* ── OVERVIEW ── */}
-      {view==="overview"&&(<>
-        {/* Coach tip */}
-        <div style={{background:`${tip.color}15`,border:`1px solid ${tip.color}30`,borderRadius:14,padding:14,marginBottom:14,display:"flex",gap:10,alignItems:"start"}}>
-          <span style={{fontSize:24}}>{tip.icon}</span>
+      {/* Coach tip */}
+      <div className="stagger-1" style={{background:`${tip.color}15`,border:`1px solid ${tip.color}30`,borderRadius:14,padding:"12px 14px",marginBottom:12,display:"flex",gap:10,alignItems:"start"}}>
+        <span style={{fontSize:20}}>{tip.icon}</span>
+        <div style={{flex:1}}>
+          <div style={{fontSize:11,fontWeight:700,color:tip.color,marginBottom:1}}>Sağlık Koçun</div>
+          <div style={{fontSize:12,opacity:.8,lineHeight:1.4}}>{tip.text}</div>
+        </div>
+      </div>
+
+      {/* Kalori denge kartı */}
+      <div className="stagger-2" style={{background:"rgba(255,255,255,0.04)",borderRadius:14,padding:"14px 16px",marginBottom:12}}>
+        <div style={{display:"flex",justifyContent:"space-around",textAlign:"center",marginBottom:10}}>
           <div>
-            <div style={{fontSize:12,fontWeight:700,color:tip.color,marginBottom:2}}>Sağlık Koçun</div>
-            <div style={{fontSize:13,opacity:.8,lineHeight:1.4}}>{tip.text}</div>
+            <div style={{fontSize:22,fontWeight:800,color:"#f97316"}}>{todayCalIn}</div>
+            <div style={{fontSize:10,opacity:.5}}>Alınan</div>
+          </div>
+          <div style={{fontSize:18,opacity:.2,alignSelf:"center"}}>−</div>
+          <div>
+            <div style={{fontSize:22,fontWeight:800,color:"#22c55e"}}>{todayCalOut}</div>
+            <div style={{fontSize:10,opacity:.5}}>Yakılan</div>
+          </div>
+          <div style={{fontSize:18,opacity:.2,alignSelf:"center"}}>=</div>
+          <div>
+            <div style={{fontSize:22,fontWeight:800,color:netCal>dailyGoal?"#ef4444":"#3b82f6"}}>{netCal}</div>
+            <div style={{fontSize:10,opacity:.5}}>Net</div>
           </div>
         </div>
-
-        {/* Today's balance */}
-        <div style={{background:"rgba(255,255,255,0.04)",borderRadius:14,padding:16,marginBottom:12}}>
-          <h4 style={{margin:"0 0 10px",fontSize:14,fontWeight:700}}>Bugünkü Denge</h4>
-          <div style={{display:"flex",justifyContent:"space-around",textAlign:"center",marginBottom:10}}>
-            <div>
-              <div style={{fontSize:22,fontWeight:800,color:"#f97316"}}>{todayCalIn}</div>
-              <div style={{fontSize:10,opacity:.5}}>Alınan kcal</div>
-            </div>
-            <div style={{fontSize:20,opacity:.3,alignSelf:"center"}}>−</div>
-            <div>
-              <div style={{fontSize:22,fontWeight:800,color:"#22c55e"}}>{todayCalOut}</div>
-              <div style={{fontSize:10,opacity:.5}}>Yakılan kcal</div>
-            </div>
-            <div style={{fontSize:20,opacity:.3,alignSelf:"center"}}>=</div>
-            <div>
-              <div style={{fontSize:22,fontWeight:800,color:netCal>dailyGoal?"#ef4444":"#3b82f6"}}>{netCal}</div>
-              <div style={{fontSize:10,opacity:.5}}>Net kcal</div>
-            </div>
-          </div>
-          <div style={{height:8,background:"rgba(255,255,255,0.08)",backdropFilter:"blur(2px)",borderRadius:4,overflow:"hidden"}}>
-            <div style={{height:"100%",background:netCal>dailyGoal?"#ef4444":"#3b82f6",borderRadius:4,width:`${Math.min(100,netCal/dailyGoal*100)}%`,transition:"width .3s"}}/>
-          </div>
-          <div style={{fontSize:10,opacity:.4,marginTop:4,textAlign:"center"}}>Günlük hedef: {dailyGoal} kcal</div>
+        <div style={{height:6,background:"rgba(255,255,255,0.08)",borderRadius:3,overflow:"hidden"}}>
+          <div style={{height:"100%",background:netCal>dailyGoal?"#ef4444":"#3b82f6",borderRadius:3,width:`${Math.min(100,netCal/dailyGoal*100)}%`,transition:"width .3s"}}/>
         </div>
+        <div style={{fontSize:10,opacity:.3,marginTop:4,textAlign:"center"}}>Hedef: {dailyGoal} kcal</div>
+      </div>
 
-        {/* Weekly stats */}
-        <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:8,marginBottom:14}}>
-          {[
-            {icon:"⏱",val:`${tMin} dk`,label:"Haftalık Spor",color:"#3b82f6"},
-            {icon:"🔥",val:`${burnedCal}`,label:"Yakılan kcal",color:"#ef4444"},
-            {icon:"📏",val:`${tDist.toFixed(1)} km`,label:"Mesafe",color:"#22c55e"},
-            {icon:"💪",val:wk.length,label:"Antrenman",color:"#f97316"},
-          ].map((s,i)=>(
-            <div key={i} style={{...cardStyle,padding:"14px",borderLeft:`3px solid ${s.color}`,boxShadow:`0 0 16px ${s.color}18`}}>
-              <div style={{fontSize:11,opacity:.5}}>{s.icon} {s.label}</div>
-              <div style={{fontSize:20,fontWeight:800,color:s.color,marginTop:4}}>{s.val}</div>
+      {/* +Yemek / +Spor butonları */}
+      <div className="stagger-3" style={{display:"flex",gap:8,marginBottom:14}}>
+        <button onClick={()=>{setFoodModal(true);setFoodSearch("");}} style={{
+          flex:1,background:"rgba(249,115,22,0.1)",color:"#f97316",
+          border:"1px solid rgba(249,115,22,0.3)",borderRadius:12,
+          padding:"14px 8px",fontSize:14,fontWeight:700,cursor:"pointer",
+          display:"flex",alignItems:"center",justifyContent:"center",gap:6,
+        }}>
+          <span style={{fontSize:18}}>+</span> Yemek Ekle
+        </button>
+        <button onClick={()=>setModal(true)} style={{
+          flex:1,background:"rgba(34,197,94,0.1)",color:"#22c55e",
+          border:"1px solid rgba(34,197,94,0.3)",borderRadius:12,
+          padding:"14px 8px",fontSize:14,fontWeight:700,cursor:"pointer",
+          display:"flex",alignItems:"center",justifyContent:"center",gap:6,
+        }}>
+          <span style={{fontSize:18}}>+</span> Spor Ekle
+        </button>
+      </div>
+
+      {hasAI&&(
+        <div style={{marginBottom:12}}>
+          <button onClick={()=>photoRef.current?.click()} disabled={analyzing} style={{
+            ...addBtnStyle,background:analyzing?"#555":"#22c55e",width:"100%",padding:"12px",borderRadius:12,fontSize:14,
+          }}>{analyzing?"🔄 Analiz ediliyor...":"📸 Fotoğrafla Kalori Hesapla"}</button>
+          <input ref={photoRef} type="file" accept="image/*" capture="environment"
+            onChange={e=>{if(e.target.files?.[0])analyzePhoto(e.target.files[0]);e.target.value="";}}
+            style={{display:"none"}}/>
+        </div>
+      )}
+
+      {/* AI Result card */}
+      {aiResult&&!aiResult.error&&(
+        <div style={{background:"rgba(34,197,94,0.08)",border:"1px solid rgba(34,197,94,0.2)",borderRadius:14,padding:14,marginBottom:12}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+            <span style={{fontSize:13,fontWeight:700,color:"#22c55e"}}>🤖 AI Analiz Sonucu</span>
+            <span style={{fontSize:14,fontWeight:800,color:"#f97316"}}>{aiResult.total} kcal</span>
+          </div>
+          {aiResult.items.map((item,i)=>(
+            <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"4px 0",fontSize:13}}>
+              <span style={{opacity:.7}}>{item.name}</span>
+              <span style={{fontWeight:600,color:"#f97316"}}>{item.calories} kcal</span>
             </div>
           ))}
+          <div style={{display:"flex",gap:8,marginTop:10}}>
+            <button onClick={saveAiResult} style={{...btnPrimary,flex:1,marginTop:0,background:"#22c55e",padding:"10px"}}>✓ Kaydet</button>
+            <button onClick={()=>setAiResult(null)} style={{...btnPrimary,flex:1,marginTop:0,background:"rgba(239,68,68,0.15)",color:"#ef4444",padding:"10px",border:"1px solid rgba(239,68,68,0.2)"}}>✕ İptal</button>
+          </div>
         </div>
-      </>)}
+      )}
+      {aiResult?.error&&(
+        <div style={{background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:14,padding:14,marginBottom:12}}>
+          <span style={{fontSize:13,color:"#ef4444"}}>{aiResult.error}</span>
+          <button onClick={()=>setAiResult(null)} style={{display:"block",marginTop:6,background:"none",border:"none",color:"#ef4444",fontSize:12,cursor:"pointer",textDecoration:"underline"}}>Kapat</button>
+        </div>
+      )}
 
-      {/* ── SPORT ── */}
-      {view==="sport"&&(<>
-        {data.sports.length===0&&(
-          <div style={{textAlign:"center",padding:"40px 20px"}}>
-            <div style={{fontSize:40,marginBottom:8}}>🏃</div>
-            <div style={{fontSize:14,fontWeight:600,opacity:.4,marginBottom:4}}>Henüz antrenman kaydı yok</div>
-            <div style={{fontSize:12,opacity:.25}}>Sağ alttaki + butonuna bas</div>
-          </div>
-        )}
-        {data.sports.slice(0,30).map(s=>(
-          <div key={s.id} style={{...cardStyle,display:"flex",alignItems:"center",gap:12}}>
-            <div style={{fontSize:24,width:44,height:44,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(255,255,255,0.04)",borderRadius:12}}>{SPORT_EMOJI[s.type]||"⚡"}</div>
-            <div style={{flex:1,minWidth:0}}>
-              <div style={{fontSize:15,fontWeight:600}}>{s.type}</div>
-              <div style={{fontSize:12,opacity:.5}}>{s.date} · {s.duration}dk {s.distance>0&&`· ${s.distance}km`} {s.calories>0&&`· ${s.calories}kcal`}</div>
-            </div>
-            <button onClick={()=>delSport(s.id)} style={delBtnStyle}>✕</button>
-          </div>
-        ))}
-      </>)}
-
-      {/* ── FOOD ── */}
-      {view==="food"&&(<>
-        {hasAI&&(
-          <div style={{marginBottom:10}}>
-            <button onClick={()=>photoRef.current?.click()} disabled={analyzing} style={{
-              ...addBtnStyle,background:analyzing?"#555":"#22c55e",width:"100%",padding:"12px",borderRadius:12,fontSize:14,
-            }}>{analyzing?"🔄 Analiz ediliyor...":"📸 Fotoğrafla Kalori Hesapla"}</button>
-            <input ref={photoRef} type="file" accept="image/*" capture="environment"
-              onChange={e=>{if(e.target.files?.[0])analyzePhoto(e.target.files[0]);e.target.value="";}}
-              style={{display:"none"}}/>
-          </div>
-        )}
-
-        {/* AI Result card */}
-        {aiResult&&!aiResult.error&&(
-          <div style={{background:"rgba(34,197,94,0.08)",border:"1px solid rgba(34,197,94,0.2)",borderRadius:14,padding:14,marginBottom:12}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
-              <span style={{fontSize:13,fontWeight:700,color:"#22c55e"}}>🤖 AI Analiz Sonucu</span>
-              <span style={{fontSize:14,fontWeight:800,color:"#f97316"}}>{aiResult.total} kcal</span>
-            </div>
-            {aiResult.items.map((item,i)=>(
-              <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"4px 0",fontSize:13}}>
-                <span style={{opacity:.7}}>{item.name}</span>
-                <span style={{fontWeight:600,color:"#f97316"}}>{item.calories} kcal</span>
-              </div>
-            ))}
-            <div style={{display:"flex",gap:8,marginTop:10}}>
-              <button onClick={saveAiResult} style={{...btnPrimary,flex:1,marginTop:0,background:"#22c55e",padding:"10px"}}>✓ Kaydet</button>
-              <button onClick={()=>setAiResult(null)} style={{...btnPrimary,flex:1,marginTop:0,background:"rgba(239,68,68,0.15)",color:"#ef4444",padding:"10px",border:"1px solid rgba(239,68,68,0.2)"}}>✕ İptal</button>
-            </div>
-          </div>
-        )}
-        {aiResult?.error&&(
-          <div style={{background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:14,padding:14,marginBottom:12}}>
-            <span style={{fontSize:13,color:"#ef4444"}}>{aiResult.error}</span>
-            <button onClick={()=>setAiResult(null)} style={{display:"block",marginTop:6,background:"none",border:"none",color:"#ef4444",fontSize:12,cursor:"pointer",textDecoration:"underline"}}>Kapat</button>
-          </div>
-        )}
-
-        {!hasAI&&(
-          <div style={{background:"rgba(59,130,246,0.06)",border:"1px solid rgba(59,130,246,0.15)",borderRadius:12,padding:12,marginBottom:12,textAlign:"center"}}>
-            <div style={{fontSize:12,opacity:.6,marginBottom:4}}>📸 Fotoğrafla kalori hesaplamak için</div>
-            <div style={{fontSize:11,opacity:.4}}>Ayarlar → AI Kalori Asistanı'ndan bir AI seç ve API anahtarını gir</div>
-          </div>
-        )}
-
-        {/* Today's meals grouped */}
-        {mealGroups.map(meal=>{
+      {/* ── Bugünün Yemekleri ── */}
+      <div style={{marginBottom:14}}>
+        <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em",marginBottom:8}}>Bugünün Yemekleri</div>
+        {todayFoods.length===0 ? (
+          <div style={{textAlign:"center",padding:"20px",opacity:.3,fontSize:13}}>Henüz yemek kaydı yok</div>
+        ) : mealGroups.map(meal=>{
           const mealFoods=todayFoods.filter(f=>f.meal===meal);
           if(mealFoods.length===0)return null;
           const mealCal=mealFoods.reduce((a,f)=>a+(f.calories||0),0);
           return (
-            <div key={meal} style={{marginBottom:12}}>
-              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
-                <span style={{fontSize:13,fontWeight:700,opacity:.7}}>{meal}</span>
-                <span style={{fontSize:12,fontWeight:600,color:"#f97316"}}>{mealCal} kcal</span>
+            <div key={meal} style={{marginBottom:10}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}>
+                <span style={{fontSize:12,fontWeight:700,opacity:.6}}>{meal}</span>
+                <span style={{fontSize:11,fontWeight:600,color:"#f97316"}}>{mealCal} kcal</span>
               </div>
               {mealFoods.map(f=>(
-                <div key={f.id} style={{...cardStyle,display:"flex",alignItems:"center",gap:10}}>
-                  <span style={{fontSize:14,flex:1}}>{f.name}</span>
-                  <span style={{fontSize:13,fontWeight:600,color:"#f97316"}}>{f.calories}</span>
+                <div key={f.id} style={{...cardStyle,display:"flex",alignItems:"center",gap:10,padding:"10px 14px"}}>
+                  <span style={{fontSize:13,flex:1}}>{f.name}</span>
+                  <span style={{fontSize:12,fontWeight:600,color:"#f97316"}}>{f.calories}</span>
                   <button onClick={()=>delFood(f.id)} style={delBtnStyle}>✕</button>
                 </div>
               ))}
             </div>
           );
         })}
-        {todayFoods.length===0&&!aiResult&&(
-          <div style={{textAlign:"center",padding:"40px 20px"}}>
-            <div style={{fontSize:40,marginBottom:8}}>🍽</div>
-            <div style={{fontSize:14,fontWeight:600,opacity:.4,marginBottom:4}}>Bugün yemek kaydı yok</div>
-            <div style={{fontSize:12,opacity:.25}}>+ butonuna basarak ekle</div>
+      </div>
+
+      {/* ── Bugünün Sporları ── */}
+      <div style={{marginBottom:14}}>
+        <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em",marginBottom:8}}>Bugünün Sporları</div>
+        {todaySports.length===0 ? (
+          <div style={{textAlign:"center",padding:"20px",opacity:.3,fontSize:13}}>Henüz spor kaydı yok</div>
+        ) : todaySports.map(s=>(
+          <div key={s.id} style={{...cardStyle,display:"flex",alignItems:"center",gap:10,padding:"10px 14px"}}>
+            <div style={{fontSize:20,width:36,height:36,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(34,197,94,0.1)",borderRadius:10}}>{SPORT_EMOJI[s.type]||"⚡"}</div>
+            <div style={{flex:1,minWidth:0}}>
+              <div style={{fontSize:14,fontWeight:600}}>{s.type}</div>
+              <div style={{fontSize:11,opacity:.5}}>{s.duration}dk {s.distance>0&&`· ${s.distance}km`} · {s.calories||calcSportCal(s.type,s.duration)} kcal</div>
+            </div>
+            <button onClick={()=>delSport(s.id)} style={delBtnStyle}>✕</button>
           </div>
-        )}
-      </>)}
+        ))}
+      </div>
 
-      {view==="sport"&&<FAB onClick={()=>setModal(true)} color="#22c55e"/>}
-      {view==="food"&&<FAB onClick={()=>setFoodModal(true)} color="#f97316"/>}
+      {/* ── Haftalık Özet ── */}
+      <div style={{marginBottom:14}}>
+        <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em",marginBottom:8}}>Bu Hafta</div>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:8}}>
+          {[
+            {icon:"⏱",val:`${tMin} dk`,label:"Spor süresi",color:"#3b82f6"},
+            {icon:"🔥",val:`${burnedCal}`,label:"Yakılan kcal",color:"#ef4444"},
+            {icon:"📏",val:`${tDist.toFixed(1)} km`,label:"Mesafe",color:"#22c55e"},
+            {icon:"💪",val:wk.length,label:"Antrenman",color:"#f97316"},
+          ].map((s,i)=>(
+            <div key={i} style={{...cardStyle,padding:"12px",borderLeft:`3px solid ${s.color}`,boxShadow:`0 0 12px ${s.color}15`}}>
+              <div style={{fontSize:10,opacity:.5}}>{s.icon} {s.label}</div>
+              <div style={{fontSize:18,fontWeight:800,color:s.color,marginTop:3}}>{s.val}</div>
+            </div>
+          ))}
+        </div>
+      </div>
 
-      {/* Sport Modal */}
-      <Modal open={modal} onClose={()=>setModal(false)} title="Yeni Antrenman">
-        <div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:12}}>
-          {SPORT_TYPES.map(t=>(
-            <button key={t} onClick={()=>setForm({...form,type:t})} style={{
-              background:form.type===t?"rgba(59,130,246,0.2)":"rgba(255,255,255,0.04)",
-              color:form.type===t?"#3b82f6":"#aaa",
-              border:form.type===t?"1px solid rgba(59,130,246,0.3)":"1px solid rgba(255,255,255,0.06)",
-              padding:"8px 14px",borderRadius:10,fontSize:14,cursor:"pointer",
-            }}>{SPORT_EMOJI[t]} {t}</button>
+      {/* ═══ YEMEK EKLEME MODAL ═══ */}
+      <Modal open={foodModal} onClose={()=>{setFoodModal(false);setFoodSearch("");}} title="Yemek Ekle">
+        <div style={{marginBottom:12}}>
+          <div style={{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap"}}>
+            {mealGroups.map(m=>(
+              <button key={m} onClick={()=>setFoodForm({...foodForm,meal:m})} style={{
+                background:foodForm.meal===m?"rgba(59,130,246,0.2)":"rgba(255,255,255,0.04)",
+                color:foodForm.meal===m?"#3b82f6":"#aaa",
+                border:foodForm.meal===m?"1px solid rgba(59,130,246,0.3)":"1px solid rgba(255,255,255,0.06)",
+                padding:"7px 12px",borderRadius:10,fontSize:13,cursor:"pointer",
+              }}>{m}</button>
+            ))}
+          </div>
+          <input style={inp} placeholder="🔍 Yemek ara (pancake, pilav, salata...)" value={foodSearch||foodForm.name}
+            onChange={e=>{
+              const v=e.target.value;
+              setFoodSearch(v);
+              const exactMatch = allFoodDB[v];
+              setFoodForm({...foodForm,name:v,calories:exactMatch?String(exactMatch):""});
+            }}/>
+          {(foodSearch||!foodForm.name)&&(
+            <div style={{maxHeight:180,overflow:"auto",marginBottom:10}}>
+              {!foodSearch&&Object.keys(myFoods).length>0&&(
+                <div style={{fontSize:10,opacity:.4,padding:"4px 8px",fontWeight:700}}>⭐ Benim Yemeklerim</div>
+              )}
+              {filteredFoods.map(([name,cal,source])=>(
+                <div key={name} onClick={()=>selectCommonFood(name,cal)} style={{
+                  display:"flex",justifyContent:"space-between",alignItems:"center",padding:"9px 10px",cursor:"pointer",
+                  borderRadius:8,background:"rgba(255,255,255,0.03)",marginBottom:2,
+                }}>
+                  <div style={{display:"flex",alignItems:"center",gap:6}}>
+                    {(source==="my"||myFoods[name])&&<span style={{fontSize:10,color:"#f59e0b"}}>⭐</span>}
+                    <span style={{fontSize:13}}>{name}</span>
+                  </div>
+                  <span style={{fontSize:12,color:"#f97316",fontWeight:600}}>{cal} kcal</span>
+                </div>
+              ))}
+              {noResults&&(
+                <div style={{textAlign:"center",padding:12}}>
+                  <p style={{fontSize:12,opacity:.4,margin:"0 0 8px"}}>"{foodSearch}" bulunamadı</p>
+                  {hasAI?(
+                    <button onClick={()=>askAiCalorie(foodSearch)} disabled={aiLookup} style={{
+                      background:"rgba(34,197,94,0.15)",color:"#22c55e",border:"1px solid rgba(34,197,94,0.3)",
+                      padding:"8px 16px",borderRadius:10,fontSize:13,cursor:"pointer",fontWeight:600,
+                    }}>{aiLookup?"🔄 AI hesaplıyor...":"🤖 AI'a Kaloriyi Sor"}</button>
+                  ):(
+                    <p style={{fontSize:11,opacity:.3}}>Kaloriyi elle gir veya Ayarlar'dan AI aç</p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+          <div style={{display:"flex",gap:8}}>
+            <input style={{...inp,flex:2}} placeholder="Yemek adı" value={foodForm.name} onChange={e=>setFoodForm({...foodForm,name:e.target.value})}/>
+            <div style={{flex:1,position:"relative"}}>
+              <input style={{...inp,paddingRight:hasAI?36:14}} type="number" placeholder="kcal" value={foodForm.calories} onChange={e=>setFoodForm({...foodForm,calories:e.target.value})}/>
+              {hasAI&&foodForm.name&&!foodForm.calories&&(
+                <button onClick={()=>askAiCalorie(foodForm.name)} disabled={aiLookup} style={{
+                  position:"absolute",right:8,top:8,background:"none",border:"none",
+                  fontSize:16,cursor:"pointer",opacity:aiLookup?.4:.8,
+                }} title="AI'a sor">{aiLookup?"⏳":"🤖"}</button>
+              )}
+            </div>
+          </div>
+          {foodForm.name&&foodForm.calories&&!allFoodDB[foodForm.name.trim()]&&(
+            <div style={{fontSize:10,opacity:.4,marginBottom:8,display:"flex",alignItems:"center",gap:4}}>
+              <span>⭐</span> "{foodForm.name}" kişisel listene kaydedilecek
+            </div>
+          )}
+          <input style={inp} type="date" value={foodForm.date} onChange={e=>setFoodForm({...foodForm,date:e.target.value})}/>
+          <button style={{...btnPrimary,background:"linear-gradient(135deg,#f97316,#ef4444)"}} onClick={()=>{addFood();setFoodModal(false);setFoodSearch("");}}>Ekle</button>
+        </div>
+      </Modal>
+
+      {/* ═══ SPOR EKLEME MODAL ═══ */}
+      <Modal open={modal} onClose={()=>setModal(false)} title="Spor Ekle">
+        <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:12}}>
+          {SPORT_TYPES.map(s=>(
+            <button key={s} onClick={()=>setForm({...form,type:s})} style={{
+              background:form.type===s?"rgba(34,197,94,0.2)":"rgba(255,255,255,0.04)",
+              color:form.type===s?"#22c55e":"#aaa",
+              border:form.type===s?"1px solid rgba(34,197,94,0.3)":"1px solid rgba(255,255,255,0.06)",
+              padding:"7px 14px",borderRadius:10,fontSize:13,cursor:"pointer",
+              display:"flex",alignItems:"center",gap:4,
+            }}><span>{SPORT_EMOJI[s]}</span>{s}</button>
           ))}
         </div>
         <div style={{display:"flex",gap:8}}>
-          <input style={{...inp,flex:1}} type="number" placeholder="Süre (dk)" value={form.duration} onChange={e=>setForm({...form,duration:e.target.value})}/>
+          <input style={{...inp,flex:1}} type="number" placeholder="Süre (dk)" value={form.duration} onChange={e=>setForm({...form,duration:e.target.value,calories:String(calcSportCal(form.type,e.target.value))})}/>
           <input style={{...inp,flex:1}} type="number" placeholder="Mesafe (km)" value={form.distance} onChange={e=>setForm({...form,distance:e.target.value})}/>
         </div>
         <div style={{display:"flex",gap:8}}>
-          <div style={{flex:1,position:"relative"}}>
-            <input style={inp} type="number" placeholder="Yakılan kalori (opsiyonel)" value={form.calories} onChange={e=>setForm({...form,calories:e.target.value})}/>
-            {form.duration&&!form.calories&&(
-              <div style={{fontSize:11,color:"#22c55e",marginTop:-8,marginBottom:8,paddingLeft:4,opacity:.8}}>
-                ≈ {calcSportCal(form.type,form.duration)} kcal otomatik hesaplanacak
-              </div>
-            )}
-          </div>
+          <input style={{...inp,flex:1}} type="number" placeholder="Kalori (kcal)" value={form.calories} onChange={e=>setForm({...form,calories:e.target.value})}/>
           <input style={{...inp,flex:1}} type="date" value={form.date} onChange={e=>setForm({...form,date:e.target.value})}/>
         </div>
         <input style={inp} placeholder="Notlar (opsiyonel)" value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})}/>
-        <button style={btnPrimary} onClick={addSport}>Kaydet</button>
-      </Modal>
-
-      {/* Food Modal */}
-      <Modal open={foodModal} onClose={()=>{setFoodModal(false);setFoodSearch("");setAiLookup(false);}} title="Yemek Ekle">
-        <div style={{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap"}}>
-          {mealGroups.map(m=>(
-            <button key={m} onClick={()=>setFoodForm({...foodForm,meal:m})} style={{
-              background:foodForm.meal===m?"rgba(59,130,246,0.2)":"rgba(255,255,255,0.04)",
-              color:foodForm.meal===m?"#3b82f6":"#aaa",
-              border:foodForm.meal===m?"1px solid rgba(59,130,246,0.3)":"1px solid rgba(255,255,255,0.06)",
-              padding:"7px 12px",borderRadius:10,fontSize:13,cursor:"pointer",
-            }}>{m}</button>
-          ))}
-        </div>
-
-        {/* Smart search input */}
-        <input style={inp} placeholder="🔍 Yemek ara (pancake, pilav, salata...)" value={foodSearch||foodForm.name}
-          onChange={e=>{
-            const v=e.target.value;
-            setFoodSearch(v);
-            // Auto-fill calories if exact match found
-            const exactMatch = allFoodDB[v];
-            setFoodForm({...foodForm,name:v,calories:exactMatch?String(exactMatch):""});
-          }}/>
-
-        {/* Search results */}
-        {(foodSearch||!foodForm.name)&&(
-          <div style={{maxHeight:180,overflow:"auto",marginBottom:10}}>
-            {/* Personal foods section */}
-            {!foodSearch&&Object.keys(myFoods).length>0&&(
-              <div style={{fontSize:10,opacity:.4,padding:"4px 8px",fontWeight:700}}>⭐ Benim Yemeklerim</div>
-            )}
-            {filteredFoods.map(([name,cal,source])=>(
-              <div key={name} onClick={()=>selectCommonFood(name,cal)} style={{
-                display:"flex",justifyContent:"space-between",alignItems:"center",padding:"9px 10px",cursor:"pointer",
-                borderRadius:8,background:"rgba(255,255,255,0.03)",marginBottom:2,
-              }}>
-                <div style={{display:"flex",alignItems:"center",gap:6}}>
-                  {(source==="my"||myFoods[name])&&<span style={{fontSize:10,color:"#f59e0b"}}>⭐</span>}
-                  <span style={{fontSize:13}}>{name}</span>
-                </div>
-                <span style={{fontSize:12,color:"#f97316",fontWeight:600}}>{cal} kcal</span>
-              </div>
-            ))}
-            {/* No results + AI button */}
-            {noResults&&(
-              <div style={{textAlign:"center",padding:12}}>
-                <p style={{fontSize:12,opacity:.4,margin:"0 0 8px"}}>"{foodSearch}" bulunamadı</p>
-                {hasAI?(
-                  <button onClick={()=>askAiCalorie(foodSearch)} disabled={aiLookup} style={{
-                    background:"rgba(34,197,94,0.15)",color:"#22c55e",border:"1px solid rgba(34,197,94,0.3)",
-                    padding:"8px 16px",borderRadius:10,fontSize:13,cursor:"pointer",fontWeight:600,
-                  }}>{aiLookup?"🔄 AI hesaplıyor...":"🤖 AI'a Kaloriyi Sor"}</button>
-                ):(
-                  <p style={{fontSize:11,opacity:.3}}>Kaloriyi elle gir veya Ayarlar'dan AI aç</p>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Name + calorie inputs */}
-        <div style={{display:"flex",gap:8}}>
-          <input style={{...inp,flex:2}} placeholder="Yemek adı" value={foodForm.name} onChange={e=>setFoodForm({...foodForm,name:e.target.value})}/>
-          <div style={{flex:1,position:"relative"}}>
-            <input style={{...inp,paddingRight:hasAI?36:14}} type="number" placeholder="kcal" value={foodForm.calories} onChange={e=>setFoodForm({...foodForm,calories:e.target.value})}/>
-            {hasAI&&foodForm.name&&!foodForm.calories&&(
-              <button onClick={()=>askAiCalorie(foodForm.name)} disabled={aiLookup} style={{
-                position:"absolute",right:8,top:8,background:"none",border:"none",
-                fontSize:16,cursor:"pointer",opacity:aiLookup?.4:.8,
-              }} title="AI'a sor">{aiLookup?"⏳":"🤖"}</button>
-            )}
-          </div>
-        </div>
-
-        {/* Auto-save info */}
-        {foodForm.name&&foodForm.calories&&!allFoodDB[foodForm.name.trim()]&&(
-          <div style={{fontSize:10,opacity:.4,marginBottom:8,display:"flex",alignItems:"center",gap:4}}>
-            <span>⭐</span> Ekledikten sonra "{foodForm.name}" kişisel listene kaydedilecek
-          </div>
-        )}
-
-        <input style={inp} type="date" value={foodForm.date} onChange={e=>setFoodForm({...foodForm,date:e.target.value})}/>
-        <button style={btnPrimary} onClick={addFood}>Ekle</button>
-
-        {/* Personal food list management */}
-        {Object.keys(myFoods).length>0&&(
-          <div style={{marginTop:16,borderTop:"1px solid rgba(255,255,255,0.06)",paddingTop:12}}>
-            <div style={{fontSize:12,fontWeight:700,opacity:.5,marginBottom:8}}>⭐ Kişisel Yemek Listen ({Object.keys(myFoods).length})</div>
-            <div style={{maxHeight:120,overflow:"auto"}}>
-              {Object.entries(myFoods).map(([name,cal])=>(
-                <div key={name} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"4px 0",fontSize:12}}>
-                  <span style={{opacity:.6}}>{name}</span>
-                  <div style={{display:"flex",alignItems:"center",gap:8}}>
-                    <span style={{color:"#f97316",fontWeight:600}}>{cal} kcal</span>
-                    <button onClick={()=>delMyFood(name)} style={{background:"none",border:"none",color:"#555",fontSize:12,cursor:"pointer"}}>✕</button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        <button style={{...btnPrimary,background:"linear-gradient(135deg,#22c55e,#14b8a6)"}} onClick={()=>{addSport();setModal(false);}}>Ekle</button>
       </Modal>
     </div>
   );
