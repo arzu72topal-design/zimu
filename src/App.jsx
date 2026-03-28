@@ -284,40 +284,29 @@ function FAB({ onClick, color="#3b82f6" }) {
 function Dashboard({ data, setTab, update }) {
   const t = today();
   const foods = data.foods || [];
-  const rooms = data.rooms || [...DEFAULT_ROOMS];
-  const roomItems = data.roomItems || {};
 
   const pending = data.tasks.filter(x=>!x.done).length;
-  const done = data.tasks.filter(x=>x.done).length;
   const overdue = data.tasks.filter(x=>!x.done && x.dueDate && x.dueDate < t).length;
-  const urgentTasks = data.tasks
-    .filter(x=>!x.done)
-    .sort((a,b)=>{const po={high:0,medium:1,low:2};return (po[a.priority]||1)-(po[b.priority]||1);})
-    .slice(0,3);
-
-  const todayEv = data.events.filter(e=>e.date===t);
-  const upcoming = data.events.filter(e=>e.date>=t).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,3);
-
-  const wkSport = data.sports.filter(s=>{const d=(new Date()-new Date(s.date))/864e5;return d>=0&&d<=7;});
-  const wkMin = wkSport.reduce((a,s)=>a+(s.duration||0),0);
-  const wkBurned = wkSport.reduce((a,s)=>a+(s.calories||0),0);
-  const todayFoods = foods.filter(f=>f.date===t);
-  const todayCalIn = todayFoods.reduce((a,f)=>a+(f.calories||0),0);
-  const todayCalOut = data.sports.filter(s=>s.date===t).reduce((a,s)=>a+(s.calories||0),0);
+  const todayEv = data.events.filter(e=>e.date===t).length;
   const activeProjects = data.projects.filter(p=>p.status!=="Tamamlandı").length;
+  const upcomingEv = data.events.filter(e=>e.date>=t).length;
+
+  const todayFoods = foods.filter(f=>f.date===t);
+  const todayCalIn  = todayFoods.reduce((a,f)=>a+(f.calories||0),0);
+  const todayCalOut = data.sports.filter(s=>s.date===t).reduce((a,s)=>a+(s.calories||0),0);
+  const netCal = todayCalIn - todayCalOut;
+  const dailyGoal = 2000;
+  const calPct = Math.min(100, Math.round(todayCalIn / dailyGoal * 100));
 
   const hour = new Date().getHours();
   const greeting = hour<12 ? "Günaydın" : hour<18 ? "İyi günler" : "İyi akşamlar";
 
-  // Daily thoughts (3 slots)
   const thoughts = data.dailyThoughts || ["","",""];
   const updateThought = (i, val) => {
-    const next = [...thoughts];
-    next[i] = val;
+    const next = [...thoughts]; next[i] = val;
     update({ ...data, dailyThoughts: next });
   };
 
-  // Live news headlines
   const [headlines, setHeadlines] = useState([]);
   useEffect(() => {
     let cancelled = false;
@@ -329,9 +318,7 @@ function Dashboard({ data, setTab, update }) {
         if (!res || !res.ok) return;
         const text = res.url?.includes("allorigins") ? JSON.parse(await res.text()).contents : await res.text();
         const titles = [...text.matchAll(/<title><!\[CDATA\[(.+?)\]\]><\/title>|<title>([^<]+)<\/title>/g)]
-          .slice(1, 6)
-          .map(m => (m[1] || m[2] || "").trim())
-          .filter(t => t.length > 5);
+          .slice(1, 6).map(m => (m[1] || m[2] || "").trim()).filter(t => t.length > 5);
         if (!cancelled) setHeadlines(titles);
       } catch {}
     }
@@ -341,137 +328,158 @@ function Dashboard({ data, setTab, update }) {
 
   const musicItems = (data.roomItems || {})["music"] || [];
 
-  const scheduleItems = [
-    ...urgentTasks.slice(0,2).map(tk=>({ type:"task", id:tk.id, title:tk.title, sub:PRIORITIES[tk.priority]+" öncelik", color:PCOL[tk.priority] })),
-    ...upcoming.slice(0,2).map(e=>({ type:"event", id:e.id, title:e.title, sub:e.time||e.date.slice(5), color:e.color||"#a855f7" })),
-  ].slice(0,4);
+  const STYLE_QUOTES = [
+    "Giydiğin şey, söylemeden önce söylediğindir.",
+    "Stil bir ifade şeklidir — kelimeler olmadan.",
+    "En iyi kıyafet, kendini iyi hissettiren kıyafettir.",
+    "Sadelik en yüksek şıklıktır.",
+    "Dolaptan ne çıkıyor — bugün kim olmak istiyorsun?",
+  ];
+  const styleQuote = STYLE_QUOTES[new Date().getDay() % STYLE_QUOTES.length];
+
+  // Stil verisi
+  const stilData = data.stilData || {};
+  const wardrobe = stilData.wardrobe || [];
+  const freqScore = wardrobe.length===0 ? 0 : Math.round(wardrobe.filter(w=>w.freq>50).length/wardrobe.length*100);
 
   return (
     <div>
       {/* HERO */}
       <div style={{
-        background:"linear-gradient(135deg,rgba(26,36,72,0.9) 0%,rgba(28,28,46,0.7) 60%,rgba(31,26,46,0.9) 100%)",
+        background:"linear-gradient(135deg,rgba(26,36,72,0.9),rgba(28,28,46,0.7),rgba(31,26,46,0.9))",
         backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",
-        borderRadius:20,padding:"20px 18px 18px",marginBottom:14,
+        borderRadius:20,padding:"20px 18px 16px",marginBottom:12,
         border:"1px solid rgba(255,255,255,0.1)",
-        boxShadow:"0 0 40px rgba(59,130,246,0.08), 0 8px 32px rgba(0,0,0,0.4)",
+        boxShadow:"0 0 40px rgba(59,130,246,0.08),0 8px 32px rgba(0,0,0,0.4)",
       }}>
-        <h2 style={{margin:0,fontSize:23,fontWeight:800,letterSpacing:-.5}}>{greeting}! 👋</h2>
-        <p style={{margin:"4px 0 16px",opacity:.45,fontSize:13}}>
+        <h2 style={{margin:0,fontSize:22,fontWeight:800,letterSpacing:-.5}}>{greeting}! 👋</h2>
+        <p style={{margin:"4px 0 0",opacity:.4,fontSize:12}}>
           {new Date().toLocaleDateString("tr-TR",{weekday:"long",day:"numeric",month:"long"})}
         </p>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
-          {[
-            {label:"Bekleyen görev",val:pending,color:"#3b82f6",tab:"tasks"},
-            {label:"Bugün etkinlik",val:todayEv.length,color:"#a855f7",tab:"calendar"},
-            {label:"kcal alındı",val:todayCalIn,color:"#f97316",tab:"sports"},
-            {label:"Aktif proje",val:activeProjects,color:"#22c55e",tab:"projects"},
-          ].map(s=>(
-            <div key={s.tab} onClick={()=>setTab(s.tab)} style={{
-              background:`linear-gradient(135deg,${s.color}18,${s.color}08)`,
-              backdropFilter:"blur(8px)",
-              borderRadius:14,padding:"12px 14px",cursor:"pointer",
-              border:`1px solid ${s.color}40`,
-              boxShadow:`0 0 20px ${s.color}15, inset 0 1px 0 ${s.color}20`,
-              transition:"transform .15s, box-shadow .15s",
-            }}>
-              <div style={{fontSize:24,fontWeight:800,color:s.color,letterSpacing:-.5}}>{s.val}</div>
-              <div style={{fontSize:11,color:s.color,opacity:.8,marginTop:2}}>{s.label}</div>
-            </div>
-          ))}
-        </div>
       </div>
 
-      {/* Quick actions */}
-      <div style={{display:"flex",gap:8,marginBottom:14}}>
-        {[
-          {label:"+ Görev",tab:"tasks",color:"#3b82f6"},
-          {label:"+ Yemek",tab:"sports",color:"#f97316"},
-          {label:"+ Spor",tab:"sports",color:"#22c55e"},
-        ].map(a=>(
-          <button key={a.label} onClick={()=>setTab(a.tab)} style={{
-            flex:1,background:`${a.color}12`,backdropFilter:"blur(8px)",color:a.color,border:`1px solid ${a.color}40`,
-            borderRadius:12,padding:"10px 4px",fontSize:12,fontWeight:700,cursor:"pointer",
-            boxShadow:`0 0 16px ${a.color}15`,
-          }}>{a.label}</button>
-        ))}
-      </div>
-
-      {overdue>0&&(
-        <div onClick={()=>setTab("tasks")} style={{
-          background:"rgba(239,68,68,0.1)",backdropFilter:"blur(8px)",border:"1px solid rgba(239,68,68,0.3)",
-          borderRadius:14,padding:"12px 14px",marginBottom:12,
-          display:"flex",alignItems:"center",gap:10,cursor:"pointer",
-          boxShadow:"0 0 20px rgba(239,68,68,0.1)",
-        }}>
-          <span style={{fontSize:20}}>🚨</span>
-          <div style={{flex:1}}>
-            <div style={{fontSize:14,fontWeight:700,color:"#ef4444"}}>{overdue} gecikmiş görev!</div>
-            <div style={{fontSize:11,opacity:.5}}>Hemen kontrol et</div>
-          </div>
-          <span style={{fontSize:14,opacity:.3}}>▶</span>
+      {/* KART 1 — GÜNDEM */}
+      <div onClick={()=>setTab("gundem")} style={{
+        background:"linear-gradient(135deg,rgba(59,130,246,0.1),rgba(99,102,241,0.08))",
+        border:"1px solid rgba(59,130,246,0.25)",borderRadius:18,padding:"14px 16px",marginBottom:10,cursor:"pointer",
+        boxShadow:"0 0 24px rgba(59,130,246,0.08)",
+      }}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+          <div style={{fontSize:11,fontWeight:700,color:"#3b82f6",opacity:.7,letterSpacing:1,textTransform:"uppercase"}}>Gündem</div>
+          <span style={{fontSize:12,color:"#3b82f6",opacity:.5}}>▶</span>
         </div>
-      )}
-
-      {scheduleItems.length>0&&(
-        <div style={{marginBottom:14}}>
-          <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em",marginBottom:8}}>Bugünün Programı</div>
-          {scheduleItems.map(item=>(
-            <div key={item.id} onClick={()=>setTab(item.type==="task"?"tasks":"calendar")} style={{
-              ...cardStyle,padding:"13px 14px",marginBottom:6,
-              display:"flex",alignItems:"center",gap:12,cursor:"pointer",minHeight:54,
-              border:`1px solid ${item.color}25`,boxShadow:`0 0 16px ${item.color}10`,
-            }}>
-              <div style={{width:3,height:36,background:item.color,borderRadius:2,flexShrink:0}}/>
-              <div style={{flex:1,minWidth:0}}>
-                <div style={{fontSize:14,fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.title}</div>
-                <div style={{fontSize:11,opacity:.4,marginTop:2}}>{item.type==="task"?"Görev":"Etkinlik"} · {item.sub}</div>
-              </div>
-              <span style={{fontSize:11,opacity:.2}}>▶</span>
-            </div>
-          ))}
-        </div>
-      )}
-
-      <div style={{marginBottom:14}}>
-        <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em",marginBottom:8}}>Bu Hafta</div>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8}}>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
           {[
-            {val:wkSport.length,label:"Antrenman",color:"#3b82f6"},
-            {val:wkBurned,label:"kcal yakıldı",color:"#ef4444"},
-            {val:done,label:"Görev bitti",color:"#22c55e"},
+            {val:pending,   label:"bekleyen görev", color:"#3b82f6", alert:overdue>0},
+            {val:todayEv,   label:"bugün etkinlik",  color:"#a855f7"},
+            {val:activeProjects, label:"aktif proje", color:"#22c55e"},
           ].map((s,i)=>(
-            <div key={i} style={{background:"rgba(255,255,255,0.04)",backdropFilter:"blur(8px)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:14,padding:"12px 10px",textAlign:"center",boxShadow:"0 4px 16px rgba(0,0,0,0.2)"}}>
-              <div style={{fontSize:20,fontWeight:800,color:s.color,letterSpacing:-.5}}>{s.val}</div>
-              <div style={{fontSize:10,opacity:.4,marginTop:3,lineHeight:1.2}}>{s.label}</div>
+            <div key={i} style={{background:`${s.color}12`,borderRadius:12,padding:"10px 10px 8px",border:`1px solid ${s.color}30`,textAlign:"center",position:"relative"}}>
+              {s.alert && <div style={{position:"absolute",top:4,right:4,width:7,height:7,borderRadius:"50%",background:"#ef4444"}}/>}
+              <div style={{fontSize:22,fontWeight:800,color:s.color}}>{s.val}</div>
+              <div style={{fontSize:10,color:s.color,opacity:.7,lineHeight:1.3,marginTop:2}}>{s.label}</div>
             </div>
           ))}
         </div>
+        {overdue>0 && (
+          <div style={{marginTop:10,background:"rgba(239,68,68,0.1)",borderRadius:10,padding:"7px 12px",display:"flex",alignItems:"center",gap:8}}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#ef4444" strokeWidth="1.5"/><line x1="12" y1="7" x2="12" y2="13" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/><circle cx="12" cy="17" r="1" fill="#ef4444"/></svg>
+            <span style={{fontSize:12,color:"#ef4444",fontWeight:600}}>{overdue} gecikmiş görev var!</span>
+          </div>
+        )}
       </div>
 
-      {/* ── KAFAMDAKILER ── */}
+      {/* KART 2 — KALORİ */}
+      <div style={{
+        background:"linear-gradient(135deg,rgba(249,115,22,0.1),rgba(34,197,94,0.08))",
+        border:"1px solid rgba(249,115,22,0.22)",borderRadius:18,padding:"14px 16px",marginBottom:10,
+        boxShadow:"0 0 24px rgba(249,115,22,0.06)",
+      }}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+          <div style={{fontSize:11,fontWeight:700,color:"#f97316",opacity:.7,letterSpacing:1,textTransform:"uppercase"}}>Kalori Takibi</div>
+          <button onClick={()=>setTab("lifestyle")} style={{background:"none",border:"none",color:"#f97316",fontSize:12,cursor:"pointer",opacity:.5}}>▶</button>
+        </div>
+        {/* Kalori özet */}
+        <div style={{display:"flex",gap:8,marginBottom:10}}>
+          <div style={{flex:1,background:"rgba(249,115,22,0.1)",borderRadius:12,padding:"10px",textAlign:"center",border:"1px solid rgba(249,115,22,0.2)"}}>
+            <div style={{fontSize:20,fontWeight:800,color:"#f97316"}}>{todayCalIn}</div>
+            <div style={{fontSize:10,opacity:.6,marginTop:2}}>kcal alındı</div>
+          </div>
+          <div style={{display:"flex",alignItems:"center",fontSize:16,opacity:.3}}>−</div>
+          <div style={{flex:1,background:"rgba(34,197,94,0.1)",borderRadius:12,padding:"10px",textAlign:"center",border:"1px solid rgba(34,197,94,0.2)"}}>
+            <div style={{fontSize:20,fontWeight:800,color:"#22c55e"}}>{todayCalOut}</div>
+            <div style={{fontSize:10,opacity:.6,marginTop:2}}>kcal yakıldı</div>
+          </div>
+          <div style={{display:"flex",alignItems:"center",fontSize:16,opacity:.3}}>=</div>
+          <div style={{flex:1,background:netCal>dailyGoal?"rgba(239,68,68,0.1)":"rgba(59,130,246,0.1)",borderRadius:12,padding:"10px",textAlign:"center",border:`1px solid ${netCal>dailyGoal?"rgba(239,68,68,0.2)":"rgba(59,130,246,0.2)"}`}}>
+            <div style={{fontSize:20,fontWeight:800,color:netCal>dailyGoal?"#ef4444":"#3b82f6"}}>{netCal}</div>
+            <div style={{fontSize:10,opacity:.6,marginTop:2}}>net kcal</div>
+          </div>
+        </div>
+        {/* Progress bar */}
+        <div style={{height:6,borderRadius:3,background:"rgba(255,255,255,0.08)",marginBottom:10}}>
+          <div style={{height:"100%",borderRadius:3,background:`linear-gradient(90deg,#f97316,${calPct>100?"#ef4444":"#22c55e"})`,width:`${calPct}%`,transition:"width .6s",maxWidth:"100%"}}/>
+        </div>
+        <div style={{fontSize:10,opacity:.35,marginBottom:10,textAlign:"center"}}>{calPct}% günlük hedef ({dailyGoal} kcal)</div>
+        {/* Quick add buttons */}
+        <div style={{display:"flex",gap:8}}>
+          <button onClick={()=>setTab("lifestyle")} style={{flex:1,background:"rgba(249,115,22,0.15)",border:"1px solid rgba(249,115,22,0.3)",color:"#f97316",borderRadius:12,padding:"9px",fontSize:12,fontWeight:700,cursor:"pointer"}}>+ Yemek</button>
+          <button onClick={()=>setTab("lifestyle")} style={{flex:1,background:"rgba(34,197,94,0.12)",border:"1px solid rgba(34,197,94,0.3)",color:"#22c55e",borderRadius:12,padding:"9px",fontSize:12,fontWeight:700,cursor:"pointer"}}>+ Spor</button>
+        </div>
+      </div>
+
+      {/* KART 3 — STİL MOTİVASYON */}
+      <div onClick={()=>setTab("lifestyle")} style={{
+        background:"linear-gradient(135deg,rgba(99,102,241,0.1),rgba(167,139,250,0.08))",
+        border:"1px solid rgba(167,139,250,0.22)",borderRadius:18,padding:"14px 16px",marginBottom:12,cursor:"pointer",
+        boxShadow:"0 0 24px rgba(167,139,250,0.06)",
+      }}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+          <div style={{fontSize:11,fontWeight:700,color:"#a78bfa",opacity:.7,letterSpacing:1,textTransform:"uppercase"}}>Benim Stilim</div>
+          <span style={{fontSize:12,color:"#a78bfa",opacity:.5}}>▶</span>
+        </div>
+        <div style={{fontSize:13,fontStyle:"italic",color:"rgba(196,181,253,0.8)",lineHeight:1.6,marginBottom:10}}>
+          "{styleQuote}"
+        </div>
+        <div style={{display:"flex",gap:8}}>
+          {wardrobe.length>0 ? (
+            <>
+              <div style={{flex:1,background:"rgba(167,139,250,0.1)",borderRadius:10,padding:"8px",textAlign:"center"}}>
+                <div style={{fontSize:16,fontWeight:700,color:"#a78bfa"}}>{wardrobe.length}</div>
+                <div style={{fontSize:10,opacity:.5}}>dolap parçası</div>
+              </div>
+              <div style={{flex:1,background:"rgba(167,139,250,0.1)",borderRadius:10,padding:"8px",textAlign:"center"}}>
+                <div style={{fontSize:16,fontWeight:700,color:"#a78bfa"}}>{freqScore}%</div>
+                <div style={{fontSize:10,opacity:.5}}>aktif dolap</div>
+              </div>
+              <div style={{flex:1,background:"rgba(167,139,250,0.1)",borderRadius:10,padding:"8px",textAlign:"center"}}>
+                <div style={{fontSize:16,fontWeight:700,color:"#a78bfa"}}>{wardrobe.filter(w=>w.freqStatus==="favorite").length}</div>
+                <div style={{fontSize:10,opacity:.5}}>favori parça</div>
+              </div>
+            </>
+          ) : (
+            <div style={{fontSize:12,opacity:.4,padding:"4px 0"}}>Dolabını ekle → stilini keşfet ✨</div>
+          )}
+        </div>
+      </div>
+
+      {/* KAFAMDAKILER */}
       <div style={{marginBottom:14}}>
-        <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em",marginBottom:8}}>☁️ Bugün Kafamı Kurcalayanlar</div>
-        <div style={{background:"rgba(255,255,255,0.04)",backdropFilter:"blur(12px)",borderRadius:16,padding:"12px 14px",border:"1px solid rgba(20,184,166,0.2)",boxShadow:"0 0 20px rgba(20,184,166,0.08)"}}>
+        <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em",marginBottom:8}}>Bugün Kafamı Kurcalayanlar</div>
+        <div style={{background:"rgba(255,255,255,0.04)",backdropFilter:"blur(12px)",borderRadius:16,padding:"12px 14px",border:"1px solid rgba(20,184,166,0.2)"}}>
           {[0,1,2].map(i=>(
             <div key={i} style={{display:"flex",alignItems:"center",gap:10,marginBottom:i<2?8:0}}>
               <span style={{fontSize:13,opacity:.35,flexShrink:0,fontWeight:700}}>{i+1}.</span>
-              <input
-                value={thoughts[i]||""}
-                onChange={e=>updateThought(i,e.target.value)}
+              <input value={thoughts[i]||""} onChange={e=>updateThought(i,e.target.value)}
                 placeholder={["Bugün en çok düşündüğüm şey...","Kafamı karıştıran bir şey...","Çözmek istediğim bir sorun..."][i]}
-                style={{
-                  flex:1,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.07)",
-                  borderRadius:10,padding:"9px 12px",color:"#e0e0e0",fontSize:13,outline:"none",
-                  WebkitAppearance:"none",boxSizing:"border-box",
-                }}
+                style={{flex:1,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:10,padding:"9px 12px",color:"#e0e0e0",fontSize:13,outline:"none",WebkitAppearance:"none",boxSizing:"border-box"}}
               />
             </div>
           ))}
         </div>
       </div>
 
-      {/* ── MİNİ HABERLER ── */}
+      {/* MİNİ HABERLER */}
       <div style={{marginBottom:14}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
           <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em",display:"flex",alignItems:"center",gap:5}}>
@@ -480,18 +488,14 @@ function Dashboard({ data, setTab, update }) {
           </div>
           <button onClick={()=>setTab("projects")} style={{background:"none",border:"none",color:"#ef4444",fontSize:12,cursor:"pointer",fontWeight:600}}>Tümü ▶</button>
         </div>
-        <div style={{background:"rgba(239,68,68,0.06)",backdropFilter:"blur(12px)",borderRadius:16,padding:"12px 14px",border:"1px solid rgba(239,68,68,0.18)",boxShadow:"0 0 20px rgba(239,68,68,0.06)"}}>
-          {headlines.length === 0 ? (
+        <div style={{background:"rgba(239,68,68,0.06)",backdropFilter:"blur(12px)",borderRadius:16,padding:"12px 14px",border:"1px solid rgba(239,68,68,0.18)"}}>
+          {headlines.length===0 ? (
             <div style={{display:"flex",alignItems:"center",gap:10,opacity:.5}}>
-              <svg width="20" height="20" viewBox="0 0 36 36" fill="none" style={{animation:"pulse 1.5s infinite",flexShrink:0}}><circle cx="18" cy="18" r="13" stroke="#ef4444" strokeWidth="1.5" fill="none"/><path d="M14 18 A4 4 0 0 0 22 18" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round"/><line x1="18" y1="5" x2="18" y2="2" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/><line x1="25" y1="7" x2="27" y2="5" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/><line x1="11" y1="7" x2="9" y2="5" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/></svg>
+              <svg width="20" height="20" viewBox="0 0 36 36" fill="none" style={{animation:"pulse 1.5s infinite",flexShrink:0}}><circle cx="18" cy="18" r="13" stroke="#ef4444" strokeWidth="1.5" fill="none"/></svg>
               <span style={{fontSize:13}}>Haberler yükleniyor...</span>
             </div>
           ) : headlines.slice(0,4).map((title,i)=>(
-            <div key={i} style={{display:"flex",alignItems:"flex-start",gap:10,
-              paddingBottom: i < headlines.slice(0,4).length-1 ? 8 : 0,
-              marginBottom: i < headlines.slice(0,4).length-1 ? 8 : 0,
-              borderBottom: i < headlines.slice(0,4).length-1 ? "1px solid rgba(239,68,68,0.1)" : "none",
-            }}>
+            <div key={i} style={{display:"flex",alignItems:"flex-start",gap:10,paddingBottom:i<3?8:0,marginBottom:i<3?8:0,borderBottom:i<3?"1px solid rgba(239,68,68,0.1)":"none"}}>
               <span style={{fontSize:10,color:"#ef4444",fontWeight:800,marginTop:3,flexShrink:0,minWidth:16}}>{i+1}</span>
               <span style={{fontSize:13,lineHeight:1.4,opacity:.85}}>{title}</span>
             </div>
@@ -499,43 +503,32 @@ function Dashboard({ data, setTab, update }) {
         </div>
       </div>
 
-      {/* ── MİNİ MÜZİK ── */}
+      {/* MİNİ MÜZİK */}
       <div style={{marginBottom:14}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
           <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em",display:"flex",alignItems:"center",gap:5}}>
-            <svg width="12" height="12" viewBox="0 0 36 36" fill="none"><circle cx="12" cy="28" r="5" stroke="#a855f7" strokeWidth="2" fill="none"/><circle cx="28" cy="24" r="5" stroke="#a855f7" strokeWidth="2" fill="none"/><path d="M17 28 L17 8 L33 4 L33 24" stroke="#a855f7" strokeWidth="2" strokeLinecap="round"/><line x1="17" y1="8" x2="33" y2="4" stroke="#a855f7" strokeWidth="1.5"/></svg>
+            <svg width="12" height="12" viewBox="0 0 36 36" fill="none"><circle cx="12" cy="28" r="5" stroke="#a855f7" strokeWidth="2" fill="none"/><circle cx="28" cy="24" r="5" stroke="#a855f7" strokeWidth="2" fill="none"/><path d="M17 28 L17 8 L33 4 L33 24" stroke="#a855f7" strokeWidth="2" strokeLinecap="round"/></svg>
             Müzik Koleksiyonu
           </div>
           <button onClick={()=>setTab("projects")} style={{background:"none",border:"none",color:"#a855f7",fontSize:12,cursor:"pointer",fontWeight:600}}>Tümü ▶</button>
         </div>
-        {musicItems.length === 0 ? (
-          <div onClick={()=>setTab("projects")} style={{
-            background:"rgba(168,85,247,0.06)",border:"1px solid rgba(168,85,247,0.18)",borderRadius:16,
-            padding:"16px 18px",cursor:"pointer",display:"flex",alignItems:"center",gap:14,
-          }}>
-            <div style={{width:48,height:48,borderRadius:14,background:"rgba(168,85,247,0.15)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-              <svg width="24" height="24" viewBox="0 0 36 36" fill="none"><path d="M6 18 C6 11 11 6 18 6 C25 6 30 11 30 18" stroke="#a855f7" strokeWidth="1.5" fill="none"/><rect x="4" y="17" width="6" height="10" rx="3" fill="#a855f7" opacity=".7"/><rect x="26" y="17" width="6" height="10" rx="3" fill="#a855f7" opacity=".7"/></svg>
+        {musicItems.length===0 ? (
+          <div onClick={()=>setTab("projects")} style={{background:"rgba(168,85,247,0.06)",border:"1px solid rgba(168,85,247,0.18)",borderRadius:16,padding:"16px 18px",cursor:"pointer",display:"flex",alignItems:"center",gap:14}}>
+            <div style={{width:44,height:44,borderRadius:14,background:"rgba(168,85,247,0.15)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+              <svg width="22" height="22" viewBox="0 0 36 36" fill="none"><path d="M6 18 C6 11 11 6 18 6 C25 6 30 11 30 18" stroke="#a855f7" strokeWidth="1.5" fill="none"/><rect x="4" y="17" width="6" height="10" rx="3" fill="#a855f7" opacity=".7"/><rect x="26" y="17" width="6" height="10" rx="3" fill="#a855f7" opacity=".7"/></svg>
             </div>
             <div>
               <div style={{fontSize:14,fontWeight:700,color:"#a855f7"}}>Müzik koleksiyonu boş</div>
-              <div style={{fontSize:12,opacity:.45,marginTop:3}}>Tarzım → Müziklerim'e git ve ekle</div>
+              <div style={{fontSize:12,opacity:.45,marginTop:3}}>Stilim → Müziklerim</div>
             </div>
             <span style={{marginLeft:"auto",opacity:.3,fontSize:16}}>▶</span>
           </div>
         ) : (
           <div style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:6,WebkitOverflowScrolling:"touch"}}>
             {musicItems.slice(0,6).map((item,i)=>(
-              <div key={item.id||i}
-                onClick={()=>item.link&&window.open(item.link,"_blank")}
-                style={{
-                  background:"rgba(168,85,247,0.08)",border:"1px solid rgba(168,85,247,0.18)",borderRadius:14,
-                  padding:"10px 12px",minWidth:120,maxWidth:140,flexShrink:0,cursor:"pointer",
-                  boxShadow:"0 0 12px rgba(168,85,247,0.1)",
-                }}>
+              <div key={item.id||i} onClick={()=>item.link&&window.open(item.link,"_blank")} style={{background:"rgba(168,85,247,0.08)",border:"1px solid rgba(168,85,247,0.18)",borderRadius:14,padding:"10px 12px",minWidth:120,maxWidth:140,flexShrink:0,cursor:"pointer"}}>
                 <div style={{width:44,height:44,borderRadius:10,background:item.albumArt?"#000":"rgba(168,85,247,0.2)",overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center",marginBottom:8}}>
-                  {item.albumArt
-                    ? <img src={item.albumArt} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
-                    : <svg width="20" height="20" viewBox="0 0 36 36" fill="none"><circle cx="11" cy="27" r="5" stroke="#a855f7" strokeWidth="1.5" fill="rgba(168,85,247,0.2)"/><path d="M16 27 L16 9 L30 5 L30 23" stroke="#a855f7" strokeWidth="1.5" strokeLinecap="round"/></svg>}
+                  {item.albumArt ? <img src={item.albumArt} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/> : <svg width="20" height="20" viewBox="0 0 36 36" fill="none"><circle cx="11" cy="27" r="5" stroke="#a855f7" strokeWidth="1.5" fill="rgba(168,85,247,0.2)"/><path d="M16 27 L16 9 L30 5 L30 23" stroke="#a855f7" strokeWidth="1.5" strokeLinecap="round"/></svg>}
                 </div>
                 <div style={{fontSize:12,fontWeight:700,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.title||"Parça"}</div>
                 {item.artist&&<div style={{fontSize:10,opacity:.5,marginTop:2,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.artist}</div>}
@@ -544,30 +537,10 @@ function Dashboard({ data, setTab, update }) {
           </div>
         )}
       </div>
-
-      {data.notes.length>0&&(
-        <div>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
-            <div style={{fontSize:11,fontWeight:700,opacity:.4,textTransform:"uppercase",letterSpacing:".07em"}}>Son Notlar</div>
-            <button onClick={()=>setTab("notes")} style={{background:"none",border:"none",color:"#3b82f6",fontSize:12,cursor:"pointer",fontWeight:600}}>Tümü ▶</button>
-          </div>
-          <div style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:4,WebkitOverflowScrolling:"touch"}}>
-            {data.notes.slice(0,5).map(n=>(
-              <div key={n.id} onClick={()=>setTab("notes")} style={{
-                background:"rgba(255,255,255,0.04)",backdropFilter:"blur(8px)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:14,padding:"10px 12px",
-                minWidth:130,maxWidth:160,cursor:"pointer",flexShrink:0,
-                borderTop:`3px solid ${n.color||"#14b8a6"}`,
-              }}>
-                <div style={{fontSize:12,fontWeight:700,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{n.title}</div>
-                {n.content&&<div style={{fontSize:11,opacity:.4,marginTop:4,overflow:"hidden",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",lineHeight:1.4}}>{n.content}</div>}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
+
 
 /* ═══════════ TASKS ═══════════ */
 function Tasks({ data, update }) {
@@ -2410,7 +2383,7 @@ const DEFAULT_WARDROBE2=[{id:"w1",name:"Lacivert Blazer",cat:"dis",wornCount:3,l
 const DEFAULT_RULES2=[{id:"r1",label:"İş ortamına uygun",on:true},{id:"r2",label:"Sürdürülebilir palet",on:true},{id:"r3",label:"Bu ay yeni alım yok",on:false},{id:"r4",label:"Tekrar giymeden ekleme yok",on:true}];
 const catIconMap={top:"smart",alt:"bottom",dis:"coat",elbise:"dress"};
 
-function BenimStilimRoom({data,update,onBack}){
+function BenimStilimRoom({data,update,onBack,embedded=false}){
   const [weather,setWeather]=useState(null);
   const [wxLoad,setWxLoad]=useState(true);
   const [activeLook,setActiveLook]=useState(0);
@@ -2437,7 +2410,7 @@ function BenimStilimRoom({data,update,onBack}){
   const addCloth=()=>{if(!addForm.name.trim())return;const ni={id:uid(),name:addForm.name,cat:addForm.cat,wornCount:0,lastWorn:"Henüz giyilmedi",freq:0,freqStatus:"new",color:addForm.color};saveStil({wardrobe:[ni,...wardrobe]});setAddModal(false);setAddForm({name:"",cat:"top",color:"#c8b8a2"});};
   return(
     <div>
-      <StickyHeader>
+      {!embedded && <StickyHeader>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
           <button onClick={onBack} style={{background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.1)",color:"#ccc",width:34,height:34,borderRadius:10,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>◀</button>
           <div>
@@ -2445,7 +2418,7 @@ function BenimStilimRoom({data,update,onBack}){
             <div style={{fontSize:10,opacity:.35}}>Kişisel stil & moodboard</div>
           </div>
         </div>
-      </StickyHeader>
+      </StickyHeader>}
       <div style={{background:"linear-gradient(135deg,rgba(59,130,246,0.1),rgba(99,102,241,0.1))",border:"1px solid rgba(59,130,246,0.2)",borderRadius:16,padding:"14px 16px",marginBottom:16}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
           <div><div style={{fontSize:10,fontWeight:700,opacity:.5,letterSpacing:1,textTransform:"uppercase"}}>Bugünün Havası</div><div style={{fontSize:12,opacity:.55,marginTop:2}}>İstanbul, Türkiye</div></div>
@@ -2814,6 +2787,68 @@ function Projects({ data, update }) {
         <input style={inp} placeholder="Etiketler (virgülle ayırın)" value={itemForm.tags} onChange={e=>setItemForm({...itemForm,tags:e.target.value})}/>
         <button style={btnPrimary} onClick={addItem}>Ekle</button>
       </Modal>
+    </div>
+  );
+}
+
+/* ═══════════ GÜNDEM (Tasks + Calendar + Notes) ═══════════ */
+function Gundem({ data, update }) {
+  const [subTab, setSubTab] = useState("tasks");
+  const tabs = [
+    { id:"tasks",    label:"Görevler", color:"#3b82f6" },
+    { id:"calendar", label:"Takvim",   color:"#a855f7" },
+    { id:"notes",    label:"Notlar",   color:"#14b8a6" },
+  ];
+  return (
+    <div>
+      <StickyHeader>
+        <h3 style={{margin:"0 0 10px",fontSize:20,fontWeight:800}}>Gündem</h3>
+        <div style={{display:"flex",gap:6}}>
+          {tabs.map(t=>(
+            <button key={t.id} onClick={()=>setSubTab(t.id)} style={{
+              flex:1,padding:"8px 4px",borderRadius:12,border:"none",cursor:"pointer",
+              background: subTab===t.id ? `${t.color}20` : "rgba(255,255,255,0.04)",
+              color: subTab===t.id ? t.color : "#555",
+              fontSize:13,fontWeight:subTab===t.id?700:500,
+              borderBottom: subTab===t.id ? `2px solid ${t.color}` : "2px solid transparent",
+              transition:"all .15s",
+            }}>{t.label}</button>
+          ))}
+        </div>
+      </StickyHeader>
+      {subTab==="tasks"    && <Tasks data={data} update={update} embedded={true}/>}
+      {subTab==="calendar" && <CalendarView data={data} update={update} embedded={true}/>}
+      {subTab==="notes"    && <Notes data={data} update={update} embedded={true}/>}
+    </div>
+  );
+}
+
+/* ═══════════ LIFESTYLE (Sports + Benim Stilim) ═══════════ */
+function LifeStylePage({ data, update }) {
+  const [subTab, setSubTab] = useState("health");
+  const tabs = [
+    { id:"health", label:"Sağlık",     color:"#22c55e" },
+    { id:"style",  label:"Benim Stilim", color:"#a78bfa" },
+  ];
+  return (
+    <div>
+      <StickyHeader>
+        <h3 style={{margin:"0 0 10px",fontSize:20,fontWeight:800,background:"linear-gradient(135deg,#22c55e,#a78bfa)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>LifeStyle</h3>
+        <div style={{display:"flex",gap:6}}>
+          {tabs.map(t=>(
+            <button key={t.id} onClick={()=>setSubTab(t.id)} style={{
+              flex:1,padding:"8px 4px",borderRadius:12,border:"none",cursor:"pointer",
+              background: subTab===t.id ? `${t.color}20` : "rgba(255,255,255,0.04)",
+              color: subTab===t.id ? t.color : "#555",
+              fontSize:13,fontWeight:subTab===t.id?700:500,
+              borderBottom: subTab===t.id ? `2px solid ${t.color}` : "2px solid transparent",
+              transition:"all .15s",
+            }}>{t.label}</button>
+          ))}
+        </div>
+      </StickyHeader>
+      {subTab==="health" && <Sports data={data} update={update} embedded={true}/>}
+      {subTab==="style"  && <BenimStilimRoom data={data} update={update} onBack={()=>setSubTab("health")} embedded={true}/>}
     </div>
   );
 }
@@ -3540,12 +3575,10 @@ export default function App() {
   const content = () => {
     switch(tab) {
       case "dashboard": return <Dashboard data={data} setTab={setTab} update={update}/>;
-      case "tasks": return <Tasks data={data} update={update}/>;
-      case "calendar": return <CalendarView data={data} update={update}/>;
-      case "sports": return <Sports data={data} update={update}/>;
-      case "projects": return <Projects data={data} update={update}/>;
-      case "notes": return <Notes data={data} update={update}/>;
-      case "settings": return <Settings data={data} update={update} onImport={d=>{setData(d);showToast("Veriler aktarıldı!")}} user={user} onLogout={handleLogout}/>;
+      case "gundem":    return <Gundem data={data} update={update}/>;
+      case "lifestyle": return <LifeStylePage data={data} update={update}/>;
+      case "projects":  return <Projects data={data} update={update}/>;
+      case "settings":  return <Settings data={data} update={update} onImport={d=>{setData(d);showToast("Veriler aktarıldı!")}} user={user} onLogout={handleLogout}/>;
     }
   };
 
