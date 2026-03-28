@@ -957,9 +957,10 @@ function Sports({ data, update, initialView }) {
   useEffect(() => {
     if (initialView && (initialView === "food" || initialView === "sport")) {
       setView(initialView);
-      // "+" ile geliyorsa ekleme modalını da aç
-      if (initialView === "food") setTimeout(() => setFoodModal(true), 350);
-      if (initialView === "sport") setTimeout(() => setModal(true), 350);
+      requestAnimationFrame(() => {
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+      });
     }
   }, [initialView]);
 
@@ -2582,6 +2583,17 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
     }
   }, [initialRoom]);
 
+  // Oda değiştiğinde scroll sıfırla
+  useEffect(() => {
+    if (activeRoom) {
+      requestAnimationFrame(() => {
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      });
+    }
+  }, [activeRoom]);
+
   const rooms = data.rooms || [...DEFAULT_ROOMS];
   const roomItems = data.roomItems || {};
 
@@ -2942,6 +2954,10 @@ function TasksHub({ data, update, initialSubTab, onSubTabConsumed }) {
     if (initialSubTab) {
       setSubTab(initialSubTab);
       onSubTabConsumed?.();
+      requestAnimationFrame(() => {
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+      });
     }
   }, [initialSubTab]);
   return (
@@ -3447,7 +3463,12 @@ export default function App() {
       setPendingSubTab(null);
     }
     setTab(tabId);
-    window.scrollTo({ top: 0 });
+    // Render sonrası scroll sıfırla
+    requestAnimationFrame(() => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    });
   }, []);
   const [loading, setLoading] = useState(true);
   const [splash, setSplash] = useState(true);
@@ -3511,12 +3532,13 @@ export default function App() {
 
   // Scroll to top when tab changes
   useEffect(() => {
-    if (isMobile) {
-      window.scrollTo(0, 0);
-    } else if (scrollRef.current) {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    if (scrollRef.current) {
       scrollRef.current.scrollTop = 0;
     }
-  }, [tab, isMobile]);
+  }, [tab]);
 
   // Mobile scroll listener
   useEffect(() => {
