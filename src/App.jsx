@@ -942,7 +942,7 @@ function CalendarView({ data, update }) {
 
 /* ═══════════ SPORTS ═══════════ */
 /* ═══════════ SAĞLIK (Health Coach) ═══════════ */
-function Sports({ data, update, initialView }) {
+function Sports({ data, update, initialView, onBack }) {
   const [view,setView]=useState(initialView || "overview"); // overview, sport, food
   const [modal,setModal]=useState(false);
   const [foodModal,setFoodModal]=useState(false);
@@ -953,15 +953,18 @@ function Sports({ data, update, initialView }) {
   const [aiResult,setAiResult]=useState(null);
   const photoRef=useRef(null);
 
-  // Dashboard'dan gelen view yönlendirmesi
+  // Dashboard'dan gelen view yönlendirmesi + scroll sıfırlama
   useEffect(() => {
     if (initialView && (initialView === "food" || initialView === "sport")) {
       setView(initialView);
-      requestAnimationFrame(() => {
-        window.scrollTo(0, 0);
-        document.documentElement.scrollTop = 0;
-      });
     }
+    // Mount olunca scroll sıfırla (gecikmeyle React render'ı bekle)
+    const t = setTimeout(() => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }, 80);
+    return () => clearTimeout(t);
   }, [initialView]);
 
   const foods = data.foods || [];
@@ -1158,7 +1161,10 @@ function Sports({ data, update, initialView }) {
   return (
     <div>
       <StickyHeader>
-        <h3 style={{margin:"0 0 12px",fontSize:20,fontWeight:800}}>Sağlık Koçu</h3>
+        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
+          {onBack && <button className="back-btn" onClick={onBack}>◀</button>}
+          <h3 style={{margin:0,fontSize:20,fontWeight:800,flex:1}}>Sağlık Koçu</h3>
+        </div>
         <div style={{background:"rgba(255,255,255,0.06)",backdropFilter:"blur(8px)",borderRadius:12,padding:3,display:"flex"}}>
           {[["overview","Özet"],["sport","Spor"],["food","Beslenme"]].map(([k,v])=>(
             <button key={k} onClick={()=>setView(k)} style={{
@@ -2586,11 +2592,12 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
   // Oda değiştiğinde scroll sıfırla
   useEffect(() => {
     if (activeRoom) {
-      requestAnimationFrame(() => {
+      const t = setTimeout(() => {
         window.scrollTo(0, 0);
         document.documentElement.scrollTop = 0;
         document.body.scrollTop = 0;
-      });
+      }, 80);
+      return () => clearTimeout(t);
     }
   }, [activeRoom]);
 
@@ -2812,19 +2819,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
   if(activeRoom==="clothes" || room.name==="Kıyafetlerim") return <div className="room-enter"><BenimStilimRoom data={data} update={update} onBack={()=>setActiveRoom(null)} /></div>;
   if(activeRoom==="healthcoach" || room.type==="health") return (
     <div className="room-enter">
-      <StickyHeader>
-        <div style={{display:"flex",alignItems:"center",gap:10}}>
-          <button className="back-btn" onClick={()=>setActiveRoom(null)}>◀</button>
-          <div style={{width:28,height:28,borderRadius:8,background:"rgba(20,184,166,0.2)",border:"1px solid rgba(20,184,166,0.4)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 21C12 21 4 15 4 9C4 5.69 6.69 3 10 3C11.5 3 12.5 4 12 4.5C12 4.5 12.5 3 14 3C17.31 3 20 5.69 20 9C20 15 12 21 12 21Z" stroke="#14b8a6" strokeWidth="1.5" fill="rgba(20,184,166,0.2)"/></svg>
-          </div>
-          <div>
-            <div style={{fontSize:18,fontWeight:800,background:"linear-gradient(135deg,#5eead4,#14b8a6)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>Sağlık Koçu</div>
-            <div style={{fontSize:10,opacity:.35}}>Beslenme & spor takibi</div>
-          </div>
-        </div>
-      </StickyHeader>
-      <Sports data={data} update={update} initialView={roomSubView}/>
+      <Sports data={data} update={update} initialView={roomSubView} onBack={()=>setActiveRoom(null)}/>
     </div>
   );
 
@@ -2954,10 +2949,10 @@ function TasksHub({ data, update, initialSubTab, onSubTabConsumed }) {
     if (initialSubTab) {
       setSubTab(initialSubTab);
       onSubTabConsumed?.();
-      requestAnimationFrame(() => {
+      setTimeout(() => {
         window.scrollTo(0, 0);
         document.documentElement.scrollTop = 0;
-      });
+      }, 80);
     }
   }, [initialSubTab]);
   return (
@@ -3464,11 +3459,11 @@ export default function App() {
     }
     setTab(tabId);
     // Render sonrası scroll sıfırla
-    requestAnimationFrame(() => {
+    setTimeout(() => {
       window.scrollTo(0, 0);
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
-    });
+    }, 50);
   }, []);
   const [loading, setLoading] = useState(true);
   const [splash, setSplash] = useState(true);
@@ -3535,9 +3530,15 @@ export default function App() {
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = 0;
-    }
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
+    // React render'ı bekle, bir daha sıfırla
+    const t = setTimeout(() => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      if (scrollRef.current) scrollRef.current.scrollTop = 0;
+    }, 100);
+    return () => clearTimeout(t);
   }, [tab]);
 
   // Mobile scroll listener
