@@ -42,6 +42,14 @@ const DEFAULT_ROOMS = [
   { id: "healthcoach", name: "Sağlık Koçu", icon: "♥", color: "#14b8a6", type: "health" },
 ];
 
+/* Eski kullanıcılarda eksik odaları otomatik ekle */
+const migrateRooms = (savedRooms) => {
+  if (!savedRooms) return [...DEFAULT_ROOMS];
+  const ids = new Set(savedRooms.map(r => r.id));
+  const missing = DEFAULT_ROOMS.filter(d => !ids.has(d.id));
+  return missing.length > 0 ? [...savedRooms, ...missing] : savedRooms;
+};
+
 const COMMON_FOODS = {
   "Çay (şekerli)": 30, "Çay (şekersiz)": 2, "Türk kahvesi": 15, "Süt": 60,
   "Ekmek (1 dilim)": 80, "Yumurta (haşlanmış)": 78, "Yumurta (sahanda)": 120,
@@ -60,46 +68,6 @@ const DN = ["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"];
 
 const today = () => new Date().toISOString().split("T")[0];
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
-
-/* ── MascotImage: kareli kağıt arka planını canvas ile kaldırır ── */
-function MascotImage({ src, style }) {
-  const canvasRef = useRef(null);
-  const [ready, setReady] = useState(false);
-  useEffect(() => {
-    const img = new window.Image();
-    img.crossOrigin = "anonymous";
-    img.onload = () => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      canvas.width = img.naturalWidth;
-      canvas.height = img.naturalHeight;
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0);
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const d = imageData.data;
-      for (let i = 0; i < d.length; i += 4) {
-        const r = d[i], g = d[i+1], b = d[i+2];
-        // Beyaz ve krem kağıt rengi
-        const isWhitePaper = r > 180 && g > 175 && b > 165;
-        // Kareli kağıt mavi çizgileri (açık mavi/gri tonlar)
-        const isGridLine = r > 160 && g > 175 && b > 185 && b > r;
-        // Sarımtırak kağıt tonu
-        const isYellowish = r > 200 && g > 190 && b > 150 && r > b + 30;
-        if (isWhitePaper || isGridLine || isYellowish) {
-          // Hafif yumuşatma — tam şeffaf yerine kontura göre
-          const brightness = (r + g + b) / 3;
-          const alpha = Math.max(0, Math.min(255, (255 - brightness) * 2.5));
-          d[i+3] = Math.round(alpha);
-        }
-      }
-      ctx.putImageData(imageData, 0, 0);
-      setReady(true);
-    };
-    img.onerror = () => setReady(true); // yüklenemezse de göster
-    img.src = src;
-  }, [src]);
-  return <canvas ref={canvasRef} style={{...style, opacity: ready ? 1 : 0, transition:"opacity .3s"}} />;
-}
 
 /* ── Hooks ── */
 function useIsMobile() {
@@ -278,7 +246,7 @@ function FAB({ onClick, color="#3b82f6" }) {
 function Dashboard({ data, setTab, goTo, update }) {
   const t = today();
   const foods = data.foods || [];
-  const rooms = data.rooms || [...DEFAULT_ROOMS];
+  const rooms = migrateRooms(data.rooms);
   const roomItems = data.roomItems || {};
 
   const pending = data.tasks.filter(x=>!x.done).length;
@@ -2554,7 +2522,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
     }
   }, [activeRoom]);
 
-  const rooms = data.rooms || [...DEFAULT_ROOMS];
+  const rooms = migrateRooms(data.rooms);
   const roomItems = data.roomItems || {};
 
   const addRoom=()=>{
@@ -3562,8 +3530,6 @@ export default function App() {
       <style>{`
         ${NEBULA_KEYFRAMES}
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
-        @keyframes checkPop { 0%{transform:scale(1)} 40%{transform:scale(1.25)} 70%{transform:scale(0.9)} 100%{transform:scale(1)} }
-        .task-check-done { animation: checkPop .3s ease; }
       `}</style>
 
       {/* Center content */}
