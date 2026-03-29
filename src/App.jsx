@@ -2275,6 +2275,34 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
     return { url, platform, icon, color, title };
   };
 
+  /* Spotify/YouTube embed URL çıkar */
+  const getEmbedUrl = (link) => {
+    if (!link) return null;
+    const u = link.toLowerCase();
+    // Spotify: open.spotify.com/track/XXXX → embed
+    if (u.includes("spotify.com/track/")) {
+      const id = link.match(/track\/([a-zA-Z0-9]+)/)?.[1];
+      if (id) return { type: "spotify", url: `https://open.spotify.com/embed/track/${id}?theme=0&utm_source=generator`, height: 80 };
+    }
+    // Spotify playlist/album
+    if (u.includes("spotify.com/playlist/") || u.includes("spotify.com/album/")) {
+      const match = link.match(/(playlist|album)\/([a-zA-Z0-9]+)/);
+      if (match) return { type: "spotify", url: `https://open.spotify.com/embed/${match[1]}/${match[2]}?theme=0`, height: 152 };
+    }
+    // YouTube: youtube.com/watch?v=XXXX veya youtu.be/XXXX
+    if (u.includes("youtube.com/watch")) {
+      const id = link.match(/[?&]v=([a-zA-Z0-9_-]{11})/)?.[1];
+      if (id) return { type: "youtube", url: `https://www.youtube.com/embed/${id}`, height: 200 };
+    }
+    if (u.includes("youtu.be/")) {
+      const id = link.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/)?.[1];
+      if (id) return { type: "youtube", url: `https://www.youtube.com/embed/${id}`, height: 200 };
+    }
+    return null;
+  };
+
+  const [expandedEmbed, setExpandedEmbed] = useState(null);
+
   const addFromLink = () => {
     if(!linkPreview && !linkInput.trim()) return;
     const meta = linkPreview || parseMusicLink(linkInput);
@@ -2349,10 +2377,15 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
             </div>
           </div>
         ) : (
-          items.map(item=>(
-            <div key={item.id} style={{
-              ...cardStyle,padding:"12px 14px",marginBottom:8,
+          items.map(item=>{
+            const embed = getEmbedUrl(item.link);
+            const isExpanded = expandedEmbed === item.id;
+            return (
+            <div key={item.id} style={{marginBottom:8}}>
+            <div style={{
+              ...cardStyle,padding:"12px 14px",marginBottom:0,
               display:"flex",alignItems:"center",gap:12,minHeight:64,
+              borderRadius: isExpanded ? "16px 16px 0 0" : 16,
             }}>
               {/* Album art or placeholder */}
               <div style={{
@@ -2384,8 +2417,19 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
                   {preview?.id===item.id?"⏸":"▶"}
                 </button>
               )}
-              {/* Open link button */}
-              {item.link&&(
+              {/* Embed play button (Spotify/YouTube) */}
+              {embed&&!item.preview&&(
+                <button onClick={()=>setExpandedEmbed(isExpanded?null:item.id)} style={{
+                  width:36,height:36,borderRadius:"50%",
+                  background:isExpanded?(embed.type==="spotify"?"#1DB954":"#FF0000"):"rgba(255,255,255,0.05)",
+                  border:"none",color:"#fff",fontSize:14,cursor:"pointer",
+                  display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,
+                }}>
+                  {isExpanded?"⏸":"▶"}
+                </button>
+              )}
+              {/* Open link button (non-embeddable) */}
+              {item.link&&!embed&&!item.preview&&(
                 <a href={item.link} target="_blank" rel="noopener noreferrer" style={{
                   width:36,height:36,borderRadius:"50%",
                   background:"#2A2A35",
@@ -2395,7 +2439,25 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
               )}
               <button onClick={()=>onDel(item.id)} style={delBtnStyle}>✕</button>
             </div>
-          ))
+            {/* Embedded player (Spotify/YouTube iframe) */}
+            {isExpanded&&embed&&(
+              <div style={{
+                background:"#1C1C26",borderRadius:"0 0 16px 16px",overflow:"hidden",
+                border:"1px solid rgba(255,255,255,0.05)",borderTop:"none",
+              }}>
+                <iframe
+                  src={embed.url}
+                  width="100%"
+                  height={embed.height}
+                  frameBorder="0"
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                  loading="lazy"
+                  style={{display:"block",borderRadius:"0 0 16px 16px"}}
+                />
+              </div>
+            )}
+            </div>
+          );})
         )
       )}
 
@@ -2694,6 +2756,7 @@ const catIconMap={top:"smart",alt:"bottom",dis:"coat",elbise:"dress"};
 function BenimStilimRoom({data,update,onBack}){
   const [weather,setWeather]=useState(null);
   const [wxLoad,setWxLoad]=useState(true);
+  const [cityName,setCityName]=useState("Konum alınıyor...");
   const [activeLook,setActiveLook]=useState(0);
   const [wardFilter,setWardFilter]=useState("all");
   const [addModal,setAddModal]=useState(false);
@@ -2705,8 +2768,27 @@ function BenimStilimRoom({data,update,onBack}){
   const saveStil=(patch)=>update({...data,stilData:{...stilData,...patch}});
   useEffect(()=>{
     setWxLoad(true);
-    fetch("https://api.open-meteo.com/v1/forecast?latitude=41.0082&longitude=28.9784&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,weather_code&wind_speed_unit=kmh&timezone=Europe/Istanbul")
-      .then(r=>r.json()).then(d=>{const c=d.current;setWeather({temp:Math.round(c.temperature_2m),feel:Math.round(c.apparent_temperature),humid:Math.round(c.relative_humidity_2m),wind:Math.round(c.wind_speed_10m),desc:WMO_TR[c.weather_code]||"Bilinmiyor"});}).catch(()=>setWeather(null)).finally(()=>setWxLoad(false));
+    const fetchWeather = (lat, lon, tz) => {
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,weather_code&wind_speed_unit=kmh&timezone=${tz||"auto"}`)
+        .then(r=>r.json()).then(d=>{const c=d.current;setWeather({temp:Math.round(c.temperature_2m),feel:Math.round(c.apparent_temperature),humid:Math.round(c.relative_humidity_2m),wind:Math.round(c.wind_speed_10m),desc:WMO_TR[c.weather_code]||"Bilinmiyor"});}).catch(()=>setWeather(null)).finally(()=>setWxLoad(false));
+    };
+    const getCityName = (lat, lon) => {
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m&timezone=auto`)
+        .then(r=>r.json()).then(d=>{ setCityName(d.timezone?.split("/").pop()?.replace(/_/g," ") || `${lat.toFixed(1)}°, ${lon.toFixed(1)}°`); }).catch(()=>{});
+    };
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude: lat, longitude: lon } = pos.coords;
+          fetchWeather(lat, lon, "auto");
+          getCityName(lat, lon);
+        },
+        () => { fetchWeather(41.0082, 28.9784, "Europe/Istanbul"); setCityName("İstanbul"); },
+        { timeout: 8000 }
+      );
+    } else {
+      fetchWeather(41.0082, 28.9784, "Europe/Istanbul"); setCityName("İstanbul");
+    }
   },[]);
   const looks=getWeatherLooks(weather?.temp??18);
   const freqScore=wardrobe.length===0?0:Math.round(wardrobe.filter(w=>w.freq>50).length/wardrobe.length*100);
@@ -2729,7 +2811,7 @@ function BenimStilimRoom({data,update,onBack}){
       </StickyHeader>
       <div style={{background:"linear-gradient(135deg,rgba(59,130,246,0.1),rgba(99,102,241,0.1))",border:"1px solid rgba(59,130,246,0.2)",borderRadius:16,padding:"14px 16px",marginBottom:16}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-          <div><div style={{fontSize:10,fontWeight:700,color:"#9CA3AF",letterSpacing:1,textTransform:"uppercase"}}>Bugünün Havası</div><div style={{fontSize:12,color:"#9CA3AF",marginTop:2}}>İstanbul, Türkiye</div></div>
+          <div><div style={{fontSize:10,fontWeight:700,color:"#9CA3AF",letterSpacing:1,textTransform:"uppercase"}}>Bugünün Havası</div><div style={{fontSize:12,color:"#9CA3AF",marginTop:2}}>{cityName}</div></div>
           <div style={{textAlign:"right"}}>{wxLoad?<div style={{fontSize:12,color:"#9CA3AF",animation:"pulse 1.5s infinite"}}>Yükleniyor...</div>:weather?<><div style={{fontSize:26,fontWeight:800,color:"#e0d5f5"}}>{weather.temp}°C</div><div style={{fontSize:11,color:"#9CA3AF"}}>{weather.desc}</div></>:<div style={{fontSize:11,color:"#9CA3AF"}}>Veri alınamadı</div>}</div>
         </div>
         {weather&&<div style={{marginTop:8,paddingTop:8,borderTop:"1px solid rgba(255,255,255,0.05)",display:"flex",gap:16}}><div style={{fontSize:10,color:"#9CA3AF"}}>{weather.wind} km/s rüzgar</div><div style={{fontSize:10,color:"#9CA3AF"}}>%{weather.humid} nem</div><div style={{fontSize:10,color:"#9CA3AF"}}>{weather.feel}°C hissedilen</div></div>}
