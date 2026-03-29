@@ -1724,44 +1724,51 @@ function Sports({ data, update, initialView, onBack }) {
 /* ═══════════ NEWS ROOM ═══════════ */
 const NEWS_SOURCES = {
   teknoloji: [
-    { name:"BBC Tech",      url:"https://feeds.bbci.co.uk/news/technology/rss.xml",             lang:"EN", color:"#3b82f6" },
-    { name:"Ars Technica",  url:"https://feeds.arstechnica.com/arstechnica/index",               lang:"EN", color:"#f97316" },
-    { name:"Hacker News",   url:"https://hnrss.org/frontpage?count=15",                         lang:"EN", color:"#ff6600" },
+    { name:"NTV Teknoloji",  url:"https://www.ntv.com.tr/teknoloji.rss",                          lang:"TR", color:"#1d4ed8" },
+    { name:"BBC Türkçe",     url:"https://www.bbc.com/turkce/index.xml",                           lang:"TR", color:"#dc2626" },
+    { name:"BBC Tech",       url:"https://feeds.bbci.co.uk/news/technology/rss.xml",               lang:"EN", color:"#3b82f6" },
+    { name:"Ars Technica",   url:"https://feeds.arstechnica.com/arstechnica/index",                lang:"EN", color:"#f97316" },
+    { name:"Hacker News",    url:"https://hnrss.org/frontpage?count=15",                           lang:"EN", color:"#ff6600" },
   ],
   spor: [
-    { name:"BBC Sport",     url:"https://feeds.bbci.co.uk/sport/rss.xml",                       lang:"EN", color:"#ef4444" },
-    { name:"BBC Football",  url:"https://feeds.bbci.co.uk/sport/football/rss.xml",              lang:"EN", color:"#ef4444" },
-    { name:"ESPN",          url:"https://www.espn.com/espn/rss/news",                           lang:"EN", color:"#cc0000" },
+    { name:"NTV Spor",       url:"https://www.ntv.com.tr/spor.rss",                               lang:"TR", color:"#dc2626" },
+    { name:"BBC Sport",      url:"https://feeds.bbci.co.uk/sport/rss.xml",                        lang:"EN", color:"#ef4444" },
+    { name:"BBC Football",   url:"https://feeds.bbci.co.uk/sport/football/rss.xml",               lang:"EN", color:"#ef4444" },
+    { name:"ESPN",           url:"https://www.espn.com/espn/rss/news",                            lang:"EN", color:"#cc0000" },
   ],
   sanat: [
-    { name:"BBC Arts",      url:"https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml", lang:"EN", color:"#a855f7" },
-    { name:"NPR Arts",      url:"https://feeds.npr.org/1008/rss.xml",                           lang:"EN", color:"#7c3aed" },
-    { name:"Smithsonian",   url:"https://www.smithsonianmag.com/rss/arts-culture/",             lang:"EN", color:"#6d28d9" },
+    { name:"NTV Sanat",      url:"https://www.ntv.com.tr/sanat.rss",                              lang:"TR", color:"#7c3aed" },
+    { name:"BBC Arts",       url:"https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml",  lang:"EN", color:"#a855f7" },
+    { name:"NPR Arts",       url:"https://feeds.npr.org/1008/rss.xml",                            lang:"EN", color:"#7c3aed" },
   ],
   saglik: [
-    { name:"BBC Health",    url:"https://feeds.bbci.co.uk/news/health/rss.xml",                 lang:"EN", color:"#22c55e" },
-    { name:"NPR Health",    url:"https://feeds.npr.org/1128/rss.xml",                           lang:"EN", color:"#16a34a" },
-    { name:"Science Daily", url:"https://www.sciencedaily.com/rss/health_medicine.xml",         lang:"EN", color:"#0d9488" },
+    { name:"NTV Sağlık",     url:"https://www.ntv.com.tr/saglik.rss",                             lang:"TR", color:"#16a34a" },
+    { name:"BBC Health",     url:"https://feeds.bbci.co.uk/news/health/rss.xml",                  lang:"EN", color:"#22c55e" },
+    { name:"NPR Health",     url:"https://feeds.npr.org/1128/rss.xml",                            lang:"EN", color:"#16a34a" },
+    { name:"Science Daily",  url:"https://www.sciencedaily.com/rss/health_medicine.xml",          lang:"EN", color:"#0d9488" },
   ],
   ekonomi: [
-    { name:"BBC Business",  url:"https://feeds.bbci.co.uk/news/business/rss.xml",               lang:"EN", color:"#f59e0b" },
-    { name:"NPR Economy",   url:"https://feeds.npr.org/1006/rss.xml",                           lang:"EN", color:"#d97706" },
-    { name:"MarketWatch",   url:"https://feeds.content.dowjones.io/public/rss/mw_realtimeheadlines", lang:"EN", color:"#b45309" },
+    { name:"NTV Ekonomi",    url:"https://www.ntv.com.tr/ekonomi.rss",                             lang:"TR", color:"#d97706" },
+    { name:"BBC Business",   url:"https://feeds.bbci.co.uk/news/business/rss.xml",                lang:"EN", color:"#f59e0b" },
+    { name:"NPR Economy",    url:"https://feeds.npr.org/1006/rss.xml",                            lang:"EN", color:"#d97706" },
   ],
   politika: [
-    { name:"BBC World",     url:"https://feeds.bbci.co.uk/news/world/rss.xml",                  lang:"EN", color:"#ef4444" },
-    { name:"BBC Türkçe",    url:"https://www.bbc.com/turkce/index.xml",                         lang:"TR", color:"#dc2626" },
-    { name:"NPR Politics",  url:"https://feeds.npr.org/1014/rss.xml",                           lang:"EN", color:"#b91c1c" },
+    { name:"BBC Türkçe",     url:"https://www.bbc.com/turkce/index.xml",                          lang:"TR", color:"#dc2626" },
+    { name:"NTV Gündem",     url:"https://www.ntv.com.tr/turkiye.rss",                             lang:"TR", color:"#1d4ed8" },
+    { name:"BBC World",      url:"https://feeds.bbci.co.uk/news/world/rss.xml",                   lang:"EN", color:"#ef4444" },
+    { name:"NPR Politics",   url:"https://feeds.npr.org/1014/rss.xml",                            lang:"EN", color:"#b91c1c" },
   ],
   bilim: [
-    { name:"Science Daily", url:"https://www.sciencedaily.com/rss/top/science.xml",             lang:"EN", color:"#06b6d4" },
-    { name:"BBC Science",   url:"https://feeds.bbci.co.uk/news/science_and_environment/rss.xml",lang:"EN", color:"#0891b2" },
-    { name:"NPR Science",   url:"https://feeds.npr.org/1007/rss.xml",                           lang:"EN", color:"#0e7490" },
+    { name:"NTV Bilim",      url:"https://www.ntv.com.tr/bilim.rss",                              lang:"TR", color:"#0891b2" },
+    { name:"Science Daily",  url:"https://www.sciencedaily.com/rss/top/science.xml",              lang:"EN", color:"#06b6d4" },
+    { name:"BBC Science",    url:"https://feeds.bbci.co.uk/news/science_and_environment/rss.xml", lang:"EN", color:"#0891b2" },
+    { name:"NPR Science",    url:"https://feeds.npr.org/1007/rss.xml",                            lang:"EN", color:"#0e7490" },
   ],
   dunya: [
-    { name:"BBC World",     url:"https://feeds.bbci.co.uk/news/world/rss.xml",                  lang:"EN", color:"#64748b" },
-    { name:"BBC Türkçe",    url:"https://www.bbc.com/turkce/index.xml",                         lang:"TR", color:"#bb1919" },
-    { name:"NPR World",     url:"https://feeds.npr.org/1004/rss.xml",                           lang:"EN", color:"#475569" },
+    { name:"BBC Türkçe",     url:"https://www.bbc.com/turkce/index.xml",                          lang:"TR", color:"#dc2626" },
+    { name:"NTV Dünya",      url:"https://www.ntv.com.tr/dunya.rss",                              lang:"TR", color:"#1d4ed8" },
+    { name:"BBC World",      url:"https://feeds.bbci.co.uk/news/world/rss.xml",                   lang:"EN", color:"#64748b" },
+    { name:"NPR World",      url:"https://feeds.npr.org/1004/rss.xml",                            lang:"EN", color:"#475569" },
   ],
 };
 
@@ -1856,7 +1863,7 @@ function NewsRoom({ room, onBack }) {
   const [articles, setArticles] = useState({});
   const [loading, setLoading] = useState({});
   const [loaded, setLoaded] = useState({});
-  const [langFilter, setLangFilter] = useState("all");
+  const [langFilter, setLangFilter] = useState("TR");
 
   const timeAgo = (dateStr) => {
     if(!dateStr) return "";
@@ -1968,7 +1975,7 @@ function NewsRoom({ room, onBack }) {
             {NEWS_ICONS[activeCat]?.(catInfo?.color||"#aaa")}
           </div>
           <div style={{fontSize:13,color:"#9CA3AF",marginBottom:4}}>Haberler yükleniyor...</div>
-          <div style={{fontSize:11,opacity:.2}}>{NEWS_SOURCES[activeCat]?.map(s=>s.name).join(" · ")}</div>
+          <div style={{fontSize:11,color:"#4B5563"}}>{NEWS_SOURCES[activeCat]?.map(s=>s.name).join(" · ")}</div>
         </div>
       )}
 
@@ -2024,13 +2031,27 @@ function NewsRoom({ room, onBack }) {
       {!isLoading&&list.length===0&&loaded[activeCat]&&(
         <div style={{textAlign:"center",padding:"40px 20px"}}>
           <div style={{fontSize:40,marginBottom:10}}>📡</div>
-          <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:6}}>Haber yüklenemedi</div>
-          <div style={{fontSize:12,color:"#4B5563",marginBottom:16}}>İnternet bağlantını kontrol et</div>
-          <button onClick={()=>fetchCategory(activeCat,true)} style={{
-            background:`${catInfo?.color}20`,color:catInfo?.color,
-            border:`1px solid ${catInfo?.color}40`,borderRadius:10,
-            padding:"10px 24px",fontSize:12,cursor:"pointer",fontWeight:600,
-          }}>↻ Tekrar Dene</button>
+          {langFilter!=="all"&&rawList.length>0 ? (
+            <>
+              <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:6}}>{langFilter==="TR"?"Türkçe":"İngilizce"} haber bulunamadı</div>
+              <div style={{fontSize:12,color:"#4B5563",marginBottom:16}}>Diğer dillerde {rawList.length} haber mevcut</div>
+              <button onClick={()=>setLangFilter("all")} style={{
+                background:`${catInfo?.color}20`,color:catInfo?.color,
+                border:`1px solid ${catInfo?.color}40`,borderRadius:10,
+                padding:"10px 24px",fontSize:12,cursor:"pointer",fontWeight:600,
+              }}>🌍 Tümünü Göster</button>
+            </>
+          ) : (
+            <>
+              <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:6}}>Haber yüklenemedi</div>
+              <div style={{fontSize:12,color:"#4B5563",marginBottom:16}}>İnternet bağlantını kontrol et</div>
+              <button onClick={()=>fetchCategory(activeCat,true)} style={{
+                background:`${catInfo?.color}20`,color:catInfo?.color,
+                border:`1px solid ${catInfo?.color}40`,borderRadius:10,
+                padding:"10px 24px",fontSize:12,cursor:"pointer",fontWeight:600,
+              }}>↻ Tekrar Dene</button>
+            </>
+          )}
         </div>
       )}
     </div>
