@@ -1724,49 +1724,49 @@ function Sports({ data, update, initialView, onBack }) {
 /* ═══════════ NEWS ROOM ═══════════ */
 const NEWS_SOURCES = {
   teknoloji: [
-    { name:"NTV Teknoloji",  url:"https://www.ntv.com.tr/teknoloji.rss",                          lang:"TR", color:"#1d4ed8" },
+    { name:"DW Türkçe",      url:"https://rss.dw.com/xml/rss-tur-all",                              lang:"TR", color:"#0284c7" },
     { name:"BBC Türkçe",     url:"https://www.bbc.com/turkce/index.xml",                           lang:"TR", color:"#dc2626" },
     { name:"BBC Tech",       url:"https://feeds.bbci.co.uk/news/technology/rss.xml",               lang:"EN", color:"#3b82f6" },
     { name:"Ars Technica",   url:"https://feeds.arstechnica.com/arstechnica/index",                lang:"EN", color:"#f97316" },
     { name:"Hacker News",    url:"https://hnrss.org/frontpage?count=15",                           lang:"EN", color:"#ff6600" },
   ],
   spor: [
-    { name:"NTV Spor",       url:"https://www.ntv.com.tr/spor.rss",                               lang:"TR", color:"#dc2626" },
+    { name:"DW Türkçe",      url:"https://rss.dw.com/xml/rss-tur-all",                              lang:"TR", color:"#0284c7" },
     { name:"BBC Sport",      url:"https://feeds.bbci.co.uk/sport/rss.xml",                        lang:"EN", color:"#ef4444" },
     { name:"BBC Football",   url:"https://feeds.bbci.co.uk/sport/football/rss.xml",               lang:"EN", color:"#ef4444" },
     { name:"ESPN",           url:"https://www.espn.com/espn/rss/news",                            lang:"EN", color:"#cc0000" },
   ],
   sanat: [
-    { name:"NTV Sanat",      url:"https://www.ntv.com.tr/sanat.rss",                              lang:"TR", color:"#7c3aed" },
+    { name:"DW Türkçe",      url:"https://rss.dw.com/xml/rss-tur-all",                              lang:"TR", color:"#0284c7" },
     { name:"BBC Arts",       url:"https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml",  lang:"EN", color:"#a855f7" },
     { name:"NPR Arts",       url:"https://feeds.npr.org/1008/rss.xml",                            lang:"EN", color:"#7c3aed" },
   ],
   saglik: [
-    { name:"NTV Sağlık",     url:"https://www.ntv.com.tr/saglik.rss",                             lang:"TR", color:"#16a34a" },
+    { name:"DW Türkçe",      url:"https://rss.dw.com/xml/rss-tur-all",                              lang:"TR", color:"#0284c7" },
     { name:"BBC Health",     url:"https://feeds.bbci.co.uk/news/health/rss.xml",                  lang:"EN", color:"#22c55e" },
     { name:"NPR Health",     url:"https://feeds.npr.org/1128/rss.xml",                            lang:"EN", color:"#16a34a" },
     { name:"Science Daily",  url:"https://www.sciencedaily.com/rss/health_medicine.xml",          lang:"EN", color:"#0d9488" },
   ],
   ekonomi: [
-    { name:"NTV Ekonomi",    url:"https://www.ntv.com.tr/ekonomi.rss",                             lang:"TR", color:"#d97706" },
+    { name:"DW Türkçe",      url:"https://rss.dw.com/xml/rss-tur-all",                              lang:"TR", color:"#0284c7" },
     { name:"BBC Business",   url:"https://feeds.bbci.co.uk/news/business/rss.xml",                lang:"EN", color:"#f59e0b" },
     { name:"NPR Economy",    url:"https://feeds.npr.org/1006/rss.xml",                            lang:"EN", color:"#d97706" },
   ],
   politika: [
     { name:"BBC Türkçe",     url:"https://www.bbc.com/turkce/index.xml",                          lang:"TR", color:"#dc2626" },
-    { name:"NTV Gündem",     url:"https://www.ntv.com.tr/turkiye.rss",                             lang:"TR", color:"#1d4ed8" },
+    { name:"DW Türkçe",      url:"https://rss.dw.com/xml/rss-tur-all",                              lang:"TR", color:"#0284c7" },
     { name:"BBC World",      url:"https://feeds.bbci.co.uk/news/world/rss.xml",                   lang:"EN", color:"#ef4444" },
     { name:"NPR Politics",   url:"https://feeds.npr.org/1014/rss.xml",                            lang:"EN", color:"#b91c1c" },
   ],
   bilim: [
-    { name:"NTV Bilim",      url:"https://www.ntv.com.tr/bilim.rss",                              lang:"TR", color:"#0891b2" },
+    { name:"DW Türkçe",      url:"https://rss.dw.com/xml/rss-tur-all",                              lang:"TR", color:"#0284c7" },
     { name:"Science Daily",  url:"https://www.sciencedaily.com/rss/top/science.xml",              lang:"EN", color:"#06b6d4" },
     { name:"BBC Science",    url:"https://feeds.bbci.co.uk/news/science_and_environment/rss.xml", lang:"EN", color:"#0891b2" },
     { name:"NPR Science",    url:"https://feeds.npr.org/1007/rss.xml",                            lang:"EN", color:"#0e7490" },
   ],
   dunya: [
     { name:"BBC Türkçe",     url:"https://www.bbc.com/turkce/index.xml",                          lang:"TR", color:"#dc2626" },
-    { name:"NTV Dünya",      url:"https://www.ntv.com.tr/dunya.rss",                              lang:"TR", color:"#1d4ed8" },
+    { name:"DW Türkçe",      url:"https://rss.dw.com/xml/rss-tur-all",                              lang:"TR", color:"#0284c7" },
     { name:"BBC World",      url:"https://feeds.bbci.co.uk/news/world/rss.xml",                   lang:"EN", color:"#64748b" },
     { name:"NPR World",      url:"https://feeds.npr.org/1004/rss.xml",                            lang:"EN", color:"#475569" },
   ],
