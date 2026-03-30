@@ -283,6 +283,7 @@ const TRANSLATIONS = {
 /* t() helper — dil anahtarına göre çeviri döndürür */
 const getLang = (data) => data?.settings?.language || "tr";
 const i18n = (key, data) => (TRANSLATIONS[getLang(data)] || TRANSLATIONS.tr)[key] || TRANSLATIONS.tr[key] || key;
+const ROOM_LABEL_MAP = {projects:"rmProjects",news:"rmNews",music:"rmMusic",clothes:"rmClothes",memories:"rmMemories",healthcoach:"rmHealth"};
 const roomLabel = (room, data) => ROOM_LABEL_MAP[room.id] ? i18n(ROOM_LABEL_MAP[room.id], data) : room.name;
 
 /* ── Constants (dil bağımsız) ── */
@@ -1730,7 +1731,7 @@ function Sports({ data, update, initialView, onBack }) {
       <StickyHeader>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
           {onBack && <button className="back-btn" onClick={onBack}>◀</button>}
-          <h3 style={{margin:0,fontSize:20,fontWeight:800,flex:1}}>Sağlık Koçu</h3>
+          <h3 style={{margin:0,fontSize:20,fontWeight:800,flex:1}}>{T("healthCoach")}</h3>
         </div>
       </StickyHeader>
 
@@ -2343,7 +2344,7 @@ function NewsRoom({ room, onBack, data }) {
           <span style={{fontSize:22}}>
             <svg width="22" height="22" viewBox="0 0 36 36" fill="none"><rect x="4" y="7" width="28" height="22" rx="2" stroke="#ef4444" strokeWidth="1.5" fill="rgba(239,68,68,0.1)"/><line x1="9" y1="13" x2="27" y2="13" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round"/><line x1="9" y1="18" x2="27" y2="18" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" opacity=".6"/><line x1="9" y1="23" x2="20" y2="23" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" opacity=".4"/></svg>
           </span>
-          <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>Haberler</h3>
+          <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{T("news")}</h3>
           <span style={{fontSize:11,color:"#4B5563"}}>{localCats.length} {T("categories")}</span>
         </div>
         <p style={{margin:"6px 0 0",fontSize:12,color:"#4B5563"}}>{T("touchToExplore")}</p>
@@ -3103,8 +3104,8 @@ function BenimStilimRoom({data,update,onBack}){
         <div style={{display:"flex",alignItems:"center",gap:10}}>
           <button className="back-btn" onClick={onBack}>◀</button>
           <div>
-            <div style={{fontSize:18,fontWeight:900,background:"linear-gradient(135deg,#e0d5f5,#a78bfa)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>Benim Stilim</div>
-            <div style={{fontSize:10,color:"#4B5563"}}>Kişisel stil & moodboard</div>
+            <div style={{fontSize:18,fontWeight:900,background:"linear-gradient(135deg,#e0d5f5,#a78bfa)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>{T("myStyle")}</div>
+            <div style={{fontSize:10,color:"#4B5563"}}>{T("lifestyleDesc")}</div>
           </div>
         </div>
       </StickyHeader>
