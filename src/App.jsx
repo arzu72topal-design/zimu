@@ -107,6 +107,12 @@ const TRANSLATIONS = {
     taskAdded:"Görev eklendi", noteAdded:"Not eklendi", foodAdded:"Yemek eklendi",
     sportAdded:"Spor eklendi", eventAdded:"Etkinlik eklendi",
     goingTo:"gidiliyor",
+    // Sağlık Koçu detay
+    yourCoach:"Sağlık Koçun", targetKcal:"Hedef: {0} kcal",
+    noRecordYet:"Bugün henüz kayıt yok. Yediklerini ve sporunu kaydet, sağlık koçun seni yönlendirsin!",
+    addMealBtn:"+ Yemek Ekle", addSportBtn:"+ Spor Ekle",
+    sportDuration:"Spor süresi", burnedKcal:"Yakılan kcal", distanceLabel:"Mesafe",
+    myFoodsLabel:"Benim Yemeklerim",
     // Common
     back:"Geri", viewAll:"Tümü ▶", loading:"Yükleniyor...",
     note:"not", task:"Görev", eventType:"Etkinlik",
@@ -153,7 +159,7 @@ const TRANSLATIONS = {
     // Not boş durum
     noNotesYet:"Henüz not yok", addFirstNote:"+ butonuna basarak ilk notunu yaz",
     // Hızlı tarih
-    noDue:"Tarih yok",
+    noDue:"Tarih yok", roomEmpty:"Bu oda boş", addItemHint:"+ ile öğe ekle",
   },
   en: {
     home:"Home", tasks:"Tasks", lifestyle:"Lifestyle", settings:"Settings",
@@ -230,6 +236,11 @@ const TRANSLATIONS = {
     taskAdded:"Task added", noteAdded:"Note added", foodAdded:"Food added",
     sportAdded:"Sport added", eventAdded:"Event added",
     goingTo:"going to",
+    yourCoach:"Health Coach", targetKcal:"Target: {0} kcal",
+    noRecordYet:"No records yet today. Log your meals and exercises, your health coach will guide you!",
+    addMealBtn:"+ Add Meal", addSportBtn:"+ Add Sport",
+    sportDuration:"Sport duration", burnedKcal:"Burned kcal", distanceLabel:"Distance",
+    myFoodsLabel:"My Foods",
     back:"Back", viewAll:"All ▶", loading:"Loading...",
     note:"note", task:"Task", eventType:"Event",
     addMealTitle:"Add Meal", addSportTitle:"Add Sport", addClothTitle:"Add Clothing",
@@ -265,13 +276,14 @@ const TRANSLATIONS = {
     total:"Total", sportRecord:"Sport Records",
     todayIntake:"Today: {0} intake · {1} burned",
     noNotesYet:"No notes yet", addFirstNote:"Tap + to write your first note",
-    noDue:"No date",
+    noDue:"No date", roomEmpty:"This room is empty", addItemHint:"Tap + to add items",
   },
 };
 
 /* t() helper — dil anahtarına göre çeviri döndürür */
 const getLang = (data) => data?.settings?.language || "tr";
 const i18n = (key, data) => (TRANSLATIONS[getLang(data)] || TRANSLATIONS.tr)[key] || TRANSLATIONS.tr[key] || key;
+const roomLabel = (room, data) => ROOM_LABEL_MAP[room.id] ? i18n(ROOM_LABEL_MAP[room.id], data) : room.name;
 
 /* ── Constants (dil bağımsız) ── */
 const TABS_KEYS = [
@@ -1689,7 +1701,7 @@ function Sports({ data, update, initialView, onBack }) {
 
   // AI Coach advice
   const getCoachTip=()=>{
-    if(todayCalIn===0&&todayCalOut===0) return {icon:"💡",text:"Bugün henüz kayıt yok. Yediklerini ve sporunu kaydet, sağlık koçun seni yönlendirsin!",color:"#3b82f6"};
+    if(todayCalIn===0&&todayCalOut===0) return {icon:"💡",text:T("noRecordYet"),color:"#3b82f6"};
     if(netCal>dailyGoal+300) return {icon:"⚠️",text:`Bugün ${netCal} kcal net kalori — hedefin üzerinde. Hafif bir yürüyüş veya koşu iyi gelir!`,color:"#f59e0b"};
     if(netCal<1200&&todayCalIn>0) return {icon:"🌟",text:`Harika gidiyorsun! ${netCal} kcal net — dengeli ve sağlıklı.`,color:"#22c55e"};
     if(todayCalOut>300) return {icon:"💪",text:`Bugün ${todayCalOut} kcal yaktın, süpersin! Protein ağırlıklı beslenmeyi unutma.`,color:"#22c55e"};
@@ -1726,7 +1738,7 @@ function Sports({ data, update, initialView, onBack }) {
       <div className="stagger-1" style={{background:`${tip.color}15`,border:`1px solid ${tip.color}30`,borderRadius:14,padding:"12px 14px",marginBottom:12,display:"flex",gap:10,alignItems:"start"}}>
         <span style={{fontSize:20}}>{tip.icon}</span>
         <div style={{flex:1}}>
-          <div style={{fontSize:11,fontWeight:700,color:tip.color,marginBottom:1}}>Sağlık Koçun</div>
+          <div style={{fontSize:11,fontWeight:700,color:tip.color,marginBottom:1}}>{T("yourCoach")}</div>
           <div style={{fontSize:12,opacity:.8,lineHeight:1.4}}>{tip.text}</div>
         </div>
       </div>
@@ -1752,7 +1764,7 @@ function Sports({ data, update, initialView, onBack }) {
         <div style={{height:6,background:"#2A2A35",borderRadius:3,overflow:"hidden"}}>
           <div style={{height:"100%",background:netCal>dailyGoal?"#ef4444":"#3b82f6",borderRadius:3,width:`${Math.min(100,netCal/dailyGoal*100)}%`,transition:"width .3s"}}/>
         </div>
-        <div style={{fontSize:10,color:"#9CA3AF",marginTop:4,textAlign:"center"}}>Hedef: {dailyGoal} kcal</div>
+        <div style={{fontSize:10,color:"#9CA3AF",marginTop:4,textAlign:"center"}}>{T("targetKcal").replace("{0}",dailyGoal)}</div>
       </div>
 
       {/* +Yemek / +Spor butonları */}
@@ -1763,7 +1775,7 @@ function Sports({ data, update, initialView, onBack }) {
           padding:"14px 8px",fontSize:14,fontWeight:700,cursor:"pointer",
           display:"flex",alignItems:"center",justifyContent:"center",gap:6,
         }}>
-          <span style={{fontSize:18}}>+</span> Yemek Ekle
+          <span style={{fontSize:18}}>+</span> {T("addMeal")}
         </button>
         <button onClick={()=>setModal(true)} style={{
           flex:1,background:"rgba(34,197,94,0.1)",color:"#22c55e",
@@ -1771,7 +1783,7 @@ function Sports({ data, update, initialView, onBack }) {
           padding:"14px 8px",fontSize:14,fontWeight:700,cursor:"pointer",
           display:"flex",alignItems:"center",justifyContent:"center",gap:6,
         }}>
-          <span style={{fontSize:18}}>+</span> Spor Ekle
+          <span style={{fontSize:18}}>+</span> {T("addExercise")}
         </button>
       </div>
 
@@ -1779,7 +1791,7 @@ function Sports({ data, update, initialView, onBack }) {
         <div style={{marginBottom:12}}>
           <button onClick={()=>photoRef.current?.click()} disabled={analyzing} style={{
             ...addBtnStyle,background:analyzing?"#6B7280":"#22c55e",width:"100%",padding:"12px",borderRadius:12,fontSize:14,
-          }}>{analyzing?"🔄 Analiz ediliyor...":"📸 Fotoğrafla Kalori Hesapla"}</button>
+          }}>{analyzing?`🔄 ${T("analyzing")}`:` 📸 ${T("photoCalorie")}`}</button>
           <input ref={photoRef} type="file" accept="image/*" capture="environment"
             onChange={e=>{if(e.target.files?.[0])analyzePhoto(e.target.files[0]);e.target.value="";}}
             style={{display:"none"}}/>
@@ -1861,10 +1873,10 @@ function Sports({ data, update, initialView, onBack }) {
         <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:8}}>{T("thisWeek")}</div>
         <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:8}}>
           {[
-            {icon:"⏱",val:`${tMin} dk`,label:"Spor süresi",color:"#3b82f6"},
-            {icon:"🔥",val:`${burnedCal}`,label:"Yakılan kcal",color:"#ef4444"},
-            {icon:"📏",val:`${tDist.toFixed(1)} km`,label:"Mesafe",color:"#22c55e"},
-            {icon:"💪",val:wk.length,label:"Antrenman",color:"#f97316"},
+            {icon:"⏱",val:`${tMin} ${T("locale")==="tr-TR"?"dk":"min"}`,label:T("sportDuration"),color:"#3b82f6"},
+            {icon:"🔥",val:`${burnedCal}`,label:T("burnedKcal"),color:"#ef4444"},
+            {icon:"📏",val:`${tDist.toFixed(1)} km`,label:T("distanceLabel"),color:"#22c55e"},
+            {icon:"💪",val:wk.length,label:T("workout"),color:"#f97316"},
           ].map((s,i)=>(
             <div key={i} style={{...cardStyle,padding:"12px",borderLeft:`3px solid ${s.color}`,boxShadow:`0 0 12px ${s.color}15`}}>
               <div style={{fontSize:10,color:"#9CA3AF"}}>{s.icon} {s.label}</div>
@@ -1901,7 +1913,7 @@ function Sports({ data, update, initialView, onBack }) {
           {(foodSearch||!foodForm.name)&&(
             <div style={{maxHeight:180,overflow:"auto",marginBottom:10}}>
               {!foodSearch&&Object.keys(myFoods).length>0&&(
-                <div style={{fontSize:10,color:"#9CA3AF",padding:"4px 8px",fontWeight:700}}>⭐ Benim Yemeklerim</div>
+                <div style={{fontSize:10,color:"#9CA3AF",padding:"4px 8px",fontWeight:700}}>⭐ {T("myFoodsLabel")}</div>
               )}
               {filteredFoods.map(([name,cal,source])=>(
                 <div key={name} onClick={()=>selectCommonFood(name,cal)} style={{
@@ -1922,7 +1934,7 @@ function Sports({ data, update, initialView, onBack }) {
                     <button onClick={()=>askAiCalorie(foodSearch)} disabled={aiLookup} style={{
                       background:"rgba(34,197,94,0.15)",color:"#22c55e",border:"1px solid rgba(34,197,94,0.3)",
                       padding:"8px 16px",borderRadius:10,fontSize:13,cursor:"pointer",fontWeight:600,
-                    }}>{aiLookup?"🔄 AI hesaplıyor...":"🤖 AI'a Kaloriyi Sor"}</button>
+                    }}>{aiLookup?`🔄 ${T("analyzing")}`:` 🤖 ${T("askAI")}`}</button>
                   ):(
                     <p style={{fontSize:11,color:"#4B5563"}}>Kaloriyi elle gir veya Ayarlar'dan AI aç</p>
                   )}
@@ -2419,7 +2431,7 @@ async function proxyFetch(url) {
 }
 
 /* ═══════════ MUSIC ROOM ═══════════ */
-function MusicRoom({ room, items, onBack, onAdd, onDel }) {
+function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
   const [tab, setTab] = useState("collection"); // collection | search | link | charts
   const [searchQ, setSearchQ] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -2634,7 +2646,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
         <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
           <button className="back-btn" onClick={onBack}>◀</button>
           <span style={{fontSize:22}}>🎵</span>
-          <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{roomLabel(room)}</h3>
+          <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{roomLabel(room,data)}</h3>
           <span style={{fontSize:12,color:"#9CA3AF"}}>{items.length} parça</span>
         </div>
         {/* Tab switcher — 4 tabs */}
@@ -3192,8 +3204,6 @@ function BenimStilimRoom({data,update,onBack}){
 /* ═══════════ TARZIM ═══════════ */
 function Projects({ data, update, initialRoom, onRoomConsumed }) {
   const T = (key) => i18n(key, data);
-  const ROOM_LABEL_MAP = {projects:"rmProjects",news:"rmNews",music:"rmMusic",clothes:"rmClothes",memories:"rmMemories",healthcoach:"rmHealth"};
-  const roomLabel = (room) => ROOM_LABEL_MAP[room.id] ? T(ROOM_LABEL_MAP[room.id]) : room.name;
   const [activeRoom,setActiveRoom]=useState(null);
   const [roomSubView,setRoomSubView]=useState(null);
   const [modal,setModal]=useState(false);
@@ -3326,7 +3336,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
                 position:"absolute",bottom:0,left:0,right:0,
                 padding:"14px 16px",zIndex:1,
               }}>
-                <div style={{fontSize:16,fontWeight:700,color:"#F9FAFB"}}>{roomLabel(room)}</div>
+                <div style={{fontSize:16,fontWeight:700,color:"#F9FAFB"}}>{roomLabel(room,data)}</div>
                 <div style={{fontSize:12,color:room.color,fontWeight:600,marginTop:2}}>{count} {T("items")}</div>
               </div>
             </div>
@@ -3355,8 +3365,8 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
       <StickyHeader>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
           <button className="back-btn" onClick={()=>setActiveRoom(null)}>◀</button>
-          <div style={{width:28,height:28,borderRadius:8,background:`${room.color}25`,border:`1px solid ${room.color}50`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:room.color,flexShrink:0}}>{roomLabel(room)[0]}</div>
-          <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{roomLabel(room)}</h3>
+          <div style={{width:28,height:28,borderRadius:8,background:`${room.color}25`,border:`1px solid ${room.color}50`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:room.color,flexShrink:0}}>{roomLabel(room,data)[0]}</div>
+          <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{roomLabel(room,data)}</h3>
         </div>
       </StickyHeader>
       {data.projects.length===0&&<p style={{textAlign:"center",color:"#9CA3AF",fontSize:14,padding:40}}>{T("noProjects")}</p>}
@@ -3423,8 +3433,8 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
 
   /* ── SPECIAL ROOM RENDERERS ── */
   if(activeRoom==="news" || room.type==="news") return <div className="room-enter"><NewsRoom room={room} onBack={()=>setActiveRoom(null)} data={data} /></div>;
-  if(activeRoom==="music" || room.name==="Müziklerim") return <div className="room-enter"><MusicRoom room={room} items={items} onBack={()=>setActiveRoom(null)} onAdd={(item)=>{const cur=roomItems[activeRoom]||[];update({...data,roomItems:{...roomItems,[activeRoom]:[item,...cur]}});}} onDel={(id)=>delItem(activeRoom,id)} /></div>;
-  if(activeRoom==="clothes" || room.name==="Kıyafetlerim") return <div className="room-enter"><BenimStilimRoom data={data} update={update} onBack={()=>setActiveRoom(null)} /></div>;
+  if(activeRoom==="music" || room.id==="music") return <div className="room-enter"><MusicRoom room={room} items={items} data={data} onBack={()=>setActiveRoom(null)} onAdd={(item)=>{const cur=roomItems[activeRoom]||[];update({...data,roomItems:{...roomItems,[activeRoom]:[item,...cur]}});}} onDel={(id)=>delItem(activeRoom,id)} /></div>;
+  if(activeRoom==="clothes" || room.id==="clothes") return <div className="room-enter"><BenimStilimRoom data={data} update={update} onBack={()=>setActiveRoom(null)} /></div>;
   if(activeRoom==="healthcoach" || room.type==="health") return (
     <div className="room-enter">
       <Sports data={data} update={update} initialView={roomSubView} onBack={()=>setActiveRoom(null)}/>
@@ -3436,8 +3446,8 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
       <StickyHeader>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
           <button className="back-btn" onClick={()=>setActiveRoom(null)}>◀</button>
-          <div style={{width:28,height:28,borderRadius:8,background:`${room.color}25`,border:`1px solid ${room.color}50`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:room.color,flexShrink:0}}>{roomLabel(room)[0]}</div>
-          <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{roomLabel(room)}</h3>
+          <div style={{width:28,height:28,borderRadius:8,background:`${room.color}25`,border:`1px solid ${room.color}50`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:room.color,flexShrink:0}}>{roomLabel(room,data)[0]}</div>
+          <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{roomLabel(room,data)}</h3>
           <button onClick={()=>delRoom(activeRoom)} style={{background:"none",border:"none",color:"#ef4444",fontSize:11,cursor:"pointer"}}>{T("del")}</button>
         </div>
       </StickyHeader>
@@ -3449,8 +3459,8 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
             <path d="M18 20 L18 10 L34 10 L34 20" stroke="#6B7280" strokeWidth="1.5" fill="none"/>
             <path d="M20 15 L32 15" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round" opacity=".5"/>
           </svg>
-          <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:4}}>Bu oda boş</div>
-          <div style={{fontSize:12,color:"#4B5563"}}>+ ile öğe ekle</div>
+          <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:4}}>{T("roomEmpty")}</div>
+          <div style={{fontSize:12,color:"#4B5563"}}>{T("addItemHint")}</div>
         </div>
       )}
       {items.map(item=>(
@@ -3709,7 +3719,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
             </div>
             <p style={{fontSize:11,color:"#9CA3AF",margin:"0 0 12px"}}>{T("cloudSyncDesc")}</p>
             <button onClick={onLogout} style={{...btnPrimary,marginTop:0,background:"rgba(239,68,68,0.15)",color:"#ef4444",border:"1px solid rgba(239,68,68,0.2)"}}>
-              Çıkış Yap
+              {T("logout")}
             </button>
           </div>
         ) : (
@@ -4379,6 +4389,7 @@ export default function App() {
           minHeight: isMobile ? "100dvh" : "100vh",
           maxWidth: isMobile ? undefined : 800,
           margin: isMobile ? undefined : "0 auto",
+          touchAction: "pan-y",
         }}
       >
         <div key={tab} className="page-enter">
