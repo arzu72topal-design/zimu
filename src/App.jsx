@@ -853,7 +853,7 @@ function Dashboard({ data, setTab, goTo, update }) {
 
       {/* Bugünün Programı — sadece etkinlikler */}
       <div style={{marginBottom:16}}>
-        <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:10}}{T("todaySchedule")}</div>
+        <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:10}}>{T("todaySchedule")}</div>
         {scheduleItems.length > 0 ? scheduleItems.map(item=>(
           <div key={item.id} onClick={()=>goTo("tasks","calendar")} className="touch-card" style={{
             ...cardStyle,padding:"14px 16px",marginBottom:8,
@@ -902,7 +902,7 @@ function Dashboard({ data, setTab, goTo, update }) {
             <span style={{fontSize:12,color:"#F59E0B",fontWeight:600,flexShrink:0}}>{Math.round(todayCalIn/2000*100)}%</span>
           </div>
         ) : (
-          <div style={{fontSize:13,color:"#9CA3AF",textAlign:"center",padding:"8px 0",marginBottom:12}}{T("noFoodToday")}</div>
+          <div style={{fontSize:13,color:"#9CA3AF",textAlign:"center",padding:"8px 0",marginBottom:12}}>{T("noFoodToday")}</div>
         )}
         <div style={{display:"flex",gap:8}}>
           <button onClick={()=>goTo("lifestyle","healthcoach:food")} style={{
@@ -954,7 +954,7 @@ function Dashboard({ data, setTab, goTo, update }) {
           {headlines.length === 0 ? (
             <div style={{display:"flex",alignItems:"center",gap:10,color:"#9CA3AF"}}>
               <svg width="20" height="20" viewBox="0 0 36 36" fill="none" style={{animation:"pulse 1.5s infinite",flexShrink:0}}><circle cx="18" cy="18" r="13" stroke="#ef4444" strokeWidth="1.5" fill="none"/><path d="M14 18 A4 4 0 0 0 22 18" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round"/><line x1="18" y1="5" x2="18" y2="2" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/><line x1="25" y1="7" x2="27" y2="5" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/><line x1="11" y1="7" x2="9" y2="5" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/></svg>
-              <span style={{fontSize:13}}{T("newsLoading")}</span>
+              <span style={{fontSize:13}}>{T("newsLoading")}</span>
             </div>
           ) : headlines.slice(0,4).map((title,i)=>(
             <div key={i} style={{display:"flex",alignItems:"flex-start",gap:10,
@@ -1015,7 +1015,7 @@ function Dashboard({ data, setTab, goTo, update }) {
       </div>
 
       <div style={{marginBottom:16}}>
-        <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:12}}{T("thisWeek")}</div>
+        <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:12}}>{T("thisWeek")}</div>
         <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10}}>
           {[
             {val:wkSport.length,label:T("workout"),color:"#3B82F6",max:7},
@@ -1155,7 +1155,7 @@ function Tasks({ data, update }) {
     <div>
       <StickyHeader>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-          <h3 style={{margin:0,fontSize:20,fontWeight:800}}{T("tasks")}</h3>
+          <h3 style={{margin:0,fontSize:20,fontWeight:800}}>{T("tasks")}</h3>
           <span style={{fontSize:12,color:"#9CA3AF",fontWeight:500}}>{pending} {T("waiting")}</span>
         </div>
         <div style={{display:"flex",gap:6,overflowX:"auto",paddingBottom:2,WebkitOverflowScrolling:"touch"}}>
@@ -1170,7 +1170,7 @@ function Tasks({ data, update }) {
           ? (
             <div style={{textAlign:"center",padding:"40px 20px"}}>
               <div style={{fontSize:40,marginBottom:8}}>✅</div>
-              <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:4}}{T("allDone")}</div>
+              <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:4}}>{T("allDone")}</div>
               <div style={{fontSize:12,color:"#4B5563"}}>+ ile yeni görev ekle</div>
             </div>
           )
@@ -1185,7 +1185,7 @@ function Tasks({ data, update }) {
           ? (
             <div style={{textAlign:"center",padding:"40px 20px"}}>
               <div style={{fontSize:40,marginBottom:8}}>✅</div>
-              <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:4}}{T("allDone")}</div>
+              <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:4}}>{T("allDone")}</div>
               <div style={{fontSize:12,color:"#4B5563"}}>+ ile yeni görev ekle</div>
             </div>
           )
@@ -1317,7 +1317,7 @@ function CalendarView({ data, update }) {
     <div>
       <StickyHeader>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-          <h3 style={{margin:0,fontSize:20,fontWeight:800}}{T("calendar")}</h3>
+          <h3 style={{margin:0,fontSize:20,fontWeight:800}}>{T("calendar")}</h3>
           <div style={{display:"flex",alignItems:"center",gap:6}}>
             <button onClick={()=>setVd(new Date(y,m-1))} style={{background:"#2A2A35",border:"1px solid rgba(255,255,255,0.05)",color:"#9CA3AF",width:32,height:32,borderRadius:10,fontSize:16,cursor:"pointer"}}>◀</button>
             <span style={{fontWeight:700,fontSize:14,minWidth:105,textAlign:"center"}}>{MN[m]} {y}</span>
@@ -1736,9 +1736,9 @@ function Sports({ data, update, initialView, onBack }) {
 
       {/* ── Bugünün Yemekleri ── */}
       <div style={{marginBottom:14}}>
-        <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:8}}{T("todayFoods")}</div>
+        <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:8}}>{T("todayFoods")}</div>
         {todayFoods.length===0 ? (
-          <div style={{textAlign:"center",padding:"20px",color:"#9CA3AF",fontSize:13}}{T("noFoodYet")}</div>
+          <div style={{textAlign:"center",padding:"20px",color:"#9CA3AF",fontSize:13}}>{T("noFoodYet")}</div>
         ) : mealGroups.map(meal=>{
           const mealFoods=todayFoods.filter(f=>f.meal===meal);
           if(mealFoods.length===0)return null;
@@ -1763,9 +1763,9 @@ function Sports({ data, update, initialView, onBack }) {
 
       {/* ── Bugünün Sporları ── */}
       <div style={{marginBottom:14}}>
-        <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:8}}{T("todaySports")}</div>
+        <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:8}}>{T("todaySports")}</div>
         {todaySports.length===0 ? (
-          <div style={{textAlign:"center",padding:"20px",color:"#9CA3AF",fontSize:13}}{T("noSportYet")}</div>
+          <div style={{textAlign:"center",padding:"20px",color:"#9CA3AF",fontSize:13}}>{T("noSportYet")}</div>
         ) : todaySports.map(s=>(
           <div key={s.id} style={{...cardStyle,display:"flex",alignItems:"center",gap:10,padding:"10px 14px"}}>
             <div style={{fontSize:20,width:36,height:36,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(34,197,94,0.1)",borderRadius:10}}>{SPORT_EMOJI[s.type]||"⚡"}</div>
@@ -1780,7 +1780,7 @@ function Sports({ data, update, initialView, onBack }) {
 
       {/* ── Haftalık Özet ── */}
       <div style={{marginBottom:14}}>
-        <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:8}}{T("thisWeek")}</div>
+        <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:8}}>{T("thisWeek")}</div>
         <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:8}}>
           {[
             {icon:"⏱",val:`${tMin} dk`,label:"Spor süresi",color:"#3b82f6"},
@@ -2157,7 +2157,7 @@ function NewsRoom({ room, onBack }) {
           <div style={{margin:"0 auto 10px",animation:"pulse 1.5s ease-in-out infinite",width:40,height:40,display:"flex",alignItems:"center",justifyContent:"center"}}>
             {NEWS_ICONS[activeCat]?.(catInfo?.color||"#aaa")}
           </div>
-          <div style={{fontSize:13,color:"#9CA3AF",marginBottom:4}}{T("newsLoading")}</div>
+          <div style={{fontSize:13,color:"#9CA3AF",marginBottom:4}}>{T("newsLoading")}</div>
           <div style={{fontSize:11,color:"#4B5563"}}>{NEWS_SOURCES[activeCat]?.map(s=>s.name).join(" · ")}</div>
         </div>
       )}
@@ -3020,7 +3020,7 @@ function BenimStilimRoom({data,update,onBack}){
           <div style={{textAlign:"right"}}>{wxLoad?<div style={{fontSize:12,color:"#9CA3AF",animation:"pulse 1.5s infinite"}}>Yükleniyor...</div>:weather?<><div style={{fontSize:26,fontWeight:800,color:"#e0d5f5"}}>{weather.temp}°C</div><div style={{fontSize:11,color:"#9CA3AF"}}>{weather.desc}</div></>:<div style={{fontSize:11,color:"#9CA3AF"}}>Veri alınamadı</div>}</div>
         </div>
         {weather&&<div style={{marginTop:8,paddingTop:8,borderTop:"1px solid rgba(255,255,255,0.05)",display:"flex",gap:16}}><div style={{fontSize:10,color:"#9CA3AF"}}>{weather.wind} km/s {T("wind")}</div><div style={{fontSize:10,color:"#9CA3AF"}}>%{weather.humid} {T("humidity")}</div><div style={{fontSize:10,color:"#9CA3AF"}}>{weather.feel}°C {T("feelsLike")}</div></div>}
-        <div style={{marginTop:10,background:"#2A2A35",borderRadius:10,padding:"8px 12px"}}><div style={{fontSize:10,color:"#9CA3AF",marginBottom:3}}{T("styleAdvice")}</div><div style={{fontSize:13,color:"#c4b5fd",fontWeight:600}}>{wxLoad?"{T("calculating")}":weather?getStyleHint(weather.temp):"{T("noWeather")}"}</div></div>
+        <div style={{marginTop:10,background:"#2A2A35",borderRadius:10,padding:"8px 12px"}}><div style={{fontSize:10,color:"#9CA3AF",marginBottom:3}}>{T("styleAdvice")}</div><div style={{fontSize:13,color:"#c4b5fd",fontWeight:600}}>{wxLoad?T("calculating"):weather?getStyleHint(weather.temp):T("noWeather")}</div></div>
       </div>
       <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,color:"#9CA3AF",textTransform:"uppercase",marginBottom:10}}>{T("todayLooks")}</div>
       <div style={{display:"flex",gap:8,marginBottom:16}}>
@@ -3208,7 +3208,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
     <div>
       <StickyHeader>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-          <h3 style={{margin:0,fontSize:20,fontWeight:800}}{T("lifestyleTitle")}</h3>
+          <h3 style={{margin:0,fontSize:20,fontWeight:800}}>{T("lifestyleTitle")}</h3>
         </div>
         <p style={{margin:"6px 0 0",fontSize:12,color:"#9CA3AF"}}>{T("lifestyleDesc")}</p>
       </StickyHeader>
@@ -3275,7 +3275,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
           <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{room.name}</h3>
         </div>
       </StickyHeader>
-      {data.projects.length===0&&<p style={{textAlign:"center",color:"#9CA3AF",fontSize:14,padding:40}}{T("noProjects")}</p>}
+      {data.projects.length===0&&<p style={{textAlign:"center",color:"#9CA3AF",fontSize:14,padding:40}}>{T("noProjects")}</p>}
       {data.projects.map(p=>{
         const tasks=p.tasks||[];const d=tasks.filter(t=>t.done).length;
         const pct=tasks.length?Math.round(d/tasks.length*100):0;const open=exp===p.id;
@@ -3421,7 +3421,7 @@ function Notes({ data, update }) {
     <div>
       <StickyHeader>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-          <h3 style={{margin:0,fontSize:20,fontWeight:800}}{T("notes")}</h3>
+          <h3 style={{margin:0,fontSize:20,fontWeight:800}}>{T("notes")}</h3>
           <span style={{fontSize:12,color:"#9CA3AF"}}>{data.notes.length} not</span>
         </div>
         <div style={{display:"flex",gap:8,alignItems:"center"}}>
