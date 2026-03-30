@@ -110,6 +110,20 @@ const TRANSLATIONS = {
     // Common
     back:"Geri", viewAll:"Tümü ▶", loading:"Yükleniyor...",
     note:"not", task:"Görev", eventType:"Etkinlik",
+    // Eksik çeviriler
+    addMealTitle:"Yemek Ekle", addSportTitle:"Spor Ekle", addClothTitle:"Kıyafet Ekle",
+    askAI:"AI'a sor", analyzing:"Analiz ediliyor...", photoCalorie:"Fotoğrafla Kalori Hesapla",
+    descOpt:"Açıklama (opsiyonel)...", catOpt:"Kategori (opsiyonel)",
+    foodName:"Yemek adı", kcalUnit:"kcal", notesOpt:"Notlar (opsiyonel)",
+    addSubtask:"Alt görev ekle...", descField:"Açıklama...", tagsField:"Etiketler (virgülle ayırın)",
+    trackNameOpt:"Parça adı (opsiyonel)",
+    account:"Hesap", cloudSync:"Bulut senkronizasyon aktif",
+    cloudSyncDesc:"Veriler tüm cihazlarında otomatik senkronize edilir",
+    backupDownloaded:"Yedek dosyası indirildi!", dataImported:"Veriler başarıyla aktarıldı!",
+    dataDeleted:"Tüm veriler silindi", enableNotif:"Bildirimleri Aç",
+    searchSongs:"Şarkı, sanatçı veya albüm ara...",
+    sportNames:["Koşu","Yüzme","Bisiklet","Yoga","Ağırlık","Yürüyüş","Diğer"],
+    locale:"tr-TR", speechLang:"tr-TR",
   },
   en: {
     home:"Home", tasks:"Tasks", lifestyle:"Lifestyle", settings:"Settings",
@@ -188,6 +202,19 @@ const TRANSLATIONS = {
     goingTo:"going to",
     back:"Back", viewAll:"All ▶", loading:"Loading...",
     note:"note", task:"Task", eventType:"Event",
+    addMealTitle:"Add Meal", addSportTitle:"Add Sport", addClothTitle:"Add Clothing",
+    askAI:"Ask AI", analyzing:"Analyzing...", photoCalorie:"Calculate Calories from Photo",
+    descOpt:"Description (optional)...", catOpt:"Category (optional)",
+    foodName:"Food name", kcalUnit:"kcal", notesOpt:"Notes (optional)",
+    addSubtask:"Add subtask...", descField:"Description...", tagsField:"Tags (comma separated)",
+    trackNameOpt:"Track name (optional)",
+    account:"Account", cloudSync:"Cloud sync active",
+    cloudSyncDesc:"Data syncs automatically across all your devices",
+    backupDownloaded:"Backup downloaded!", dataImported:"Data imported successfully!",
+    dataDeleted:"All data deleted", enableNotif:"Enable Notifications",
+    searchSongs:"Search songs, artists or albums...",
+    sportNames:["Running","Swimming","Cycling","Yoga","Weights","Walking","Other"],
+    locale:"en-US", speechLang:"en-US",
   },
 };
 
@@ -769,7 +796,7 @@ function Dashboard({ data, setTab, goTo, update }) {
           <div style={{flex:1}}>
             <h2 style={{margin:0,fontSize:28,fontWeight:700,letterSpacing:-.5,color:"#F9FAFB",lineHeight:1.2}}>{greeting}!</h2>
             <p style={{margin:"4px 0 0",color:"#9CA3AF",fontSize:13}}>
-              {new Date().toLocaleDateString("tr-TR",{weekday:"long",day:"numeric",month:"long"})}
+              {new Date().toLocaleDateString(T("locale"),{weekday:"long",day:"numeric",month:"long"})}
             </p>
           </div>
         </div>
@@ -1113,7 +1140,7 @@ function Tasks({ data, update }) {
     if(!d) return "";
     if(d===t) return "Bugün";
     if(d===tomorrow()) return "Yarın";
-    return new Date(d).toLocaleDateString("tr-TR",{day:"numeric",month:"short"});
+    return new Date(d).toLocaleDateString(T("locale"),{day:"numeric",month:"short"});
   };
 
   const pending = data.tasks.filter(x=>!x.done).length;
@@ -1223,8 +1250,8 @@ function Tasks({ data, update }) {
           <VoiceMic onResult={(t)=>setForm(f=>({...f,title:t}))}/>
         </div>
         <div style={{height:10}}/>
-        <textarea style={{...inp,minHeight:80,resize:"vertical",fontFamily:"inherit",lineHeight:1.5}} placeholder="Açıklama (opsiyonel)..." value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/>
-        <input style={inp} placeholder="Kategori (opsiyonel)" value={form.category} onChange={e=>setForm({...form,category:e.target.value})}/>
+        <textarea style={{...inp,minHeight:80,resize:"vertical",fontFamily:"inherit",lineHeight:1.5}} placeholder={T("descOpt")} value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/>
+        <input style={inp} placeholder={T("catOpt")} value={form.category} onChange={e=>setForm({...form,category:e.target.value})}/>
         <div style={{marginBottom:10}}>
           <div style={{fontSize:12,color:"#9CA3AF",marginBottom:6}}>Tarih seç:</div>
           <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:8}}>
@@ -1401,7 +1428,7 @@ function CalendarView({ data, update }) {
           <input style={{...inp,flex:1}} type="date" value={form.date} onChange={e=>setForm({...form,date:e.target.value})}/>
           <input style={{...inp,flex:1}} type="time" value={form.time} onChange={e=>setForm({...form,time:e.target.value})}/>
         </div>
-        <input style={inp} placeholder="Açıklama (opsiyonel)" value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/>
+        <input style={inp} placeholder={T("descOpt")} value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/>
         <select style={inp} value={form.recurring} onChange={e=>setForm({...form,recurring:e.target.value})}>
           <option value="none">Tekrarlama yok</option>
           <option value="daily">Her gün</option>
@@ -1413,7 +1440,7 @@ function CalendarView({ data, update }) {
             <button key={c} onClick={()=>setForm({...form,color:c})} style={{width:30,height:30,borderRadius:"50%",background:c,border:form.color===c?"3px solid #fff":"3px solid transparent",cursor:"pointer"}}/>
           ))}
         </div>
-        <button style={btnPrimary} onClick={add}>Ekle</button>
+        <button style={btnPrimary} onClick={add}>{T("add")}</button>
       </Modal>
     </div>
   );
@@ -1797,7 +1824,7 @@ function Sports({ data, update, initialView, onBack }) {
       </div>
 
       {/* ═══ YEMEK EKLEME MODAL ═══ */}
-      <Modal open={foodModal} onClose={()=>{setFoodModal(false);setFoodSearch("");}} title="Yemek Ekle">
+      <Modal open={foodModal} onClose={()=>{setFoodModal(false);setFoodSearch("");}} title={T("addMealTitle")}>
         <div style={{marginBottom:12}}>
           <div style={{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap"}}>
             {mealGroups.map(m=>(
@@ -1853,9 +1880,9 @@ function Sports({ data, update, initialView, onBack }) {
             </div>
           )}
           <div style={{display:"flex",gap:8}}>
-            <input style={{...inp,flex:2}} placeholder="Yemek adı" value={foodForm.name} onChange={e=>setFoodForm({...foodForm,name:e.target.value})}/>
+            <input style={{...inp,flex:2}} placeholder={T("foodName")} value={foodForm.name} onChange={e=>setFoodForm({...foodForm,name:e.target.value})}/>
             <div style={{flex:1,position:"relative"}}>
-              <input style={{...inp,paddingRight:hasAI?36:14}} type="number" placeholder="kcal" value={foodForm.calories} onChange={e=>setFoodForm({...foodForm,calories:e.target.value})}/>
+              <input style={{...inp,paddingRight:hasAI?36:14}} type="number" placeholder={T("kcalUnit")} value={foodForm.calories} onChange={e=>setFoodForm({...foodForm,calories:e.target.value})}/>
               {hasAI&&foodForm.name&&!foodForm.calories&&(
                 <button onClick={()=>askAiCalorie(foodForm.name)} disabled={aiLookup} style={{
                   position:"absolute",right:8,top:8,background:"none",border:"none",
@@ -1870,12 +1897,12 @@ function Sports({ data, update, initialView, onBack }) {
             </div>
           )}
           <input style={inp} type="date" value={foodForm.date} onChange={e=>setFoodForm({...foodForm,date:e.target.value})}/>
-          <button style={{...btnPrimary,background:"linear-gradient(135deg,#f97316,#ef4444)"}} onClick={()=>{addFood();setFoodModal(false);setFoodSearch("");}}>Ekle</button>
+          <button style={{...btnPrimary,background:"linear-gradient(135deg,#f97316,#ef4444)"}} onClick={()=>{addFood();setFoodModal(false);setFoodSearch("");}}>{T("add")}</button>
         </div>
       </Modal>
 
       {/* ═══ SPOR EKLEME MODAL ═══ */}
-      <Modal open={modal} onClose={()=>setModal(false)} title="Spor Ekle">
+      <Modal open={modal} onClose={()=>setModal(false)} title={T("addSportTitle")}>
         <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:12}}>
           {SPORT_TYPES.map(s=>(
             <button key={s} onClick={()=>setForm({...form,type:s})} style={{
@@ -1888,15 +1915,15 @@ function Sports({ data, update, initialView, onBack }) {
           ))}
         </div>
         <div style={{display:"flex",gap:8}}>
-          <input style={{...inp,flex:1}} type="number" placeholder="Süre (dk)" value={form.duration} onChange={e=>setForm({...form,duration:e.target.value,calories:String(calcSportCal(form.type,e.target.value))})}/>
-          <input style={{...inp,flex:1}} type="number" placeholder="Mesafe (km)" value={form.distance} onChange={e=>setForm({...form,distance:e.target.value})}/>
+          <input style={{...inp,flex:1}} type="number" placeholder={T("duration")} value={form.duration} onChange={e=>setForm({...form,duration:e.target.value,calories:String(calcSportCal(form.type,e.target.value))})}/>
+          <input style={{...inp,flex:1}} type="number" placeholder={T("distance")} value={form.distance} onChange={e=>setForm({...form,distance:e.target.value})}/>
         </div>
         <div style={{display:"flex",gap:8}}>
-          <input style={{...inp,flex:1}} type="number" placeholder="Kalori (kcal)" value={form.calories} onChange={e=>setForm({...form,calories:e.target.value})}/>
+          <input style={{...inp,flex:1}} type="number" placeholder={T("calorie")+" (kcal)"} value={form.calories} onChange={e=>setForm({...form,calories:e.target.value})}/>
           <input style={{...inp,flex:1}} type="date" value={form.date} onChange={e=>setForm({...form,date:e.target.value})}/>
         </div>
-        <input style={inp} placeholder="Notlar (opsiyonel)" value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})}/>
-        <button style={{...btnPrimary,background:"linear-gradient(135deg,#22c55e,#14b8a6)"}} onClick={()=>{addSport();setModal(false);}}>Ekle</button>
+        <input style={inp} placeholder={T("notesOpt")} value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})}/>
+        <button style={{...btnPrimary,background:"linear-gradient(135deg,#22c55e,#14b8a6)"}} onClick={()=>{addSport();setModal(false);}}>{T("add")}</button>
       </Modal>
     </div>
   );
@@ -2670,7 +2697,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
         <div>
           <input
             style={{...inp,marginBottom:12}}
-            placeholder="🔍 Şarkı, sanatçı veya albüm ara..."
+            placeholder={T("searchSongs")}
             value={searchQ}
             onChange={e=>setSearchQ(e.target.value)}
             onKeyDown={e=>e.key==="Enter"&&searchMusic(searchQ)}
@@ -2776,7 +2803,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
           {/* Title override */}
           <input
             style={inp}
-            placeholder="Parça adı (opsiyonel, otomatik doldurulamadıysa)"
+            placeholder={T("trackNameOpt")}
             value={linkPreview?.title||""}
             onChange={e=>setLinkPreview(lp=>lp?{...lp,title:e.target.value}:{title:e.target.value,url:linkInput,platform:"Müzik",color:"#9CA3AF"})}
           />
@@ -3309,7 +3336,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
                 <span style={{fontSize:13,textDecoration:t.done?"line-through":"none",opacity:t.done?.4:1}}>{t.title}</span>
               </div>))}
               <div style={{display:"flex",gap:8,marginTop:10}}>
-                <input style={{...inp,flex:1,marginBottom:0}} placeholder="Alt görev ekle..." value={tf.title} onChange={e=>setTf({title:e.target.value})} onKeyDown={e=>e.key==="Enter"&&addPT(p.id)}/>
+                <input style={{...inp,flex:1,marginBottom:0}} placeholder={T("addSubtask")} value={tf.title} onChange={e=>setTf({title:e.target.value})} onKeyDown={e=>e.key==="Enter"&&addPT(p.id)}/>
                 <button onClick={()=>addPT(p.id)} style={{background:"#3b82f6",color:"#fff",border:"none",borderRadius:10,padding:"0 18px",fontSize:18,cursor:"pointer"}}>+</button>
               </div>
               <button onClick={()=>delProject(p.id)} style={{background:"rgba(239,68,68,0.1)",color:"#ef4444",border:"1px solid rgba(239,68,68,0.2)",borderRadius:10,padding:"10px",width:"100%",marginTop:12,fontSize:13,cursor:"pointer"}}>Projeyi Sil</button>
@@ -3324,12 +3351,12 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
           <VoiceMic onResult={(t)=>setForm(f=>({...f,name:t}))}/>
         </div>
         <div style={{height:10}}/>
-        <input style={inp} placeholder="Açıklama..." value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/>
+        <input style={inp} placeholder={T("descField")} value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/>
         <div style={{display:"flex",gap:8}}>
           <select style={{...inp,flex:1}} value={form.status} onChange={e=>setForm({...form,status:e.target.value})}>{PROJECT_STATUSES.map(s=><option key={s}>{s}</option>)}</select>
           <input style={{...inp,flex:1}} type="date" value={form.deadline} onChange={e=>setForm({...form,deadline:e.target.value})}/>
         </div>
-        <input style={inp} placeholder="Etiketler (virgülle ayırın)" value={form.tags} onChange={e=>setForm({...form,tags:e.target.value})}/>
+        <input style={inp} placeholder={T("tagsField")} value={form.tags} onChange={e=>setForm({...form,tags:e.target.value})}/>
         <button style={btnPrimary} onClick={addProject}>{T("create")}</button>
       </Modal>
     </div>
@@ -3354,7 +3381,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
           <button className="back-btn" onClick={()=>setActiveRoom(null)}>◀</button>
           <div style={{width:28,height:28,borderRadius:8,background:`${room.color}25`,border:`1px solid ${room.color}50`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:room.color,flexShrink:0}}>{room.name[0]}</div>
           <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{room.name}</h3>
-          <button onClick={()=>delRoom(activeRoom)} style={{background:"none",border:"none",color:"#ef4444",fontSize:11,cursor:"pointer"}}>Sil</button>
+          <button onClick={()=>delRoom(activeRoom)} style={{background:"none",border:"none",color:"#ef4444",fontSize:11,cursor:"pointer"}}>{T("del")}</button>
         </div>
       </StickyHeader>
       {items.length===0&&(
@@ -3387,9 +3414,9 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
       <FAB onClick={()=>setItemModal(true)} color={room.color}/>
       <Modal open={itemModal} onClose={()=>setItemModal(false)} title={`${room.icon} ${room.name} — Yeni Öğe`}>
         <input style={inp} placeholder={T("noteTitle")} value={itemForm.title} onChange={e=>setItemForm({...itemForm,title:e.target.value})} autoFocus/>
-        <textarea style={{...inp,minHeight:80,resize:"vertical",fontFamily:"inherit",lineHeight:1.5}} placeholder="Açıklama (opsiyonel)..." value={itemForm.description} onChange={e=>setItemForm({...itemForm,description:e.target.value})}/>
-        <input style={inp} placeholder="Etiketler (virgülle ayırın)" value={itemForm.tags} onChange={e=>setItemForm({...itemForm,tags:e.target.value})}/>
-        <button style={btnPrimary} onClick={addItem}>Ekle</button>
+        <textarea style={{...inp,minHeight:80,resize:"vertical",fontFamily:"inherit",lineHeight:1.5}} placeholder={T("descOpt")} value={itemForm.description} onChange={e=>setItemForm({...itemForm,description:e.target.value})}/>
+        <input style={inp} placeholder={T("tagsField")} value={itemForm.tags} onChange={e=>setItemForm({...itemForm,tags:e.target.value})}/>
+        <button style={btnPrimary} onClick={addItem}>{T("add")}</button>
       </Modal>
     </div>
   );
@@ -3460,7 +3487,7 @@ function Notes({ data, update }) {
           <VoiceMic onResult={(t)=>setForm(f=>({...f,title:t}))} color="#14b8a6"/>
         </div>
         <div style={{height:10}}/>
-        <textarea style={{...inp,minHeight:140,resize:"vertical",fontFamily:"inherit",lineHeight:1.5}} placeholder="İçerik yazın..." value={form.content} onChange={e=>setForm({...form,content:e.target.value})}/>
+        <textarea style={{...inp,minHeight:140,resize:"vertical",fontFamily:"inherit",lineHeight:1.5}} placeholder={T("noteContent")} value={form.content} onChange={e=>setForm({...form,content:e.target.value})}/>
         <div style={{display:"flex",gap:8,marginBottom:14}}>
           {COLORS.map(c=>(
             <button key={c} onClick={()=>setForm({...form,color:c})} style={{width:30,height:30,borderRadius:"50%",background:c,border:form.color===c?"3px solid #fff":"3px solid transparent",cursor:"pointer"}}/>
@@ -3538,7 +3565,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
 
   const handleExport = () => {
     exportData();
-    setMsg("Yedek dosyası indirildi!");
+    setMsg(T("backupDownloaded"));
     setTimeout(() => setMsg(""), 2000);
   };
 
@@ -3549,7 +3576,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
     try {
       const imported = await importData(file);
       onImport(imported);
-      setMsg("Veriler başarıyla aktarıldı!");
+      setMsg(T("dataImported"));
     } catch (err) {
       setMsg("Hata: " + err.message);
     }
@@ -3558,10 +3585,10 @@ function Settings({ data, update, onImport, user, onLogout }) {
   };
 
   const clearAll = () => {
-    if (confirm("Tüm veriler silinecek. Emin misiniz?")) {
+    if (confirm(T("deleteConfirm"))) {
       const empty = { tasks: [], events: [], sports: [], projects: [], notes: [], settings: data.settings };
       update(empty);
-      setMsg("Tüm veriler silindi");
+      setMsg(T("dataDeleted"));
       setTimeout(() => setMsg(""), 2000);
     }
   };
@@ -3603,7 +3630,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
 
       {/* User info */}
       <div style={{background:"#1C1C26",borderRadius:14,padding:16,marginBottom:12}}>
-        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>👤 Hesap</h4>
+        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>👤 {T("account")}</h4>
         {user ? (
           <div>
             <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
@@ -3621,9 +3648,9 @@ function Settings({ data, update, onImport, user, onLogout }) {
             </div>
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
               <span style={{width:8,height:8,borderRadius:"50%",background:"#22c55e"}}/>
-              <span style={{fontSize:12,color:"#22c55e"}}>Bulut senkronizasyon aktif</span>
+              <span style={{fontSize:12,color:"#22c55e"}}>{T("cloudSync")}</span>
             </div>
-            <p style={{fontSize:11,color:"#9CA3AF",margin:"0 0 12px"}}>Veriler tüm cihazlarında otomatik senkronize edilir</p>
+            <p style={{fontSize:11,color:"#9CA3AF",margin:"0 0 12px"}}>{T("cloudSyncDesc")}</p>
             <button onClick={onLogout} style={{...btnPrimary,marginTop:0,background:"rgba(239,68,68,0.15)",color:"#ef4444",border:"1px solid rgba(239,68,68,0.2)"}}>
               Çıkış Yap
             </button>
@@ -3658,7 +3685,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
         ) : notifStatus === "denied" ? (
           <p style={{fontSize:13,color:"#ef4444"}}>Bildirimler engellendi. Tarayıcı ayarlarından izin verin.</p>
         ) : (
-          <button onClick={enableNotif} style={{...btnPrimary,marginTop:0,background:"#22c55e"}}>Bildirimleri Aç</button>
+          <button onClick={enableNotif} style={{...btnPrimary,marginTop:0,background:"#22c55e"}}>{T("enableNotif")}</button>
         )}
       </div>
 
@@ -3684,7 +3711,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
         <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>💾 Veri Yönetimi</h4>
         <p style={{fontSize:12,color:"#9CA3AF",margin:"0 0 12px"}}>Bilgisayarınızdan veri aktarabilir veya yedeğinizi indirebilirsiniz</p>
         <button onClick={handleExport} style={{...btnPrimary,marginTop:0,marginBottom:8,background:"#14b8a6"}}>
-          📥 Yedek İndir (JSON)
+          📥 {T("exportData")} (JSON)
         </button>
         <button onClick={()=>fileRef.current?.click()} disabled={importing} style={{...btnPrimary,marginTop:0,background:"#a855f7"}}>
           {importing ? "Aktarılıyor..." : "📤 Dosyadan Aktar (JSON)"}
@@ -3759,7 +3786,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
       <div style={{background:"#1C1C26",borderRadius:14,padding:16}}>
         <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700,color:"#ef4444"}}>⚠️ Tehlikeli Bölge</h4>
         <button onClick={clearAll} style={{...btnPrimary,marginTop:0,background:"#ef4444"}}>
-          Tüm Verileri Sil
+          {T("deleteAll")}
         </button>
       </div>
     </div>
@@ -4226,7 +4253,7 @@ export default function App() {
       case "dashboard": return <Dashboard data={data} setTab={setTab} goTo={goTo} update={update}/>;
       case "tasks": return <TasksHub data={data} update={update} initialSubTab={pendingSubTab} onSubTabConsumed={()=>setPendingSubTab(null)}/>;
       case "lifestyle": return <Projects data={data} update={update} initialRoom={pendingRoom} onRoomConsumed={()=>setPendingRoom(null)}/>;
-      case "settings": return <Settings data={data} update={update} onImport={d=>{setData(d);showToast("Veriler aktarıldı!")}} user={user} onLogout={handleLogout}/>;
+      case "settings": return <Settings data={data} update={update} onImport={d=>{setData(d);showToast(T("dataImported"))}} user={user} onLogout={handleLogout}/>;
     }
   };
 
