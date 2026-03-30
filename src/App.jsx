@@ -193,7 +193,7 @@ const TRANSLATIONS = {
 
 /* t() helper — dil anahtarına göre çeviri döndürür */
 const getLang = (data) => data?.settings?.language || "tr";
-const t = (key, data) => (TRANSLATIONS[getLang(data)] || TRANSLATIONS.tr)[key] || TRANSLATIONS.tr[key] || key;
+const i18n = (key, data) => (TRANSLATIONS[getLang(data)] || TRANSLATIONS.tr)[key] || TRANSLATIONS.tr[key] || key;
 
 /* ── Constants (dil bağımsız) ── */
 const TABS_KEYS = [
@@ -709,7 +709,7 @@ function Dashboard({ data, setTab, goTo, update }) {
   const activeProjects = data.projects.filter(p=>p.status!=="Tamamlandı").length;
 
   const hour = new Date().getHours();
-  const T = (key) => t(key, data);
+  const T = (key) => i18n(key, data);
   const greeting = hour<12 ? T("goodMorning") : hour<18 ? T("goodAfternoon") : T("goodEvening");
 
   // Daily thoughts (3 slots)
@@ -1069,7 +1069,7 @@ function Dashboard({ data, setTab, goTo, update }) {
 
 /* ═══════════ TASKS ═══════════ */
 function Tasks({ data, update }) {
-  const T = (key) => t(key, data);
+  const T = (key) => i18n(key, data);
   const [modal,setModal]=useState(false);
   const [filter,setFilter]=useState("all");
   const [editingId,setEditingId]=useState(null);
@@ -1271,7 +1271,7 @@ function Tasks({ data, update }) {
 
 /* ═══════════ CALENDAR ═══════════ */
 function CalendarView({ data, update }) {
-  const T = (key) => t(key, data);
+  const T = (key) => i18n(key, data);
   const [vd,setVd]=useState(new Date());
   const [modal,setModal]=useState(false);
   const [selDay,setSelDay]=useState(null);
@@ -1422,7 +1422,7 @@ function CalendarView({ data, update }) {
 /* ═══════════ SPORTS ═══════════ */
 /* ═══════════ SAĞLIK (Health Coach) ═══════════ */
 function Sports({ data, update, initialView, onBack }) {
-  const T = (key) => t(key, data);
+  const T = (key) => i18n(key, data);
   const [modal,setModal]=useState(false);
   const [foodModal,setFoodModal]=useState(false);
   const [form,setForm]=useState({type:"Koşu",duration:"",distance:"",calories:"",date:today(),notes:""});
@@ -2958,7 +2958,7 @@ const DEFAULT_RULES2=[{id:"r1",label:"İş ortamına uygun",on:true},{id:"r2",la
 const catIconMap={top:"smart",alt:"bottom",dis:"coat",elbise:"dress"};
 
 function BenimStilimRoom({data,update,onBack}){
-  const T = (key) => t(key, data);
+  const T = (key) => i18n(key, data);
   const [weather,setWeather]=useState(null);
   const [wxLoad,setWxLoad]=useState(true);
   const [cityName,setCityName]=useState(T("gettingLoc"));
@@ -3109,7 +3109,7 @@ function BenimStilimRoom({data,update,onBack}){
 }
 /* ═══════════ TARZIM ═══════════ */
 function Projects({ data, update, initialRoom, onRoomConsumed }) {
-  const T = (key) => t(key, data);
+  const T = (key) => i18n(key, data);
   const [activeRoom,setActiveRoom]=useState(null);
   const [roomSubView,setRoomSubView]=useState(null);
   const [modal,setModal]=useState(false);
@@ -3397,7 +3397,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
 
 /* ═══════════ NOTES ═══════════ */
 function Notes({ data, update }) {
-  const T = (key) => t(key, data);
+  const T = (key) => i18n(key, data);
   const [modal,setModal]=useState(false);
   const [editing,setEditing]=useState(null);
   const [form,setForm]=useState({title:"",content:"",color:"#3b82f6"});
@@ -3474,7 +3474,7 @@ function Notes({ data, update }) {
 
 /* ═══════════ TASKS HUB (Görevler + Takvim + Notlar) ═══════════ */
 function TasksHub({ data, update, initialSubTab, onSubTabConsumed }) {
-  const T = (key) => t(key, data);
+  const T = (key) => i18n(key, data);
   const [subTab, setSubTab] = useState("tasks");
 
   // Dashboard'dan gelen sub-tab yönlendirmesini yakala
@@ -3572,7 +3572,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
   const projectCount = data.projects.length;
   const noteCount = data.notes.length;
 
-  const T = (key) => t(key, data);
+  const T = (key) => i18n(key, data);
   const curLang = data.settings?.language || "tr";
   const setLang = (lang) => update({...data, settings:{...data.settings, language:lang}});
 
@@ -4142,7 +4142,7 @@ export default function App() {
     setData(null);
   };
 
-  const T = (key) => t(key, data);
+  const T = (key) => i18n(key, data);
   const allTabs = [...TABS_KEYS.map(tb=>({...tb, label: T(tb.labelKey)})), { id: "settings", label: T("settings"), icon: "⚙" }];
 
   // Show login screen (after splash, when not authenticated)
