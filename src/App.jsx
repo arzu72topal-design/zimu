@@ -141,7 +141,7 @@ const TRANSLATIONS = {
     catEkoD:"Piyasalar, borsa & iş dünyası", catPolD:"Dünya siyaseti & gündem",
     catSagD:"Tıp, beslenme & wellness", catBilD:"Uzay, keşifler & araştırmalar",
     catSanD:"Kültür, sanat & eğlence", catDunD:"Dünya haberleri & olaylar",
-    touchToExplore:"{T("touchToExplore")}",
+    touchToExplore:"Bir kategoriye dokun ve haberleri keşfet",
     // Settings bölümleri
     notifications:"Bildirimler", dataSummary:"Veri Özeti", dataManagement:"Veri Yönetimi",
     dangerZone:"Tehlikeli Bölge", notifActive:"Bildirimler aktif",
