@@ -3258,7 +3258,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
             <button key={c} onClick={()=>setRoomForm({...roomForm,color:c})} style={{width:30,height:30,borderRadius:"50%",background:c,border:roomForm.color===c?"3px solid #fff":"3px solid transparent",cursor:"pointer"}}/>
           ))}
         </div>
-        <button style={btnPrimary} onClick={addRoom}{T("create")}</button>
+        <button style={btnPrimary} onClick={addRoom}>{T("create")}</button>
       </Modal>
     </div>
   );
@@ -3330,7 +3330,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
           <input style={{...inp,flex:1}} type="date" value={form.deadline} onChange={e=>setForm({...form,deadline:e.target.value})}/>
         </div>
         <input style={inp} placeholder="Etiketler (virgülle ayırın)" value={form.tags} onChange={e=>setForm({...form,tags:e.target.value})}/>
-        <button style={btnPrimary} onClick={addProject}{T("create")}</button>
+        <button style={btnPrimary} onClick={addProject}>{T("create")}</button>
       </Modal>
     </div>
   );
@@ -3466,7 +3466,7 @@ function Notes({ data, update }) {
             <button key={c} onClick={()=>setForm({...form,color:c})} style={{width:30,height:30,borderRadius:"50%",background:c,border:form.color===c?"3px solid #fff":"3px solid transparent",cursor:"pointer"}}/>
           ))}
         </div>
-        <button style={btnPrimary} onClick={save2}>{editing?"Güncelle":"Kaydet"}</button>
+        <button style={btnPrimary} onClick={save2}>{editing?T("update"):T("save")}</button>
       </Modal>
     </div>
   );
