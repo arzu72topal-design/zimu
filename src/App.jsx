@@ -124,6 +124,36 @@ const TRANSLATIONS = {
     searchSongs:"Şarkı, sanatçı veya albüm ara...",
     sportNames:["Koşu","Yüzme","Bisiklet","Yoga","Ağırlık","Yürüyüş","Diğer"],
     locale:"tr-TR", speechLang:"tr-TR",
+    // Ay ve gün isimleri
+    months:["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"],
+    daysShort:["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"],
+    // Öncelik
+    priHigh:"Yüksek", priMed:"Orta", priLow:"Düşük",
+    // Görev grupları
+    grpOverdue:"Gecikmiş", grpToday:"Bugün", grpWeek:"Bu Hafta", grpPending:"Bekleyen",
+    // Oda isimleri
+    rmProjects:"Projeler", rmNews:"Haberler", rmMusic:"Müziklerim",
+    rmClothes:"Kıyafetlerim", rmMemories:"Anılar", rmHealth:"Sağlık Koçu",
+    // Haber kategorileri
+    catSpor:"Spor", catTek:"Teknoloji", catEko:"Ekonomi", catPol:"Politika",
+    catSag:"Sağlık", catBil:"Bilim", catSan:"Sanat", catDun:"Dünya",
+    catSporD:"Futbol, basketbol & dünya sporları", catTekD:"Yapay zeka, gadget & yazılım",
+    catEkoD:"Piyasalar, borsa & iş dünyası", catPolD:"Dünya siyaseti & gündem",
+    catSagD:"Tıp, beslenme & wellness", catBilD:"Uzay, keşifler & araştırmalar",
+    catSanD:"Kültür, sanat & eğlence", catDunD:"Dünya haberleri & olaylar",
+    touchToExplore:"{T("touchToExplore")}",
+    // Settings bölümleri
+    notifications:"Bildirimler", dataSummary:"Veri Özeti", dataManagement:"Veri Yönetimi",
+    dangerZone:"Tehlikeli Bölge", notifActive:"Bildirimler aktif",
+    notifBlocked:"Bildirimler engellendi. Tarayıcı ayarlarından izin verin.",
+    dataDesc:"Bilgisayarınızdan veri aktarabilir veya yedeğinizi indirebilirsiniz",
+    total:"Toplam", sportRecord:"Spor Kaydı",
+    // Kalori detay
+    todayIntake:"Bugün: {0} alındı · {1} yakıldı",
+    // Not boş durum
+    noNotesYet:"Henüz not yok", addFirstNote:"+ butonuna basarak ilk notunu yaz",
+    // Hızlı tarih
+    noDue:"Tarih yok",
   },
   en: {
     home:"Home", tasks:"Tasks", lifestyle:"Lifestyle", settings:"Settings",
@@ -215,6 +245,27 @@ const TRANSLATIONS = {
     searchSongs:"Search songs, artists or albums...",
     sportNames:["Running","Swimming","Cycling","Yoga","Weights","Walking","Other"],
     locale:"en-US", speechLang:"en-US",
+    months:["January","February","March","April","May","June","July","August","September","October","November","December"],
+    daysShort:["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],
+    priHigh:"High", priMed:"Medium", priLow:"Low",
+    grpOverdue:"Overdue", grpToday:"Today", grpWeek:"This Week", grpPending:"Pending",
+    rmProjects:"Projects", rmNews:"News", rmMusic:"My Music",
+    rmClothes:"My Wardrobe", rmMemories:"Memories", rmHealth:"Health Coach",
+    catSpor:"Sports", catTek:"Technology", catEko:"Economy", catPol:"Politics",
+    catSag:"Health", catBil:"Science", catSan:"Art", catDun:"World",
+    catSporD:"Football, basketball & world sports", catTekD:"AI, gadgets & software",
+    catEkoD:"Markets, stocks & business", catPolD:"World politics & agenda",
+    catSagD:"Medicine, nutrition & wellness", catBilD:"Space, discoveries & research",
+    catSanD:"Culture, art & entertainment", catDunD:"World news & events",
+    touchToExplore:"Tap a category to explore news",
+    notifications:"Notifications", dataSummary:"Data Summary", dataManagement:"Data Management",
+    dangerZone:"Danger Zone", notifActive:"Notifications active",
+    notifBlocked:"Notifications blocked. Allow in browser settings.",
+    dataDesc:"You can import data or download your backup",
+    total:"Total", sportRecord:"Sport Records",
+    todayIntake:"Today: {0} intake · {1} burned",
+    noNotesYet:"No notes yet", addFirstNote:"Tap + to write your first note",
+    noDue:"No date",
   },
 };
 
@@ -889,7 +940,7 @@ function Dashboard({ data, setTab, goTo, update }) {
             <div style={{width:3,height:36,background:item.color,borderRadius:2,flexShrink:0}}/>
             <div style={{flex:1,minWidth:0}}>
               <div style={{fontSize:14,fontWeight:600,color:"#F9FAFB",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.title}</div>
-              <div style={{fontSize:13,color:"#9CA3AF",marginTop:2}}>Etkinlik · {item.sub}</div>
+              <div style={{fontSize:13,color:"#9CA3AF",marginTop:2}}>{T("eventType")} · {item.sub}</div>
             </div>
             <span style={{fontSize:11,color:"#9CA3AF"}}>▶</span>
           </div>
@@ -918,7 +969,7 @@ function Dashboard({ data, setTab, goTo, update }) {
           </div>
           <div style={{flex:1}}>
             <div style={{fontSize:16,fontWeight:600,color:"#F9FAFB"}}>{T("calorieTrack")}</div>
-            <div style={{fontSize:13,color:"#9CA3AF"}}>Bugün: {todayCalIn} alındı · {todayCalOut} yakıldı</div>
+            <div style={{fontSize:13,color:"#9CA3AF"}}>{T("todayIntake").replace("{0}",todayCalIn).replace("{1}",todayCalOut)}</div>
           </div>
         </div>
         {todayCalIn > 0 ? (
@@ -935,11 +986,11 @@ function Dashboard({ data, setTab, goTo, update }) {
           <button onClick={()=>goTo("lifestyle","healthcoach:food")} style={{
             flex:1,background:"rgba(245,158,11,0.1)",color:"#F59E0B",border:"1px solid rgba(245,158,11,0.2)",
             borderRadius:12,padding:"11px 4px",fontSize:13,fontWeight:600,cursor:"pointer",
-          }}>+ Yemek</button>
+          }}>{T("addFood")}</button>
           <button onClick={()=>goTo("lifestyle","healthcoach:sport")} style={{
             flex:1,background:"rgba(16,185,129,0.1)",color:"#10B981",border:"1px solid rgba(16,185,129,0.2)",
             borderRadius:12,padding:"11px 4px",fontSize:13,fontWeight:600,cursor:"pointer",
-          }}>+ Spor</button>
+          }}>{T("addSport")}</button>
         </div>
       </div>
 
@@ -1130,15 +1181,15 @@ function Tasks({ data, update }) {
   const weekEnd = nextWeek();
 
   const quickDates = [
-    {label:"Bugün",val:t,icon:"📌"},
-    {label:"Yarın",val:tomorrow(),icon:"⏭"},
+    {label:T("today"),val:t,icon:"📌"},
+    {label:T("tomorrow"),val:tomorrow(),icon:"⏭"},
     {label:"1 Hafta",val:weekEnd,icon:"📅"},
     {label:"1 Ay",val:nextMonth(),icon:"🗓"},
   ];
 
   const formatDate = (d) => {
     if(!d) return "";
-    if(d===t) return "Bugün";
+    if(d===t) return T("today");
     if(d===tomorrow()) return "Yarın";
     return new Date(d).toLocaleDateString(T("locale"),{day:"numeric",month:"short"});
   };
@@ -1154,10 +1205,10 @@ function Tasks({ data, update }) {
   });
 
   const groups = filter==="all" ? [
-    {key:"overdue",label:"Gecikmiş",color:"#ef4444",tasks:list.filter(x=>!x.done&&x.dueDate&&x.dueDate<t)},
-    {key:"today",label:"Bugün",color:"#3b82f6",tasks:list.filter(x=>!x.done&&x.dueDate===t)},
-    {key:"week",label:"Bu Hafta",color:"#a855f7",tasks:list.filter(x=>!x.done&&x.dueDate&&x.dueDate>t&&x.dueDate<=weekEnd)},
-    {key:"pending",label:"Bekleyen",color:"#9CA3AF",tasks:list.filter(x=>!x.done&&(!x.dueDate||x.dueDate>weekEnd))},
+    {key:"overdue",label:T("grpOverdue"),color:"#ef4444",tasks:list.filter(x=>!x.done&&x.dueDate&&x.dueDate<t)},
+    {key:"today",label:T("grpToday"),color:"#3b82f6",tasks:list.filter(x=>!x.done&&x.dueDate===t)},
+    {key:"week",label:T("grpWeek"),color:"#a855f7",tasks:list.filter(x=>!x.done&&x.dueDate&&x.dueDate>t&&x.dueDate<=weekEnd)},
+    {key:"pending",label:T("grpPending"),color:"#9CA3AF",tasks:list.filter(x=>!x.done&&(!x.dueDate||x.dueDate>weekEnd))},
     {key:"done",label:"Tamamlanan",color:"#22c55e",tasks:list.filter(x=>x.done)},
   ].filter(g=>g.tasks.length>0) : null;
 
@@ -1169,7 +1220,7 @@ function Tasks({ data, update }) {
       <div style={{flex:1,minWidth:0,cursor:"pointer"}} onClick={()=>setDetail(detail===task.id?null:task.id)}>
         <div style={{fontSize:14,fontWeight:600,color:"#F9FAFB",textDecoration:task.done?"line-through":"none",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{task.title}</div>
         <div style={{display:"flex",gap:6,marginTop:4,flexWrap:"wrap",alignItems:"center"}}>
-          {task.priority&&<span style={{background:`${PCOL[task.priority]}15`,color:PCOL[task.priority],padding:"2px 8px",borderRadius:6,fontSize:11,fontWeight:600}}>{PRIORITIES[task.priority]}</span>}
+          {task.priority&&<span style={{background:`${PCOL[task.priority]}15`,color:PCOL[task.priority],padding:"2px 8px",borderRadius:6,fontSize:11,fontWeight:600}}>{({high:T("priHigh"),medium:T("priMed"),low:T("priLow")}[task.priority])}</span>}
           {task.category&&<span style={{background:"rgba(59,130,246,0.1)",color:"#3b82f6",padding:"2px 8px",borderRadius:6,fontSize:11}}>{task.category}</span>}
           {task.dueDate&&<span style={{fontSize:11,color:!task.done&&task.dueDate<t?"#ef4444":"#9CA3AF"}}>{formatDate(task.dueDate)}</span>}
         </div>
@@ -1198,7 +1249,7 @@ function Tasks({ data, update }) {
             <div style={{textAlign:"center",padding:"40px 20px"}}>
               <div style={{fontSize:40,marginBottom:8}}>✅</div>
               <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:4}}>{T("allDone")}</div>
-              <div style={{fontSize:12,color:"#4B5563"}}>+ ile yeni görev ekle</div>
+              <div style={{fontSize:12,color:"#4B5563"}}>{T("addFirst")}</div>
             </div>
           )
           : groups.map(group=>(
@@ -1213,7 +1264,7 @@ function Tasks({ data, update }) {
             <div style={{textAlign:"center",padding:"40px 20px"}}>
               <div style={{fontSize:40,marginBottom:8}}>✅</div>
               <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:4}}>{T("allDone")}</div>
-              <div style={{fontSize:12,color:"#4B5563"}}>+ ile yeni görev ekle</div>
+              <div style={{fontSize:12,color:"#4B5563"}}>{T("addFirst")}</div>
             </div>
           )
           : list.map(task=><TaskCard key={task.id} task={task}/>)
@@ -1235,7 +1286,7 @@ function Tasks({ data, update }) {
             <div style={{display:"flex",flexWrap:"wrap",gap:8,fontSize:12,opacity:.6}}>
               {task.category&&<span>🏷 {task.category}</span>}
               {task.dueDate&&<span style={{color:!task.done&&task.dueDate<today()?"#ef4444":"inherit"}}>📅 {task.dueDate}</span>}
-              <span>⚡ {PRIORITIES[task.priority]}</span>
+              <span>⚡ {({high:T("priHigh"),medium:T("priMed"),low:T("priLow")}[task.priority])}</span>
               <span>{task.done?"✅ Tamamlandı":"⏳ Bekliyor"}</span>
             </div>
           </div>
@@ -1274,9 +1325,9 @@ function Tasks({ data, update }) {
           </div>
         </div>
         <div style={{marginBottom:12}}>
-          <div style={{fontSize:12,color:"#9CA3AF",marginBottom:6}}>Öncelik:</div>
+          <div style={{fontSize:12,color:"#9CA3AF",marginBottom:6}}>{T("selPriority")}</div>
           <div style={{display:"flex",gap:6}}>
-            {Object.entries(PRIORITIES).map(([k,v])=>(
+            {Object.keys(PCOL).map(k=>(
               <button key={k} onClick={()=>setForm({...form,priority:k})} style={{
                 flex:1,padding:"10px",borderRadius:10,fontSize:13,cursor:"pointer",textAlign:"center",fontWeight:600,
                 background:form.priority===k?`${PCOL[k]}20`:"#2A2A35",
@@ -1284,7 +1335,7 @@ function Tasks({ data, update }) {
                 border:`1px solid ${form.priority===k?PCOL[k]+"40":"rgba(255,255,255,0.05)"}`,
               }}>
                 <span style={{display:"block",width:8,height:8,borderRadius:"50%",background:PCOL[k],margin:"0 auto 4px"}}/>
-                {v}
+                {{high:T("priHigh"),medium:T("priMed"),low:T("priLow")}[k]}
               </button>
             ))}
           </div>
@@ -1347,13 +1398,13 @@ function CalendarView({ data, update }) {
           <h3 style={{margin:0,fontSize:20,fontWeight:800}}>{T("calendar")}</h3>
           <div style={{display:"flex",alignItems:"center",gap:6}}>
             <button onClick={()=>setVd(new Date(y,m-1))} style={{background:"#2A2A35",border:"1px solid rgba(255,255,255,0.05)",color:"#9CA3AF",width:32,height:32,borderRadius:10,fontSize:16,cursor:"pointer"}}>◀</button>
-            <span style={{fontWeight:700,fontSize:14,minWidth:105,textAlign:"center"}}>{MN[m]} {y}</span>
+            <span style={{fontWeight:700,fontSize:14,minWidth:105,textAlign:"center"}}>{T("months")[m]} {y}</span>
             <button onClick={()=>setVd(new Date(y,m+1))} style={{background:"#2A2A35",border:"1px solid rgba(255,255,255,0.05)",color:"#9CA3AF",width:32,height:32,borderRadius:10,fontSize:16,cursor:"pointer"}}>▶</button>
           </div>
         </div>
       </StickyHeader>
       <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:3}}>
-        {DN.map(d=><div key={d} style={{textAlign:"center",fontSize:11,fontWeight:700,color:"#9CA3AF",padding:"6px 0"}}>{d}</div>)}
+        {T("daysShort").map(d=><div key={d} style={{textAlign:"center",fontSize:11,fontWeight:700,color:"#9CA3AF",padding:"6px 0"}}>{d}</div>)}
         {cells.map((d,i)=>{
           const isToday=d&&ds(d)===t;
           const ev=d?evOn(d):[];
@@ -1378,7 +1429,7 @@ function CalendarView({ data, update }) {
       {selDay&&(
         <div style={{background:"#1C1C26",borderRadius:14,padding:16,marginTop:12}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-            <h4 style={{margin:0,fontSize:15,fontWeight:700}}>{selDay} {MN[m]}</h4>
+            <h4 style={{margin:0,fontSize:15,fontWeight:700}}>{selDay} {T("months")[m]}</h4>
             <button onClick={openAdd} style={{background:"rgba(59,130,246,0.15)",color:"#3b82f6",border:"none",borderRadius:8,padding:"6px 14px",fontSize:12,cursor:"pointer",fontWeight:600}}>+ Ekle</button>
           </div>
           {evOn(selDay).length===0&&<p style={{color:"#9CA3AF",fontSize:13,margin:0}}>Etkinlik yok</p>}
@@ -1904,14 +1955,14 @@ function Sports({ data, update, initialView, onBack }) {
       {/* ═══ SPOR EKLEME MODAL ═══ */}
       <Modal open={modal} onClose={()=>setModal(false)} title={T("addSportTitle")}>
         <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:12}}>
-          {SPORT_TYPES.map(s=>(
+          {SPORT_TYPES.map((s,si)=>(
             <button key={s} onClick={()=>setForm({...form,type:s})} style={{
               background:form.type===s?"rgba(34,197,94,0.2)":"#2A2A35",
-              color:form.type===s?"#22c55e":"#aaa",
+              color:form.type===s?"#22c55e":"#9CA3AF",
               border:form.type===s?"1px solid rgba(34,197,94,0.3)":"1px solid rgba(255,255,255,0.05)",
               padding:"7px 14px",borderRadius:10,fontSize:13,cursor:"pointer",
               display:"flex",alignItems:"center",gap:4,
-            }}><span>{SPORT_EMOJI[s]}</span>{s}</button>
+            }}><span>{SPORT_EMOJI[s]}</span>{(T("sportNames")||SPORT_TYPES)[si]}</button>
           ))}
         </div>
         <div style={{display:"flex",gap:8}}>
@@ -2068,7 +2119,11 @@ const NEWS_CATS = [
 ];
 
 /* ── NewsRoom: Category grid → drill into article list ── */
-function NewsRoom({ room, onBack }) {
+function NewsRoom({ room, onBack, data }) {
+  const T = (key) => i18n(key, data);
+  const CAT_LABEL = {spor:"catSpor",teknoloji:"catTek",ekonomi:"catEko",politika:"catPol",saglik:"catSag",bilim:"catBil",sanat:"catSan",dunya:"catDun"};
+  const CAT_DESC = {spor:"catSporD",teknoloji:"catTekD",ekonomi:"catEkoD",politika:"catPolD",saglik:"catSagD",bilim:"catBilD",sanat:"catSanD",dunya:"catDunD"};
+  const localCats = NEWS_CATS.map(c=>({...c, label:T(CAT_LABEL[c.id])||c.label, desc:T(CAT_DESC[c.id])||c.desc}));
   const [activeCat, setActiveCat] = useState(null); // null = grid, string = category id
   const [articles, setArticles] = useState({});
   const [loading, setLoading] = useState({});
@@ -2142,7 +2197,7 @@ function NewsRoom({ room, onBack }) {
     fetchCategory(catId);
   };
 
-  const catInfo = NEWS_CATS.find(c=>c.id===activeCat);
+  const catInfo = localCats.find(c=>c.id===activeCat);
   const rawList = articles[activeCat] || [];
   const list = langFilter==="all" ? rawList : rawList.filter(a=>a.lang===langFilter);
   const isLoading = loading[activeCat];
@@ -2277,13 +2332,13 @@ function NewsRoom({ room, onBack }) {
             <svg width="22" height="22" viewBox="0 0 36 36" fill="none"><rect x="4" y="7" width="28" height="22" rx="2" stroke="#ef4444" strokeWidth="1.5" fill="rgba(239,68,68,0.1)"/><line x1="9" y1="13" x2="27" y2="13" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round"/><line x1="9" y1="18" x2="27" y2="18" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" opacity=".6"/><line x1="9" y1="23" x2="20" y2="23" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" opacity=".4"/></svg>
           </span>
           <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>Haberler</h3>
-          <span style={{fontSize:11,color:"#4B5563"}}>{NEWS_CATS.length} kategori</span>
+          <span style={{fontSize:11,color:"#4B5563"}}>{localCats.length} {T("categories")}</span>
         </div>
-        <p style={{margin:"6px 0 0",fontSize:12,color:"#4B5563"}}>Bir kategoriye dokun ve haberleri keşfet</p>
+        <p style={{margin:"6px 0 0",fontSize:12,color:"#4B5563"}}>{T("touchToExplore")}</p>
       </StickyHeader>
 
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
-        {NEWS_CATS.map((cat,idx)=>(
+        {localCats.map((cat,idx)=>(
           <div key={cat.id} className={`touch-card stagger-${Math.min(idx+1,6)}`} onClick={()=>openCat(cat.id)}
             style={{
               background:`linear-gradient(145deg,rgba(255,255,255,0.05) 0%,rgba(255,255,255,0.02) 100%)`,
@@ -2579,7 +2634,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel }) {
         <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
           <button className="back-btn" onClick={onBack}>◀</button>
           <span style={{fontSize:22}}>🎵</span>
-          <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{room.name}</h3>
+          <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{roomLabel(room)}</h3>
           <span style={{fontSize:12,color:"#9CA3AF"}}>{items.length} parça</span>
         </div>
         {/* Tab switcher — 4 tabs */}
@@ -3137,6 +3192,8 @@ function BenimStilimRoom({data,update,onBack}){
 /* ═══════════ TARZIM ═══════════ */
 function Projects({ data, update, initialRoom, onRoomConsumed }) {
   const T = (key) => i18n(key, data);
+  const ROOM_LABEL_MAP = {projects:"rmProjects",news:"rmNews",music:"rmMusic",clothes:"rmClothes",memories:"rmMemories",healthcoach:"rmHealth"};
+  const roomLabel = (room) => ROOM_LABEL_MAP[room.id] ? T(ROOM_LABEL_MAP[room.id]) : room.name;
   const [activeRoom,setActiveRoom]=useState(null);
   const [roomSubView,setRoomSubView]=useState(null);
   const [modal,setModal]=useState(false);
@@ -3269,8 +3326,8 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
                 position:"absolute",bottom:0,left:0,right:0,
                 padding:"14px 16px",zIndex:1,
               }}>
-                <div style={{fontSize:16,fontWeight:700,color:"#F9FAFB"}}>{room.name}</div>
-                <div style={{fontSize:12,color:room.color,fontWeight:600,marginTop:2}}>{count} öğe</div>
+                <div style={{fontSize:16,fontWeight:700,color:"#F9FAFB"}}>{roomLabel(room)}</div>
+                <div style={{fontSize:12,color:room.color,fontWeight:600,marginTop:2}}>{count} {T("items")}</div>
               </div>
             </div>
           );
@@ -3298,8 +3355,8 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
       <StickyHeader>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
           <button className="back-btn" onClick={()=>setActiveRoom(null)}>◀</button>
-          <div style={{width:28,height:28,borderRadius:8,background:`${room.color}25`,border:`1px solid ${room.color}50`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:room.color,flexShrink:0}}>{room.name[0]}</div>
-          <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{room.name}</h3>
+          <div style={{width:28,height:28,borderRadius:8,background:`${room.color}25`,border:`1px solid ${room.color}50`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:room.color,flexShrink:0}}>{roomLabel(room)[0]}</div>
+          <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{roomLabel(room)}</h3>
         </div>
       </StickyHeader>
       {data.projects.length===0&&<p style={{textAlign:"center",color:"#9CA3AF",fontSize:14,padding:40}}>{T("noProjects")}</p>}
@@ -3365,7 +3422,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
   const items=roomItems[activeRoom]||[];
 
   /* ── SPECIAL ROOM RENDERERS ── */
-  if(activeRoom==="news" || room.type==="news") return <div className="room-enter"><NewsRoom room={room} onBack={()=>setActiveRoom(null)} /></div>;
+  if(activeRoom==="news" || room.type==="news") return <div className="room-enter"><NewsRoom room={room} onBack={()=>setActiveRoom(null)} data={data} /></div>;
   if(activeRoom==="music" || room.name==="Müziklerim") return <div className="room-enter"><MusicRoom room={room} items={items} onBack={()=>setActiveRoom(null)} onAdd={(item)=>{const cur=roomItems[activeRoom]||[];update({...data,roomItems:{...roomItems,[activeRoom]:[item,...cur]}});}} onDel={(id)=>delItem(activeRoom,id)} /></div>;
   if(activeRoom==="clothes" || room.name==="Kıyafetlerim") return <div className="room-enter"><BenimStilimRoom data={data} update={update} onBack={()=>setActiveRoom(null)} /></div>;
   if(activeRoom==="healthcoach" || room.type==="health") return (
@@ -3379,8 +3436,8 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
       <StickyHeader>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
           <button className="back-btn" onClick={()=>setActiveRoom(null)}>◀</button>
-          <div style={{width:28,height:28,borderRadius:8,background:`${room.color}25`,border:`1px solid ${room.color}50`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:room.color,flexShrink:0}}>{room.name[0]}</div>
-          <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{room.name}</h3>
+          <div style={{width:28,height:28,borderRadius:8,background:`${room.color}25`,border:`1px solid ${room.color}50`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:room.color,flexShrink:0}}>{roomLabel(room)[0]}</div>
+          <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{roomLabel(room)}</h3>
           <button onClick={()=>delRoom(activeRoom)} style={{background:"none",border:"none",color:"#ef4444",fontSize:11,cursor:"pointer"}}>{T("del")}</button>
         </div>
       </StickyHeader>
@@ -3465,8 +3522,8 @@ function Notes({ data, update }) {
         {filtered.length===0&&(
           <div style={{gridColumn:"1/-1",textAlign:"center",padding:"40px 20px"}}>
             <div style={{fontSize:40,marginBottom:8}}>📝</div>
-            <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:4}}>{data.notes.length===0?"Henüz not yok":"Arama sonucu bulunamadı"}</div>
-            {data.notes.length===0&&<div style={{fontSize:12,color:"#4B5563"}}>+ butonuna basarak ilk notunu yaz</div>}
+            <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:4}}>{data.notes.length===0?T("noNotesYet"):T("noResult")}</div>
+            {data.notes.length===0&&<div style={{fontSize:12,color:"#4B5563"}}>{T("addFirstNote")}</div>}
           </div>
         )}
         {filtered.map(n=>(
@@ -3671,19 +3728,19 @@ function Settings({ data, update, onImport, user, onLogout }) {
 
       {/* Notifications */}
       <div style={{background:"#1C1C26",borderRadius:14,padding:16,marginBottom:12}}>
-        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>🔔 Bildirimler</h4>
+        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>🔔 {T("notifications")}</h4>
         {!isNotificationSupported() ? (
           <p style={{fontSize:13,color:"#9CA3AF"}}>Bu tarayıcı bildirimleri desteklemiyor</p>
         ) : notifStatus === "granted" ? (
           <div>
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
               <span style={{width:10,height:10,borderRadius:"50%",background:"#22c55e"}}/>
-              <span style={{fontSize:13,color:"#22c55e"}}>Bildirimler aktif</span>
+              <span style={{fontSize:13,color:"#22c55e"}}>{T("notifActive")}</span>
             </div>
             <p style={{fontSize:12,color:"#9CA3AF",margin:0}}>Etkinlik ve görev hatırlatmaları otomatik olarak gönderilecek</p>
           </div>
         ) : notifStatus === "denied" ? (
-          <p style={{fontSize:13,color:"#ef4444"}}>Bildirimler engellendi. Tarayıcı ayarlarından izin verin.</p>
+          <p style={{fontSize:13,color:"#ef4444"}}>{T("notifBlocked")}</p>
         ) : (
           <button onClick={enableNotif} style={{...btnPrimary,marginTop:0,background:"#22c55e"}}>{T("enableNotif")}</button>
         )}
@@ -3691,12 +3748,12 @@ function Settings({ data, update, onImport, user, onLogout }) {
 
       {/* Data Stats */}
       <div style={{background:"#1C1C26",borderRadius:14,padding:16,marginBottom:12}}>
-        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>📊 Veri Özeti</h4>
+        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>📊 {T("dataSummary")}</h4>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
           {[
-            {l:"Görev",v:taskCount},{l:"Etkinlik",v:eventCount},
-            {l:"Spor Kaydı",v:sportCount},{l:"Proje",v:projectCount},
-            {l:"Not",v:noteCount},{l:"Toplam",v:taskCount+eventCount+sportCount+projectCount+noteCount},
+            {l:T("task"),v:taskCount},{l:T("eventType"),v:eventCount},
+            {l:T("sportRecord"),v:sportCount},{l:T("project"),v:projectCount},
+            {l:T("note"),v:noteCount},{l:T("total"),v:taskCount+eventCount+sportCount+projectCount+noteCount},
           ].map((s,i)=>(
             <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"6px 0",borderBottom:"1px solid rgba(255,255,255,0.05)"}}>
               <span style={{fontSize:13,opacity:.6}}>{s.l}</span>
@@ -3708,8 +3765,8 @@ function Settings({ data, update, onImport, user, onLogout }) {
 
       {/* Import / Export */}
       <div style={{background:"#1C1C26",borderRadius:14,padding:16,marginBottom:12}}>
-        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>💾 Veri Yönetimi</h4>
-        <p style={{fontSize:12,color:"#9CA3AF",margin:"0 0 12px"}}>Bilgisayarınızdan veri aktarabilir veya yedeğinizi indirebilirsiniz</p>
+        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>💾 {T("dataManagement")}</h4>
+        <p style={{fontSize:12,color:"#9CA3AF",margin:"0 0 12px"}}>{T("dataDesc")}</p>
         <button onClick={handleExport} style={{...btnPrimary,marginTop:0,marginBottom:8,background:"#14b8a6"}}>
           📥 {T("exportData")} (JSON)
         </button>
@@ -3784,7 +3841,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
 
       {/* Danger zone */}
       <div style={{background:"#1C1C26",borderRadius:14,padding:16}}>
-        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700,color:"#ef4444"}}>⚠️ Tehlikeli Bölge</h4>
+        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700,color:"#ef4444"}}>⚠️ {T("dangerZone")}</h4>
         <button onClick={clearAll} style={{...btnPrimary,marginTop:0,background:"#ef4444"}}>
           {T("deleteAll")}
         </button>
