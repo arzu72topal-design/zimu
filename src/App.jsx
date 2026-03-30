@@ -16,11 +16,190 @@ import {
   clearAllReminders,
 } from "./notifications.js";
 
-/* ── Constants ── */
-const TABS = [
-  { id: "dashboard", label: "Ana Sayfa", icon: "⌂" },
-  { id: "tasks", label: "Görevler", icon: "✓" },
-  { id: "lifestyle", label: "Yaşam Tarzı", icon: "◈" },
+/* ── i18n — Dil Desteği ── */
+const TRANSLATIONS = {
+  tr: {
+    // Nav
+    home:"Ana Sayfa", tasks:"Görevler", lifestyle:"Yaşam Tarzı", settings:"Ayarlar",
+    // Greetings
+    goodMorning:"Günaydın", goodAfternoon:"İyi günler", goodEvening:"İyi akşamlar",
+    // Dashboard
+    taskStatus:"Görev Durumu", todaySummary:"Bugünün özeti",
+    pending:"Bekleyen", event:"Etkinlik", project:"Proje",
+    calorieTrack:"Kalori Takibi", noFoodToday:"Henüz bugün yemek kaydı yok",
+    addFood:"+ Yemek", addSport:"+ Spor",
+    styleMotiv:"Bugün harika görüneceksin!", styleReady:"Hava durumuna göre stil önerilerin hazır",
+    overdueAlert:"gecikmiş görev!", checkNow:"Hemen kontrol et",
+    todaySchedule:"Bugünün Programı", noEventToday:"Bugün planlanmış etkinlik yok",
+    goCalendar:"Takvim'e git ve etkinlik ekle",
+    thisWeek:"Bu Hafta", workout:"Antrenman", kcalBurned:"kcal yakıldı", taskDone:"Görev bitti",
+    thoughts:"{T("thoughts")}",
+    thought1:"Bugün en çok düşündüğüm şey...", thought2:"Kafamı karıştıran bir şey...", thought3:"Çözmek istediğim bir sorun...",
+    bbcNews:"Haberler", newsLoading:"Haberler yükleniyor...",
+    musicCol:"{T("musicCol")}", musicEmpty:"Müzik koleksiyonu boş",
+    musicEmptyDesc:"{T("musicEmptyDesc")}",
+    recentNotes:"Son Notlar",
+    // Tasks
+    waiting:"bekliyor", all:"Tümü", pendingF:"Bekleyen", done:"Bitti",
+    priorityF:"Öncelikli", overdueF:"Gecikmiş",
+    allDone:"Tüm görevler tamamlandı!", noTasks:"Henüz görev yok", addFirst:"İlk görevini ekle",
+    newTask:"Yeni Görev", editTask:"Görevi Düzenle", taskTitle:"Görev başlığı...",
+    selDate:"Tarih seç:", today:"Bugün", tomorrow:"Yarın", thisWeekS:"Bu Hafta",
+    selPriority:"Öncelik:", low:"Düşük", medium:"Orta", high:"Yüksek",
+    category:"Kategori (opsiyonel):",
+    save:"Kaydet", add:"Ekle", del:"Sil", cancel:"İptal", update:"Güncelle", create:"Oluştur",
+    // Calendar
+    calendar:"Takvim", newEvent:"Yeni Etkinlik", eventName:"Etkinlik adı...",
+    noEvents:"Etkinlik yok", time:"Saat", desc:"Açıklama", color:"Renk",
+    repeat:"Tekrar", none:"Yok", daily:"Günlük", weekly:"Haftalık", monthly:"Aylık",
+    upcomingEv:"Yaklaşan Etkinlikler",
+    // Notes
+    notes:"Notlar", newNote:"Yeni Not", editNote:"Notu Düzenle",
+    searchNotes:"Notlarda ara...", noNotes:"Henüz not yok", noResult:"Arama sonucu bulunamadı",
+    noteTitle:"Başlık...", noteContent:"İçerik...",
+    // Health Coach
+    healthCoach:"Sağlık Koçu", dailyBalance:"Günlük Denge",
+    intake:"Alınan", burned:"Yakılan", net:"Net", target:"Hedef",
+    todayFoods:"Bugünün Yemekleri", noFoodYet:"Henüz yemek kaydı yok",
+    todaySports:"Bugünün Sporları", noSportYet:"Henüz spor kaydı yok",
+    addMeal:"Yemek Ekle", addExercise:"Spor Ekle",
+    searchFood:"Yemek ara (pilav, salata...)", myFoods:"Benim Yemeklerim",
+    notFound:"bulunamadı", enterManual:"Kaloriyi elle gir veya Ayarlar'dan AI aç",
+    meal:"Öğün:", breakfast:"Kahvaltı", lunch:"Öğle", dinner:"Akşam", snack:"Atıştırma",
+    calorie:"Kalori", sportType:"Spor Türü:", duration:"Süre (dk)", distance:"Mesafe (km)",
+    sportTypes:["Koşu","Yüzme","Bisiklet","Yoga","Ağırlık","Yürüyüş","Diğer"],
+    // Lifestyle
+    lifestyleTitle:"Yaşam Tarzı", lifestyleDesc:"{T("lifestyleDesc")}",
+    items:"öğe", newRoom:"Yeni Oda", roomName:"Oda adı...", selColor:"Renk seç:",
+    // Projects
+    projects:"Projeler", newProject:"Yeni Proje", projectName:"Proje adı...", noProjects:"Henüz proje yok",
+    // News
+    news:"Haberler", newsLoadFail:"Haber yüklenemedi", checkInternet:"İnternet bağlantını kontrol et",
+    retry:"Tekrar Dene", noTrNews:"Türkçe haber bulunamadı",
+    otherLangAvail:"Diğer dillerde haber mevcut", showAll:"Tümünü Göster",
+    categories:"kategori",
+    // Music
+    myMusic:"Müziklerim", emptyCol:"Koleksiyonun boş",
+    emptyColDesc:"Deezer'dan ara veya link yapıştır",
+    searchDeezer:"Deezer'da Ara", addLink:"Link Ekle",
+    searchMusic:"Şarkı, sanatçı veya albüm ara...",
+    collection:"Koleksiyon", search:"Ara", charts:"Listeler", link:"Link",
+    piece:"parça", howToUse:"Nasıl kullanılır?",
+    // Clothing
+    myStyle:"Kıyafetlerim", todayWeather:"{T("todayWeather")}", gettingLoc:T("gettingLoc"),
+    styleAdvice:"Stil Önerisi", calculating:"{T("calculating")}", noWeather:"{T("noWeather")}",
+    todayLooks:"{T("todayLooks")}", styleRules:"{T("styleRules")}",
+    colorPalette:"{T("colorPalette")}", myCloset:"Dolabım",
+    top:"Üst", bottom:"Alt", outer:"Dış", dress:"Elbise", wore:"Giydim",
+    addClothing:"Kıyafet Ekle", clothingName:"Kıyafet adı (örn: Lacivert Blazer)",
+    noClothesCat:"Bu kategoride kıyafet yok",
+    wind:"rüzgar", humidity:"nem", feelsLike:"hissedilen",
+    // Settings
+    settingsTitle:"Ayarlar", language:"Dil",
+    aiCalorie:"AI Kalori Tahmini", notifTitle:"Bildirimler",
+    dataBackup:"Veri Yedekleme", exportData:"Yedek İndir", importData:"Yedek Yükle",
+    deleteAll:"Tüm Verileri Sil", logout:"Çıkış Yap",
+    notifNotSupported:"Bu tarayıcı bildirimleri desteklemiyor",
+    deleteConfirm:"Tüm veriler silinecek. Emin misiniz?",
+    // Voice
+    listening:"Dinliyorum...", startSpeaking:"Konuşmaya başlayın", voiceInput:"Sesli giriş",
+    notUnderstood:"Anlaşılamadı",
+    taskAdded:"Görev eklendi", noteAdded:"Not eklendi", foodAdded:"Yemek eklendi",
+    sportAdded:"Spor eklendi", eventAdded:"Etkinlik eklendi",
+    goingTo:"gidiliyor",
+    // Common
+    back:"Geri", viewAll:"Tümü ▶", loading:"Yükleniyor...",
+    note:"not", task:"Görev", eventType:"Etkinlik",
+  },
+  en: {
+    home:"Home", tasks:"Tasks", lifestyle:"Lifestyle", settings:"Settings",
+    goodMorning:"Good morning", goodAfternoon:"Good afternoon", goodEvening:"Good evening",
+    taskStatus:"Task Status", todaySummary:"Today's summary",
+    pending:"Pending", event:"Event", project:"Project",
+    calorieTrack:"Calorie Tracking", noFoodToday:"No food logged today",
+    addFood:"+ Food", addSport:"+ Sport",
+    styleMotiv:"You'll look amazing today!", styleReady:"Style suggestions ready based on weather",
+    overdueAlert:"overdue task(s)!", checkNow:"Check now",
+    todaySchedule:"Today's Schedule", noEventToday:"No events scheduled for today",
+    goCalendar:"Go to Calendar and add an event",
+    thisWeek:"This Week", workout:"Workout", kcalBurned:"kcal burned", taskDone:"Tasks done",
+    thoughts:"What's on My Mind",
+    thought1:"What I'm thinking about the most...", thought2:"Something that's bugging me...", thought3:"A problem I want to solve...",
+    bbcNews:"News", newsLoading:"Loading news...",
+    musicCol:"Music Collection", musicEmpty:"Music collection is empty",
+    musicEmptyDesc:"Go to Lifestyle → My Music and add some",
+    recentNotes:"Recent Notes",
+    waiting:"waiting", all:"All", pendingF:"Pending", done:"Done",
+    priorityF:"Priority", overdueF:"Overdue",
+    allDone:"All tasks completed!", noTasks:"No tasks yet", addFirst:"Add your first task",
+    newTask:"New Task", editTask:"Edit Task", taskTitle:"Task title...",
+    selDate:"Select date:", today:"Today", tomorrow:"Tomorrow", thisWeekS:"This Week",
+    selPriority:"Priority:", low:"Low", medium:"Medium", high:"High",
+    category:"Category (optional):",
+    save:"Save", add:"Add", del:"Delete", cancel:"Cancel", update:"Update", create:"Create",
+    calendar:"Calendar", newEvent:"New Event", eventName:"Event name...",
+    noEvents:"No events", time:"Time", desc:"Description", color:"Color",
+    repeat:"Repeat", none:"None", daily:"Daily", weekly:"Weekly", monthly:"Monthly",
+    upcomingEv:"Upcoming Events",
+    notes:"Notes", newNote:"New Note", editNote:"Edit Note",
+    searchNotes:"Search notes...", noNotes:"No notes yet", noResult:"No results found",
+    noteTitle:"Title...", noteContent:"Content...",
+    healthCoach:"Health Coach", dailyBalance:"Daily Balance",
+    intake:"Intake", burned:"Burned", net:"Net", target:"Target",
+    todayFoods:"Today's Meals", noFoodYet:"No food logged yet",
+    todaySports:"Today's Sports", noSportYet:"No sport logged yet",
+    addMeal:"Add Meal", addExercise:"Add Exercise",
+    searchFood:"Search food (rice, salad...)", myFoods:"My Foods",
+    notFound:"not found", enterManual:"Enter calories manually or enable AI in Settings",
+    meal:"Meal:", breakfast:"Breakfast", lunch:"Lunch", dinner:"Dinner", snack:"Snack",
+    calorie:"Calorie", sportType:"Sport Type:", duration:"Duration (min)", distance:"Distance (km)",
+    sportTypes:["Running","Swimming","Cycling","Yoga","Weights","Walking","Other"],
+    lifestyleTitle:"Lifestyle", lifestyleDesc:"Your personal spaces — tap a room to explore",
+    items:"items", newRoom:"New Room", roomName:"Room name...", selColor:"Pick color:",
+    projects:"Projects", newProject:"New Project", projectName:"Project name...", noProjects:"No projects yet",
+    news:"News", newsLoadFail:"Failed to load news", checkInternet:"Check your internet connection",
+    retry:"Retry", noTrNews:"No Turkish news found",
+    otherLangAvail:"News available in other languages", showAll:"Show All",
+    categories:"categories",
+    myMusic:"My Music", emptyCol:"Your collection is empty",
+    emptyColDesc:"Search on Deezer or paste a link",
+    searchDeezer:"Search Deezer", addLink:"Add Link",
+    searchMusic:"Search songs, artists or albums...",
+    collection:"Collection", search:"Search", charts:"Charts", link:"Link",
+    piece:"tracks", howToUse:"How to use?",
+    myStyle:"My Wardrobe", todayWeather:"Today's Weather", gettingLoc:"Getting location...",
+    styleAdvice:"Style Advice", calculating:"Calculating...", noWeather:"Weather data unavailable",
+    todayLooks:"Today's Looks", styleRules:"Style Rules & Limits",
+    colorPalette:"Color Palette Discipline", myCloset:"My Closet",
+    top:"Top", bottom:"Bottom", outer:"Outer", dress:"Dress", wore:"Wore it",
+    addClothing:"Add Clothing", clothingName:"Clothing name (e.g. Navy Blazer)",
+    noClothesCat:"No clothes in this category",
+    wind:"wind", humidity:"humidity", feelsLike:"feels like",
+    settingsTitle:"Settings", language:"Language",
+    aiCalorie:"AI Calorie Estimation", notifTitle:"Notifications",
+    dataBackup:"Data Backup", exportData:"Download Backup", importData:"Upload Backup",
+    deleteAll:"Delete All Data", logout:"Log Out",
+    notifNotSupported:"This browser doesn't support notifications",
+    deleteConfirm:"All data will be deleted. Are you sure?",
+    listening:"Listening...", startSpeaking:"Start speaking", voiceInput:"Voice input",
+    notUnderstood:"Not understood",
+    taskAdded:"Task added", noteAdded:"Note added", foodAdded:"Food added",
+    sportAdded:"Sport added", eventAdded:"Event added",
+    goingTo:"going to",
+    back:"Back", viewAll:"All ▶", loading:"Loading...",
+    note:"note", task:"Task", eventType:"Event",
+  },
+};
+
+/* t() helper — dil anahtarına göre çeviri döndürür */
+const getLang = (data) => data?.settings?.language || "tr";
+const t = (key, data) => (TRANSLATIONS[getLang(data)] || TRANSLATIONS.tr)[key] || TRANSLATIONS.tr[key] || key;
+
+/* ── Constants (dil bağımsız) ── */
+const TABS_KEYS = [
+  { id: "dashboard", labelKey: "home", icon: "⌂" },
+  { id: "tasks", labelKey: "tasks", icon: "✓" },
+  { id: "lifestyle", labelKey: "lifestyle", icon: "◈" },
 ];
 
 const SPORT_TYPES = ["Koşu","Yüzme","Bisiklet","Yoga","Ağırlık","Yürüyüş","Diğer"];
@@ -530,7 +709,8 @@ function Dashboard({ data, setTab, goTo, update }) {
   const activeProjects = data.projects.filter(p=>p.status!=="Tamamlandı").length;
 
   const hour = new Date().getHours();
-  const greeting = hour<12 ? "Günaydın" : hour<18 ? "İyi günler" : "İyi akşamlar";
+  const T = (key) => t(key, data);
+  const greeting = hour<12 ? T("goodMorning") : hour<18 ? T("goodAfternoon") : T("goodEvening");
 
   // Daily thoughts (3 slots)
   const thoughts = data.dailyThoughts || ["","",""];
@@ -616,8 +796,8 @@ function Dashboard({ data, setTab, goTo, update }) {
           </svg>
         </div>
         <div style={{flex:1}}>
-          <div style={{fontSize:16,fontWeight:600,color:"#F9FAFB"}}>Bugün harika görüneceksin!</div>
-          <div style={{fontSize:13,color:"#c4b5fd",marginTop:3}}>Hava durumuna göre stil önerilerin hazır</div>
+          <div style={{fontSize:16,fontWeight:600,color:"#F9FAFB"}}>{T("styleMotiv")}</div>
+          <div style={{fontSize:13,color:"#c4b5fd",marginTop:3}}>{T("styleReady")}</div>
         </div>
         <span style={{fontSize:14,color:"#8B5CF6"}}>▶</span>
       </div>
@@ -632,23 +812,23 @@ function Dashboard({ data, setTab, goTo, update }) {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 11l3 3L22 4" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </div>
           <div style={{flex:1}}>
-            <div style={{fontSize:16,fontWeight:600,color:"#F9FAFB"}}>Görev Durumu</div>
-            <div style={{fontSize:13,color:"#9CA3AF"}}>Bugünün özeti</div>
+            <div style={{fontSize:16,fontWeight:600,color:"#F9FAFB"}}>{T("taskStatus")}</div>
+            <div style={{fontSize:13,color:"#9CA3AF"}}>{T("todaySummary")}</div>
           </div>
           <span style={{fontSize:14,color:"#9CA3AF"}}>▶</span>
         </div>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
           <div style={{background:"#3b82f6",borderRadius:12,padding:"14px 8px",textAlign:"center"}}>
             <div style={{fontSize:24,fontWeight:700,color:"#fff"}}>{pending}</div>
-            <div style={{fontSize:11,color:"rgba(255,255,255,0.75)",marginTop:2}}>Bekleyen</div>
+            <div style={{fontSize:11,color:"rgba(255,255,255,0.75)",marginTop:2}}>{T("pending")}</div>
           </div>
           <div style={{background:"#8B5CF6",borderRadius:12,padding:"14px 8px",textAlign:"center"}}>
             <div style={{fontSize:24,fontWeight:700,color:"#fff"}}>{todayEv.length}</div>
-            <div style={{fontSize:11,color:"rgba(255,255,255,0.75)",marginTop:2}}>Etkinlik</div>
+            <div style={{fontSize:11,color:"rgba(255,255,255,0.75)",marginTop:2}}>{T("event")}</div>
           </div>
           <div style={{background:"#10B981",borderRadius:12,padding:"14px 8px",textAlign:"center"}}>
             <div style={{fontSize:24,fontWeight:700,color:"#fff"}}>{activeProjects}</div>
-            <div style={{fontSize:11,color:"rgba(255,255,255,0.75)",marginTop:2}}>Proje</div>
+            <div style={{fontSize:11,color:"rgba(255,255,255,0.75)",marginTop:2}}>{T("project")}</div>
           </div>
         </div>
       </div>
@@ -664,8 +844,8 @@ function Dashboard({ data, setTab, goTo, update }) {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </div>
           <div style={{flex:1}}>
-            <div style={{fontSize:14,fontWeight:600,color:"#EF4444"}}>{overdue} gecikmiş görev!</div>
-            <div style={{fontSize:13,color:"#9CA3AF"}}>Hemen kontrol et</div>
+            <div style={{fontSize:14,fontWeight:600,color:"#EF4444"}}>{overdue} {T("overdueAlert")}</div>
+            <div style={{fontSize:13,color:"#9CA3AF"}}>{T("checkNow")}</div>
           </div>
           <span style={{fontSize:14,color:"#9CA3AF"}}>▶</span>
         </div>
@@ -673,7 +853,7 @@ function Dashboard({ data, setTab, goTo, update }) {
 
       {/* Bugünün Programı — sadece etkinlikler */}
       <div style={{marginBottom:16}}>
-        <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:10}}>Bugünün Programı</div>
+        <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:10}}{T("todaySchedule")}</div>
         {scheduleItems.length > 0 ? scheduleItems.map(item=>(
           <div key={item.id} onClick={()=>goTo("tasks","calendar")} className="touch-card" style={{
             ...cardStyle,padding:"14px 16px",marginBottom:8,
@@ -697,8 +877,8 @@ function Dashboard({ data, setTab, goTo, update }) {
               <line x1="8" y1="2" x2="8" y2="6" stroke="#9CA3AF" strokeWidth="1.2" strokeLinecap="round"/>
               <line x1="16" y1="2" x2="16" y2="6" stroke="#9CA3AF" strokeWidth="1.2" strokeLinecap="round"/>
             </svg>
-            <div style={{fontSize:13,color:"#9CA3AF"}}>Bugün planlanmış etkinlik yok</div>
-            <div style={{fontSize:11,color:"#4B5563"}}>Takvim'e git ve etkinlik ekle</div>
+            <div style={{fontSize:13,color:"#9CA3AF"}}>{T("noEventToday")}</div>
+            <div style={{fontSize:11,color:"#4B5563"}}>{T("goCalendar")}</div>
           </div>
         )}
       </div>
@@ -710,7 +890,7 @@ function Dashboard({ data, setTab, goTo, update }) {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 22c-4.97 0-9-4.03-9-9 0-4 3-7.5 5-9.5.5 3 2 4 3.5 4.5C13 7 12.5 4 14 2c2.5 3.5 7 7.5 7 11 0 4.97-4.03 9-9 9z" stroke="#F59E0B" strokeWidth="1.5" fill="rgba(245,158,11,0.1)"/></svg>
           </div>
           <div style={{flex:1}}>
-            <div style={{fontSize:16,fontWeight:600,color:"#F9FAFB"}}>Kalori Takibi</div>
+            <div style={{fontSize:16,fontWeight:600,color:"#F9FAFB"}}>{T("calorieTrack")}</div>
             <div style={{fontSize:13,color:"#9CA3AF"}}>Bugün: {todayCalIn} alındı · {todayCalOut} yakıldı</div>
           </div>
         </div>
@@ -722,7 +902,7 @@ function Dashboard({ data, setTab, goTo, update }) {
             <span style={{fontSize:12,color:"#F59E0B",fontWeight:600,flexShrink:0}}>{Math.round(todayCalIn/2000*100)}%</span>
           </div>
         ) : (
-          <div style={{fontSize:13,color:"#9CA3AF",textAlign:"center",padding:"8px 0",marginBottom:12}}>Henüz bugün yemek kaydı yok</div>
+          <div style={{fontSize:13,color:"#9CA3AF",textAlign:"center",padding:"8px 0",marginBottom:12}}{T("noFoodToday")}</div>
         )}
         <div style={{display:"flex",gap:8}}>
           <button onClick={()=>goTo("lifestyle","healthcoach:food")} style={{
@@ -740,7 +920,7 @@ function Dashboard({ data, setTab, goTo, update }) {
       <div style={{marginBottom:16}}>
         <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:12,display:"flex",alignItems:"center",gap:6}}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M17.5 19H9.5a7 7 0 117.9-10.5 5 5 0 110 10.5z" stroke="#14b8a6" strokeWidth="1.5" fill="rgba(20,184,166,0.1)"/></svg>
-          Bugün Kafamı Kurcalayanlar
+          {T("thoughts")}
         </div>
         <div style={{background:"#1C1C26",borderRadius:16,padding:"14px 16px",border:"1px solid rgba(255,255,255,0.05)"}}>
           {[0,1,2].map(i=>(
@@ -749,7 +929,7 @@ function Dashboard({ data, setTab, goTo, update }) {
               <input
                 value={thoughts[i]||""}
                 onChange={e=>updateThought(i,e.target.value)}
-                placeholder={["Bugün en çok düşündüğüm şey...","Kafamı karıştıran bir şey...","Çözmek istediğim bir sorun..."][i]}
+                placeholder={[T("thought1"),T("thought2"),T("thought3")][i]}
                 style={{
                   flex:1,background:"#2A2A35",border:"1px solid rgba(255,255,255,0.05)",
                   borderRadius:10,padding:"10px 12px",color:"#F9FAFB",fontSize:13,outline:"none",
@@ -774,7 +954,7 @@ function Dashboard({ data, setTab, goTo, update }) {
           {headlines.length === 0 ? (
             <div style={{display:"flex",alignItems:"center",gap:10,color:"#9CA3AF"}}>
               <svg width="20" height="20" viewBox="0 0 36 36" fill="none" style={{animation:"pulse 1.5s infinite",flexShrink:0}}><circle cx="18" cy="18" r="13" stroke="#ef4444" strokeWidth="1.5" fill="none"/><path d="M14 18 A4 4 0 0 0 22 18" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round"/><line x1="18" y1="5" x2="18" y2="2" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/><line x1="25" y1="7" x2="27" y2="5" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/><line x1="11" y1="7" x2="9" y2="5" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/></svg>
-              <span style={{fontSize:13}}>Haberler yükleniyor...</span>
+              <span style={{fontSize:13}}{T("newsLoading")}</span>
             </div>
           ) : headlines.slice(0,4).map((title,i)=>(
             <div key={i} style={{display:"flex",alignItems:"flex-start",gap:10,
@@ -794,7 +974,7 @@ function Dashboard({ data, setTab, goTo, update }) {
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
           <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",display:"flex",alignItems:"center",gap:5}}>
             <svg width="12" height="12" viewBox="0 0 36 36" fill="none"><circle cx="12" cy="28" r="5" stroke="#8B5CF6" strokeWidth="2" fill="none"/><circle cx="28" cy="24" r="5" stroke="#8B5CF6" strokeWidth="2" fill="none"/><path d="M17 28 L17 8 L33 4 L33 24" stroke="#8B5CF6" strokeWidth="2" strokeLinecap="round"/><line x1="17" y1="8" x2="33" y2="4" stroke="#8B5CF6" strokeWidth="1.5"/></svg>
-            Müzik Koleksiyonu
+            {T("musicCol")}
           </div>
           <button onClick={()=>goTo("lifestyle","music")} style={{background:"none",border:"none",color:"#8B5CF6",fontSize:12,cursor:"pointer",fontWeight:600}}>Tümü ▶</button>
         </div>
@@ -807,8 +987,8 @@ function Dashboard({ data, setTab, goTo, update }) {
               <svg width="24" height="24" viewBox="0 0 36 36" fill="none"><path d="M6 18 C6 11 11 6 18 6 C25 6 30 11 30 18" stroke="#8B5CF6" strokeWidth="1.5" fill="none"/><rect x="4" y="17" width="6" height="10" rx="3" fill="#8B5CF6" opacity=".7"/><rect x="26" y="17" width="6" height="10" rx="3" fill="#8B5CF6" opacity=".7"/></svg>
             </div>
             <div>
-              <div style={{fontSize:14,fontWeight:600,color:"#F9FAFB"}}>Müzik koleksiyonu boş</div>
-              <div style={{fontSize:13,color:"#9CA3AF",marginTop:3}}>Yaşam Tarzı → Müziklerim'e git ve ekle</div>
+              <div style={{fontSize:14,fontWeight:600,color:"#F9FAFB"}}>{T("musicEmpty")}</div>
+              <div style={{fontSize:13,color:"#9CA3AF",marginTop:3}}>{T("musicEmptyDesc")}</div>
             </div>
             <span style={{marginLeft:"auto",color:"#9CA3AF",fontSize:16}}>▶</span>
           </div>
@@ -835,12 +1015,12 @@ function Dashboard({ data, setTab, goTo, update }) {
       </div>
 
       <div style={{marginBottom:16}}>
-        <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:12}}>Bu Hafta</div>
+        <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:12}}{T("thisWeek")}</div>
         <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10}}>
           {[
-            {val:wkSport.length,label:"Antrenman",color:"#3B82F6",max:7},
-            {val:wkBurned,label:"kcal yakıldı",color:"#EF4444",max:Math.max(wkBurned,2000)},
-            {val:done,label:"Görev bitti",color:"#10B981",max:Math.max(done,10)},
+            {val:wkSport.length,label:T("workout"),color:"#3B82F6",max:7},
+            {val:wkBurned,label:T("kcalBurned"),color:"#EF4444",max:Math.max(wkBurned,2000)},
+            {val:done,label:T("taskDone"),color:"#10B981",max:Math.max(done,10)},
           ].map((s,i)=>{
             const pct = s.max > 0 ? Math.min(100, (s.val / s.max) * 100) : 0;
             const r = 20; const circ = 2 * Math.PI * r;
@@ -866,7 +1046,7 @@ function Dashboard({ data, setTab, goTo, update }) {
       {data.notes.length>0&&(
         <div style={{marginBottom:16}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-            <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px"}}>Son Notlar</div>
+            <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px"}}>{T("recentNotes")}</div>
             <button onClick={()=>goTo("tasks","notes")} style={{background:"none",border:"none",color:"#3b82f6",fontSize:12,cursor:"pointer",fontWeight:600}}>Tümü ▶</button>
           </div>
           <div style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:4,WebkitOverflowScrolling:"touch"}}>
@@ -889,6 +1069,7 @@ function Dashboard({ data, setTab, goTo, update }) {
 
 /* ═══════════ TASKS ═══════════ */
 function Tasks({ data, update }) {
+  const T = (key) => t(key, data);
   const [modal,setModal]=useState(false);
   const [filter,setFilter]=useState("all");
   const [editingId,setEditingId]=useState(null);
@@ -974,11 +1155,11 @@ function Tasks({ data, update }) {
     <div>
       <StickyHeader>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-          <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Görevler</h3>
-          <span style={{fontSize:12,color:"#9CA3AF",fontWeight:500}}>{pending} bekliyor</span>
+          <h3 style={{margin:0,fontSize:20,fontWeight:800}}{T("tasks")}</h3>
+          <span style={{fontSize:12,color:"#9CA3AF",fontWeight:500}}>{pending} {T("waiting")}</span>
         </div>
         <div style={{display:"flex",gap:6,overflowX:"auto",paddingBottom:2,WebkitOverflowScrolling:"touch"}}>
-          {[["all","Tümü"],["pending","Bekleyen"],["done","Bitti"],["high","Öncelikli"],["overdue","Gecikmiş"]].map(([k,v])=>(
+          {[["all",T("all")],["pending",T("pendingF")],["done",T("done")],["high",T("priorityF")],["overdue",T("overdueF")]].map(([k,v])=>(
             <button key={k} onClick={()=>setFilter(k)} style={filterBtnStyle(filter===k)}>{v}</button>
           ))}
         </div>
@@ -989,7 +1170,7 @@ function Tasks({ data, update }) {
           ? (
             <div style={{textAlign:"center",padding:"40px 20px"}}>
               <div style={{fontSize:40,marginBottom:8}}>✅</div>
-              <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:4}}>Tüm görevler tamamlandı!</div>
+              <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:4}}{T("allDone")}</div>
               <div style={{fontSize:12,color:"#4B5563"}}>+ ile yeni görev ekle</div>
             </div>
           )
@@ -1004,7 +1185,7 @@ function Tasks({ data, update }) {
           ? (
             <div style={{textAlign:"center",padding:"40px 20px"}}>
               <div style={{fontSize:40,marginBottom:8}}>✅</div>
-              <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:4}}>Tüm görevler tamamlandı!</div>
+              <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:4}}{T("allDone")}</div>
               <div style={{fontSize:12,color:"#4B5563"}}>+ ile yeni görev ekle</div>
             </div>
           )
@@ -1036,9 +1217,9 @@ function Tasks({ data, update }) {
 
       <FAB onClick={openNew}/>
 
-      <Modal open={modal} onClose={()=>{setModal(false);setEditingId(null);}} title={editingId?"Görevi Düzenle":"Yeni Görev"}>
+      <Modal open={modal} onClose={()=>{setModal(false);setEditingId(null);}} title={editingId?T("editTask"):T("newTask")}>
         <div style={{display:"flex",gap:8,alignItems:"center"}}>
-          <input style={{...inp,flex:1,marginBottom:0}} placeholder="Görev başlığı..." value={form.title} onChange={e=>setForm({...form,title:e.target.value})} autoFocus/>
+          <input style={{...inp,flex:1,marginBottom:0}} placeholder={T("taskTitle")} value={form.title} onChange={e=>setForm({...form,title:e.target.value})} autoFocus/>
           <VoiceMic onResult={(t)=>setForm(f=>({...f,title:t}))}/>
         </div>
         <div style={{height:10}}/>
@@ -1081,7 +1262,7 @@ function Tasks({ data, update }) {
             ))}
           </div>
         </div>
-        <button style={btnPrimary} onClick={save}>{editingId?"Kaydet":"Ekle"}</button>
+        <button style={btnPrimary} onClick={save}>{editingId?T("save"):T("add")}</button>
         {editingId&&<button onClick={()=>{del(editingId);setModal(false);setEditingId(null);}} style={{...btnPrimary,background:"#ef4444",marginTop:8}}>Görevi Sil</button>}
       </Modal>
     </div>
@@ -1090,6 +1271,7 @@ function Tasks({ data, update }) {
 
 /* ═══════════ CALENDAR ═══════════ */
 function CalendarView({ data, update }) {
+  const T = (key) => t(key, data);
   const [vd,setVd]=useState(new Date());
   const [modal,setModal]=useState(false);
   const [selDay,setSelDay]=useState(null);
@@ -1135,7 +1317,7 @@ function CalendarView({ data, update }) {
     <div>
       <StickyHeader>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-          <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Takvim</h3>
+          <h3 style={{margin:0,fontSize:20,fontWeight:800}}{T("calendar")}</h3>
           <div style={{display:"flex",alignItems:"center",gap:6}}>
             <button onClick={()=>setVd(new Date(y,m-1))} style={{background:"#2A2A35",border:"1px solid rgba(255,255,255,0.05)",color:"#9CA3AF",width:32,height:32,borderRadius:10,fontSize:16,cursor:"pointer"}}>◀</button>
             <span style={{fontWeight:700,fontSize:14,minWidth:105,textAlign:"center"}}>{MN[m]} {y}</span>
@@ -1209,9 +1391,9 @@ function CalendarView({ data, update }) {
 
       <FAB onClick={openAdd} color="#a855f7"/>
 
-      <Modal open={modal} onClose={()=>setModal(false)} title="Yeni Etkinlik">
+      <Modal open={modal} onClose={()=>setModal(false)} title={T("newEvent")}>
         <div style={{display:"flex",gap:8,alignItems:"center"}}>
-          <input style={{...inp,flex:1,marginBottom:0}} placeholder="Etkinlik adı..." value={form.title} onChange={e=>setForm({...form,title:e.target.value})} autoFocus/>
+          <input style={{...inp,flex:1,marginBottom:0}} placeholder={T("eventName")} value={form.title} onChange={e=>setForm({...form,title:e.target.value})} autoFocus/>
           <VoiceMic onResult={(t)=>setForm(f=>({...f,title:t}))} color="#8B5CF6"/>
         </div>
         <div style={{height:10}}/>
@@ -1240,6 +1422,7 @@ function CalendarView({ data, update }) {
 /* ═══════════ SPORTS ═══════════ */
 /* ═══════════ SAĞLIK (Health Coach) ═══════════ */
 function Sports({ data, update, initialView, onBack }) {
+  const T = (key) => t(key, data);
   const [modal,setModal]=useState(false);
   const [foodModal,setFoodModal]=useState(false);
   const [form,setForm]=useState({type:"Koşu",duration:"",distance:"",calories:"",date:today(),notes:""});
@@ -1450,7 +1633,7 @@ function Sports({ data, update, initialView, onBack }) {
       ].slice(0,12);
   const noResults = foodSearch && filteredFoods.length === 0;
 
-  const mealGroups = ["Kahvaltı","Öğle","Akşam","Atıştırma"];
+  const mealGroups = [T("breakfast"),T("lunch"),T("dinner"),T("snack")];
 
   return (
     <div>
@@ -1475,17 +1658,17 @@ function Sports({ data, update, initialView, onBack }) {
         <div style={{display:"flex",justifyContent:"space-around",textAlign:"center",marginBottom:10}}>
           <div>
             <div style={{fontSize:22,fontWeight:800,color:"#f97316"}}>{todayCalIn}</div>
-            <div style={{fontSize:10,color:"#9CA3AF"}}>Alınan</div>
+            <div style={{fontSize:10,color:"#9CA3AF"}}>{T("intake")}</div>
           </div>
           <div style={{fontSize:18,opacity:.2,alignSelf:"center"}}>−</div>
           <div>
             <div style={{fontSize:22,fontWeight:800,color:"#22c55e"}}>{todayCalOut}</div>
-            <div style={{fontSize:10,color:"#9CA3AF"}}>Yakılan</div>
+            <div style={{fontSize:10,color:"#9CA3AF"}}>{T("burned")}</div>
           </div>
           <div style={{fontSize:18,opacity:.2,alignSelf:"center"}}>=</div>
           <div>
             <div style={{fontSize:22,fontWeight:800,color:netCal>dailyGoal?"#ef4444":"#3b82f6"}}>{netCal}</div>
-            <div style={{fontSize:10,color:"#9CA3AF"}}>Net</div>
+            <div style={{fontSize:10,color:"#9CA3AF"}}>{T("net")}</div>
           </div>
         </div>
         <div style={{height:6,background:"#2A2A35",borderRadius:3,overflow:"hidden"}}>
@@ -1553,9 +1736,9 @@ function Sports({ data, update, initialView, onBack }) {
 
       {/* ── Bugünün Yemekleri ── */}
       <div style={{marginBottom:14}}>
-        <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:8}}>Bugünün Yemekleri</div>
+        <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:8}}{T("todayFoods")}</div>
         {todayFoods.length===0 ? (
-          <div style={{textAlign:"center",padding:"20px",color:"#9CA3AF",fontSize:13}}>Henüz yemek kaydı yok</div>
+          <div style={{textAlign:"center",padding:"20px",color:"#9CA3AF",fontSize:13}}{T("noFoodYet")}</div>
         ) : mealGroups.map(meal=>{
           const mealFoods=todayFoods.filter(f=>f.meal===meal);
           if(mealFoods.length===0)return null;
@@ -1580,9 +1763,9 @@ function Sports({ data, update, initialView, onBack }) {
 
       {/* ── Bugünün Sporları ── */}
       <div style={{marginBottom:14}}>
-        <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:8}}>Bugünün Sporları</div>
+        <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:8}}{T("todaySports")}</div>
         {todaySports.length===0 ? (
-          <div style={{textAlign:"center",padding:"20px",color:"#9CA3AF",fontSize:13}}>Henüz spor kaydı yok</div>
+          <div style={{textAlign:"center",padding:"20px",color:"#9CA3AF",fontSize:13}}{T("noSportYet")}</div>
         ) : todaySports.map(s=>(
           <div key={s.id} style={{...cardStyle,display:"flex",alignItems:"center",gap:10,padding:"10px 14px"}}>
             <div style={{fontSize:20,width:36,height:36,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(34,197,94,0.1)",borderRadius:10}}>{SPORT_EMOJI[s.type]||"⚡"}</div>
@@ -1597,7 +1780,7 @@ function Sports({ data, update, initialView, onBack }) {
 
       {/* ── Haftalık Özet ── */}
       <div style={{marginBottom:14}}>
-        <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:8}}>Bu Hafta</div>
+        <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:8}}{T("thisWeek")}</div>
         <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:8}}>
           {[
             {icon:"⏱",val:`${tMin} dk`,label:"Spor süresi",color:"#3b82f6"},
@@ -1627,7 +1810,7 @@ function Sports({ data, update, initialView, onBack }) {
             ))}
           </div>
           <div style={{display:"flex",gap:8,alignItems:"center"}}>
-            <input style={{...inp,flex:1,marginBottom:0}} placeholder="Yemek ara (pancake, pilav...)" value={foodSearch||foodForm.name}
+            <input style={{...inp,flex:1,marginBottom:0}} placeholder={T("searchFood")} value={foodSearch||foodForm.name}
               onChange={e=>{
                 const v=e.target.value;
                 setFoodSearch(v);
@@ -1974,7 +2157,7 @@ function NewsRoom({ room, onBack }) {
           <div style={{margin:"0 auto 10px",animation:"pulse 1.5s ease-in-out infinite",width:40,height:40,display:"flex",alignItems:"center",justifyContent:"center"}}>
             {NEWS_ICONS[activeCat]?.(catInfo?.color||"#aaa")}
           </div>
-          <div style={{fontSize:13,color:"#9CA3AF",marginBottom:4}}>Haberler yükleniyor...</div>
+          <div style={{fontSize:13,color:"#9CA3AF",marginBottom:4}}{T("newsLoading")}</div>
           <div style={{fontSize:11,color:"#4B5563"}}>{NEWS_SOURCES[activeCat]?.map(s=>s.name).join(" · ")}</div>
         </div>
       )}
@@ -2775,9 +2958,10 @@ const DEFAULT_RULES2=[{id:"r1",label:"İş ortamına uygun",on:true},{id:"r2",la
 const catIconMap={top:"smart",alt:"bottom",dis:"coat",elbise:"dress"};
 
 function BenimStilimRoom({data,update,onBack}){
+  const T = (key) => t(key, data);
   const [weather,setWeather]=useState(null);
   const [wxLoad,setWxLoad]=useState(true);
-  const [cityName,setCityName]=useState("Konum alınıyor...");
+  const [cityName,setCityName]=useState(T("gettingLoc"));
   const [activeLook,setActiveLook]=useState(0);
   const [wardFilter,setWardFilter]=useState("all");
   const [addModal,setAddModal]=useState(false);
@@ -2832,13 +3016,13 @@ function BenimStilimRoom({data,update,onBack}){
       </StickyHeader>
       <div style={{background:"linear-gradient(135deg,rgba(59,130,246,0.1),rgba(99,102,241,0.1))",border:"1px solid rgba(59,130,246,0.2)",borderRadius:16,padding:"14px 16px",marginBottom:16}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-          <div><div style={{fontSize:10,fontWeight:700,color:"#9CA3AF",letterSpacing:1,textTransform:"uppercase"}}>Bugünün Havası</div><div style={{fontSize:12,color:"#9CA3AF",marginTop:2}}>{cityName}</div></div>
+          <div><div style={{fontSize:10,fontWeight:700,color:"#9CA3AF",letterSpacing:1,textTransform:"uppercase"}}>{T("todayWeather")}</div><div style={{fontSize:12,color:"#9CA3AF",marginTop:2}}>{cityName}</div></div>
           <div style={{textAlign:"right"}}>{wxLoad?<div style={{fontSize:12,color:"#9CA3AF",animation:"pulse 1.5s infinite"}}>Yükleniyor...</div>:weather?<><div style={{fontSize:26,fontWeight:800,color:"#e0d5f5"}}>{weather.temp}°C</div><div style={{fontSize:11,color:"#9CA3AF"}}>{weather.desc}</div></>:<div style={{fontSize:11,color:"#9CA3AF"}}>Veri alınamadı</div>}</div>
         </div>
-        {weather&&<div style={{marginTop:8,paddingTop:8,borderTop:"1px solid rgba(255,255,255,0.05)",display:"flex",gap:16}}><div style={{fontSize:10,color:"#9CA3AF"}}>{weather.wind} km/s rüzgar</div><div style={{fontSize:10,color:"#9CA3AF"}}>%{weather.humid} nem</div><div style={{fontSize:10,color:"#9CA3AF"}}>{weather.feel}°C hissedilen</div></div>}
-        <div style={{marginTop:10,background:"#2A2A35",borderRadius:10,padding:"8px 12px"}}><div style={{fontSize:10,color:"#9CA3AF",marginBottom:3}}>Stil Önerisi</div><div style={{fontSize:13,color:"#c4b5fd",fontWeight:600}}>{wxLoad?"Hesaplanıyor...":weather?getStyleHint(weather.temp):"Hava bilgisi mevcut değil"}</div></div>
+        {weather&&<div style={{marginTop:8,paddingTop:8,borderTop:"1px solid rgba(255,255,255,0.05)",display:"flex",gap:16}}><div style={{fontSize:10,color:"#9CA3AF"}}>{weather.wind} km/s {T("wind")}</div><div style={{fontSize:10,color:"#9CA3AF"}}>%{weather.humid} {T("humidity")}</div><div style={{fontSize:10,color:"#9CA3AF"}}>{weather.feel}°C {T("feelsLike")}</div></div>}
+        <div style={{marginTop:10,background:"#2A2A35",borderRadius:10,padding:"8px 12px"}}><div style={{fontSize:10,color:"#9CA3AF",marginBottom:3}}{T("styleAdvice")}</div><div style={{fontSize:13,color:"#c4b5fd",fontWeight:600}}>{wxLoad?"{T("calculating")}":weather?getStyleHint(weather.temp):"{T("noWeather")}"}</div></div>
       </div>
-      <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,color:"#9CA3AF",textTransform:"uppercase",marginBottom:10}}>Bugün İçin Görünümler</div>
+      <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,color:"#9CA3AF",textTransform:"uppercase",marginBottom:10}}>{T("todayLooks")}</div>
       <div style={{display:"flex",gap:8,marginBottom:16}}>
         {looks.map((look,i)=>(
           <div key={i} onClick={()=>setActiveLook(i)} style={{background:activeLook===i?"rgba(167,139,250,0.1)":"#2A2A35",border:`1px solid ${activeLook===i?"rgba(167,139,250,0.5)":"rgba(255,255,255,0.05)"}`,borderRadius:14,padding:"12px 8px",cursor:"pointer",flex:1,minWidth:0,transition:"all .2s"}}>
@@ -2850,7 +3034,7 @@ function BenimStilimRoom({data,update,onBack}){
         ))}
       </div>
       <div style={{background:"#1C1C26",border:"1px solid rgba(255,255,255,0.05)",borderRadius:16,padding:"14px 16px",marginBottom:12}}>
-        <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,color:"#9CA3AF",textTransform:"uppercase",marginBottom:12}}>Stil Kuralları & Sınırlar</div>
+        <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,color:"#9CA3AF",textTransform:"uppercase",marginBottom:12}}>{T("styleRules")}</div>
         <div style={{marginBottom:14}}>
           <div style={{display:"flex",justifyContent:"space-between",fontSize:12,opacity:.7,marginBottom:4}}><span>Giyim Sıklığı Skoru</span><span style={{color:"#a78bfa",fontWeight:700}}>{freqScore}%</span></div>
           <div style={{height:6,borderRadius:3,background:"#2A2A35"}}><div style={{height:"100%",borderRadius:3,background:"linear-gradient(90deg,#6366f1,#a78bfa)",width:`${freqScore}%`,transition:"width .8s"}}/></div>
@@ -2866,7 +3050,7 @@ function BenimStilimRoom({data,update,onBack}){
         ))}
       </div>
       <div style={{background:"#1C1C26",border:"1px solid rgba(255,255,255,0.05)",borderRadius:16,padding:"14px 16px",marginBottom:12}}>
-        <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,color:"#9CA3AF",textTransform:"uppercase",marginBottom:12}}>Renk Paleti Disiplini</div>
+        <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,color:"#9CA3AF",textTransform:"uppercase",marginBottom:12}}>{T("colorPalette")}</div>
         <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
           {PALETTE_COLS.map(p=>(<div key={p.hex} title={p.name} onClick={()=>togglePalette(p.hex)} style={{width:36,height:36,borderRadius:10,background:p.hex,cursor:"pointer",flexShrink:0,transition:"transform .15s",outline:paletteActive.includes(p.hex)?"2.5px solid rgba(167,139,250,0.9)":"none",transform:paletteActive.includes(p.hex)?"scale(1.12)":"scale(1)"}}/>))}
           <div style={{width:36,height:36,borderRadius:10,border:"1.5px dashed rgba(255,255,255,0.2)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,color:"#9CA3AF",cursor:"pointer"}}>+</div>
@@ -2875,9 +3059,9 @@ function BenimStilimRoom({data,update,onBack}){
       </div>
       <div style={{marginBottom:12}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-          <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,color:"#9CA3AF",textTransform:"uppercase"}}>Dolabım</div>
+          <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,color:"#9CA3AF",textTransform:"uppercase"}}>{T("myCloset")}</div>
           <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
-            {[{id:"all",l:"Tümü"},{id:"top",l:"Üst"},{id:"alt",l:"Alt"},{id:"dis",l:"Dış"},{id:"elbise",l:"Elbise"}].map(f=>(
+            {[{id:"all",l:T("all")},{id:"top",l:T("top")},{id:"alt",l:T("bottom")},{id:"dis",l:T("outer")},{id:"elbise",l:T("dress")}].map(f=>(
               <button key={f.id} onClick={()=>setWardFilter(f.id)} style={{background:wardFilter===f.id?"rgba(167,139,250,0.15)":"#2A2A35",border:`1px solid ${wardFilter===f.id?"rgba(167,139,250,0.4)":"rgba(255,255,255,0.05)"}`,color:wardFilter===f.id?"#c4b5fd":"#6B7280",borderRadius:20,padding:"4px 10px",fontSize:10,cursor:"pointer",fontWeight:wardFilter===f.id?700:400}}>{f.l}</button>
             ))}
           </div>
@@ -2908,8 +3092,8 @@ function BenimStilimRoom({data,update,onBack}){
       <button onClick={()=>setAddModal(true)} style={{position:"fixed",bottom:84,right:16,background:"linear-gradient(135deg,#6366f1,#a78bfa)",border:"none",borderRadius:18,padding:"12px 18px",color:"#fff",fontSize:13,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:8,boxShadow:"0 4px 20px rgba(99,102,241,0.5)",zIndex:100}}>
         <span style={{fontSize:18}}>+</span> Kıyafet Ekle
       </button>
-      <Modal open={addModal} onClose={()=>setAddModal(false)} title="Kıyafet Ekle">
-        <input style={inp} placeholder="Kıyafet adı (örn: Lacivert Blazer)" value={addForm.name} onChange={e=>setAddForm({...addForm,name:e.target.value})} autoFocus/>
+      <Modal open={addModal} onClose={()=>setAddModal(false)} title={T("addClothing")}>
+        <input style={inp} placeholder={T("clothingName")} value={addForm.name} onChange={e=>setAddForm({...addForm,name:e.target.value})} autoFocus/>
         <div style={{fontSize:12,color:"#9CA3AF",marginBottom:6}}>Kategori:</div>
         <div style={{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap"}}>
           {CLOTH_CATS.map(c=>(<button key={c.id} onClick={()=>setAddForm({...addForm,cat:c.id})} style={{background:addForm.cat===c.id?`${c.color}25`:"#2A2A35",border:`1px solid ${addForm.cat===c.id?c.color+"60":"rgba(255,255,255,0.05)"}`,color:addForm.cat===c.id?c.color:"#777",borderRadius:10,padding:"6px 12px",fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",gap:6}}><ClothingIcon type={c.svgType} size={14} color={addForm.cat===c.id?c.color:"#6B7280"}/>{c.label}</button>))}
@@ -2925,6 +3109,7 @@ function BenimStilimRoom({data,update,onBack}){
 }
 /* ═══════════ TARZIM ═══════════ */
 function Projects({ data, update, initialRoom, onRoomConsumed }) {
+  const T = (key) => t(key, data);
   const [activeRoom,setActiveRoom]=useState(null);
   const [roomSubView,setRoomSubView]=useState(null);
   const [modal,setModal]=useState(false);
@@ -3023,9 +3208,9 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
     <div>
       <StickyHeader>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-          <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Yaşam Tarzı</h3>
+          <h3 style={{margin:0,fontSize:20,fontWeight:800}}{T("lifestyleTitle")}</h3>
         </div>
-        <p style={{margin:"6px 0 0",fontSize:12,color:"#9CA3AF"}}>Kişisel alanların — odalarına dokun ve keşfet</p>
+        <p style={{margin:"6px 0 0",fontSize:12,color:"#9CA3AF"}}>{T("lifestyleDesc")}</p>
       </StickyHeader>
       <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:12}}>
         {rooms.map((room,idx)=>{
@@ -3065,15 +3250,15 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
         })}
       </div>
       <FAB onClick={()=>setRoomModal(true)} color="#f97316"/>
-      <Modal open={roomModal} onClose={()=>setRoomModal(false)} title="Yeni Oda">
-        <input style={inp} placeholder="Oda adı..." value={roomForm.name} onChange={e=>setRoomForm({...roomForm,name:e.target.value})} autoFocus/>
+      <Modal open={roomModal} onClose={()=>setRoomModal(false)} title={T("newRoom")}>
+        <input style={inp} placeholder={T("roomName")} value={roomForm.name} onChange={e=>setRoomForm({...roomForm,name:e.target.value})} autoFocus/>
         <div style={{fontSize:12,color:"#9CA3AF",marginBottom:6}}>Renk seç:</div>
         <div style={{display:"flex",gap:8,marginBottom:14}}>
           {COLORS.map(c=>(
             <button key={c} onClick={()=>setRoomForm({...roomForm,color:c})} style={{width:30,height:30,borderRadius:"50%",background:c,border:roomForm.color===c?"3px solid #fff":"3px solid transparent",cursor:"pointer"}}/>
           ))}
         </div>
-        <button style={btnPrimary} onClick={addRoom}>Oluştur</button>
+        <button style={btnPrimary} onClick={addRoom}{T("create")}</button>
       </Modal>
     </div>
   );
@@ -3090,7 +3275,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
           <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{room.name}</h3>
         </div>
       </StickyHeader>
-      {data.projects.length===0&&<p style={{textAlign:"center",color:"#9CA3AF",fontSize:14,padding:40}}>Henüz proje yok</p>}
+      {data.projects.length===0&&<p style={{textAlign:"center",color:"#9CA3AF",fontSize:14,padding:40}}{T("noProjects")}</p>}
       {data.projects.map(p=>{
         const tasks=p.tasks||[];const d=tasks.filter(t=>t.done).length;
         const pct=tasks.length?Math.round(d/tasks.length*100):0;const open=exp===p.id;
@@ -3133,9 +3318,9 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
         );
       })}
       <FAB onClick={()=>setModal(true)}/>
-      <Modal open={modal} onClose={()=>setModal(false)} title="Yeni Proje">
+      <Modal open={modal} onClose={()=>setModal(false)} title={T("newProject")}>
         <div style={{display:"flex",gap:8,alignItems:"center"}}>
-          <input style={{...inp,flex:1,marginBottom:0}} placeholder="Proje adı..." value={form.name} onChange={e=>setForm({...form,name:e.target.value})} autoFocus/>
+          <input style={{...inp,flex:1,marginBottom:0}} placeholder={T("projectName")} value={form.name} onChange={e=>setForm({...form,name:e.target.value})} autoFocus/>
           <VoiceMic onResult={(t)=>setForm(f=>({...f,name:t}))}/>
         </div>
         <div style={{height:10}}/>
@@ -3145,7 +3330,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
           <input style={{...inp,flex:1}} type="date" value={form.deadline} onChange={e=>setForm({...form,deadline:e.target.value})}/>
         </div>
         <input style={inp} placeholder="Etiketler (virgülle ayırın)" value={form.tags} onChange={e=>setForm({...form,tags:e.target.value})}/>
-        <button style={btnPrimary} onClick={addProject}>Oluştur</button>
+        <button style={btnPrimary} onClick={addProject}{T("create")}</button>
       </Modal>
     </div>
   );
@@ -3201,7 +3386,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
       ))}
       <FAB onClick={()=>setItemModal(true)} color={room.color}/>
       <Modal open={itemModal} onClose={()=>setItemModal(false)} title={`${room.icon} ${room.name} — Yeni Öğe`}>
-        <input style={inp} placeholder="Başlık..." value={itemForm.title} onChange={e=>setItemForm({...itemForm,title:e.target.value})} autoFocus/>
+        <input style={inp} placeholder={T("noteTitle")} value={itemForm.title} onChange={e=>setItemForm({...itemForm,title:e.target.value})} autoFocus/>
         <textarea style={{...inp,minHeight:80,resize:"vertical",fontFamily:"inherit",lineHeight:1.5}} placeholder="Açıklama (opsiyonel)..." value={itemForm.description} onChange={e=>setItemForm({...itemForm,description:e.target.value})}/>
         <input style={inp} placeholder="Etiketler (virgülle ayırın)" value={itemForm.tags} onChange={e=>setItemForm({...itemForm,tags:e.target.value})}/>
         <button style={btnPrimary} onClick={addItem}>Ekle</button>
@@ -3212,6 +3397,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
 
 /* ═══════════ NOTES ═══════════ */
 function Notes({ data, update }) {
+  const T = (key) => t(key, data);
   const [modal,setModal]=useState(false);
   const [editing,setEditing]=useState(null);
   const [form,setForm]=useState({title:"",content:"",color:"#3b82f6"});
@@ -3235,13 +3421,13 @@ function Notes({ data, update }) {
     <div>
       <StickyHeader>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-          <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Notlar</h3>
+          <h3 style={{margin:0,fontSize:20,fontWeight:800}}{T("notes")}</h3>
           <span style={{fontSize:12,color:"#9CA3AF"}}>{data.notes.length} not</span>
         </div>
         <div style={{display:"flex",gap:8,alignItems:"center"}}>
           <input
             style={{...inp,flex:1,marginBottom:0,background:"#2A2A35",border:"1px solid rgba(255,255,255,0.05)"}}
-            placeholder="Notlarda ara..."
+            placeholder={T("searchNotes")}
             value={search}
             onChange={e=>setSearch(e.target.value)}
           />
@@ -3268,9 +3454,9 @@ function Notes({ data, update }) {
         ))}
       </div>
       <FAB onClick={()=>{setEditing(null);setForm({title:"",content:"",color:"#3b82f6"});setModal(true);}} color="#14b8a6"/>
-      <Modal open={modal} onClose={()=>{setModal(false);setEditing(null);}} title={editing?"Notu Düzenle":"Yeni Not"}>
+      <Modal open={modal} onClose={()=>{setModal(false);setEditing(null);}} title={editing?T("editNote"):T("newNote")}>
         <div style={{display:"flex",gap:8,alignItems:"center"}}>
-          <input style={{...inp,flex:1,marginBottom:0}} placeholder="Başlık..." value={form.title} onChange={e=>setForm({...form,title:e.target.value})} autoFocus/>
+          <input style={{...inp,flex:1,marginBottom:0}} placeholder={T("noteTitle")} value={form.title} onChange={e=>setForm({...form,title:e.target.value})} autoFocus/>
           <VoiceMic onResult={(t)=>setForm(f=>({...f,title:t}))} color="#14b8a6"/>
         </div>
         <div style={{height:10}}/>
@@ -3288,6 +3474,7 @@ function Notes({ data, update }) {
 
 /* ═══════════ TASKS HUB (Görevler + Takvim + Notlar) ═══════════ */
 function TasksHub({ data, update, initialSubTab, onSubTabConsumed }) {
+  const T = (key) => t(key, data);
   const [subTab, setSubTab] = useState("tasks");
 
   // Dashboard'dan gelen sub-tab yönlendirmesini yakala
@@ -3311,7 +3498,7 @@ function TasksHub({ data, update, initialSubTab, onSubTabConsumed }) {
         borderRadius:14,
         position:"sticky",top:0,zIndex:60,
       }}>
-        {[["tasks","Görevler","✓"],["calendar","Takvim","◫"],["notes","Notlar","☰"]].map(([k,v,icon])=>(
+        {[["tasks",T("tasks"),"✓"],["calendar",T("calendar"),"◫"],["notes",T("notes"),"☰"]].map(([k,v,icon])=>(
           <button key={k} className="nav-item" onClick={()=>setSubTab(k)} style={{
             flex:1,
             background:subTab===k?"rgba(59,130,246,0.15)":"#2A2A35",
@@ -3385,13 +3572,34 @@ function Settings({ data, update, onImport, user, onLogout }) {
   const projectCount = data.projects.length;
   const noteCount = data.notes.length;
 
+  const T = (key) => t(key, data);
+  const curLang = data.settings?.language || "tr";
+  const setLang = (lang) => update({...data, settings:{...data.settings, language:lang}});
+
   return (
     <div>
       <StickyHeader>
-        <h3 style={{margin:0,fontSize:20,fontWeight:800}}>Ayarlar</h3>
+        <h3 style={{margin:0,fontSize:20,fontWeight:800}}>{T("settingsTitle")}</h3>
       </StickyHeader>
 
       {msg && <div style={{background:"rgba(59,130,246,0.15)",border:"1px solid rgba(59,130,246,0.3)",borderRadius:12,padding:"10px 14px",marginBottom:12,fontSize:13,color:"#3b82f6"}}>{msg}</div>}
+
+      {/* Language selector */}
+      <div style={{background:"#1C1C26",borderRadius:14,padding:16,marginBottom:12}}>
+        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>🌐 {T("language")}</h4>
+        <div style={{display:"flex",gap:8}}>
+          {[["tr","🇹🇷 Türkçe"],["en","🇬🇧 English"]].map(([code,label])=>(
+            <button key={code} onClick={()=>setLang(code)} style={{
+              flex:1,padding:"12px 8px",borderRadius:12,cursor:"pointer",
+              fontSize:13,fontWeight:curLang===code?700:400,
+              background:curLang===code?"rgba(59,130,246,0.15)":"#2A2A35",
+              color:curLang===code?"#3b82f6":"#9CA3AF",
+              border:curLang===code?"1px solid rgba(59,130,246,0.3)":"1px solid rgba(255,255,255,0.05)",
+              transition:"all .2s",
+            }}>{label}</button>
+          ))}
+        </div>
+      </div>
 
       {/* User info */}
       <div style={{background:"#1C1C26",borderRadius:14,padding:16,marginBottom:12}}>
@@ -3934,7 +4142,8 @@ export default function App() {
     setData(null);
   };
 
-  const allTabs = [...TABS, { id: "settings", label: "Ayarlar", icon: "⚙" }];
+  const T = (key) => t(key, data);
+  const allTabs = [...TABS_KEYS.map(tb=>({...tb, label: T(tb.labelKey)})), { id: "settings", label: T("settings"), icon: "⚙" }];
 
   // Show login screen (after splash, when not authenticated)
   if (!splash && user === undefined && !loading) {
