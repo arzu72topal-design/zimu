@@ -33,11 +33,11 @@ const TRANSLATIONS = {
     todaySchedule:"Bugünün Programı", noEventToday:"Bugün planlanmış etkinlik yok",
     goCalendar:"Takvim'e git ve etkinlik ekle",
     thisWeek:"Bu Hafta", workout:"Antrenman", kcalBurned:"kcal yakıldı", taskDone:"Görev bitti",
-    thoughts:"{T("thoughts")}",
+    thoughts:"Bugün Kafamı Kurcalayanlar",
     thought1:"Bugün en çok düşündüğüm şey...", thought2:"Kafamı karıştıran bir şey...", thought3:"Çözmek istediğim bir sorun...",
     bbcNews:"Haberler", newsLoading:"Haberler yükleniyor...",
-    musicCol:"{T("musicCol")}", musicEmpty:"Müzik koleksiyonu boş",
-    musicEmptyDesc:"{T("musicEmptyDesc")}",
+    musicCol:"Müzik Koleksiyonu", musicEmpty:"Müzik koleksiyonu boş",
+    musicEmptyDesc:"Yaşam Tarzı → Müziklerim'e git ve ekle",
     recentNotes:"Son Notlar",
     // Tasks
     waiting:"bekliyor", all:"Tümü", pendingF:"Bekleyen", done:"Bitti",
@@ -69,7 +69,7 @@ const TRANSLATIONS = {
     calorie:"Kalori", sportType:"Spor Türü:", duration:"Süre (dk)", distance:"Mesafe (km)",
     sportTypes:["Koşu","Yüzme","Bisiklet","Yoga","Ağırlık","Yürüyüş","Diğer"],
     // Lifestyle
-    lifestyleTitle:"Yaşam Tarzı", lifestyleDesc:"{T("lifestyleDesc")}",
+    lifestyleTitle:"Yaşam Tarzı", lifestyleDesc:"Kişisel alanların — odalarına dokun ve keşfet",
     items:"öğe", newRoom:"Yeni Oda", roomName:"Oda adı...", selColor:"Renk seç:",
     // Projects
     projects:"Projeler", newProject:"Yeni Proje", projectName:"Proje adı...", noProjects:"Henüz proje yok",
@@ -86,10 +86,10 @@ const TRANSLATIONS = {
     collection:"Koleksiyon", search:"Ara", charts:"Listeler", link:"Link",
     piece:"parça", howToUse:"Nasıl kullanılır?",
     // Clothing
-    myStyle:"Kıyafetlerim", todayWeather:"{T("todayWeather")}", gettingLoc:T("gettingLoc"),
-    styleAdvice:"Stil Önerisi", calculating:"{T("calculating")}", noWeather:"{T("noWeather")}",
-    todayLooks:"{T("todayLooks")}", styleRules:"{T("styleRules")}",
-    colorPalette:"{T("colorPalette")}", myCloset:"Dolabım",
+    myStyle:"Kıyafetlerim", todayWeather:"Bugünün Havası", gettingLoc:"Konum alınıyor...",
+    styleAdvice:"Stil Önerisi", calculating:"Hesaplanıyor...", noWeather:"Hava bilgisi mevcut değil",
+    todayLooks:"Bugün İçin Görünümler", styleRules:"Stil Kuralları & Sınırlar",
+    colorPalette:"Renk Paleti Disiplini", myCloset:"Dolabım",
     top:"Üst", bottom:"Alt", outer:"Dış", dress:"Elbise", wore:"Giydim",
     addClothing:"Kıyafet Ekle", clothingName:"Kıyafet adı (örn: Lacivert Blazer)",
     noClothesCat:"Bu kategoride kıyafet yok",
