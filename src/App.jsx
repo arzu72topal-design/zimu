@@ -832,7 +832,7 @@ function GroupLabel({ label, count, color }) {
   return (
     <div style={{
       display:"flex",alignItems:"center",gap:6,
-      fontSize:11,fontWeight:700,color:"#6B7280",
+      fontSize:11,fontWeight:700,color:"#9CA3AF",
       textTransform:"uppercase",letterSpacing:".07em",
       marginBottom:8,marginTop:4,
     }}>
@@ -1048,15 +1048,15 @@ function Dashboard({ data, setTab, goTo, update }) {
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
           <div style={{background:"#2563eb",borderRadius:12,padding:"14px 8px",textAlign:"center"}}>
             <div style={{fontSize:24,fontWeight:700,color:"#fff"}}>{pending}</div>
-            <div style={{fontSize:12,color:"#fff",marginTop:2,opacity:0.9}}>{T("pending")}</div>
+            <div style={{fontSize:12,color:"#fff",marginTop:2}}>{T("pending")}</div>
           </div>
           <div style={{background:"#7c3aed",borderRadius:12,padding:"14px 8px",textAlign:"center"}}>
             <div style={{fontSize:24,fontWeight:700,color:"#fff"}}>{todayEv.length}</div>
-            <div style={{fontSize:12,color:"#fff",marginTop:2,opacity:0.9}}>{T("event")}</div>
+            <div style={{fontSize:12,color:"#fff",marginTop:2}}>{T("event")}</div>
           </div>
-          <div style={{background:"#059669",borderRadius:12,padding:"14px 8px",textAlign:"center"}}>
+          <div style={{background:"#047857",borderRadius:12,padding:"14px 8px",textAlign:"center"}}>
             <div style={{fontSize:24,fontWeight:700,color:"#fff"}}>{activeProjects}</div>
-            <div style={{fontSize:12,color:"#fff",marginTop:2,opacity:0.9}}>{T("project")}</div>
+            <div style={{fontSize:12,color:"#fff",marginTop:2}}>{T("project")}</div>
           </div>
         </div>
       </div>
@@ -1106,7 +1106,7 @@ function Dashboard({ data, setTab, goTo, update }) {
               <line x1="16" y1="2" x2="16" y2="6" stroke="#9CA3AF" strokeWidth="1.2" strokeLinecap="round"/>
             </svg>
             <div style={{fontSize:13,color:"#9CA3AF"}}>{T("noEventToday")}</div>
-            <div style={{fontSize:11,color:"#6B7280"}}>{T("goCalendar")}</div>
+            <div style={{fontSize:11,color:"#9CA3AF"}}>{T("goCalendar")}</div>
           </div>
         )}
       </div>
@@ -1408,7 +1408,7 @@ function Tasks({ data, update }) {
             <div style={{textAlign:"center",padding:"40px 20px"}}>
               <div style={{fontSize:40,marginBottom:8}}>✅</div>
               <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:4}}>{T("allDone")}</div>
-              <div style={{fontSize:12,color:"#6B7280"}}>{T("addFirst")}</div>
+              <div style={{fontSize:12,color:"#9CA3AF"}}>{T("addFirst")}</div>
             </div>
           )
           : groups.map(group=>(
@@ -1423,7 +1423,7 @@ function Tasks({ data, update }) {
             <div style={{textAlign:"center",padding:"40px 20px"}}>
               <div style={{fontSize:40,marginBottom:8}}>✅</div>
               <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:4}}>{T("allDone")}</div>
-              <div style={{fontSize:12,color:"#6B7280"}}>{T("addFirst")}</div>
+              <div style={{fontSize:12,color:"#9CA3AF"}}>{T("addFirst")}</div>
             </div>
           )
           : list.map(task=><TaskCard key={task.id} task={task}/>)
@@ -2083,7 +2083,7 @@ function Sports({ data, update, initialView, onBack }) {
                       padding:"8px 16px",borderRadius:10,fontSize:13,cursor:"pointer",fontWeight:600,
                     }}>{aiLookup?`🔄 ${T("analyzing")}`:` 🤖 ${T("askAI")}`}</button>
                   ):(
-                    <p style={{fontSize:11,color:"#6B7280"}}>Kaloriyi elle gir veya Ayarlar'dan AI aç</p>
+                    <p style={{fontSize:11,color:"#9CA3AF"}}>Kaloriyi elle gir veya Ayarlar'dan AI aç</p>
                   )}
                 </div>
               )}
@@ -2387,7 +2387,7 @@ function NewsRoom({ room, onBack, data }) {
               padding:"5px 12px",borderRadius:10,border:"none",cursor:"pointer",
               fontSize:11,fontWeight:langFilter===k?700:400,
               background:langFilter===k?`${catInfo?.color}25`:"rgba(255,255,255,0.05)",
-              color:langFilter===k?catInfo?.color:"#6B7280",
+              color:langFilter===k?catInfo?.color:"#9CA3AF",
             }}>{v}</button>
           ))}
         </div>
@@ -2399,13 +2399,13 @@ function NewsRoom({ room, onBack, data }) {
             {NEWS_ICONS[activeCat]?.(catInfo?.color||"#aaa")}
           </div>
           <div style={{fontSize:13,color:"#9CA3AF",marginBottom:4}}>{T("newsLoading")}</div>
-          <div style={{fontSize:11,color:"#6B7280"}}>{NEWS_SOURCES[activeCat]?.map(s=>s.name).join(" · ")}</div>
+          <div style={{fontSize:11,color:"#9CA3AF"}}>{NEWS_SOURCES[activeCat]?.map(s=>s.name).join(" · ")}</div>
         </div>
       )}
 
       {!isLoading&&list.length>0&&(
         <div>
-          <div style={{fontSize:11,color:"#6B7280",marginBottom:12,display:"flex",alignItems:"center",gap:6}}>
+          <div style={{fontSize:11,color:"#9CA3AF",marginBottom:12,display:"flex",alignItems:"center",gap:6}}>
             <span style={{width:5,height:5,borderRadius:"50%",background:catInfo?.color,display:"inline-block"}}/>
             <span>{list.length} haber</span>
           </div>
@@ -2442,7 +2442,7 @@ function NewsRoom({ room, onBack, data }) {
                       background:`${article.sourceColor}18`,
                       padding:"2px 8px",borderRadius:5,
                     }}>{article.source}</span>
-                    {article.pubDate&&<span style={{fontSize:10,color:"#6B7280"}}>{timeAgo(article.pubDate)}</span>}
+                    {article.pubDate&&<span style={{fontSize:10,color:"#9CA3AF"}}>{timeAgo(article.pubDate)}</span>}
                     <span style={{fontSize:10,opacity:.2,marginLeft:"auto"}}>↗ Habere git</span>
                   </div>
                 </div>
@@ -2458,7 +2458,7 @@ function NewsRoom({ room, onBack, data }) {
           {langFilter!=="all"&&rawList.length>0 ? (
             <>
               <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:6}}>{langFilter==="TR"?"Türkçe":"İngilizce"} haber bulunamadı</div>
-              <div style={{fontSize:12,color:"#6B7280",marginBottom:16}}>Diğer dillerde {rawList.length} haber mevcut</div>
+              <div style={{fontSize:12,color:"#9CA3AF",marginBottom:16}}>Diğer dillerde {rawList.length} haber mevcut</div>
               <button onClick={()=>setLangFilter("all")} style={{
                 background:`${catInfo?.color}20`,color:catInfo?.color,
                 border:`1px solid ${catInfo?.color}40`,borderRadius:10,
@@ -2468,7 +2468,7 @@ function NewsRoom({ room, onBack, data }) {
           ) : (
             <>
               <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:6}}>Haber yüklenemedi</div>
-              <div style={{fontSize:12,color:"#6B7280",marginBottom:16}}>İnternet bağlantını kontrol et</div>
+              <div style={{fontSize:12,color:"#9CA3AF",marginBottom:16}}>İnternet bağlantını kontrol et</div>
               <button onClick={()=>fetchCategory(activeCat,true)} style={{
                 background:`${catInfo?.color}20`,color:catInfo?.color,
                 border:`1px solid ${catInfo?.color}40`,borderRadius:10,
@@ -2491,9 +2491,9 @@ function NewsRoom({ room, onBack, data }) {
             <svg width="22" height="22" viewBox="0 0 36 36" fill="none"><rect x="4" y="7" width="28" height="22" rx="2" stroke="#ef4444" strokeWidth="1.5" fill="rgba(239,68,68,0.1)"/><line x1="9" y1="13" x2="27" y2="13" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round"/><line x1="9" y1="18" x2="27" y2="18" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" opacity=".6"/><line x1="9" y1="23" x2="20" y2="23" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" opacity=".4"/></svg>
           </span>
           <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{T("news")}</h3>
-          <span style={{fontSize:11,color:"#6B7280"}}>{localCats.length} {T("categories")}</span>
+          <span style={{fontSize:11,color:"#9CA3AF"}}>{localCats.length} {T("categories")}</span>
         </div>
-        <p style={{margin:"6px 0 0",fontSize:12,color:"#6B7280"}}>{T("touchToExplore")}</p>
+        <p style={{margin:"6px 0 0",fontSize:12,color:"#9CA3AF"}}>{T("touchToExplore")}</p>
       </StickyHeader>
 
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
@@ -2831,7 +2831,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
           <div style={{textAlign:"center",padding:"40px 20px"}}>
             <div style={{fontSize:44,marginBottom:10}}>🎵</div>
             <div style={{fontSize:15,fontWeight:700,color:"#9CA3AF",marginBottom:6}}>Koleksiyonun boş</div>
-            <div style={{fontSize:12,color:"#6B7280",marginBottom:20}}>Deezer'dan ara veya link yapıştır</div>
+            <div style={{fontSize:12,color:"#9CA3AF",marginBottom:20}}>Deezer'dan ara veya link yapıştır</div>
             <div style={{display:"flex",gap:8,justifyContent:"center"}}>
               <button onClick={()=>setTab("search")} style={{background:"rgba(162,56,255,0.15)",color:"#a238ff",border:"1px solid rgba(162,56,255,0.3)",borderRadius:12,padding:"10px 20px",fontSize:13,fontWeight:700,cursor:"pointer"}}>🔍 Deezer'da Ara</button>
               <button onClick={()=>setTab("link")} style={{background:"rgba(59,130,246,0.15)",color:"#3b82f6",border:"1px solid rgba(59,130,246,0.3)",borderRadius:12,padding:"10px 20px",fontSize:13,fontWeight:700,cursor:"pointer"}}>🔗 Link Ekle</button>
@@ -2862,7 +2862,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
               <div style={{flex:1,minWidth:0,cursor:item.link?"pointer":"default"}} onClick={()=>{if(item.link&&!embed&&!item.preview)window.open(item.link,"_blank","noopener");}}>
                 <div style={{fontSize:14,fontWeight:700,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.title}</div>
                 {item.artist&&<div style={{fontSize:12,color:"#9CA3AF",marginTop:2}}>{item.artist}</div>}
-                <div style={{fontSize:11,color:"#6B7280",marginTop:2,display:"flex",alignItems:"center",gap:4}}>
+                <div style={{fontSize:11,color:"#9CA3AF",marginTop:2,display:"flex",alignItems:"center",gap:4}}>
                   <span>{platformIcon(item)}</span>
                   <span>{item.platform||item.source||"Müzik"}</span>
                 </div>
@@ -3271,7 +3271,7 @@ function BenimStilimRoom({data,update,onBack}){
           <button className="back-btn" aria-label="Go back" onClick={onBack}>◀</button>
           <div>
             <div style={{fontSize:18,fontWeight:900,background:"linear-gradient(135deg,#e0d5f5,#a78bfa)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>{T("myStyle")}</div>
-            <div style={{fontSize:10,color:"#6B7280"}}>{T("lifestyleDesc")}</div>
+            <div style={{fontSize:10,color:"#9CA3AF"}}>{T("lifestyleDesc")}</div>
           </div>
         </div>
       </StickyHeader>
@@ -3316,7 +3316,7 @@ function BenimStilimRoom({data,update,onBack}){
           {PALETTE_COLS.map(p=>(<div key={p.hex} title={p.name} onClick={()=>togglePalette(p.hex)} style={{width:36,height:36,borderRadius:10,background:p.hex,cursor:"pointer",flexShrink:0,transition:"transform .15s",outline:paletteActive.includes(p.hex)?"2.5px solid rgba(167,139,250,0.9)":"none",transform:paletteActive.includes(p.hex)?"scale(1.12)":"scale(1)"}}/>))}
           <div style={{width:36,height:36,borderRadius:10,border:"1.5px dashed rgba(255,255,255,0.2)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,color:"#9CA3AF",cursor:"pointer"}}>+</div>
         </div>
-        <div style={{fontSize:10,color:"#6B7280",marginTop:8}}>{paletteActive.length===0?T("paletteTap"):T("paletteActive").replace("{0}",paletteActive.length)}</div>
+        <div style={{fontSize:10,color:"#9CA3AF",marginTop:8}}>{paletteActive.length===0?T("paletteTap"):T("paletteActive").replace("{0}",paletteActive.length)}</div>
       </div>
       <div style={{marginBottom:12}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
@@ -3357,7 +3357,7 @@ function BenimStilimRoom({data,update,onBack}){
         <input style={inp} placeholder={T("clothingName")} value={addForm.name} onChange={e=>setAddForm({...addForm,name:e.target.value})} autoFocus/>
         <div style={{fontSize:12,color:"#9CA3AF",marginBottom:6}}>{T("categoryLabel")}</div>
         <div style={{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap"}}>
-          {CLOTH_CATS.map(c=>(<button key={c.id} onClick={()=>setAddForm({...addForm,cat:c.id})} style={{background:addForm.cat===c.id?`${c.color}25`:"#2A2A35",border:`1px solid ${addForm.cat===c.id?c.color+"60":"rgba(255,255,255,0.05)"}`,color:addForm.cat===c.id?c.color:"#777",borderRadius:10,padding:"6px 12px",fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",gap:6}}><ClothingIcon type={c.svgType} size={14} color={addForm.cat===c.id?c.color:"#6B7280"}/>{c.label}</button>))}
+          {CLOTH_CATS.map(c=>(<button key={c.id} onClick={()=>setAddForm({...addForm,cat:c.id})} style={{background:addForm.cat===c.id?`${c.color}25`:"#2A2A35",border:`1px solid ${addForm.cat===c.id?c.color+"60":"rgba(255,255,255,0.05)"}`,color:addForm.cat===c.id?c.color:"#777",borderRadius:10,padding:"6px 12px",fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",gap:6}}><ClothingIcon type={c.svgType} size={14} color={addForm.cat===c.id?c.color:"#9CA3AF"}/>{c.label}</button>))}
         </div>
         <div style={{fontSize:12,color:"#9CA3AF",marginBottom:6}}>{T("clothColor")}</div>
         <div style={{display:"flex",gap:6,marginBottom:16,flexWrap:"wrap"}}>
@@ -3628,7 +3628,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
             <path d="M20 15 L32 15" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round" opacity=".5"/>
           </svg>
           <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:4}}>{T("roomEmpty")}</div>
-          <div style={{fontSize:12,color:"#6B7280"}}>{T("addItemHint")}</div>
+          <div style={{fontSize:12,color:"#9CA3AF"}}>{T("addItemHint")}</div>
         </div>
       )}
       {items.map(item=>(
@@ -3701,7 +3701,7 @@ function Notes({ data, update }) {
           <div style={{gridColumn:"1/-1",textAlign:"center",padding:"40px 20px"}}>
             <div style={{fontSize:40,marginBottom:8}}>📝</div>
             <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:4}}>{data.notes.length===0?T("noNotesYet"):T("noResult")}</div>
-            {data.notes.length===0&&<div style={{fontSize:12,color:"#6B7280"}}>{T("addFirstNote")}</div>}
+            {data.notes.length===0&&<div style={{fontSize:12,color:"#9CA3AF"}}>{T("addFirstNote")}</div>}
           </div>
         )}
         {filtered.map(n=>(
@@ -3999,7 +3999,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
               <span style={{fontSize:11,color:"#f59e0b"}}>Anahtar gerekli</span></>
             )}
           </div>
-          <div style={{fontSize:10,color:"#6B7280",marginBottom:10}}>🔒 Anahtarın sadece senin telefonunda saklanır, sunucuya gönderilmez</div>
+          <div style={{fontSize:10,color:"#9CA3AF",marginBottom:10}}>🔒 Anahtarın sadece senin telefonunda saklanır, sunucuya gönderilmez</div>
 
           {/* Guide button */}
           <button onClick={()=>setMsg(
@@ -4211,7 +4211,7 @@ function LoginScreen({ onLogin }) {
           {/* Divider */}
           <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:16}}>
             <div style={{flex:1,height:1,background:"#2A2A35"}}/>
-            <span style={{fontSize:12,color:"#6B7280",letterSpacing:.5}}>{T("orDivider")}</span>
+            <span style={{fontSize:12,color:"#9CA3AF",letterSpacing:.5}}>{T("orDivider")}</span>
             <div style={{flex:1,height:1,background:"#2A2A35"}}/>
           </div>
 
@@ -4246,7 +4246,7 @@ function LoginScreen({ onLogin }) {
         {/* Skip */}
         <div style={{textAlign:"center",marginTop:20}}>
           <button onClick={handleSkip} style={{
-            background:"none",border:"none",color:"#6B7280",fontSize:12,cursor:"pointer",
+            background:"none",border:"none",color:"#9CA3AF",fontSize:12,cursor:"pointer",
           }}>
             {T("skipLogin")}
           </button>
