@@ -2819,7 +2819,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
               flex:1,padding:"8px 2px",borderRadius:9,border:"none",cursor:"pointer",
               fontSize:11,fontWeight:tab===k?700:500,
               background:tab===k?"rgba(255,255,255,0.12)":"transparent",
-              color:tab===k?"#F9FAFB":"#6B7280",transition:"all .2s",
+              color:tab===k?"#F9FAFB":"#9CA3AF",transition:"all .2s",
             }}>{v}</button>
           ))}
         </div>
@@ -3067,7 +3067,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
                 flex:1,padding:"9px 4px",borderRadius:12,border:"none",cursor:"pointer",
                 fontSize:12,fontWeight:chartSource===k?700:500,
                 background:chartSource===k?"rgba(162,56,255,0.25)":"rgba(255,255,255,0.05)",
-                color:chartSource===k?"#c084fc":"#6B7280",
+                color:chartSource===k?"#c084fc":"#9CA3AF",
                 transition:"all .2s",
               }}>{v}</button>
             ))}
@@ -3081,7 +3081,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
                   padding:"6px 14px",borderRadius:20,border:"none",cursor:"pointer",whiteSpace:"nowrap",
                   fontSize:12,fontWeight:chartGenre===k?700:400,
                   background:chartGenre===k?"rgba(162,56,255,0.25)":"rgba(255,255,255,0.05)",
-                  color:chartGenre===k?"#c084fc":"#6B7280",
+                  color:chartGenre===k?"#c084fc":"#9CA3AF",
                 }}>{v}</button>
               ))}
             </div>
@@ -3118,7 +3118,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
                   background:i<3?"rgba(162,56,255,0.2)":"#2A2A35",
                   display:"flex",alignItems:"center",justifyContent:"center",
                   fontSize:11,fontWeight:700,
-                  color:i<3?"#c084fc":"#6B7280",
+                  color:i<3?"#c084fc":"#9CA3AF",
                 }}>{i+1}</div>
                 {/* Album art */}
                 <div style={{width:42,height:42,borderRadius:8,overflow:"hidden",flexShrink:0,background:"#111"}}>
@@ -3287,7 +3287,7 @@ function BenimStilimRoom({data,update,onBack}){
       <div style={{display:"flex",gap:8,marginBottom:16}}>
         {looks.map((look,i)=>(
           <div key={i} onClick={()=>setActiveLook(i)} style={{background:activeLook===i?"rgba(167,139,250,0.1)":"#2A2A35",border:`1px solid ${activeLook===i?"rgba(167,139,250,0.5)":"rgba(255,255,255,0.05)"}`,borderRadius:14,padding:"12px 8px",cursor:"pointer",flex:1,minWidth:0,transition:"all .2s"}}>
-            <div style={{marginBottom:6,display:"flex",justifyContent:"center"}}><ClothingIcon type={look.icon} size={26} color={activeLook===i?"#a78bfa":"#6B7280"}/></div>
+            <div style={{marginBottom:6,display:"flex",justifyContent:"center"}}><ClothingIcon type={look.icon} size={26} color={activeLook===i?"#a78bfa":"#9CA3AF"}/></div>
             <div style={{fontSize:11,fontWeight:700,marginBottom:4,textAlign:"center",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{look.name}</div>
             <div style={{display:"flex",flexWrap:"wrap",gap:2,justifyContent:"center"}}>{look.tags.map((t,ti)=><span key={ti} style={{fontSize:9,fontWeight:600,padding:"2px 5px",borderRadius:20,background:TAG_COL[t.c]?.bg,color:TAG_COL[t.c]?.text}}>{t.l}</span>)}</div>
             <div style={{fontSize:9,color:"#9CA3AF",marginTop:4,textAlign:"center"}}>{look.mood}</div>
@@ -3323,7 +3323,7 @@ function BenimStilimRoom({data,update,onBack}){
           <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,color:"#9CA3AF",textTransform:"uppercase"}}>{T("myCloset")}</div>
           <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
             {[{id:"all",l:T("all")},{id:"top",l:T("top")},{id:"alt",l:T("bottom")},{id:"dis",l:T("outer")},{id:"elbise",l:T("dress")}].map(f=>(
-              <button key={f.id} onClick={()=>setWardFilter(f.id)} style={{background:wardFilter===f.id?"rgba(167,139,250,0.15)":"#2A2A35",border:`1px solid ${wardFilter===f.id?"rgba(167,139,250,0.4)":"rgba(255,255,255,0.05)"}`,color:wardFilter===f.id?"#c4b5fd":"#6B7280",borderRadius:20,padding:"4px 10px",fontSize:10,cursor:"pointer",fontWeight:wardFilter===f.id?700:400}}>{f.l}</button>
+              <button key={f.id} onClick={()=>setWardFilter(f.id)} style={{background:wardFilter===f.id?"rgba(167,139,250,0.15)":"#2A2A35",border:`1px solid ${wardFilter===f.id?"rgba(167,139,250,0.4)":"rgba(255,255,255,0.05)"}`,color:wardFilter===f.id?"#c4b5fd":"#9CA3AF",borderRadius:20,padding:"4px 10px",fontSize:10,cursor:"pointer",fontWeight:wardFilter===f.id?700:400}}>{f.l}</button>
             ))}
           </div>
         </div>
@@ -3764,7 +3764,7 @@ function TasksHub({ data, update, initialSubTab, onSubTabConsumed }) {
           <button key={k} className="nav-item" onClick={()=>setSubTab(k)} style={{
             flex:1,
             background:subTab===k?"rgba(59,130,246,0.15)":"#2A2A35",
-            color:subTab===k?"#3b82f6":"#6B7280",
+            color:subTab===k?"#3b82f6":"#9CA3AF",
             border:subTab===k?"1px solid rgba(59,130,246,0.3)":"1px solid rgba(255,255,255,0.05)",
             padding:"10px 4px",borderRadius:10,fontSize:12,fontWeight:subTab===k?700:500,
             cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:3,
@@ -4615,7 +4615,7 @@ export default function App() {
             padding:isMobile?"10px 6px":"8px 12px",
             minWidth:isMobile?52:50,
             borderRadius:14,
-            color:tab===t.id?"#3b82f6":"#6B7280",
+            color:tab===t.id?"#3b82f6":"#9CA3AF",
             flex:1,
           }}>
             <span style={{fontSize:isMobile?22:18,lineHeight:1}}>{t.icon}</span>
