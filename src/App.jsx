@@ -183,7 +183,7 @@ const TRANSLATIONS = {
     guestMode:"Misafir modu", noAccount:"Hesabın yok mu? Kayıt ol",
     hasAccount:"Zaten hesabın var mı? Giriş yap", googleLogin:"Google ile Giriş Yap",
     orDivider:"veya", emailPlaceholder:"Email adresi", passwordPlaceholder:"Şifre (en az 6 karakter)",
-    emailRequired:T("emailRequired"), skipLogin:"Giriş yapmadan devam et →",
+    emailRequired:"Email ve şifre gerekli", skipLogin:"Giriş yapmadan devam et →",
     localOnly:"Veriler sadece bu cihazda kalır", localOnlyDesc:"Veriler sadece bu cihazda saklanıyor. Giriş yaparak tüm cihazlarında senkronize edebilirsin.",
     tapToContinue:"Devam etmek için dokun",
     // Proje statusleri
