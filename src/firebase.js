@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
 import { getDatabase, ref, set, get, onValue } from "firebase/database";
 
 const firebaseConfig = {
@@ -19,11 +19,34 @@ const db = getDatabase(app);
 const googleProvider = new GoogleAuthProvider();
 
 // ── Auth Functions ──
+
+// Handle redirect result (fires on page load after redirect sign-in)
+getRedirectResult(auth).then((result) => {
+  // Result is handled by onAuthStateChanged listener
+}).catch((error) => {
+  console.error("Redirect sign-in error:", error?.message);
+});
+
 export async function signInWithGoogle() {
   try {
+    // Try popup first (works on desktop)
     const result = await signInWithPopup(auth, googleProvider);
     return { user: result.user, error: null };
   } catch (error) {
+    // If popup blocked/failed, fall back to redirect (better for mobile)
+    if (
+      error.code === "auth/popup-blocked" ||
+      error.code === "auth/popup-closed-by-user" ||
+      error.code === "auth/cancelled-popup-request" ||
+      error.code === "auth/operation-not-supported-in-this-environment"
+    ) {
+      try {
+        await signInWithRedirect(auth, googleProvider);
+        return { user: null, error: null }; // Redirect will reload the page
+      } catch (redirectError) {
+        return { user: null, error: redirectError.message };
+      }
+    }
     return { user: null, error: error.message };
   }
 }
