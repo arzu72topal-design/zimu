@@ -3230,7 +3230,7 @@ function BenimStilimRoom({data,update,onBack}){
         <div style={{display:"flex",gap:6,marginBottom:16,flexWrap:"wrap"}}>
           {PALETTE_COLS.map(p=>(<div key={p.hex} title={p.name} onClick={()=>setAddForm({...addForm,color:p.hex})} style={{width:30,height:30,borderRadius:8,background:p.hex,cursor:"pointer",outline:addForm.color===p.hex?"2.5px solid #a78bfa":"none",transform:addForm.color===p.hex?"scale(1.15)":"scale(1)",transition:"all .15s"}}/>))}
         </div>
-        <button style={btnPrimary} onClick={addCloth}{T("addToCloset")}</button>
+        <button style={btnPrimary} onClick={addCloth}>{T("addToCloset")}</button>
       </Modal>
     </div>
   );
