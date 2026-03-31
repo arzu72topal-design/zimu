@@ -178,6 +178,38 @@ const TRANSLATIONS = {
     moodEnergetic:"Enerjik & Hafif", moodNatural:"Doğal & Serin", moodFree:"Güçlü & Özgür",
     lookLayered:"Katmanlı Şık", lookCasualLayer:"Casual Layered", lookSmartCozy:"Smart Cozy",
     noDue:"Tarih yok", roomEmpty:"Bu oda boş", addItemHint:"+ ile öğe ekle",
+    // Login
+    loginTitle:"Giriş Yap", registerTitle:"Kayıt Ol", waitLogin:"Bekleyin...",
+    guestMode:"Misafir modu", noAccount:"Hesabın yok mu? Kayıt ol",
+    hasAccount:"Zaten hesabın var mı? Giriş yap", googleLogin:"Google ile Giriş Yap",
+    orDivider:"veya", emailPlaceholder:"Email adresi", passwordPlaceholder:"Şifre (en az 6 karakter)",
+    emailRequired:T("emailRequired"), skipLogin:"Giriş yapmadan devam et →",
+    localOnly:"Veriler sadece bu cihazda kalır", localOnlyDesc:"Veriler sadece bu cihazda saklanıyor. Giriş yaparak tüm cihazlarında senkronize edebilirsin.",
+    tapToContinue:"Devam etmek için dokun",
+    // Proje statusleri
+    statPlanning:"Planlama", statProgress:"Devam Ediyor", statTest:"Test", statDone:"Tamamlandı",
+    // Takvim select
+    repeatNone:"Tekrarlama yok", repeatDaily:"Her gün", repeatWeekly:"Her hafta", repeatMonthly:"Her ay",
+    // Kıyafet frekans
+    freqFavorite:"Favori", freqFrequent:"Sık", freqWaiting:"Bekliyor", freqNew:"Yeni",
+    // Görev detay
+    edit:"Düzenle", deleteTask:"Görevi Sil", deleteProject:"Projeyi Sil",
+    statusDone:"Tamamlandı", statusWaiting:"Bekliyor", grpDone:"Tamamlanan",
+    // Hızlı tarih
+    oneWeek:"1 Hafta", oneMonth:"1 Ay", clear:"Temizle",
+    // Takvim ek
+    upcoming:"Yaklaşan", addBtn:"+ Ekle",
+    // Müzik tabs
+    musicTabMine:"Benim", musicTabSearch:"Ara",
+    musicSearching:"Aranıyor...", musicSearchDeezer:"Deezer'da Ara", musicNoResult:"Sonuç bulunamadı",
+    musicAddToCol:"Koleksiyona Ekle", musicChecking:"Kontrol ediliyor...",
+    musicChartLoading:"Liste yükleniyor...", musicChartFail:"Liste yüklenemedi",
+    musicDeezerSearch:"Deezer veritabanında 90M+ parça",
+    musicLinkDesc:"Spotify, YouTube, SoundCloud, Apple Music veya herhangi bir müzik linkini yapıştır.",
+    musicHowTo:"Nasıl kullanılır?",
+    musicHowToSteps:"1. Spotify'dan bir parça aç → 3 nokta → \"Paylaş\" → \"Linki kopyala\"\n2. Yukarıdaki kutuya yapıştır\n3. \"Koleksiyona Ekle\" ye bas",
+    // Voice
+    voiceCommands:"Komutlar: \"görev ekle: ...\", \"not ekle: ...\", \"yemek ekle: ...\", \"spor ekle: ...\", \"etkinlik ekle: ...\"",
   },
   en: {
     home:"Home", tasks:"Tasks", lifestyle:"Lifestyle", settings:"Settings",
@@ -310,6 +342,29 @@ const TRANSLATIONS = {
     moodEnergetic:"Energetic & Light", moodNatural:"Natural & Cool", moodFree:"Strong & Free",
     lookLayered:"Layered Chic", lookCasualLayer:"Casual Layered", lookSmartCozy:"Smart Cozy",
     noDue:"No date", roomEmpty:"This room is empty", addItemHint:"Tap + to add items",
+    loginTitle:"Log In", registerTitle:"Sign Up", waitLogin:"Please wait...",
+    guestMode:"Guest mode", noAccount:"Don't have an account? Sign up",
+    hasAccount:"Already have an account? Log in", googleLogin:"Sign in with Google",
+    orDivider:"or", emailPlaceholder:"Email address", passwordPlaceholder:"Password (min 6 characters)",
+    emailRequired:"Email and password required", skipLogin:"Continue without signing in →",
+    localOnly:"Data stays on this device only", localOnlyDesc:"Data is stored only on this device. Sign in to sync across all your devices.",
+    tapToContinue:"Tap to continue",
+    statPlanning:"Planning", statProgress:"In Progress", statTest:"Testing", statDone:"Completed",
+    repeatNone:"No repeat", repeatDaily:"Daily", repeatWeekly:"Weekly", repeatMonthly:"Monthly",
+    freqFavorite:"Favorite", freqFrequent:"Frequent", freqWaiting:"Waiting", freqNew:"New",
+    edit:"Edit", deleteTask:"Delete Task", deleteProject:"Delete Project",
+    statusDone:"Completed", statusWaiting:"Pending", grpDone:"Completed",
+    oneWeek:"1 Week", oneMonth:"1 Month", clear:"Clear",
+    upcoming:"Upcoming", addBtn:"+ Add",
+    musicTabMine:"Mine", musicTabSearch:"Search",
+    musicSearching:"Searching...", musicSearchDeezer:"Search Deezer", musicNoResult:"No results found",
+    musicAddToCol:"Add to Collection", musicChecking:"Checking...",
+    musicChartLoading:"Loading charts...", musicChartFail:"Failed to load charts",
+    musicDeezerSearch:"90M+ tracks on Deezer",
+    musicLinkDesc:"Paste a Spotify, YouTube, SoundCloud, Apple Music or any music link.",
+    musicHowTo:"How to use?",
+    musicHowToSteps:"1. Open a track on Spotify → three dots → \"Share\" → \"Copy link\"\n2. Paste in the box above\n3. Tap \"Add to Collection\"",
+    voiceCommands:"Commands: \"task add: ...\", \"note add: ...\", \"food add: ...\", \"sport add: ...\", \"event add: ...\"",
   },
 };
 
@@ -443,7 +498,7 @@ function VoiceMic({ onResult, size = 32, color = "#3b82f6" }) {
       flexShrink:0,padding:0,
       animation:listening ? "pulse 1s ease-in-out infinite" : "none",
       transition:"all .2s",
-    }} title={listening ? "Dinleniyor..." : "Sesli giriş"}>
+    }} title={listening ? "Dinleniyor..." : "Sesli giriş"} aria-label={listening ? "Stop listening" : "Voice input"}>
       <svg width={size*0.5} height={size*0.5} viewBox="0 0 24 24" fill="none">
         {listening ? (
           <>
@@ -559,7 +614,7 @@ function VoiceCommand({ data, update, goTo, showToast }) {
   return (
     <>
       {/* FAB mikrofon butonu */}
-      <button className="touch-card" onClick={open && listening ? stop : handleStart} style={{
+      <button className="touch-card" onClick={open && listening ? stop : handleStart} aria-label="Voice command" style={{
         position:"fixed",left:20,bottom:100,
         width:52,height:52,borderRadius:"50%",
         background:listening ? "#ef4444" : "linear-gradient(135deg,#3b82f6,#6366f1)",
@@ -707,13 +762,13 @@ const checkBtnStyle = (done) => ({
 function Modal({ open, onClose, title, children }) {
   if (!open) return null;
   return (
-    <div onClick={onClose} style={{
+    <div onClick={onClose} role="presentation" style={{
       position:"fixed",inset:0,background:"rgba(0,0,0,0.8)",display:"flex",
       alignItems:"flex-end",justifyContent:"center",zIndex:9999,
       padding:0,
       animation:"modalOverlayIn .2s ease both",
     }}>
-      <div onClick={e=>e.stopPropagation()} style={{
+      <div onClick={e=>e.stopPropagation()} role="dialog" aria-modal="true" aria-label={title} style={{
         background:"#1C1C26",
         backdropFilter:"blur(24px)",WebkitBackdropFilter:"blur(24px)",
         width:"100%",maxWidth:480,
@@ -727,7 +782,7 @@ function Modal({ open, onClose, title, children }) {
           flexShrink:0,
         }}>
           <h3 style={{margin:0,fontSize:16,fontWeight:600,color:"#F9FAFB"}}>{title}</h3>
-          <button className="back-btn" onClick={onClose} style={{width:32,height:32,fontSize:14}}>✕</button>
+          <button className="back-btn" onClick={onClose} aria-label="Close" style={{width:32,height:32,fontSize:14}}>✕</button>
         </div>
         <div style={{
           padding:"16px 20px 32px",
@@ -788,11 +843,13 @@ function GroupLabel({ label, count, color }) {
   );
 }
 
-function FAB({ onClick, color="#3b82f6" }) {
+function FAB({ onClick, color="#3b82f6", label="Add" }) {
   return (
     <button
       className="touch-card"
       onClick={onClick}
+      aria-label={label}
+      role="button"
       style={{
         position:"fixed",right:20,bottom:100,
         width:56,height:56,borderRadius:"50%",
@@ -1229,14 +1286,14 @@ function Tasks({ data, update }) {
   const quickDates = [
     {label:T("today"),val:t,icon:"📌"},
     {label:T("tomorrow"),val:tomorrow(),icon:"⏭"},
-    {label:"1 Hafta",val:weekEnd,icon:"📅"},
-    {label:"1 Ay",val:nextMonth(),icon:"🗓"},
+    {label:T("oneWeek"),val:weekEnd,icon:"📅"},
+    {label:T("oneMonth"),val:nextMonth(),icon:"🗓"},
   ];
 
   const formatDate = (d) => {
     if(!d) return "";
     if(d===t) return T("today");
-    if(d===tomorrow()) return "Yarın";
+    if(d===tomorrow()) return T("tomorrow");
     return new Date(d).toLocaleDateString(T("locale"),{day:"numeric",month:"short"});
   };
 
@@ -1255,14 +1312,14 @@ function Tasks({ data, update }) {
     {key:"today",label:T("grpToday"),color:"#3b82f6",tasks:list.filter(x=>!x.done&&x.dueDate===t)},
     {key:"week",label:T("grpWeek"),color:"#a855f7",tasks:list.filter(x=>!x.done&&x.dueDate&&x.dueDate>t&&x.dueDate<=weekEnd)},
     {key:"pending",label:T("grpPending"),color:"#9CA3AF",tasks:list.filter(x=>!x.done&&(!x.dueDate||x.dueDate>weekEnd))},
-    {key:"done",label:"Tamamlanan",color:"#22c55e",tasks:list.filter(x=>x.done)},
+    {key:"done",label:T("grpDone"),color:"#22c55e",tasks:list.filter(x=>x.done)},
   ].filter(g=>g.tasks.length>0) : null;
 
   const TaskCard = ({ task }) => (
     <div style={{...cardStyle,display:"flex",alignItems:"center",gap:12,minHeight:52,opacity:task.done?.5:1,
       border:`1px solid ${task.done?"rgba(16,185,129,0.1)":PCOL[task.priority]+"15"}`,
     }}>
-      <button onClick={()=>toggle(task.id)} style={checkBtnStyle(task.done)}>{task.done&&"✓"}</button>
+      <button onClick={()=>toggle(task.id)} style={checkBtnStyle(task.done)} aria-label={task.done?"Mark incomplete":"Mark complete"}>{task.done&&"✓"}</button>
       <div style={{flex:1,minWidth:0,cursor:"pointer"}} onClick={()=>setDetail(detail===task.id?null:task.id)}>
         <div style={{fontSize:14,fontWeight:600,color:"#F9FAFB",textDecoration:task.done?"line-through":"none",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{task.title}</div>
         <div style={{display:"flex",gap:6,marginTop:4,flexWrap:"wrap",alignItems:"center"}}>
@@ -1271,7 +1328,7 @@ function Tasks({ data, update }) {
           {task.dueDate&&<span style={{fontSize:11,color:!task.done&&task.dueDate<t?"#ef4444":"#9CA3AF"}}>{formatDate(task.dueDate)}</span>}
         </div>
       </div>
-      <button onClick={()=>del(task.id)} style={delBtnStyle}>✕</button>
+      <button onClick={()=>del(task.id)} style={delBtnStyle} aria-label="Delete">✕</button>
     </div>
   );
 
@@ -1324,7 +1381,7 @@ function Tasks({ data, update }) {
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
               <h4 style={{margin:0,fontSize:16,fontWeight:700}}>{task.title}</h4>
               <div style={{display:"flex",gap:6}}>
-                <button onClick={()=>openEdit(task)} style={{background:"rgba(59,130,246,0.15)",color:"#3b82f6",border:"none",borderRadius:8,padding:"6px 12px",fontSize:12,cursor:"pointer",fontWeight:600}}>Düzenle</button>
+                <button onClick={()=>openEdit(task)} style={{background:"rgba(59,130,246,0.15)",color:"#3b82f6",border:"none",borderRadius:8,padding:"6px 12px",fontSize:12,cursor:"pointer",fontWeight:600}}>{T("edit")}</button>
                 <button onClick={()=>setDetail(null)} style={{background:"#2A2A35",color:"#9CA3AF",border:"none",borderRadius:8,padding:"6px 10px",fontSize:14,cursor:"pointer"}}>✕</button>
               </div>
             </div>
@@ -1333,7 +1390,7 @@ function Tasks({ data, update }) {
               {task.category&&<span>🏷 {task.category}</span>}
               {task.dueDate&&<span style={{color:!task.done&&task.dueDate<today()?"#ef4444":"inherit"}}>📅 {task.dueDate}</span>}
               <span>⚡ {({high:T("priHigh"),medium:T("priMed"),low:T("priLow")}[task.priority])}</span>
-              <span>{task.done?"✅ Tamamlandı":"⏳ Bekliyor"}</span>
+              <span>{task.done?`✅ ${T("statusDone")}`:`⏳ ${T("statusWaiting")}`}</span>
             </div>
           </div>
         );
@@ -1363,7 +1420,7 @@ function Tasks({ data, update }) {
             {form.dueDate&&<button onClick={()=>setForm({...form,dueDate:""})} style={{
               background:"rgba(239,68,68,0.1)",color:"#ef4444",border:"1px solid rgba(239,68,68,0.2)",
               padding:"8px 12px",borderRadius:10,fontSize:13,cursor:"pointer",
-            }}>✕ Temizle</button>}
+            }}>✕ {T("clear")}</button>}
           </div>
           <div style={{display:"flex",gap:8,alignItems:"center"}}>
             <input style={{...inp,flex:1,marginBottom:0}} type="date" value={form.dueDate} onChange={e=>setForm({...form,dueDate:e.target.value})}/>
@@ -1387,7 +1444,7 @@ function Tasks({ data, update }) {
           </div>
         </div>
         <button style={btnPrimary} onClick={save}>{editingId?T("save"):T("add")}</button>
-        {editingId&&<button onClick={()=>{del(editingId);setModal(false);setEditingId(null);}} style={{...btnPrimary,background:"#ef4444",marginTop:8}}>Görevi Sil</button>}
+        {editingId&&<button onClick={()=>{del(editingId);setModal(false);setEditingId(null);}} style={{...btnPrimary,background:"#ef4444",marginTop:8}}>{T("deleteTask")}</button>}
       </Modal>
     </div>
   );
@@ -1476,9 +1533,9 @@ function CalendarView({ data, update }) {
         <div style={{background:"#1C1C26",borderRadius:14,padding:16,marginTop:12}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
             <h4 style={{margin:0,fontSize:15,fontWeight:700}}>{selDay} {T("months")[m]}</h4>
-            <button onClick={openAdd} style={{background:"rgba(59,130,246,0.15)",color:"#3b82f6",border:"none",borderRadius:8,padding:"6px 14px",fontSize:12,cursor:"pointer",fontWeight:600}}>+ Ekle</button>
+            <button onClick={openAdd} style={{background:"rgba(59,130,246,0.15)",color:"#3b82f6",border:"none",borderRadius:8,padding:"6px 14px",fontSize:12,cursor:"pointer",fontWeight:600}}>+ {T("add")}</button>
           </div>
-          {evOn(selDay).length===0&&<p style={{color:"#9CA3AF",fontSize:13,margin:0}}>Etkinlik yok</p>}
+          {evOn(selDay).length===0&&<p style={{color:"#9CA3AF",fontSize:13,margin:0}}>{T("noEvents")}</p>}
           {evOn(selDay).map((e,idx)=>(
             <div key={idx} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 0",borderBottom:"1px solid rgba(255,255,255,0.05)"}}>
               <span style={{width:10,height:10,borderRadius:"50%",background:e.color||"#3b82f6",flexShrink:0}}/>
@@ -1487,7 +1544,7 @@ function CalendarView({ data, update }) {
                 {e.time&&<div style={{fontSize:12,color:"#9CA3AF"}}>🕐 {e.time}</div>}
                 {e.description&&<div style={{fontSize:12,color:"#9CA3AF"}}>{e.description}</div>}
               </div>
-              <button onClick={()=>del(e.id)} style={delBtnStyle}>✕</button>
+              <button onClick={()=>del(e.id)} style={delBtnStyle} aria-label="Delete">✕</button>
             </div>
           ))}
         </div>
@@ -1498,7 +1555,7 @@ function CalendarView({ data, update }) {
         if(upEv.length===0) return null;
         return (
           <div style={{marginBottom:14}}>
-            <GroupLabel label="Yaklaşan" count={upEv.length} color="#a855f7"/>
+            <GroupLabel label={T("upcoming")} count={upEv.length} color="#a855f7"/>
             {upEv.map(e=>(
               <div key={e.id} style={{...cardStyle,display:"flex",alignItems:"center",gap:12,minHeight:52}}>
                 <span style={{width:10,height:10,borderRadius:"50%",background:e.color||"#a855f7",flexShrink:0}}/>
@@ -1506,7 +1563,7 @@ function CalendarView({ data, update }) {
                   <div style={{fontSize:14,fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{e.title}</div>
                   <div style={{fontSize:11,color:"#9CA3AF",marginTop:2}}>{e.date}{e.time?` · ${e.time}`:""}</div>
                 </div>
-                <button onClick={()=>update({...data,events:data.events.filter(ev=>ev.id!==e.id)})} style={delBtnStyle}>✕</button>
+                <button onClick={()=>update({...data,events:data.events.filter(ev=>ev.id!==e.id)})} style={delBtnStyle} aria-label="Delete">✕</button>
               </div>
             ))}
           </div>
@@ -1527,10 +1584,10 @@ function CalendarView({ data, update }) {
         </div>
         <input style={inp} placeholder={T("descOpt")} value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/>
         <select style={inp} value={form.recurring} onChange={e=>setForm({...form,recurring:e.target.value})}>
-          <option value="none">Tekrarlama yok</option>
-          <option value="daily">Her gün</option>
-          <option value="weekly">Her hafta</option>
-          <option value="monthly">Her ay</option>
+          <option value="none">{T("repeatNone")}</option>
+          <option value="daily">{T("repeatDaily")}</option>
+          <option value="weekly">{T("repeatWeekly")}</option>
+          <option value="monthly">{T("repeatMonthly")}</option>
         </select>
         <div style={{display:"flex",gap:8,marginBottom:14}}>
           {COLORS.map(c=>(
@@ -1763,7 +1820,7 @@ function Sports({ data, update, initialView, onBack }) {
     <div>
       <StickyHeader>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
-          {onBack && <button className="back-btn" onClick={onBack}>◀</button>}
+          {onBack && <button className="back-btn" aria-label="Go back" onClick={onBack}>◀</button>}
           <h3 style={{margin:0,fontSize:20,fontWeight:800,flex:1}}>{T("healthCoach")}</h3>
         </div>
       </StickyHeader>
@@ -1877,7 +1934,7 @@ function Sports({ data, update, initialView, onBack }) {
                 <div key={f.id} style={{...cardStyle,display:"flex",alignItems:"center",gap:10,padding:"10px 14px"}}>
                   <span style={{fontSize:13,flex:1}}>{f.name}</span>
                   <span style={{fontSize:12,fontWeight:600,color:"#f97316"}}>{f.calories}</span>
-                  <button onClick={()=>delFood(f.id)} style={delBtnStyle}>✕</button>
+                  <button onClick={()=>delFood(f.id)} style={delBtnStyle} aria-label="Delete">✕</button>
                 </div>
               ))}
             </div>
@@ -1897,7 +1954,7 @@ function Sports({ data, update, initialView, onBack }) {
               <div style={{fontSize:14,fontWeight:600}}>{s.type}</div>
               <div style={{fontSize:11,color:"#9CA3AF"}}>{s.duration}dk {s.distance>0&&`· ${s.distance}km`} · {s.calories||calcSportCal(s.type,s.duration)} kcal</div>
             </div>
-            <button onClick={()=>delSport(s.id)} style={delBtnStyle}>✕</button>
+            <button onClick={()=>delSport(s.id)} style={delBtnStyle} aria-label="Delete">✕</button>
           </div>
         ))}
       </div>
@@ -2253,7 +2310,7 @@ function NewsRoom({ room, onBack, data }) {
     <div className="room-enter">
       <StickyHeader>
         <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
-          <button className="back-btn" onClick={()=>setActiveCat(null)}>◀</button>
+          <button className="back-btn" aria-label="Go back" onClick={()=>setActiveCat(null)}>◀</button>
           <div style={{filter:`drop-shadow(0 0 6px ${catInfo?.color}88)`,flexShrink:0}}>
             {NEWS_ICONS[activeCat]?.(catInfo?.color||"#aaa")}
           </div>
@@ -2373,7 +2430,7 @@ function NewsRoom({ room, onBack, data }) {
     <div>
       <StickyHeader>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
-          <button className="back-btn" onClick={onBack}>◀</button>
+          <button className="back-btn" aria-label="Go back" onClick={onBack}>◀</button>
           <span style={{fontSize:22}}>
             <svg width="22" height="22" viewBox="0 0 36 36" fill="none"><rect x="4" y="7" width="28" height="22" rx="2" stroke="#ef4444" strokeWidth="1.5" fill="rgba(239,68,68,0.1)"/><line x1="9" y1="13" x2="27" y2="13" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round"/><line x1="9" y1="18" x2="27" y2="18" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" opacity=".6"/><line x1="9" y1="23" x2="20" y2="23" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" opacity=".4"/></svg>
           </span>
@@ -2678,14 +2735,14 @@ function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
       <audio ref={audioRef} onEnded={()=>setPreview(null)} style={{display:"none"}}/>
       <StickyHeader>
         <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
-          <button className="back-btn" onClick={onBack}>◀</button>
+          <button className="back-btn" aria-label="Go back" onClick={onBack}>◀</button>
           <span style={{fontSize:22}}>🎵</span>
           <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{roomLabel(room,data)}</h3>
           <span style={{fontSize:12,color:"#9CA3AF"}}>{items.length} parça</span>
         </div>
         {/* Tab switcher — 4 tabs */}
         <div style={{background:"#2A2A35",borderRadius:12,padding:3,display:"flex",gap:1}}>
-          {[["collection","Benim"],["charts","Top 🏆"],["search","Ara"],["link","Link"]].map(([k,v])=>(
+          {[["collection",T("musicTabMine")],["charts","Top 🏆"],["search",T("musicTabSearch")],["link","Link"]].map(([k,v])=>(
             <button key={k} onClick={()=>setTab(k)} style={{
               flex:1,padding:"8px 2px",borderRadius:9,border:"none",cursor:"pointer",
               fontSize:11,fontWeight:tab===k?700:500,
@@ -2769,7 +2826,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
                   textDecoration:"none",fontSize:14,flexShrink:0,
                 }}>↗</a>
               )}
-              <button onClick={()=>onDel(item.id)} style={delBtnStyle}>✕</button>
+              <button onClick={()=>onDel(item.id)} style={delBtnStyle} aria-label="Delete">✕</button>
             </div>
             {/* Embedded player (Spotify/YouTube iframe) */}
             {isExpanded&&embed&&(
@@ -3135,7 +3192,7 @@ function BenimStilimRoom({data,update,onBack}){
     <div>
       <StickyHeader>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
-          <button className="back-btn" onClick={onBack}>◀</button>
+          <button className="back-btn" aria-label="Go back" onClick={onBack}>◀</button>
           <div>
             <div style={{fontSize:18,fontWeight:900,background:"linear-gradient(135deg,#e0d5f5,#a78bfa)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>{T("myStyle")}</div>
             <div style={{fontSize:10,color:"#4B5563"}}>{T("lifestyleDesc")}</div>
@@ -3208,7 +3265,7 @@ function BenimStilimRoom({data,update,onBack}){
                 <div style={{height:5,borderRadius:3,background:"#2A2A35",marginTop:5}}><div style={{height:"100%",borderRadius:3,width:`${item.freq}%`,background:item.freqStatus==="favorite"?"linear-gradient(90deg,#22c55e,#14b8a6)":item.freqStatus==="waiting"?"linear-gradient(90deg,#f59e0b,#ef4444)":"linear-gradient(90deg,#6366f1,#a78bfa)",transition:"width .6s"}}/></div>
               </div>
               <div style={{display:"flex",flexDirection:"column",gap:4,alignItems:"flex-end"}}>
-                <div style={{background:fc.bg,border:`1px solid ${fc.border}`,color:fc.text,fontSize:10,padding:"2px 8px",borderRadius:20,whiteSpace:"nowrap"}}>{fc.label}</div>
+                <div style={{background:fc.bg,border:`1px solid ${fc.border}`,color:fc.text,fontSize:10,padding:"2px 8px",borderRadius:20,whiteSpace:"nowrap"}}>{{favorite:T("freqFavorite"),frequent:T("freqFrequent"),waiting:T("freqWaiting"),new:T("freqNew")}[item.freqStatus]||fc.label}</div>
                 <button onClick={()=>wearCloth(item.id)} style={{background:"rgba(167,139,250,0.1)",border:"1px solid rgba(167,139,250,0.2)",color:"#a78bfa",fontSize:9,padding:"2px 8px",borderRadius:10,cursor:"pointer",whiteSpace:"nowrap"}}>{T("woreToday")}</button>
                 <button onClick={()=>delCloth(item.id)} style={{background:"none",border:"none",color:"#444",fontSize:10,cursor:"pointer",padding:"2px 4px"}}>✕</button>
               </div>
@@ -3315,6 +3372,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
     update({...data,projects:data.projects.map(p=>p.id===pid?{...p,tasks:(p.tasks||[]).map(t=>t.id===tid?{...t,done:!t.done}:t)}:p)});
   };
   const stCol=s=>s==="Tamamlandı"?"#22c55e":s==="Devam Ediyor"?"#3b82f6":s==="Test"?"#f59e0b":"#9CA3AF";
+  const statusLabel=s=>({"Planlama":T("statPlanning"),"Devam Ediyor":T("statProgress"),"Test":T("statTest"),"Tamamlandı":T("statDone")}[s]||s);
 
   const roomIcons=["📂","🎵","👗","📸","🎮","📚","🎨","💼","🏠","✈️","🎯","💡","🛒","🎬","🍳"];
 
@@ -3398,7 +3456,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
     <div className="room-enter">
       <StickyHeader>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
-          <button className="back-btn" onClick={()=>setActiveRoom(null)}>◀</button>
+          <button className="back-btn" aria-label="Go back" onClick={()=>setActiveRoom(null)}>◀</button>
           <div style={{width:28,height:28,borderRadius:8,background:`${room.color}25`,border:`1px solid ${room.color}50`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:room.color,flexShrink:0}}>{roomLabel(room,data)[0]}</div>
           <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{roomLabel(room,data)}</h3>
         </div>
@@ -3418,7 +3476,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
                     {p.deadline&&<span>📅 {p.deadline}</span>}
                   </div>
                 </div>
-                <span style={{fontSize:11,fontWeight:600,color:stCol(p.status),background:`${stCol(p.status)}20`,padding:"4px 10px",borderRadius:8}}>{p.status}</span>
+                <span style={{fontSize:11,fontWeight:600,color:stCol(p.status),background:`${stCol(p.status)}20`,padding:"4px 10px",borderRadius:8}}>{statusLabel(p.status)}</span>
               </div>
               {tasks.length>0&&(<div style={{marginTop:10}}>
                 <div style={{height:6,background:"#2A2A35",borderRadius:3,overflow:"hidden"}}>
@@ -3430,17 +3488,17 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
             {open&&(<div style={{marginTop:12,paddingTop:12,borderTop:"1px solid rgba(255,255,255,0.05)"}}>
               {p.description&&<p style={{fontSize:13,opacity:.6,margin:"0 0 10px"}}>{p.description}</p>}
               <div style={{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap"}}>
-                {PROJECT_STATUSES.map(s=>(<button key={s} onClick={()=>upSt(p.id,s)} style={{background:p.status===s?`${stCol(s)}20`:"#2A2A35",color:p.status===s?stCol(s):"#9CA3AF",border:`1px solid ${p.status===s?stCol(s)+"40":"rgba(255,255,255,0.05)"}`,padding:"7px 14px",borderRadius:8,fontSize:12,cursor:"pointer"}}>{s}</button>))}
+                {PROJECT_STATUSES.map(s=>(<button key={s} onClick={()=>upSt(p.id,s)} style={{background:p.status===s?`${stCol(s)}20`:"#2A2A35",color:p.status===s?stCol(s):"#9CA3AF",border:`1px solid ${p.status===s?stCol(s)+"40":"rgba(255,255,255,0.05)"}`,padding:"7px 14px",borderRadius:8,fontSize:12,cursor:"pointer"}}>{statusLabel(s)}</button>))}
               </div>
               {tasks.map(t=>(<div key={t.id} style={{display:"flex",alignItems:"center",gap:10,padding:"7px 0"}}>
-                <button onClick={()=>togPT(p.id,t.id)} style={checkBtnStyle(t.done)}>{t.done&&"✓"}</button>
+                <button onClick={()=>togPT(p.id,t.id)} style={checkBtnStyle(t.done)} aria-label={t.done?"Mark incomplete":"Mark complete"}>{t.done&&"✓"}</button>
                 <span style={{fontSize:13,textDecoration:t.done?"line-through":"none",opacity:t.done?.4:1}}>{t.title}</span>
               </div>))}
               <div style={{display:"flex",gap:8,marginTop:10}}>
                 <input style={{...inp,flex:1,marginBottom:0}} placeholder={T("addSubtask")} value={tf.title} onChange={e=>setTf({title:e.target.value})} onKeyDown={e=>e.key==="Enter"&&addPT(p.id)}/>
                 <button onClick={()=>addPT(p.id)} style={{background:"#3b82f6",color:"#fff",border:"none",borderRadius:10,padding:"0 18px",fontSize:18,cursor:"pointer"}}>+</button>
               </div>
-              <button onClick={()=>delProject(p.id)} style={{background:"rgba(239,68,68,0.1)",color:"#ef4444",border:"1px solid rgba(239,68,68,0.2)",borderRadius:10,padding:"10px",width:"100%",marginTop:12,fontSize:13,cursor:"pointer"}}>Projeyi Sil</button>
+              <button onClick={()=>delProject(p.id)} style={{background:"rgba(239,68,68,0.1)",color:"#ef4444",border:"1px solid rgba(239,68,68,0.2)",borderRadius:10,padding:"10px",width:"100%",marginTop:12,fontSize:13,cursor:"pointer"}}>{T("deleteProject")}</button>
             </div>)}
           </div>
         );
@@ -3454,7 +3512,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
         <div style={{height:10}}/>
         <input style={inp} placeholder={T("descField")} value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/>
         <div style={{display:"flex",gap:8}}>
-          <select style={{...inp,flex:1}} value={form.status} onChange={e=>setForm({...form,status:e.target.value})}>{PROJECT_STATUSES.map(s=><option key={s}>{s}</option>)}</select>
+          <select style={{...inp,flex:1}} value={form.status} onChange={e=>setForm({...form,status:e.target.value})}>{PROJECT_STATUSES.map(s=><option key={s} value={s}>{statusLabel(s)}</option>)}</select>
           <input style={{...inp,flex:1}} type="date" value={form.deadline} onChange={e=>setForm({...form,deadline:e.target.value})}/>
         </div>
         <input style={inp} placeholder={T("tagsField")} value={form.tags} onChange={e=>setForm({...form,tags:e.target.value})}/>
@@ -3479,7 +3537,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
     <div className="room-enter">
       <StickyHeader>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
-          <button className="back-btn" onClick={()=>setActiveRoom(null)}>◀</button>
+          <button className="back-btn" aria-label="Go back" onClick={()=>setActiveRoom(null)}>◀</button>
           <div style={{width:28,height:28,borderRadius:8,background:`${room.color}25`,border:`1px solid ${room.color}50`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:room.color,flexShrink:0}}>{roomLabel(room,data)[0]}</div>
           <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{roomLabel(room,data)}</h3>
           <button onClick={()=>delRoom(activeRoom)} style={{background:"none",border:"none",color:"#ef4444",fontSize:11,cursor:"pointer"}}>{T("del")}</button>
@@ -3507,7 +3565,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
                 {item.tags.map(t=><span key={t} style={{background:`${room.color}20`,color:room.color,padding:"1px 8px",borderRadius:6,fontSize:10}}>{t}</span>)}
               </div>)}
             </div>
-            <button onClick={()=>delItem(activeRoom,item.id)} style={delBtnStyle}>✕</button>
+            <button onClick={()=>delItem(activeRoom,item.id)} style={delBtnStyle} aria-label="Delete">✕</button>
           </div>
           <div style={{fontSize:10,opacity:.25,marginTop:6}}>{item.createdAt}</div>
         </div>
@@ -3760,11 +3818,11 @@ function Settings({ data, update, onImport, user, onLogout }) {
           <div>
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
               <span style={{width:8,height:8,borderRadius:"50%",background:"#f59e0b"}}/>
-              <span style={{fontSize:12,color:"#f59e0b"}}>Misafir modu</span>
+              <span style={{fontSize:12,color:"#f59e0b"}}>{T("guestMode")}</span>
             </div>
-            <p style={{fontSize:11,color:"#9CA3AF",margin:"0 0 12px"}}>Veriler sadece bu cihazda saklanıyor. Giriş yaparak tüm cihazlarında senkronize edebilirsin.</p>
+            <p style={{fontSize:11,color:"#9CA3AF",margin:"0 0 12px"}}>{T("localOnlyDesc")}</p>
             <button onClick={onLogout} style={{...btnPrimary,marginTop:0,background:"#3b82f6"}}>
-              Giriş Yap / Kayıt Ol
+              {T("loginTitle")} / {T("registerTitle")}
             </button>
           </div>
         )}
@@ -3970,6 +4028,9 @@ function NebulaBackground({ children, style }) {
 }
 
 function LoginScreen({ onLogin }) {
+  // Login ekranında data yok, localStorage'dan dil oku
+  const loginLang = (() => { try { const d = JSON.parse(localStorage.getItem("zimu-data")||"{}"); return d?.settings?.language || "tr"; } catch { return "tr"; } })();
+  const T = (key) => (TRANSLATIONS[loginLang] || TRANSLATIONS.tr)[key] || TRANSLATIONS.tr[key] || key;
   const [mode, setMode] = useState("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -3984,7 +4045,7 @@ function LoginScreen({ onLogin }) {
   };
 
   const handleEmail = async () => {
-    if (!email.trim() || !password.trim()) { setError("Email ve şifre gerekli"); return; }
+    if (!email.trim() || !password.trim()) { setError(T("emailRequired")); return; }
     setLoading(true); setError("");
     const fn = mode === "register" ? registerWithEmail : signInWithEmail;
     const { user, error } = await fn(email, password);
@@ -4068,20 +4129,20 @@ function LoginScreen({ onLogin }) {
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
             </svg>
-            Google ile Giriş Yap
+            {T("googleLogin")}
           </button>
 
           {/* Divider */}
           <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:16}}>
             <div style={{flex:1,height:1,background:"#2A2A35"}}/>
-            <span style={{fontSize:12,color:"#4B5563",letterSpacing:.5}}>veya</span>
+            <span style={{fontSize:12,color:"#4B5563",letterSpacing:.5}}>{T("orDivider")}</span>
             <div style={{flex:1,height:1,background:"#2A2A35"}}/>
           </div>
 
-          <input type="email" placeholder="Email adresi" value={email}
+          <input type="email" placeholder={T("emailPlaceholder")} value={email}
             onChange={e=>setEmail(e.target.value)}
             style={glassInp} />
-          <input type="password" placeholder="Şifre (en az 6 karakter)" value={password}
+          <input type="password" placeholder={T("passwordPlaceholder")} value={password}
             onChange={e=>setPassword(e.target.value)}
             onKeyDown={e=>e.key==="Enter"&&handleEmail()}
             style={glassInp} />
@@ -4094,14 +4155,14 @@ function LoginScreen({ onLogin }) {
             boxShadow:"0 4px 24px rgba(99,102,241,0.45)",
             opacity:loading?.6:1,transition:"all .2s",letterSpacing:.3,
           }}>
-            {loading ? "Bekleyin..." : mode === "register" ? "Kayıt Ol" : "Giriş Yap"}
+            {loading ? T("waitLogin") : mode === "register" ? T("registerTitle") : T("loginTitle")}
           </button>
 
           <div style={{textAlign:"center",marginTop:16}}>
             <button onClick={()=>{setMode(mode==="login"?"register":"login");setError("");}} style={{
               background:"none",border:"none",color:"#a78bfa",fontSize:13,cursor:"pointer",opacity:.8,
             }}>
-              {mode === "login" ? "Hesabın yok mu? Kayıt ol" : "Zaten hesabın var mı? Giriş yap"}
+              {mode === "login" ? T("noAccount") : T("hasAccount")}
             </button>
           </div>
         </div>
@@ -4111,9 +4172,9 @@ function LoginScreen({ onLogin }) {
           <button onClick={handleSkip} style={{
             background:"none",border:"none",color:"#6B7280",fontSize:12,cursor:"pointer",
           }}>
-            Giriş yapmadan devam et →
+            {T("skipLogin")}
           </button>
-          <div style={{fontSize:10,opacity:.25,marginTop:4}}>Veriler sadece bu cihazda kalır</div>
+          <div style={{fontSize:10,opacity:.25,marginTop:4}}>{T("localOnly")}</div>
         </div>
       </div>
     </NebulaBackground>
@@ -4344,7 +4405,7 @@ export default function App() {
         letterSpacing:.5,
         animation:"tapBlink 2.5s ease-in-out infinite",
       }}>
-        Devam etmek için dokun
+        {T("tapToContinue")}
       </div>
     </NebulaBackground>
   );
@@ -4433,7 +4494,7 @@ export default function App() {
 
       {/* Scroll to top button */}
       {showScrollTop && (
-        <button onClick={scrollToTop} style={{
+        <button onClick={scrollToTop} aria-label="Scroll to top" style={{
           position:"fixed",
           right:16,
           bottom:NAV_HEIGHT + SAFE_BOTTOM + 70,
@@ -4452,7 +4513,7 @@ export default function App() {
       {data && <VoiceCommand data={data} update={update} goTo={goTo} showToast={showToast}/>}
 
       {/* Bottom nav bar */}
-      <div style={{
+      <nav aria-label="Main navigation" style={{
         position:"fixed",
         bottom:0,
         left:0,right:0,
@@ -4469,7 +4530,7 @@ export default function App() {
       }}>
         <div style={{display:"flex",justifyContent:"space-around",alignItems:"center",width:"100%",maxWidth:isMobile?undefined:600}}>
         {allTabs.map(t=>(
-          <button key={t.id} className="nav-item" onClick={()=>setTab(t.id)} style={{
+          <button key={t.id} className="nav-item" onClick={()=>setTab(t.id)} aria-current={tab===t.id?"page":undefined} aria-label={t.label} style={{
             background:tab===t.id?"rgba(59,130,246,0.15)":"none",
             boxShadow:tab===t.id?"0 0 20px rgba(59,130,246,0.25)":undefined,
             border:"none",cursor:"pointer",
@@ -4486,7 +4547,7 @@ export default function App() {
           </button>
         ))}
         </div>
-      </div>
+      </nav>
     </div>
   );
 
