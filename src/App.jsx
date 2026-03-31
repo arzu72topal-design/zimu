@@ -34,7 +34,7 @@ const TRANSLATIONS = {
     goCalendar:"Takvim'e git ve etkinlik ekle",
     thisWeek:"Bu Hafta", workout:"Antrenman", kcalBurned:"kcal yakıldı", taskDone:"Görev bitti",
     thoughts:"Bugün Kafamı Kurcalayanlar",
-    thought1:"Bugün en çok düşündüğüm şey...", thought2:"Kafamı karıştıran bir şey...", thought3:"Çözmek istediğim bir sorun...",
+    thought1:"Bugün en çok düşündüğüm şey...", thought2:"Kafamı karıştıran bir şey...", thought3:"Çözmek istediğim bir sorun...", saveToNotes:"Notlara kaydet",
     bbcNews:"Haberler", newsLoading:"Haberler yükleniyor...",
     musicCol:"Müzik Koleksiyonu", musicEmpty:"Müzik koleksiyonu boş",
     musicEmptyDesc:"Yaşam Tarzı → Müziklerim'e git ve ekle",
@@ -224,7 +224,7 @@ const TRANSLATIONS = {
     goCalendar:"Go to Calendar and add an event",
     thisWeek:"This Week", workout:"Workout", kcalBurned:"kcal burned", taskDone:"Tasks done",
     thoughts:"What's on My Mind",
-    thought1:"What I'm thinking about the most...", thought2:"Something that's bugging me...", thought3:"A problem I want to solve...",
+    thought1:"What I'm thinking about the most...", thought2:"Something that's bugging me...", thought3:"A problem I want to solve...", saveToNotes:"Save to notes",
     bbcNews:"News", newsLoading:"Loading news...",
     musicCol:"Music Collection", musicEmpty:"Music collection is empty",
     musicEmptyDesc:"Go to Lifestyle → My Music and add some",
@@ -887,11 +887,32 @@ function Dashboard({ data, setTab, goTo, update }) {
   const todayFoods = foods.filter(f=>f.date===t);
   const todayCalIn = todayFoods.reduce((a,f)=>a+(f.calories||0),0);
   const todayCalOut = data.sports.filter(s=>s.date===t).reduce((a,s)=>a+(s.calories||0),0);
-  const activeProjects = data.projects.filter(p=>p.status!=="Tamamlandı").length;
+  const activeProjects = (data.projects||[]).filter(p=>p.status!=="Tamamlandı").length;
 
   const hour = new Date().getHours();
   const T = (key) => i18n(key, data);
   const greeting = hour<12 ? T("goodMorning") : hour<18 ? T("goodAfternoon") : T("goodEvening");
+
+  // Live clock (updates every minute)
+  const [clock, setClock] = useState(new Date().toLocaleTimeString(T("locale"), {hour:"2-digit",minute:"2-digit"}));
+  useEffect(()=>{
+    const iv=setInterval(()=>setClock(new Date().toLocaleTimeString(T("locale"),{hour:"2-digit",minute:"2-digit"})),30000);
+    return ()=>clearInterval(iv);
+  },[]);
+
+  // Dashboard weather
+  const [dashWx, setDashWx] = useState(null);
+  useEffect(()=>{
+    if(!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(pos=>{
+      const {latitude:lat,longitude:lon}=pos.coords;
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code&timezone=auto`)
+        .then(r=>r.json()).then(d=>{
+          const c=d.current;
+          setDashWx({temp:Math.round(c.temperature_2m),humid:Math.round(c.relative_humidity_2m),code:c.weather_code});
+        }).catch(()=>{});
+    },()=>{},{timeout:5000,maximumAge:300000});
+  },[]);
 
   // Daily thoughts (3 slots)
   const thoughts = data.dailyThoughts || ["","",""];
@@ -899,6 +920,13 @@ function Dashboard({ data, setTab, goTo, update }) {
     const next = [...thoughts];
     next[i] = val;
     update({ ...data, dailyThoughts: next });
+  };
+  const thoughtToNote = (i) => {
+    const text = (thoughts[i]||"").trim();
+    if(!text) return;
+    const newNote = {id:uid(),title:text,content:"",color:"#14b8a6",createdAt:today(),updatedAt:today()};
+    const next = [...thoughts]; next[i] = "";
+    update({...data, notes:[newNote,...(data.notes||[])], dailyThoughts:next});
   };
 
   // Live news headlines
@@ -931,7 +959,7 @@ function Dashboard({ data, setTab, goTo, update }) {
 
   return (
     <div>
-      {/* HERO - Greeting */}
+      {/* HERO - Greeting + Weather + Clock */}
       <div className="stagger-1" style={{
         background:"#1C1C26",
         borderRadius:16,padding:"20px",marginBottom:16,
@@ -953,7 +981,26 @@ function Dashboard({ data, setTab, goTo, update }) {
               {new Date().toLocaleDateString(T("locale"),{weekday:"long",day:"numeric",month:"long"})}
             </p>
           </div>
+          <div style={{textAlign:"right",flexShrink:0}}>
+            <div style={{fontSize:22,fontWeight:700,color:"#F9FAFB",letterSpacing:-.5,lineHeight:1}}>{clock}</div>
+            {dashWx&&<div style={{fontSize:13,fontWeight:600,color:"#a5b4fc",marginTop:4}}>{dashWx.temp}°C</div>}
+          </div>
         </div>
+        {dashWx&&(
+          <div style={{display:"flex",gap:12,marginTop:12,paddingTop:12,borderTop:"1px solid rgba(255,255,255,0.05)"}}>
+            <div style={{display:"flex",alignItems:"center",gap:5,fontSize:12,color:"#9CA3AF"}}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M14 14.76V3.5a2.5 2.5 0 00-5 0v11.26a4.5 4.5 0 105 0z" stroke="#f59e0b" strokeWidth="1.5" fill="rgba(245,158,11,0.1)"/></svg>
+              {dashWx.temp}°C
+            </div>
+            <div style={{display:"flex",alignItems:"center",gap:5,fontSize:12,color:"#9CA3AF"}}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z" stroke="#3b82f6" strokeWidth="1.5" fill="rgba(59,130,246,0.1)"/></svg>
+              %{dashWx.humid} {T("humidity")||"nem"}
+            </div>
+            <div style={{display:"flex",alignItems:"center",gap:5,fontSize:12,color:"#9CA3AF"}}>
+              {WMO_TR[dashWx.code]||""}
+            </div>
+          </div>
+        )}
       </div>
 
 
@@ -1105,7 +1152,7 @@ function Dashboard({ data, setTab, goTo, update }) {
         </div>
         <div style={{background:"#1C1C26",borderRadius:16,padding:"14px 16px",border:"1px solid rgba(255,255,255,0.05)"}}>
           {[0,1,2].map(i=>(
-            <div key={i} style={{display:"flex",alignItems:"center",gap:10,marginBottom:i<2?10:0}}>
+            <div key={i} style={{display:"flex",alignItems:"center",gap:8,marginBottom:i<2?10:0}}>
               <span style={{fontSize:13,color:"#9CA3AF",flexShrink:0,fontWeight:700}}>{i+1}.</span>
               <input
                 value={thoughts[i]||""}
@@ -1117,6 +1164,15 @@ function Dashboard({ data, setTab, goTo, update }) {
                   WebkitAppearance:"none",boxSizing:"border-box",
                 }}
               />
+              {(thoughts[i]||"").trim()&&(
+                <button onClick={()=>thoughtToNote(i)} title={T("saveToNotes")||"Notlara kaydet"} style={{
+                  width:32,height:32,borderRadius:8,border:"1px solid rgba(20,184,166,0.2)",
+                  background:"rgba(20,184,166,0.1)",color:"#14b8a6",fontSize:14,
+                  cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,
+                }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" stroke="#14b8a6" strokeWidth="1.5"/><polyline points="17,21 17,13 7,13 7,21" stroke="#14b8a6" strokeWidth="1.5"/><polyline points="7,3 7,8 15,8" stroke="#14b8a6" strokeWidth="1.5"/></svg>
+                </button>
+              )}
             </div>
           ))}
         </div>
@@ -2788,7 +2844,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
                   : <span style={{fontSize:22}}>🎵</span>
                 }
               </div>
-              <div style={{flex:1,minWidth:0}}>
+              <div style={{flex:1,minWidth:0,cursor:item.link?"pointer":"default"}} onClick={()=>{if(item.link&&!embed&&!item.preview)window.open(item.link,"_blank","noopener");}}>
                 <div style={{fontSize:14,fontWeight:700,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.title}</div>
                 {item.artist&&<div style={{fontSize:12,color:"#9CA3AF",marginTop:2}}>{item.artist}</div>}
                 <div style={{fontSize:11,color:"#4B5563",marginTop:2,display:"flex",alignItems:"center",gap:4}}>
@@ -2820,12 +2876,14 @@ function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
               )}
               {/* Open link button (non-embeddable) */}
               {item.link&&!embed&&!item.preview&&(
-                <a href={item.link} target="_blank" rel="noopener noreferrer" style={{
+                <button onClick={()=>window.open(item.link,"_blank","noopener")} style={{
                   width:36,height:36,borderRadius:"50%",
-                  background:"#2A2A35",
-                  display:"flex",alignItems:"center",justifyContent:"center",
-                  textDecoration:"none",fontSize:14,flexShrink:0,
-                }}>↗</a>
+                  background:"rgba(59,130,246,0.15)",border:"1px solid rgba(59,130,246,0.25)",
+                  color:"#3b82f6",fontSize:14,cursor:"pointer",
+                  display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,
+                }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </button>
               )}
               <button onClick={()=>onDel(item.id)} style={delBtnStyle} aria-label="Delete">✕</button>
             </div>
@@ -3359,18 +3417,18 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
   const addProject=()=>{
     if(!form.name.trim())return;
     const np={id:uid(),...form,tags:form.tags.split(",").map(t=>t.trim()).filter(Boolean),tasks:[],createdAt:today()};
-    update({...data,projects:[np,...data.projects]});
+    update({...data,projects:[np,...(data.projects||[])]});
     setModal(false);setForm({name:"",status:"Planlama",description:"",deadline:"",tags:""});
   };
-  const delProject=id=>update({...data,projects:data.projects.filter(p=>p.id!==id)});
-  const upSt=(id,st)=>update({...data,projects:data.projects.map(p=>p.id===id?{...p,status:st}:p)});
+  const delProject=id=>update({...data,projects:(data.projects||[]).filter(p=>p.id!==id)});
+  const upSt=(id,st)=>update({...data,projects:(data.projects||[]).map(p=>p.id===id?{...p,status:st}:p)});
   const addPT=pid=>{
     if(!tf.title.trim())return;
-    update({...data,projects:data.projects.map(p=>p.id===pid?{...p,tasks:[...(p.tasks||[]),{id:uid(),title:tf.title,done:false}]}:p)});
+    update({...data,projects:(data.projects||[]).map(p=>p.id===pid?{...p,tasks:[...(p.tasks||[]),{id:uid(),title:tf.title,done:false}]}:p)});
     setTf({title:""});
   };
   const togPT=(pid,tid)=>{
-    update({...data,projects:data.projects.map(p=>p.id===pid?{...p,tasks:(p.tasks||[]).map(t=>t.id===tid?{...t,done:!t.done}:t)}:p)});
+    update({...data,projects:(data.projects||[]).map(p=>p.id===pid?{...p,tasks:(p.tasks||[]).map(t=>t.id===tid?{...t,done:!t.done}:t)}:p)});
   };
   const stCol=s=>s==="Tamamlandı"?"#22c55e":s==="Devam Ediyor"?"#3b82f6":s==="Test"?"#f59e0b":"#9CA3AF";
   const statusLabel=s=>({"Planlama":T("statPlanning"),"Devam Ediyor":T("statProgress"),"Test":T("statTest"),"Tamamlandı":T("statDone")}[s]||s);
@@ -3401,7 +3459,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
       </StickyHeader>
       <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:12}}>
         {rooms.map((room,idx)=>{
-          const count=room.type==="project"?data.projects.length:room.type==="health"?(data.sports||[]).length:(roomItems[room.id]||[]).length;
+          const count=room.type==="project"?(data.projects||[]).length:room.type==="health"?(data.sports||[]).length:(roomItems[room.id]||[]).length;
           const photo = getRoomImage(room);
           return (
             <div key={room.id} className={`touch-card stagger-${idx+1}`} onClick={()=>{setActiveRoom(room.id);setRoomSubView(null);}}
@@ -3462,8 +3520,8 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
           <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{roomLabel(room,data)}</h3>
         </div>
       </StickyHeader>
-      {data.projects.length===0&&<p style={{textAlign:"center",color:"#9CA3AF",fontSize:14,padding:40}}>{T("noProjects")}</p>}
-      {data.projects.map(p=>{
+      {(data.projects||[]).length===0&&<p style={{textAlign:"center",color:"#9CA3AF",fontSize:14,padding:40}}>{T("noProjects")}</p>}
+      {(data.projects||[]).map(p=>{
         const tasks=p.tasks||[];const d=tasks.filter(t=>t.done).length;
         const pct=tasks.length?Math.round(d/tasks.length*100):0;const open=exp===p.id;
         return (
@@ -3760,7 +3818,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
   const taskCount = data.tasks.length;
   const eventCount = data.events.length;
   const sportCount = data.sports.length;
-  const projectCount = data.projects.length;
+  const projectCount = (data.projects||[]).length;
   const noteCount = data.notes.length;
 
   return (
