@@ -2523,6 +2523,7 @@ async function proxyFetch(url) {
 
 /* ═══════════ MUSIC ROOM ═══════════ */
 function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
+  const T = (key) => i18n(key, data);
   const [tab, setTab] = useState("collection"); // collection | search | link | charts
   const [searchQ, setSearchQ] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -3714,6 +3715,10 @@ function Settings({ data, update, onImport, user, onLogout }) {
   const [importing, setImporting] = useState(false);
   const [msg, setMsg] = useState("");
 
+  const T = (key) => i18n(key, data);
+  const curLang = data.settings?.language || "tr";
+  const setLang = (lang) => update({...data, settings:{...data.settings, language:lang}});
+
   const enableNotif = async () => {
     const granted = await requestNotificationPermission();
     setNotifStatus(granted ? "granted" : "denied");
@@ -3757,10 +3762,6 @@ function Settings({ data, update, onImport, user, onLogout }) {
   const sportCount = data.sports.length;
   const projectCount = data.projects.length;
   const noteCount = data.notes.length;
-
-  const T = (key) => i18n(key, data);
-  const curLang = data.settings?.language || "tr";
-  const setLang = (lang) => update({...data, settings:{...data.settings, language:lang}});
 
   return (
     <div>
