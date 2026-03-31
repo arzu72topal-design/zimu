@@ -785,7 +785,7 @@ function Modal({ open, onClose, title, children }) {
           <button className="back-btn" onClick={onClose} aria-label="Close" style={{width:32,height:32,fontSize:14}}>✕</button>
         </div>
         <div style={{
-          padding:"16px 20px 32px",
+          padding:"16px 20px calc(80px + env(safe-area-inset-bottom, 20px))",
           overflow:"auto",
           WebkitOverflowScrolling:"touch",
           flex:1,
