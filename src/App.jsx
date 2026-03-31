@@ -772,7 +772,7 @@ function Modal({ open, onClose, title, children }) {
         background:"#1C1C26",
         backdropFilter:"blur(24px)",WebkitBackdropFilter:"blur(24px)",
         width:"100%",maxWidth:480,
-        maxHeight:"85dvh",
+        maxHeight:"85vh",
         borderRadius:"20px 20px 0 0",
         display:"flex",flexDirection:"column",
         animation:"modalSlideUp .3s cubic-bezier(.22,1,.36,1) both",
@@ -2610,16 +2610,21 @@ function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
         // iTunes Turkey — direct fetch, no CORS needed
         const json = await fetch("https://itunes.apple.com/tr/rss/topsongs/limit=25/json")
           .then(r=>r.json());
-        setChartTracks((json.feed?.entry||[]).map((e,i)=>({
-          id:"itunes_"+i,
-          title:e["im:name"]?.label||"",
-          artist:e["im:artist"]?.label||"",
-          albumArt:e["im:image"]?.[2]?.label||e["im:image"]?.[0]?.label||"",
-          link:e.link?.attributes?.href||"",
-          preview:"",
-          source:"itunes",
-          rank:i+1,
-        })));
+        setChartTracks((json.feed?.entry||[]).map((e,i)=>{
+          const links = Array.isArray(e.link) ? e.link : (e.link ? [e.link] : []);
+          const pageLink = links.find(l=>l.attributes?.type==="text/html")?.attributes?.href || links[0]?.attributes?.href || "";
+          const audioLink = links.find(l=>l.attributes?.rel==="enclosure"&&l.attributes?.href)?.attributes?.href || "";
+          return {
+            id:"itunes_"+i,
+            title:e["im:name"]?.label||"",
+            artist:e["im:artist"]?.label||"",
+            albumArt:e["im:image"]?.[2]?.label||e["im:image"]?.[0]?.label||"",
+            link:pageLink,
+            preview:audioLink,
+            source:"itunes",
+            rank:i+1,
+          };
+        }));
       } else {
         // Deezer via multi-proxy fallback
         const deezerUrl = source==="global"
@@ -2669,7 +2674,17 @@ function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
       audioRef.current?.pause();
       setPreview(null);
     } else {
-      if(audioRef.current) { audioRef.current.pause(); audioRef.current.src=track.preview; audioRef.current.play().catch(()=>{}); }
+      if(audioRef.current) {
+        audioRef.current.pause();
+        // Ensure HTTPS for preview URLs
+        const src = (track.preview||"").replace(/^http:\/\//,"https://");
+        audioRef.current.src = src;
+        audioRef.current.load();
+        audioRef.current.play().catch(err=>{
+          console.warn("Audio play failed:",err.message);
+          setPreview(null);
+        });
+      }
       setPreview(track);
     }
   };
@@ -2789,7 +2804,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
 
   return (
     <div>
-      <audio ref={audioRef} onEnded={()=>setPreview(null)} style={{display:"none"}}/>
+      <audio ref={audioRef} crossOrigin="anonymous" preload="auto" onEnded={()=>setPreview(null)} onError={()=>setPreview(null)} style={{display:"none"}}/>
       <StickyHeader>
         <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
           <button className="back-btn" aria-label="Go back" onClick={onBack}>◀</button>
@@ -3091,7 +3106,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
 
           {/* Track list */}
           {!chartLoading&&chartTracks.map((track,i)=>{
-            const inColl = items.some(it=>it.link===track.link||it.title===track.title);
+            const inColl = items.some(it=>(track.link&&it.link===track.link)||(track.title&&track.artist&&it.title===track.title&&it.artist===track.artist));
             return (
               <div key={track.id||i} style={{
                 background:"#1C1C26",borderRadius:16,padding:"10px 12px",marginBottom:6,
@@ -3129,14 +3144,16 @@ function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
                     display:"flex",alignItems:"center",justifyContent:"center",
                   }}>{preview?.id===track.id?"⏸":"▶"}</button>
                 )}
-                {/* Open link (iTunes tracks) */}
+                {/* Open link (iTunes tracks without preview) */}
                 {track.link&&!track.preview&&(
-                  <a href={track.link} target="_blank" rel="noopener noreferrer" style={{
+                  <button onClick={()=>window.open(track.link,"_blank","noopener")} style={{
                     width:32,height:32,borderRadius:"50%",flexShrink:0,
-                    background:"#2A2A35",
+                    background:"rgba(59,130,246,0.15)",border:"1px solid rgba(59,130,246,0.25)",
+                    color:"#3b82f6",fontSize:12,cursor:"pointer",
                     display:"flex",alignItems:"center",justifyContent:"center",
-                    textDecoration:"none",fontSize:13,color:"#9CA3AF",
-                  }}>↗</a>
+                  }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </button>
                 )}
                 {/* Add to collection */}
                 <button onClick={()=>{
@@ -4623,16 +4640,16 @@ export default function App() {
 
         /* ── PAGE TRANSITIONS ── */
         @keyframes pageFadeIn { 
-          from { opacity:0; transform:translateY(12px) } 
-          to { opacity:1; transform:translateY(0) } 
+          from { opacity:0 } 
+          to { opacity:1 } 
         }
         @keyframes slideInRight { 
-          from { opacity:0; transform:translateX(60px) } 
-          to { opacity:1; transform:translateX(0) } 
+          from { opacity:0 } 
+          to { opacity:1 } 
         }
         @keyframes slideOutRight { 
-          from { opacity:1; transform:translateX(0) } 
-          to { opacity:0; transform:translateX(60px) } 
+          from { opacity:1 } 
+          to { opacity:0 } 
         }
         
         /* ── STAGGERED CARD ANIMATIONS ── */
