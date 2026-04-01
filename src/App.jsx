@@ -151,6 +151,10 @@ const TRANSLATIONS = {
     // Settings bölümleri
     notifications:"Bildirimler", dataSummary:"Veri Özeti", dataManagement:"Veri Yönetimi",
     dangerZone:"Tehlikeli Bölge", notifActive:"Bildirimler aktif",
+    reminderBefore:"Hatırlatma zamanı", reminderMinLabel:"dk önce",
+    eventReminders:"Etkinlik hatırlatmaları", taskReminders:"Görev hatırlatmaları",
+    taskRemindDesc:"Bugünkü görevler için sabah hatırlatma", quietHours:"Sessiz saatler",
+    quietHoursDesc:"Bu saatler arasında bildirim gelmez",
     notifBlocked:"Bildirimler engellendi. Tarayıcı ayarlarından izin verin.",
     dataDesc:"Bilgisayarınızdan veri aktarabilir veya yedeğinizi indirebilirsiniz",
     total:"Toplam", sportRecord:"Spor Kaydı",
@@ -321,6 +325,10 @@ const TRANSLATIONS = {
     touchToExplore:"Tap a category to explore news",
     notifications:"Notifications", dataSummary:"Data Summary", dataManagement:"Data Management",
     dangerZone:"Danger Zone", notifActive:"Notifications active",
+    reminderBefore:"Reminder time", reminderMinLabel:"min before",
+    eventReminders:"Event reminders", taskReminders:"Task reminders",
+    taskRemindDesc:"Morning reminder for today's tasks", quietHours:"Quiet hours",
+    quietHoursDesc:"No notifications during these hours",
     notifBlocked:"Notifications blocked. Allow in browser settings.",
     dataDesc:"You can import data or download your backup",
     total:"Total", sportRecord:"Sport Records",
@@ -3911,11 +3919,84 @@ function Settings({ data, update, onImport, user, onLogout }) {
           <p style={{fontSize:13,color:"#9CA3AF"}}>Bu tarayıcı bildirimleri desteklemiyor</p>
         ) : notifStatus === "granted" ? (
           <div>
-            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
               <span style={{width:10,height:10,borderRadius:"50%",background:"#22c55e"}}/>
               <span style={{fontSize:13,color:"#22c55e"}}>{T("notifActive")}</span>
             </div>
-            <p style={{fontSize:12,color:"#9CA3AF",margin:0}}>Etkinlik ve görev hatırlatmaları otomatik olarak gönderilecek</p>
+
+            {/* Reminder time selector */}
+            <div style={{marginBottom:14}}>
+              <div style={{fontSize:12,color:"#9CA3AF",marginBottom:8}}>{T("reminderBefore")}</div>
+              <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+                {[5,10,15,30,60].map(m=>{
+                  const active=(data.settings?.reminderMinutes||15)===m;
+                  return <button key={m} onClick={()=>update({...data,settings:{...data.settings,reminderMinutes:m}})} style={{
+                    padding:"8px 14px",borderRadius:10,cursor:"pointer",fontSize:12,fontWeight:active?700:400,
+                    background:active?"rgba(34,197,94,0.15)":"#2A2A35",
+                    color:active?"#22c55e":"#9CA3AF",
+                    border:active?"1px solid rgba(34,197,94,0.3)":"1px solid rgba(255,255,255,0.05)",
+                  }}>{m} {T("reminderMinLabel")}</button>;
+                })}
+              </div>
+            </div>
+
+            {/* Event reminders toggle */}
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 0",borderTop:"1px solid rgba(255,255,255,0.05)"}}>
+              <div>
+                <div style={{fontSize:13,fontWeight:600,color:"#F9FAFB"}}>{T("eventReminders")}</div>
+              </div>
+              <button onClick={()=>update({...data,settings:{...data.settings,eventNotif:!(data.settings?.eventNotif!==false)}})} style={{
+                width:44,height:24,borderRadius:12,border:"none",cursor:"pointer",
+                background:(data.settings?.eventNotif!==false)?"#22c55e":"#2A2A35",
+                position:"relative",transition:"background .2s",
+              }}>
+                <div style={{width:18,height:18,borderRadius:"50%",background:"#fff",position:"absolute",top:3,
+                  left:(data.settings?.eventNotif!==false)?23:3,transition:"left .2s"}}/>
+              </button>
+            </div>
+
+            {/* Task reminders toggle */}
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 0",borderTop:"1px solid rgba(255,255,255,0.05)"}}>
+              <div>
+                <div style={{fontSize:13,fontWeight:600,color:"#F9FAFB"}}>{T("taskReminders")}</div>
+                <div style={{fontSize:11,color:"#9CA3AF",marginTop:2}}>{T("taskRemindDesc")}</div>
+              </div>
+              <button onClick={()=>update({...data,settings:{...data.settings,taskNotif:!(data.settings?.taskNotif!==false)}})} style={{
+                width:44,height:24,borderRadius:12,border:"none",cursor:"pointer",
+                background:(data.settings?.taskNotif!==false)?"#22c55e":"#2A2A35",
+                position:"relative",transition:"background .2s",
+              }}>
+                <div style={{width:18,height:18,borderRadius:"50%",background:"#fff",position:"absolute",top:3,
+                  left:(data.settings?.taskNotif!==false)?23:3,transition:"left .2s"}}/>
+              </button>
+            </div>
+
+            {/* Quiet hours */}
+            <div style={{padding:"10px 0",borderTop:"1px solid rgba(255,255,255,0.05)"}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
+                <div>
+                  <div style={{fontSize:13,fontWeight:600,color:"#F9FAFB"}}>{T("quietHours")}</div>
+                  <div style={{fontSize:11,color:"#9CA3AF",marginTop:2}}>{T("quietHoursDesc")}</div>
+                </div>
+                <button onClick={()=>update({...data,settings:{...data.settings,quietEnabled:!data.settings?.quietEnabled}})} style={{
+                  width:44,height:24,borderRadius:12,border:"none",cursor:"pointer",
+                  background:data.settings?.quietEnabled?"#22c55e":"#2A2A35",
+                  position:"relative",transition:"background .2s",
+                }}>
+                  <div style={{width:18,height:18,borderRadius:"50%",background:"#fff",position:"absolute",top:3,
+                    left:data.settings?.quietEnabled?23:3,transition:"left .2s"}}/>
+                </button>
+              </div>
+              {data.settings?.quietEnabled&&(
+                <div style={{display:"flex",alignItems:"center",gap:8}}>
+                  <input type="time" value={data.settings?.quietStart||"23:00"} onChange={e=>update({...data,settings:{...data.settings,quietStart:e.target.value}})}
+                    style={{background:"#2A2A35",border:"1px solid rgba(255,255,255,0.05)",borderRadius:8,padding:"6px 10px",color:"#F9FAFB",fontSize:13,flex:1}}/>
+                  <span style={{color:"#9CA3AF",fontSize:12}}>—</span>
+                  <input type="time" value={data.settings?.quietEnd||"08:00"} onChange={e=>update({...data,settings:{...data.settings,quietEnd:e.target.value}})}
+                    style={{background:"#2A2A35",border:"1px solid rgba(255,255,255,0.05)",borderRadius:8,padding:"6px 10px",color:"#F9FAFB",fontSize:13,flex:1}}/>
+                </div>
+              )}
+            </div>
           </div>
         ) : notifStatus === "denied" ? (
           <p style={{fontSize:13,color:"#ef4444"}}>{T("notifBlocked")}</p>
@@ -4335,14 +4416,31 @@ export default function App() {
     return () => clearTimeout(fallback);
   }, []);
 
-  // Schedule notifications
+  // Schedule notifications (respects settings)
   useEffect(() => {
     if (!data) return;
-    if (getNotificationPermission() === "granted") {
-      scheduleEventReminders(data.events, data.settings?.reminderMinutes || 15);
+    if (getNotificationPermission() !== "granted") return;
+    const s = data.settings || {};
+
+    // Check quiet hours
+    if (s.quietEnabled) {
+      const now = new Date();
+      const hhmm = `${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}`;
+      const start = s.quietStart || "23:00";
+      const end = s.quietEnd || "08:00";
+      const inQuiet = start < end
+        ? (hhmm >= start && hhmm < end)
+        : (hhmm >= start || hhmm < end);
+      if (inQuiet) return; // skip all notifications during quiet hours
+    }
+
+    if (s.eventNotif !== false) {
+      scheduleEventReminders(data.events, s.reminderMinutes || 15);
+    }
+    if (s.taskNotif !== false) {
       scheduleTaskReminders(data.tasks);
     }
-  }, [data?.events, data?.tasks]);
+  }, [data?.events, data?.tasks, data?.settings]);
 
   // Scroll to top when tab changes
   useEffect(() => {
