@@ -10,7 +10,12 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'icon-192.png', 'icon-512.png', 'icon-512-maskable.png', 'apple-touch-icon.png'],
+      includeAssets: [
+        'favicon.svg', 'icon-192.png', 'icon-512.png', 'icon-512-maskable.png',
+        'apple-touch-icon.png', 'offline.html',
+        'splash-750x1334.png', 'splash-1170x2532.png', 'splash-1179x2556.png',
+        'splash-1290x2796.png', 'splash-1668x2388.png', 'splash-2048x2732.png'
+      ],
       manifest: {
         name: 'Zimu',
         short_name: 'Zimu',
@@ -28,22 +33,12 @@ export default defineConfig({
         ]
       },
       workbox: {
-        // Do NOT precache JS/CSS — let them load fresh from network
-        globPatterns: ['**/*.{ico,png,svg,webp,woff,woff2}'],
-        // Navigation: always go to network
-        navigateFallback: null,
+        globPatterns: ['**/*.{ico,png,svg,webp,woff,woff2,html}'],
+        navigateFallback: '/offline.html',
+        navigateFallbackDenylist: [/^\/api\//],
         runtimeCaching: [
           {
-            // HTML pages — Network First (always get fresh)
-            urlPattern: ({ request }) => request.mode === 'navigate',
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'pages',
-              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 }
-            }
-          },
-          {
-            // JS and CSS — Network First (new deploys work immediately)
+            // JS and CSS — Network First
             urlPattern: /\.(?:js|css)$/,
             handler: 'NetworkFirst',
             options: {
@@ -52,7 +47,7 @@ export default defineConfig({
             }
           },
           {
-            // Images — Cache First (they rarely change)
+            // Images — Cache First
             urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/,
             handler: 'CacheFirst',
             options: {
