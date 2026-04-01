@@ -147,6 +147,12 @@ const TRANSLATIONS = {
     catEkoD:"Piyasalar, borsa & iş dünyası", catPolD:"Dünya siyaseti & gündem",
     catSagD:"Tıp, beslenme & wellness", catBilD:"Uzay, keşifler & araştırmalar",
     catSanD:"Kültür, sanat & eğlence", catDunD:"Dünya haberleri & olaylar",
+    catSon:"Son Dakika", catSonD:"Anlık gelişmeler & flaş haberler",
+    mySources:"Kaynaklarım", mySourcesD:"Kendi eklediğin haber kaynakları",
+    addSource:"Kaynak Ekle", suggestedSources:"Önerilen Kaynaklar", manualUrl:"Manuel URL",
+    feedUrl:"RSS feed URL'si", feedName:"Kaynak adı", feedAdded:"Kaynak eklendi",
+    feedRemoved:"Kaynak kaldırıldı", feedExists:"Bu kaynak zaten ekli",
+    noCustomFeeds:"Henüz kaynak eklemedin", addFirstSource:"İlk kaynağını ekle",
     touchToExplore:"Bir kategoriye dokun ve haberleri keşfet",
     // Settings bölümleri
     notifications:"Bildirimler", dataSummary:"Veri Özeti", dataManagement:"Veri Yönetimi",
@@ -322,6 +328,12 @@ const TRANSLATIONS = {
     catEkoD:"Markets, stocks & business", catPolD:"World politics & agenda",
     catSagD:"Medicine, nutrition & wellness", catBilD:"Space, discoveries & research",
     catSanD:"Culture, art & entertainment", catDunD:"World news & events",
+    catSon:"Breaking", catSonD:"Breaking news & flash updates",
+    mySources:"My Sources", mySourcesD:"Your custom news sources",
+    addSource:"Add Source", suggestedSources:"Suggested Sources", manualUrl:"Manual URL",
+    feedUrl:"RSS feed URL", feedName:"Source name", feedAdded:"Source added",
+    feedRemoved:"Source removed", feedExists:"This source is already added",
+    noCustomFeeds:"No sources added yet", addFirstSource:"Add your first source",
     touchToExplore:"Tap a category to explore news",
     notifications:"Notifications", dataSummary:"Data Summary", dataManagement:"Data Management",
     dangerZone:"Danger Zone", notifActive:"Notifications active",
@@ -2198,7 +2210,24 @@ const NEWS_SOURCES = {
     { name:"BBC World",      url:"https://feeds.bbci.co.uk/news/world/rss.xml",                   lang:"EN", color:"#64748b" },
     { name:"NPR World",      url:"https://feeds.npr.org/1004/rss.xml",                            lang:"EN", color:"#475569" },
   ],
+  sondakika: [
+    { name:"T24",            url:"https://t24.com.tr/rss/haberler",                               lang:"TR", color:"#e11d48" },
+    { name:"BBC Türkçe",     url:"https://www.bbc.com/turkce/index.xml",                          lang:"TR", color:"#dc2626" },
+    { name:"DW Türkçe",      url:"https://rss.dw.com/xml/rss-tur-all",                            lang:"TR", color:"#0284c7" },
+    { name:"BBC Breaking",   url:"https://feeds.bbci.co.uk/news/rss.xml",                         lang:"EN", color:"#ef4444" },
+  ],
 };
+
+/* ── Önerilen RSS Kaynakları ── */
+const SUGGESTED_FEEDS = [
+  { name:"T24",           url:"https://t24.com.tr/rss/haberler",           lang:"TR", color:"#e11d48", desc:"Bağımsız haber" },
+  { name:"BBC Türkçe",    url:"https://www.bbc.com/turkce/index.xml",      lang:"TR", color:"#dc2626", desc:"Güvenilir dünya haberleri" },
+  { name:"DW Türkçe",     url:"https://rss.dw.com/xml/rss-tur-all",       lang:"TR", color:"#0284c7", desc:"Almanya ve dünya" },
+  { name:"Ars Technica",  url:"https://feeds.arstechnica.com/arstechnica/index", lang:"EN", color:"#f97316", desc:"Derinlemesine teknoloji" },
+  { name:"Hacker News",   url:"https://hnrss.org/frontpage?count=15",      lang:"EN", color:"#ff6600", desc:"Startup & yazılım" },
+  { name:"NPR News",      url:"https://feeds.npr.org/1001/rss.xml",        lang:"EN", color:"#2563eb", desc:"ABD ve dünya haberleri" },
+  { name:"Science Daily",  url:"https://www.sciencedaily.com/rss/top/science.xml", lang:"EN", color:"#06b6d4", desc:"Günlük bilim" },
+];
 
 /* SVG ikonlar — her haber kategorisi için */
 const NEWS_ICONS = {
@@ -2272,9 +2301,24 @@ const NEWS_ICONS = {
       <path d="M5 18 L10 16 L14 18 L18 15 L22 18 L26 16 L31 18" stroke={c} strokeWidth="1.5" fill="none" opacity=".5"/>
     </svg>
   ),
+  sondakika: (c) => (
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+      <path d="M20 4 L14 18 L20 18 L16 32 L26 16 L20 16 Z" stroke={c} strokeWidth="1.5" fill={c+"20"} strokeLinejoin="round"/>
+      <circle cx="18" cy="18" r="14" stroke={c} strokeWidth="1" opacity=".3" strokeDasharray="3 3"/>
+    </svg>
+  ),
+  custom: (c) => (
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+      <rect x="5" y="5" width="26" height="26" rx="6" stroke={c} strokeWidth="1.5" fill={c+"10"}/>
+      <path d="M13 13 L23 13" stroke={c} strokeWidth="1.5" strokeLinecap="round"/>
+      <path d="M13 18 L23 18" stroke={c} strokeWidth="1.5" strokeLinecap="round" opacity=".6"/>
+      <path d="M13 23 L19 23" stroke={c} strokeWidth="1.5" strokeLinecap="round" opacity=".4"/>
+    </svg>
+  ),
 };
 
 const NEWS_CATS = [
+  { id:"sondakika", label:"Son Dakika", color:"#e11d48", desc:"Anlık gelişmeler & flaş haberler" },
   { id:"spor",      label:"Spor",      color:"#ef4444",  desc:"Futbol, basketbol & dünya sporları" },
   { id:"teknoloji", label:"Teknoloji", color:"#3b82f6",  desc:"Yapay zeka, gadget & yazılım" },
   { id:"ekonomi",   label:"Ekonomi",   color:"#f59e0b",  desc:"Piyasalar, borsa & iş dünyası" },
@@ -2286,16 +2330,26 @@ const NEWS_CATS = [
 ];
 
 /* ── NewsRoom: Category grid → drill into article list ── */
-function NewsRoom({ room, onBack, data }) {
+function NewsRoom({ room, onBack, data, update }) {
   const T = (key) => i18n(key, data);
-  const CAT_LABEL = {spor:"catSpor",teknoloji:"catTek",ekonomi:"catEko",politika:"catPol",saglik:"catSag",bilim:"catBil",sanat:"catSan",dunya:"catDun"};
-  const CAT_DESC = {spor:"catSporD",teknoloji:"catTekD",ekonomi:"catEkoD",politika:"catPolD",saglik:"catSagD",bilim:"catBilD",sanat:"catSanD",dunya:"catDunD"};
+  const CAT_LABEL = {sondakika:"catSon",spor:"catSpor",teknoloji:"catTek",ekonomi:"catEko",politika:"catPol",saglik:"catSag",bilim:"catBil",sanat:"catSan",dunya:"catDun"};
+  const CAT_DESC = {sondakika:"catSonD",spor:"catSporD",teknoloji:"catTekD",ekonomi:"catEkoD",politika:"catPolD",saglik:"catSagD",bilim:"catBilD",sanat:"catSanD",dunya:"catDunD"};
   const localCats = NEWS_CATS.map(c=>({...c, label:T(CAT_LABEL[c.id])||c.label, desc:T(CAT_DESC[c.id])||c.desc}));
   const [activeCat, setActiveCat] = useState(null); // null = grid, string = category id
   const [articles, setArticles] = useState({});
   const [loading, setLoading] = useState({});
   const [loaded, setLoaded] = useState({});
   const [langFilter, setLangFilter] = useState("TR");
+  const [showSourceModal, setShowSourceModal] = useState(false);
+  const [sourceTab, setSourceTab] = useState("suggested"); // "suggested" | "manual"
+  const [manualUrl, setManualUrl] = useState("");
+  const [manualName, setManualName] = useState("");
+
+  const customFeeds = data?.settings?.customFeeds || [];
+  const setCustomFeeds = (feeds) => {
+    const s = { ...(data?.settings || {}), customFeeds: feeds };
+    update({ ...data, settings: s });
+  };
 
   const timeAgo = (dateStr) => {
     if(!dateStr) return "";
@@ -2346,7 +2400,8 @@ function NewsRoom({ room, onBack, data }) {
   const fetchCategory = async (catId, force=false) => {
     if(loaded[catId] && !force) return;
     setLoading(l=>({...l,[catId]:true}));
-    const sources = NEWS_SOURCES[catId] || [];
+    const sources = catId === "custom" ? customFeeds : (NEWS_SOURCES[catId] || []);
+    if(sources.length === 0) { setLoading(l=>({...l,[catId]:false})); setLoaded(l=>({...l,[catId]:true})); return; }
     const results = await Promise.allSettled(sources.map(fetchOneFeed));
     const seen = new Set();
     const merged = results
@@ -2359,12 +2414,31 @@ function NewsRoom({ room, onBack, data }) {
     setLoading(l=>({...l,[catId]:false}));
   };
 
+  const addFeed = (feed) => {
+    if(customFeeds.some(f=>f.url===feed.url)) return;
+    setCustomFeeds([...customFeeds, { name:feed.name, url:feed.url, lang:feed.lang||"TR", color:feed.color||"#3b82f6" }]);
+    setLoaded(prev=>({...prev,custom:false}));
+  };
+  const removeFeed = (url) => {
+    setCustomFeeds(customFeeds.filter(f=>f.url!==url));
+    setLoaded(prev=>({...prev,custom:false}));
+  };
+  const addManualFeed = () => {
+    const url = manualUrl.trim();
+    const name = manualName.trim() || new URL(url).hostname;
+    if(!url) return;
+    addFeed({ name, url, lang:"TR", color:"#8b5cf6" });
+    setManualUrl(""); setManualName("");
+  };
+
   const openCat = (catId) => {
     setActiveCat(catId);
     fetchCategory(catId);
   };
 
-  const catInfo = localCats.find(c=>c.id===activeCat);
+  const catInfo = activeCat==="custom"
+    ? { id:"custom", label:T("mySources"), color:"#8b5cf6", desc:T("mySourcesD") }
+    : localCats.find(c=>c.id===activeCat);
   const rawList = articles[activeCat] || [];
   const list = langFilter==="all" ? rawList : rawList.filter(a=>a.lang===langFilter);
   const isLoading = loading[activeCat];
@@ -2387,6 +2461,13 @@ function NewsRoom({ room, onBack, data }) {
             color:"#9CA3AF",width:34,height:34,borderRadius:10,fontSize:14,cursor:"pointer",
             display:"flex",alignItems:"center",justifyContent:"center",
           }}>↻</button>
+          {activeCat==="custom"&&(
+            <button onClick={()=>{setActiveCat(null);setShowSourceModal(true);}} style={{
+              background:"rgba(139,92,246,0.15)",border:"1px solid rgba(139,92,246,0.3)",
+              color:"#8b5cf6",width:34,height:34,borderRadius:10,fontSize:16,cursor:"pointer",
+              display:"flex",alignItems:"center",justifyContent:"center",
+            }}>+</button>
+          )}
         </div>
         {/* Lang filter */}
         <div style={{display:"flex",gap:5}}>
@@ -2462,8 +2543,18 @@ function NewsRoom({ room, onBack, data }) {
 
       {!isLoading&&list.length===0&&loaded[activeCat]&&(
         <div style={{textAlign:"center",padding:"40px 20px"}}>
-          <div style={{fontSize:40,marginBottom:10}}>📡</div>
-          {langFilter!=="all"&&rawList.length>0 ? (
+          <div style={{fontSize:40,marginBottom:10}}>{activeCat==="custom"?"📰":"📡"}</div>
+          {activeCat==="custom"&&customFeeds.length===0 ? (
+            <>
+              <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:6}}>{T("noCustomFeeds")}</div>
+              <div style={{fontSize:12,color:"#9CA3AF",marginBottom:16}}>{T("addFirstSource")}</div>
+              <button onClick={()=>{setActiveCat(null);setShowSourceModal(true);}} style={{
+                background:"rgba(139,92,246,0.15)",color:"#8b5cf6",
+                border:"1px solid rgba(139,92,246,0.3)",borderRadius:10,
+                padding:"10px 24px",fontSize:12,cursor:"pointer",fontWeight:600,
+              }}>+ {T("addSource")}</button>
+            </>
+          ) : langFilter!=="all"&&rawList.length>0 ? (
             <>
               <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:6}}>{langFilter==="TR"?"Türkçe":"İngilizce"} haber bulunamadı</div>
               <div style={{fontSize:12,color:"#9CA3AF",marginBottom:16}}>Diğer dillerde {rawList.length} haber mevcut</div>
@@ -2536,7 +2627,157 @@ function NewsRoom({ room, onBack, data }) {
             )}
           </div>
         ))}
+
+        {/* ── Kaynaklarım kartı ── */}
+        <div className="touch-card" onClick={()=>customFeeds.length>0?openCat("custom"):setShowSourceModal(true)}
+          style={{
+            background:"linear-gradient(145deg,rgba(139,92,246,0.12) 0%,rgba(139,92,246,0.04) 100%)",
+            borderRadius:20,padding:"20px 16px",cursor:"pointer",
+            border:"1px solid rgba(139,92,246,0.35)",
+            boxShadow:"0 0 28px rgba(139,92,246,0.15), inset 0 1px 0 rgba(255,255,255,0.05)",
+            minHeight:110,
+            display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:8,
+          }}
+        >
+          <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+            <rect x="5" y="5" width="26" height="26" rx="6" stroke="#8b5cf6" strokeWidth="1.5" fill="rgba(139,92,246,0.1)"/>
+            <path d="M13 13 L23 13" stroke="#8b5cf6" strokeWidth="1.5" strokeLinecap="round"/>
+            <path d="M13 18 L23 18" stroke="#8b5cf6" strokeWidth="1.5" strokeLinecap="round" opacity=".6"/>
+            <path d="M13 23 L19 23" stroke="#8b5cf6" strokeWidth="1.5" strokeLinecap="round" opacity=".4"/>
+            <circle cx="26" cy="26" r="6" fill="#8b5cf6"/>
+            <path d="M26 23.5 L26 28.5 M23.5 26 L28.5 26" stroke="#fff" strokeWidth="1.5" strokeLinecap="round"/>
+          </svg>
+          <div style={{fontSize:14,fontWeight:800,color:"#fff",textAlign:"center"}}>{T("mySources")}</div>
+          <div style={{fontSize:10,color:"#8b5cf6",opacity:.8,textAlign:"center",lineHeight:1.3}}>
+            {customFeeds.length>0?`${customFeeds.length} kaynak`:T("mySourcesD")}
+          </div>
+          {loaded.custom&&articles.custom?.length>0&&(
+            <div style={{fontSize:10,color:"#8b5cf6",fontWeight:700,opacity:.7}}>
+              {articles.custom.length} haber
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* ── Kaynak Yönetimi Butonu ── */}
+      <button onClick={()=>setShowSourceModal(true)} style={{
+        width:"100%",marginTop:16,padding:"14px",borderRadius:16,cursor:"pointer",
+        background:"rgba(139,92,246,0.08)",border:"1px solid rgba(139,92,246,0.25)",
+        color:"#8b5cf6",fontSize:13,fontWeight:700,
+        display:"flex",alignItems:"center",justifyContent:"center",gap:8,
+      }}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#8b5cf6" strokeWidth="2" strokeLinecap="round"/></svg>
+        {T("addSource")}
+      </button>
+
+      {/* ── Kaynak Ekle Modal ── */}
+      {showSourceModal&&(
+        <div style={{position:"fixed",inset:0,zIndex:9999,background:"rgba(0,0,0,0.7)",display:"flex",alignItems:"flex-end",justifyContent:"center"}}
+          onClick={e=>{if(e.target===e.currentTarget)setShowSourceModal(false);}}>
+          <div style={{
+            width:"100%",maxWidth:420,maxHeight:"85vh",
+            background:"#1C1C26",borderRadius:"24px 24px 0 0",
+            padding:"20px 16px calc(20px + env(safe-area-inset-bottom,0px))",
+            overflowY:"auto",
+          }}>
+            {/* Modal Header */}
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
+              <h3 style={{margin:0,fontSize:18,fontWeight:800,color:"#fff"}}>{T("addSource")}</h3>
+              <button onClick={()=>setShowSourceModal(false)} style={{background:"rgba(255,255,255,0.1)",border:"none",color:"#9CA3AF",width:32,height:32,borderRadius:10,cursor:"pointer",fontSize:16}}>✕</button>
+            </div>
+
+            {/* Tabs */}
+            <div style={{display:"flex",gap:6,marginBottom:16}}>
+              {[["suggested",T("suggestedSources")],["manual",T("manualUrl")]].map(([k,v])=>(
+                <button key={k} onClick={()=>setSourceTab(k)} style={{
+                  flex:1,padding:"10px",borderRadius:12,border:"none",cursor:"pointer",
+                  fontSize:12,fontWeight:sourceTab===k?700:400,
+                  background:sourceTab===k?"rgba(139,92,246,0.15)":"rgba(255,255,255,0.05)",
+                  color:sourceTab===k?"#8b5cf6":"#9CA3AF",
+                }}>{v}</button>
+              ))}
+            </div>
+
+            {/* Önerilen Kaynaklar */}
+            {sourceTab==="suggested"&&(
+              <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                {SUGGESTED_FEEDS.map(feed=>{
+                  const added = customFeeds.some(f=>f.url===feed.url);
+                  return (
+                    <div key={feed.url} style={{
+                      display:"flex",alignItems:"center",gap:12,padding:"12px 14px",
+                      background:"rgba(255,255,255,0.04)",borderRadius:14,
+                      border:`1px solid ${added?"rgba(139,92,246,0.3)":"rgba(255,255,255,0.06)"}`,
+                    }}>
+                      <div style={{
+                        width:36,height:36,borderRadius:10,flexShrink:0,
+                        background:`${feed.color}20`,
+                        display:"flex",alignItems:"center",justifyContent:"center",
+                        fontSize:11,fontWeight:800,color:feed.color,
+                      }}>{feed.name.slice(0,2)}</div>
+                      <div style={{flex:1,minWidth:0}}>
+                        <div style={{fontSize:13,fontWeight:700,color:"#fff"}}>{feed.name}</div>
+                        <div style={{fontSize:10,color:"#9CA3AF",marginTop:1}}>{feed.desc}</div>
+                        <div style={{fontSize:9,color:feed.color,marginTop:2}}>{feed.lang}</div>
+                      </div>
+                      <button onClick={()=>added?removeFeed(feed.url):addFeed(feed)} style={{
+                        padding:"6px 14px",borderRadius:10,border:"none",cursor:"pointer",
+                        fontSize:11,fontWeight:700,
+                        background:added?"rgba(239,68,68,0.15)":"rgba(139,92,246,0.15)",
+                        color:added?"#ef4444":"#8b5cf6",
+                      }}>{added?"✕":"+ Ekle"}</button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Manuel URL */}
+            {sourceTab==="manual"&&(
+              <div style={{display:"flex",flexDirection:"column",gap:10}}>
+                <input value={manualName} onChange={e=>setManualName(e.target.value)}
+                  placeholder={T("feedName")} style={{
+                  padding:"12px 14px",borderRadius:12,border:"1px solid rgba(255,255,255,0.1)",
+                  background:"rgba(255,255,255,0.05)",color:"#fff",fontSize:13,outline:"none",
+                }}/>
+                <input value={manualUrl} onChange={e=>setManualUrl(e.target.value)}
+                  placeholder="https://example.com/rss.xml" style={{
+                  padding:"12px 14px",borderRadius:12,border:"1px solid rgba(255,255,255,0.1)",
+                  background:"rgba(255,255,255,0.05)",color:"#fff",fontSize:13,outline:"none",
+                }}/>
+                <button onClick={addManualFeed} disabled={!manualUrl.trim()} style={{
+                  padding:"12px",borderRadius:12,border:"none",cursor:"pointer",
+                  background:manualUrl.trim()?"#8b5cf6":"rgba(255,255,255,0.1)",
+                  color:manualUrl.trim()?"#fff":"#9CA3AF",fontSize:13,fontWeight:700,
+                }}>+ {T("addSource")}</button>
+              </div>
+            )}
+
+            {/* Mevcut Kaynaklar */}
+            {customFeeds.length>0&&(
+              <div style={{marginTop:16}}>
+                <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",marginBottom:8}}>{T("mySources")} ({customFeeds.length})</div>
+                {customFeeds.map(feed=>(
+                  <div key={feed.url} style={{
+                    display:"flex",alignItems:"center",gap:10,padding:"10px 12px",
+                    background:"rgba(255,255,255,0.04)",borderRadius:12,marginBottom:6,
+                    border:"1px solid rgba(139,92,246,0.2)",
+                  }}>
+                    <div style={{width:8,height:8,borderRadius:"50%",background:feed.color,flexShrink:0}}/>
+                    <div style={{flex:1,fontSize:12,fontWeight:600,color:"#fff"}}>{feed.name}</div>
+                    <div style={{fontSize:9,color:"#9CA3AF"}}>{feed.lang}</div>
+                    <button onClick={()=>removeFeed(feed.url)} style={{
+                      background:"rgba(239,68,68,0.12)",border:"none",color:"#ef4444",
+                      width:26,height:26,borderRadius:8,cursor:"pointer",fontSize:12,
+                      display:"flex",alignItems:"center",justifyContent:"center",
+                    }}>✕</button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -3608,7 +3849,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
   const items=roomItems[activeRoom]||[];
 
   /* ── SPECIAL ROOM RENDERERS ── */
-  if(activeRoom==="news" || room.type==="news") return <div className="room-enter"><NewsRoom room={room} onBack={()=>setActiveRoom(null)} data={data} /></div>;
+  if(activeRoom==="news" || room.type==="news") return <div className="room-enter"><NewsRoom room={room} onBack={()=>setActiveRoom(null)} data={data} update={update} /></div>;
   if(activeRoom==="music" || room.id==="music") return <div className="room-enter"><MusicRoom room={room} items={items} data={data} onBack={()=>setActiveRoom(null)} onAdd={(item)=>{const cur=roomItems[activeRoom]||[];update({...data,roomItems:{...roomItems,[activeRoom]:[item,...cur]}});}} onDel={(id)=>delItem(activeRoom,id)} /></div>;
   if(activeRoom==="clothes" || room.id==="clothes") return <div className="room-enter"><BenimStilimRoom data={data} update={update} onBack={()=>setActiveRoom(null)} /></div>;
   if(activeRoom==="healthcoach" || room.type==="health") return (
