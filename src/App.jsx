@@ -5167,11 +5167,11 @@ export default function App() {
     loadData(userId).then(d => { setData(d); setLoading(false); });
   }, [user]);
 
-  // Splash screen — 2.5s, sonra zorla geç
+  // Splash screen — 1.5s, sonra zorla geç
   useEffect(() => {
     const timer = setTimeout(() => {
       setSplash(false);
-    }, 2500);
+    }, 1500);
     return () => clearTimeout(timer);
   }, []);
 
@@ -5179,7 +5179,7 @@ export default function App() {
   useEffect(() => {
     const fallback = setTimeout(() => {
       setLoading(false);
-    }, 6000);
+    }, 4000);
     return () => clearTimeout(fallback);
   }, []);
 
@@ -5480,11 +5480,11 @@ export default function App() {
             padding:isMobile?"10px 6px":"8px 12px",
             minWidth:isMobile?52:50,
             borderRadius:14,
-            color:tab===t.id?"#3b82f6":"#9CA3AF",
+            color:tab===t.id?"#60a5fa":"#9CA3AF",
             flex:1,
           }}>
             <span style={{fontSize:isMobile?22:18,lineHeight:1}}>{t.icon}</span>
-            <span style={{fontSize:isMobile?10:9,fontWeight:tab===t.id?700:500,letterSpacing:-.2}}>{t.label}</span>
+            <span style={{fontSize:isMobile?11:10,fontWeight:tab===t.id?700:500,letterSpacing:-.2}}>{t.label}</span>
           </button>
         ))}
         </div>
