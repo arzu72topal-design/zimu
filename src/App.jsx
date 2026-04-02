@@ -949,22 +949,45 @@ function Dashboard({ data, setTab, goTo, update }) {
     update({...data, notes:[newNote,...(data.notes||[])], dailyThoughts:next});
   };
 
-  // Live news headlines
+  // Live news headlines — custom feeds first, fallback BBC Türkçe
   const [headlines, setHeadlines] = useState([]);
+  const customFeedsRef = useRef(data?.settings?.customFeeds || []);
+  customFeedsRef.current = data?.settings?.customFeeds || [];
   useEffect(() => {
     let cancelled = false;
+    async function fetchOneDashFeed(feedUrl) {
+      const res = await fetch(`/api/proxy?url=${encodeURIComponent(feedUrl)}`, { signal: AbortSignal.timeout(5000) }).catch(() => null)
+        || await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(feedUrl)}`, { signal: AbortSignal.timeout(5000) });
+      if (!res || !res.ok) return [];
+      const text = res.url?.includes("allorigins") ? JSON.parse(await res.text()).contents : await res.text();
+      const xml = new DOMParser().parseFromString(text, "text/xml");
+      return [...xml.querySelectorAll("item, entry")].slice(0,8).map(item => {
+        const txt = (sel) => item.querySelector(sel)?.textContent?.replace(/<[^>]+>/g,"")?.trim() || "";
+        const attr = (sel, a) => item.querySelector(sel)?.getAttribute(a) || "";
+        return {
+          title: txt("title"),
+          link: txt("link") || attr("link","href"),
+          pubDate: txt("pubDate") || txt("published") || "",
+        };
+      }).filter(a=>a.title && a.title.length > 5);
+    }
     async function fetchHeadlines() {
       try {
-        const url = "https://www.bbc.com/turkce/index.xml";
-        const res = await fetch(`/api/proxy?url=${encodeURIComponent(url)}`, { signal: AbortSignal.timeout(5000) }).catch(() => null)
-          || await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`, { signal: AbortSignal.timeout(5000) });
-        if (!res || !res.ok) return;
-        const text = res.url?.includes("allorigins") ? JSON.parse(await res.text()).contents : await res.text();
-        const titles = [...text.matchAll(/<title><!\[CDATA\[(.+?)\]\]><\/title>|<title>([^<]+)<\/title>/g)]
-          .slice(1, 6)
-          .map(m => (m[1] || m[2] || "").trim())
-          .filter(t => t.length > 5);
-        if (!cancelled) setHeadlines(titles);
+        const feeds = customFeedsRef.current;
+        let items = [];
+        if (feeds.length > 0) {
+          const results = await Promise.allSettled(feeds.slice(0,4).map(f => fetchOneDashFeed(f.url)));
+          items = results.flatMap(r => r.status==="fulfilled" ? r.value : []);
+        }
+        // Fallback: always add BBC Türkçe if few results
+        if (items.length < 4) {
+          const bbc = await fetchOneDashFeed("https://www.bbc.com/turkce/index.xml").catch(()=>[]);
+          const existing = new Set(items.map(i=>i.title));
+          items = [...items, ...bbc.filter(b=>!existing.has(b.title))];
+        }
+        // Sort by date, take top 5
+        items.sort((a,b) => new Date(b.pubDate) - new Date(a.pubDate));
+        if (!cancelled) setHeadlines(items.slice(0,5));
       } catch {}
     }
     fetchHeadlines();
@@ -1213,14 +1236,15 @@ function Dashboard({ data, setTab, goTo, update }) {
               <svg width="20" height="20" viewBox="0 0 36 36" fill="none" style={{animation:"pulse 1.5s infinite",flexShrink:0}}><circle cx="18" cy="18" r="13" stroke="#ef4444" strokeWidth="1.5" fill="none"/><path d="M14 18 A4 4 0 0 0 22 18" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round"/><line x1="18" y1="5" x2="18" y2="2" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/><line x1="25" y1="7" x2="27" y2="5" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/><line x1="11" y1="7" x2="9" y2="5" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/></svg>
               <span style={{fontSize:13}}>{T("newsLoading")}</span>
             </div>
-          ) : headlines.slice(0,4).map((title,i)=>(
-            <div key={i} style={{display:"flex",alignItems:"flex-start",gap:10,
+          ) : headlines.slice(0,4).map((item,i)=>(
+            <div key={i} onClick={()=>item.link&&window.open(item.link,"_blank")}
+              style={{display:"flex",alignItems:"flex-start",gap:10,cursor:item.link?"pointer":"default",
               paddingBottom: i < headlines.slice(0,4).length-1 ? 8 : 0,
               marginBottom: i < headlines.slice(0,4).length-1 ? 8 : 0,
               borderBottom: i < headlines.slice(0,4).length-1 ? "1px solid rgba(255,255,255,0.05)" : "none",
             }}>
               <span style={{fontSize:10,color:"#ef4444",fontWeight:700,marginTop:3,flexShrink:0,minWidth:16}}>{i+1}</span>
-              <span style={{fontSize:13,lineHeight:1.4,color:"#F9FAFB",opacity:.85}}>{title}</span>
+              <span style={{fontSize:13,lineHeight:1.4,color:"#F9FAFB",opacity:.85}}>{typeof item==="string"?item:item.title}</span>
             </div>
           ))}
         </div>
