@@ -420,7 +420,7 @@ const TABS_KEYS = [
 ];
 
 const SPORT_TYPES = ["Koşu","Yüzme","Bisiklet","Yoga","Ağırlık","Yürüyüş","Diğer"];
-const SPORT_EMOJI = {"Koşu":"🏃","Yüzme":"🏊","Bisiklet":"🚴","Yoga":"🧘","Ağırlık":"🏋️","Yürüyüş":"🚶","Diğer":"⚡"};
+const SPORT_EMOJI = {"Koşu":"▸","Yüzme":"≈","Bisiklet":"◎","Yoga":"◉","Ağırlık":"■","Yürüyüş":"▪","Diğer":"●"};
 // MET × 70kg × (duration/60) → kcal
 const SPORT_KCAL_PER_MIN = {"Koşu":10,"Yüzme":7,"Bisiklet":7,"Yoga":3.3,"Ağırlık":5,"Yürüyüş":4.7,"Diğer":5};
 const calcSportCal = (type, durationMin) => Math.round((SPORT_KCAL_PER_MIN[type]||5) * (+durationMin||0));
@@ -430,12 +430,12 @@ const PROJECT_STATUSES = ["Planlama","Devam Ediyor","Test","Tamamlandı"];
 const COLORS = ["#3b82f6","#ef4444","#22c55e","#f59e0b","#a855f7","#f97316","#14b8a6"];
 
 const DEFAULT_ROOMS = [
-  { id: "projects", name: "Projeler", icon: "📂", color: "#3b82f6", type: "project" },
-  { id: "news", name: "Haberler", icon: "📰", color: "#ef4444", type: "news" },
-  { id: "music", name: "Müziklerim", icon: "🎵", color: "#a855f7", type: "collection" },
-  { id: "clothes", name: "Kıyafetlerim", icon: "👗", color: "#f97316", type: "collection" },
-  { id: "memories", name: "Anılar", icon: "📸", color: "#22c55e", type: "collection" },
-  { id: "healthcoach", name: "Sağlık Koçu", icon: "♥", color: "#14b8a6", type: "health" },
+  { id: "projects", name: "Projeler", icon: "Pr", color: "#3b82f6", type: "project" },
+  { id: "news", name: "Haberler", icon: "Hb", color: "#ef4444", type: "news" },
+  { id: "music", name: "Müziklerim", icon: "Mz", color: "#a855f7", type: "collection" },
+  { id: "clothes", name: "Kıyafetlerim", icon: "St", color: "#f97316", type: "collection" },
+  { id: "memories", name: "Anılar", icon: "An", color: "#22c55e", type: "collection" },
+  { id: "healthcoach", name: "Sağlık Koçu", icon: "Sk", color: "#14b8a6", type: "health" },
 ];
 
 /* Eski kullanıcılarda eksik odaları otomatik ekle */
@@ -1402,10 +1402,10 @@ function Tasks({ data, update }) {
   const weekEnd = nextWeek();
 
   const quickDates = [
-    {label:T("today"),val:t,icon:"📌"},
+    {label:T("today"),val:t,icon:"●"},
     {label:T("tomorrow"),val:tomorrow(),icon:"⏭"},
-    {label:T("oneWeek"),val:weekEnd,icon:"📅"},
-    {label:T("oneMonth"),val:nextMonth(),icon:"🗓"},
+    {label:T("oneWeek"),val:weekEnd,icon:"◆"},
+    {label:T("oneMonth"),val:nextMonth(),icon:"▪"},
   ];
 
   const formatDate = (d) => {
@@ -1468,7 +1468,7 @@ function Tasks({ data, update }) {
         groups.length===0
           ? (
             <div style={{textAlign:"center",padding:"40px 20px"}}>
-              <div style={{fontSize:40,marginBottom:8}}>✅</div>
+              <div style={{marginBottom:8}}><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="16" stroke="#22c55e" strokeWidth="1.5" fill="rgba(34,197,94,0.1)"/><path d="M13 20l5 5 9-10" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
               <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:4}}>{T("allDone")}</div>
               <div style={{fontSize:12,color:"#9CA3AF"}}>{T("addFirst")}</div>
             </div>
@@ -1483,7 +1483,7 @@ function Tasks({ data, update }) {
         list.length===0
           ? (
             <div style={{textAlign:"center",padding:"40px 20px"}}>
-              <div style={{fontSize:40,marginBottom:8}}>✅</div>
+              <div style={{marginBottom:8}}><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="16" stroke="#22c55e" strokeWidth="1.5" fill="rgba(34,197,94,0.1)"/><path d="M13 20l5 5 9-10" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
               <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:4}}>{T("allDone")}</div>
               <div style={{fontSize:12,color:"#9CA3AF"}}>{T("addFirst")}</div>
             </div>
@@ -1505,10 +1505,10 @@ function Tasks({ data, update }) {
             </div>
             {task.description&&<p style={{fontSize:13,opacity:.7,margin:"0 0 10px",whiteSpace:"pre-wrap",lineHeight:1.5}}>{task.description}</p>}
             <div style={{display:"flex",flexWrap:"wrap",gap:8,fontSize:12,opacity:.6}}>
-              {task.category&&<span>🏷 {task.category}</span>}
-              {task.dueDate&&<span style={{color:!task.done&&task.dueDate<today()?"#ef4444":"inherit"}}>📅 {task.dueDate}</span>}
-              <span>⚡ {({high:T("priHigh"),medium:T("priMed"),low:T("priLow")}[task.priority])}</span>
-              <span>{task.done?`✅ ${T("statusDone")}`:`⏳ ${T("statusWaiting")}`}</span>
+              {task.category&&<span>● {task.category}</span>}
+              {task.dueDate&&<span style={{color:!task.done&&task.dueDate<today()?"#ef4444":"inherit"}}>◆ {task.dueDate}</span>}
+              <span>▸ {({high:T("priHigh"),medium:T("priMed"),low:T("priLow")}[task.priority])}</span>
+              <span>{task.done?`◉ ${T("statusDone")}`:`◎ ${T("statusWaiting")}`}</span>
             </div>
           </div>
         );
@@ -1658,8 +1658,8 @@ function CalendarView({ data, update }) {
             <div key={idx} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 0",borderBottom:"1px solid rgba(255,255,255,0.05)"}}>
               <span style={{width:10,height:10,borderRadius:"50%",background:e.color||"#3b82f6",flexShrink:0}}/>
               <div style={{flex:1}}>
-                <div style={{fontSize:14,fontWeight:500}}>{e.title} {e.recurring&&e.recurring!=="none"&&<span style={{fontSize:10,color:"#9CA3AF"}}>🔁</span>}</div>
-                {e.time&&<div style={{fontSize:12,color:"#9CA3AF"}}>🕐 {e.time}</div>}
+                <div style={{fontSize:14,fontWeight:500}}>{e.title} {e.recurring&&e.recurring!=="none"&&<span style={{fontSize:10,color:"#9CA3AF"}}>↻</span>}</div>
+                {e.time&&<div style={{fontSize:12,color:"#9CA3AF"}}>◷ {e.time}</div>}
                 {e.description&&<div style={{fontSize:12,color:"#9CA3AF"}}>{e.description}</div>}
               </div>
               <button onClick={()=>del(e.id)} style={delBtnStyle} aria-label="Delete">✕</button>
@@ -1910,11 +1910,11 @@ function Sports({ data, update, initialView, onBack }) {
 
   // AI Coach advice
   const getCoachTip=()=>{
-    if(todayCalIn===0&&todayCalOut===0) return {icon:"💡",text:T("noRecordYet"),color:"#3b82f6"};
+    if(todayCalIn===0&&todayCalOut===0) return {icon:"●",text:T("noRecordYet"),color:"#3b82f6"};
     if(netCal>dailyGoal+300) return {icon:"⚠️",text:`Bugün ${netCal} kcal net kalori — hedefin üzerinde. Hafif bir yürüyüş veya koşu iyi gelir!`,color:"#f59e0b"};
-    if(netCal<1200&&todayCalIn>0) return {icon:"🌟",text:`Harika gidiyorsun! ${netCal} kcal net — dengeli ve sağlıklı.`,color:"#22c55e"};
-    if(todayCalOut>300) return {icon:"💪",text:`Bugün ${todayCalOut} kcal yaktın, süpersin! Protein ağırlıklı beslenmeyi unutma.`,color:"#22c55e"};
-    if(todayCalIn>0&&todayCalOut===0) return {icon:"🏃",text:`${todayCalIn} kcal aldın ama henüz spor yapmadın. 30dk yürüyüş ~150 kcal yakar!`,color:"#f97316"};
+    if(netCal<1200&&todayCalIn>0) return {icon:"★",text:`Harika gidiyorsun! ${netCal} kcal net — dengeli ve sağlıklı.`,color:"#22c55e"};
+    if(todayCalOut>300) return {icon:"▲",text:`Bugün ${todayCalOut} kcal yaktın, süpersin! Protein ağırlıklı beslenmeyi unutma.`,color:"#22c55e"};
+    if(todayCalIn>0&&todayCalOut===0) return {icon:"▸",text:`${todayCalIn} kcal aldın ama henüz spor yapmadın. 30dk yürüyüş ~150 kcal yakar!`,color:"#f97316"};
     return {icon:"✨",text:"Günü dengeli geçiriyorsun, böyle devam!",color:"#3b82f6"};
   };
   const tip=getCoachTip();
@@ -2000,7 +2000,7 @@ function Sports({ data, update, initialView, onBack }) {
         <div style={{marginBottom:12}}>
           <button onClick={()=>photoRef.current?.click()} disabled={analyzing} style={{
             ...addBtnStyle,background:analyzing?"#6B7280":"#22c55e",width:"100%",padding:"12px",borderRadius:12,fontSize:14,
-          }}>{analyzing?`🔄 ${T("analyzing")}`:` 📸 ${T("photoCalorie")}`}</button>
+          }}>{analyzing?`◌ ${T("analyzing")}`:` ◎ ${T("photoCalorie")}`}</button>
           <input ref={photoRef} type="file" accept="image/*" capture="environment"
             onChange={e=>{if(e.target.files?.[0])analyzePhoto(e.target.files[0]);e.target.value="";}}
             style={{display:"none"}}/>
@@ -2011,7 +2011,7 @@ function Sports({ data, update, initialView, onBack }) {
       {aiResult&&!aiResult.error&&(
         <div style={{background:"rgba(34,197,94,0.08)",border:"1px solid rgba(34,197,94,0.2)",borderRadius:14,padding:14,marginBottom:12}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
-            <span style={{fontSize:13,fontWeight:700,color:"#22c55e"}}>🤖 AI Analiz Sonucu</span>
+            <span style={{fontSize:13,fontWeight:700,color:"#22c55e"}}>AI Analiz Sonucu</span>
             <span style={{fontSize:14,fontWeight:800,color:"#f97316"}}>{aiResult.total} kcal</span>
           </div>
           {aiResult.items.map((item,i)=>(
@@ -2083,9 +2083,9 @@ function Sports({ data, update, initialView, onBack }) {
         <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:8}}>
           {[
             {icon:"⏱",val:`${tMin} ${T("locale")==="tr-TR"?"dk":"min"}`,label:T("sportDuration"),color:"#3b82f6"},
-            {icon:"🔥",val:`${burnedCal}`,label:T("burnedKcal"),color:"#ef4444"},
-            {icon:"📏",val:`${tDist.toFixed(1)} km`,label:T("distanceLabel"),color:"#22c55e"},
-            {icon:"💪",val:wk.length,label:T("workout"),color:"#f97316"},
+            {icon:"▸",val:`${burnedCal}`,label:T("burnedKcal"),color:"#ef4444"},
+            {icon:"―",val:`${tDist.toFixed(1)} km`,label:T("distanceLabel"),color:"#22c55e"},
+            {icon:"▲",val:wk.length,label:T("workout"),color:"#f97316"},
           ].map((s,i)=>(
             <div key={i} style={{...cardStyle,padding:"12px",borderLeft:`3px solid ${s.color}`,boxShadow:`0 0 12px ${s.color}15`}}>
               <div style={{fontSize:10,color:"#9CA3AF"}}>{s.icon} {s.label}</div>
@@ -2143,7 +2143,7 @@ function Sports({ data, update, initialView, onBack }) {
                     <button onClick={()=>askAiCalorie(foodSearch)} disabled={aiLookup} style={{
                       background:"rgba(34,197,94,0.15)",color:"#22c55e",border:"1px solid rgba(34,197,94,0.3)",
                       padding:"8px 16px",borderRadius:10,fontSize:13,cursor:"pointer",fontWeight:600,
-                    }}>{aiLookup?`🔄 ${T("analyzing")}`:` 🤖 ${T("askAI")}`}</button>
+                    }}>{aiLookup?`◌ ${T("analyzing")}`:` ◈ ${T("askAI")}`}</button>
                   ):(
                     <p style={{fontSize:11,color:"#9CA3AF"}}>Kaloriyi elle gir veya Ayarlar'dan AI aç</p>
                   )}
@@ -2159,7 +2159,7 @@ function Sports({ data, update, initialView, onBack }) {
                 <button onClick={()=>askAiCalorie(foodForm.name)} disabled={aiLookup} style={{
                   position:"absolute",right:8,top:8,background:"none",border:"none",
                   fontSize:16,cursor:"pointer",opacity:aiLookup?.4:.8,
-                }} title="AI'a sor">{aiLookup?"⏳":"🤖"}</button>
+                }} title="AI'a sor">{aiLookup?"◌":"◈"}</button>
               )}
             </div>
           </div>
@@ -2513,7 +2513,7 @@ function NewsRoom({ room, onBack, data, update }) {
         </div>
         {/* Lang filter */}
         <div style={{display:"flex",gap:5}}>
-          {[["all","🌍 Tümü"],["TR","🇹🇷 TR"],["EN","🌐 EN"]].map(([k,v])=>(
+          {[["all","Tümü"],["TR","TR"],["EN","EN"]].map(([k,v])=>(
             <button key={k} onClick={()=>setLangFilter(k)} style={{
               padding:"5px 12px",borderRadius:10,border:"none",cursor:"pointer",
               fontSize:11,fontWeight:langFilter===k?700:400,
@@ -2585,7 +2585,9 @@ function NewsRoom({ room, onBack, data, update }) {
 
       {!isLoading&&list.length===0&&loaded[activeCat]&&(
         <div style={{textAlign:"center",padding:"40px 20px"}}>
-          <div style={{fontSize:40,marginBottom:10}}>{activeCat==="custom"?"📰":"📡"}</div>
+          <div style={{marginBottom:10}}>
+            <svg width="40" height="40" viewBox="0 0 36 36" fill="none"><circle cx="18" cy="14" r="5" stroke={activeCat==="custom"?"#8b5cf6":"#9CA3AF"} strokeWidth="1.5"/><line x1="18" y1="19" x2="18" y2="30" stroke={activeCat==="custom"?"#8b5cf6":"#9CA3AF"} strokeWidth="1.5"/><line x1="12" y1="26" x2="24" y2="26" stroke={activeCat==="custom"?"#8b5cf6":"#9CA3AF"} strokeWidth="1.5" opacity=".5"/></svg>
+          </div>
           {activeCat==="custom"&&customFeeds.length===0 ? (
             <>
               <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:6}}>{T("noCustomFeeds")}</div>
@@ -2604,7 +2606,7 @@ function NewsRoom({ room, onBack, data, update }) {
                 background:`${catInfo?.color}20`,color:catInfo?.color,
                 border:`1px solid ${catInfo?.color}40`,borderRadius:10,
                 padding:"10px 24px",fontSize:12,cursor:"pointer",fontWeight:600,
-              }}>🌍 Tümünü Göster</button>
+              }}>Tümünü Göster</button>
             </>
           ) : (
             <>
@@ -3010,15 +3012,15 @@ function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
   const parseMusicLink = (url) => {
     const u = url.toLowerCase();
     let platform = "Müzik";
-    let icon = "🎵";
+    let icon = "♪";
     let color = "#1DB954";
 
-    if(u.includes("spotify.com")) { platform="Spotify"; icon="🟢"; color="#1DB954"; }
-    else if(u.includes("youtube.com")||u.includes("youtu.be")) { platform="YouTube"; icon="🔴"; color="#FF0000"; }
-    else if(u.includes("soundcloud.com")) { platform="SoundCloud"; icon="🟠"; color="#FF5500"; }
-    else if(u.includes("apple.com/music")||u.includes("music.apple")) { platform="Apple Music"; icon="⚪"; color="#FC3C44"; }
-    else if(u.includes("deezer.com")) { platform="Deezer"; icon="🟣"; color="#A238FF"; }
-    else if(u.includes("tidal.com")) { platform="Tidal"; icon="🔵"; color="#00FEEE"; }
+    if(u.includes("spotify.com")) { platform="Spotify"; icon="●"; color="#1DB954"; }
+    else if(u.includes("youtube.com")||u.includes("youtu.be")) { platform="YouTube"; icon="●"; color="#FF0000"; }
+    else if(u.includes("soundcloud.com")) { platform="SoundCloud"; icon="●"; color="#FF5500"; }
+    else if(u.includes("apple.com/music")||u.includes("music.apple")) { platform="Apple Music"; icon="●"; color="#FC3C44"; }
+    else if(u.includes("deezer.com")) { platform="Deezer"; icon="●"; color="#A238FF"; }
+    else if(u.includes("tidal.com")) { platform="Tidal"; icon="●"; color="#00FEEE"; }
 
     // Try to extract title from URL path
     let title = url.split("/").filter(Boolean).pop()?.replace(/-/g," ")?.replace(/\?.*/,"") || "Yeni parça";
@@ -3084,13 +3086,13 @@ function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
   };
 
   const platformIcon = (item) => {
-    if(item.source==="deezer") return "🎵";
+    if(item.source==="deezer") return "♪";
     const u=(item.link||"").toLowerCase();
-    if(u.includes("spotify"))return "🟢";
-    if(u.includes("youtube")||u.includes("youtu.be"))return "🔴";
-    if(u.includes("soundcloud"))return "🟠";
-    if(u.includes("apple"))return "⚪";
-    return "🎵";
+    if(u.includes("spotify"))return "●";
+    if(u.includes("youtube")||u.includes("youtu.be"))return "●";
+    if(u.includes("soundcloud"))return "●";
+    if(u.includes("apple"))return "●";
+    return "♪";
   };
 
   return (
@@ -3099,13 +3101,13 @@ function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
       <StickyHeader>
         <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
           <button className="back-btn" aria-label="Go back" onClick={onBack}>◀</button>
-          <span style={{fontSize:22}}>🎵</span>
+          <span style={{fontSize:22}}>♪</span>
           <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{roomLabel(room,data)}</h3>
           <span style={{fontSize:12,color:"#9CA3AF"}}>{items.length} parça</span>
         </div>
         {/* Tab switcher — 4 tabs */}
         <div style={{background:"#2A2A35",borderRadius:12,padding:3,display:"flex",gap:1}}>
-          {[["collection",T("musicTabMine")],["charts","Top 🏆"],["search",T("musicTabSearch")],["link","Link"]].map(([k,v])=>(
+          {[["collection",T("musicTabMine")],["charts","Top"],["search",T("musicTabSearch")],["link","Link"]].map(([k,v])=>(
             <button key={k} onClick={()=>setTab(k)} style={{
               flex:1,padding:"8px 2px",borderRadius:9,border:"none",cursor:"pointer",
               fontSize:11,fontWeight:tab===k?700:500,
@@ -3120,12 +3122,12 @@ function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
       {tab==="collection"&&(
         items.length===0 ? (
           <div style={{textAlign:"center",padding:"40px 20px"}}>
-            <div style={{fontSize:44,marginBottom:10}}>🎵</div>
+            <div style={{fontSize:44,marginBottom:10}}>♪</div>
             <div style={{fontSize:15,fontWeight:700,color:"#9CA3AF",marginBottom:6}}>Koleksiyonun boş</div>
             <div style={{fontSize:12,color:"#9CA3AF",marginBottom:20}}>Deezer'dan ara veya link yapıştır</div>
             <div style={{display:"flex",gap:8,justifyContent:"center"}}>
-              <button onClick={()=>setTab("search")} style={{background:"rgba(162,56,255,0.15)",color:"#a238ff",border:"1px solid rgba(162,56,255,0.3)",borderRadius:12,padding:"10px 20px",fontSize:13,fontWeight:700,cursor:"pointer"}}>🔍 Deezer'da Ara</button>
-              <button onClick={()=>setTab("link")} style={{background:"rgba(59,130,246,0.15)",color:"#3b82f6",border:"1px solid rgba(59,130,246,0.3)",borderRadius:12,padding:"10px 20px",fontSize:13,fontWeight:700,cursor:"pointer"}}>🔗 Link Ekle</button>
+              <button onClick={()=>setTab("search")} style={{background:"rgba(162,56,255,0.15)",color:"#a238ff",border:"1px solid rgba(162,56,255,0.3)",borderRadius:12,padding:"10px 20px",fontSize:13,fontWeight:700,cursor:"pointer"}}>▸ Deezer'da Ara</button>
+              <button onClick={()=>setTab("link")} style={{background:"rgba(59,130,246,0.15)",color:"#3b82f6",border:"1px solid rgba(59,130,246,0.3)",borderRadius:12,padding:"10px 20px",fontSize:13,fontWeight:700,cursor:"pointer"}}>▸ Link Ekle</button>
             </div>
           </div>
         ) : (
@@ -3147,7 +3149,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
               }}>
                 {item.albumArt
                   ? <img src={item.albumArt} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
-                  : <span style={{fontSize:22}}>🎵</span>
+                  : <span style={{fontSize:22}}>♪</span>
                 }
               </div>
               <div style={{flex:1,minWidth:0,cursor:item.link?"pointer":"default"}} onClick={()=>{if(item.link&&!embed&&!item.preview)window.open(item.link,"_blank","noopener");}}>
@@ -3229,14 +3231,14 @@ function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
             {searching?"Aranıyor...":"Deezer'da Ara"}
           </button>
           {searching&&(
-            <div style={{textAlign:"center",padding:20,color:"#9CA3AF",fontSize:13}}>🎵 Aranıyor...</div>
+            <div style={{textAlign:"center",padding:20,color:"#9CA3AF",fontSize:13}}>♪ Aranıyor...</div>
           )}
           {!searching&&searchResults.length===0&&searchQ&&(
             <div style={{textAlign:"center",padding:"20px 0",color:"#9CA3AF",fontSize:13}}>Sonuç bulunamadı</div>
           )}
           {!searching&&searchResults.length===0&&!searchQ&&(
             <div style={{textAlign:"center",padding:"20px 0"}}>
-              <div style={{fontSize:32,marginBottom:8}}>🎧</div>
+              <div style={{fontSize:32,marginBottom:8}}>♪</div>
               <div style={{fontSize:13,color:"#9CA3AF"}}>Deezer veritabanında 90M+ parça</div>
               <div style={{fontSize:11,opacity:.25,marginTop:4}}>Arama yap → 30 sn önizleme dinle → Ekle</div>
             </div>
@@ -3252,7 +3254,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
                 <div style={{width:44,height:44,borderRadius:8,overflow:"hidden",flexShrink:0,background:"#111"}}>
                   {track.album?.cover_medium
                     ? <img src={track.album.cover_medium} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
-                    : <div style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>🎵</div>
+                    : <div style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>♪</div>
                   }
                 </div>
                 <div style={{flex:1,minWidth:0}}>
@@ -3302,11 +3304,11 @@ function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
           {/* Platform icons */}
           <div style={{display:"flex",gap:8,marginBottom:16,flexWrap:"wrap"}}>
             {[
-              {name:"Spotify",color:"#1DB954",icon:"🟢"},
-              {name:"YouTube",color:"#FF0000",icon:"🔴"},
-              {name:"SoundCloud",color:"#FF5500",icon:"🟠"},
-              {name:"Apple Music",color:"#FC3C44",icon:"⚪"},
-              {name:"Deezer",color:"#A238FF",icon:"🟣"},
+              {name:"Spotify",color:"#1DB954",icon:"●"},
+              {name:"YouTube",color:"#FF0000",icon:"●"},
+              {name:"SoundCloud",color:"#FF5500",icon:"●"},
+              {name:"Apple Music",color:"#FC3C44",icon:"●"},
+              {name:"Deezer",color:"#A238FF",icon:"●"},
             ].map(p=>(
               <div key={p.name} style={{display:"flex",alignItems:"center",gap:4,background:"#1C1C26",borderRadius:8,padding:"4px 10px",fontSize:11,opacity:.6}}>
                 <span>{p.icon}</span><span>{p.name}</span>
@@ -3353,7 +3355,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
         <div>
           {/* Source selector */}
           <div style={{display:"flex",gap:6,marginBottom:12}}>
-            {[["tr","🇹🇷 Türkiye"],["global","🌍 Global"],["genre","🎸 Tür"]].map(([k,v])=>(
+            {[["tr","Türkiye"],["global","Global"],["genre","Tür"]].map(([k,v])=>(
               <button key={k} onClick={()=>setChartSource(k)} style={{
                 flex:1,padding:"9px 4px",borderRadius:12,border:"none",cursor:"pointer",
                 fontSize:12,fontWeight:chartSource===k?700:500,
@@ -3381,16 +3383,16 @@ function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
           {/* Source label */}
           <div style={{fontSize:11,color:"#9CA3AF",marginBottom:10,display:"flex",alignItems:"center",gap:6}}>
             <span>
-              {chartSource==="tr"&&"🍎 Apple Music Türkiye · Güncel Top 25"}
-              {chartSource==="global"&&"🟣 Deezer Global · Top 25 · 30sn önizleme"}
-              {chartSource==="genre"&&`🟣 Deezer ${GENRE_LABELS[chartGenre]} Listesi · 30sn önizleme`}
+              {chartSource==="tr"&&"● Apple Music Türkiye · Güncel Top 25"}
+              {chartSource==="global"&&"● Deezer Global · Top 25 · 30sn önizleme"}
+              {chartSource==="genre"&&`● Deezer ${GENRE_LABELS[chartGenre]} Listesi · 30sn önizleme`}
             </span>
           </div>
 
           {/* Loading */}
           {chartLoading&&(
             <div style={{textAlign:"center",padding:"30px 0"}}>
-              <div style={{fontSize:32,marginBottom:8,animation:"pulse 1.5s ease-in-out infinite"}}>🎵</div>
+              <div style={{fontSize:32,marginBottom:8,animation:"pulse 1.5s ease-in-out infinite"}}>♪</div>
               <div style={{fontSize:13,color:"#9CA3AF"}}>Liste yükleniyor...</div>
             </div>
           )}
@@ -3415,7 +3417,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
                 <div style={{width:42,height:42,borderRadius:8,overflow:"hidden",flexShrink:0,background:"#111"}}>
                   {track.albumArt
                     ? <img src={track.albumArt} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
-                    : <div style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16}}>🎵</div>
+                    : <div style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16}}>♪</div>
                   }
                 </div>
                 {/* Info */}
@@ -3472,7 +3474,7 @@ function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
 
           {!chartLoading&&chartTracks.length===0&&(
             <div style={{textAlign:"center",padding:"30px 0"}}>
-              <div style={{fontSize:32,marginBottom:8}}>📡</div>
+              <div style={{marginBottom:8}}><svg width="32" height="32" viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="4" fill="#9CA3AF"/><path d="M10 26A13 13 0 0126 10" stroke="#9CA3AF" strokeWidth="1.5" fill="none" opacity=".4"/><path d="M6 30A19 19 0 0130 6" stroke="#9CA3AF" strokeWidth="1.5" fill="none" opacity=".2"/></svg></div>
               <div style={{fontSize:13,color:"#9CA3AF"}}>Liste yüklenemedi</div>
               <div style={{fontSize:11,opacity:.25,marginTop:4}}>İnternet bağlantını kontrol et</div>
               <button onClick={()=>{setChartLoaded("");fetchCharts(chartSource,chartGenre);}} style={{
@@ -3662,19 +3664,19 @@ function BenimStilimRoom({data,update,onBack}){
 
 /* ═══════════ MEMORIES ROOM ═══════════ */
 const DEFAULT_MEMORY_FOLDERS = [
-  { id:"tatiller", name:"Tatiller", color:"#22c55e", icon:"🌴" },
-  { id:"aile", name:"Aile", color:"#3b82f6", icon:"👨‍👩‍👧" },
-  { id:"arkadaslar", name:"Arkadaşlar", color:"#a855f7", icon:"🤝" },
+  { id:"tatiller", name:"Tatiller", color:"#22c55e", icon:"T" },
+  { id:"aile", name:"Aile", color:"#3b82f6", icon:"A" },
+  { id:"arkadaslar", name:"Arkadaşlar", color:"#a855f7", icon:"Ar" },
 ];
 const MOOD_LIST = [
-  { emoji:"😊", label:"Mutlu", color:"#22c55e" },
-  { emoji:"🥰", label:"Aşk", color:"#ec4899" },
-  { emoji:"🤩", label:"Heyecanlı", color:"#f59e0b" },
-  { emoji:"😌", label:"Huzurlu", color:"#06b6d4" },
-  { emoji:"😢", label:"Üzgün", color:"#6366f1" },
-  { emoji:"😤", label:"Kızgın", color:"#ef4444" },
-  { emoji:"🤔", label:"Düşünceli", color:"#8b5cf6" },
-  { emoji:"😂", label:"Komik", color:"#f97316" },
+  { id:"happy", label:"Mutlu", color:"#22c55e", symbol:"☺" },
+  { id:"love", label:"Aşk", color:"#ec4899", symbol:"♥" },
+  { id:"excited", label:"Heyecanlı", color:"#f59e0b", symbol:"★" },
+  { id:"peaceful", label:"Huzurlu", color:"#06b6d4", symbol:"◉" },
+  { id:"sad", label:"Üzgün", color:"#6366f1", symbol:"◎" },
+  { id:"angry", label:"Kızgın", color:"#ef4444", symbol:"▲" },
+  { id:"thoughtful", label:"Düşünceli", color:"#8b5cf6", symbol:"◆" },
+  { id:"funny", label:"Komik", color:"#f97316", symbol:"✦" },
 ];
 
 function resizeImage(file, maxSize=600) {
@@ -3715,10 +3717,10 @@ function MemoriesRoom({ data, update, onBack }) {
   const [editingId, setEditingId] = useState(null);
   const [search, setSearch] = useState("");
   const [form, setForm] = useState({ title:"", text:"", date:today(), mood:"", folder:"", tags:"", photos:[] });
-  const [folderForm, setFolderForm] = useState({ name:"", color:"#22c55e", icon:"📁" });
+  const [folderForm, setFolderForm] = useState({ name:"", color:"#22c55e", icon:"N" });
   const fileRef = useRef(null);
 
-  const FOLDER_ICONS = ["📁","🌴","👨‍👩‍👧","🤝","🎓","💼","🎵","🏠","✈️","🎂","🐾","💕"];
+  const FOLDER_ICONS = ["T","A","Ar","Ok","İş","Mü","Ev","Gez","Dk","Pt","Sev","Sp"];
 
   const openFolder = (folderId) => { setActiveFolder(folderId); setView("list"); };
   const openAll = () => { setActiveFolder(null); setView("list"); };
@@ -3775,7 +3777,7 @@ function MemoriesRoom({ data, update, onBack }) {
     if(!folderForm.name.trim()) return;
     const f = { id:uid(), name:folderForm.name.trim(), color:folderForm.color, icon:folderForm.icon };
     save({ ...memories, folders:[...folders, f] });
-    setShowFolderModal(false); setFolderForm({ name:"", color:"#22c55e", icon:"📁" });
+    setShowFolderModal(false); setFolderForm({ name:"", color:"#22c55e", icon:"N" });
   };
 
   const deleteFolder = (folderId) => {
@@ -3856,13 +3858,15 @@ function MemoriesRoom({ data, update, onBack }) {
 
         {filteredItems.length===0?(
           <div style={{textAlign:"center",padding:"40px 20px"}}>
-            <div style={{fontSize:48,marginBottom:12}}>📸</div>
+            <div style={{marginBottom:12}}>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="14" rx="3" stroke="#22c55e" strokeWidth="1.5" fill="rgba(34,197,94,0.1)"/><circle cx="12" cy="13" r="4" stroke="#22c55e" strokeWidth="1.5"/><path d="M8 6V5a2 2 0 012-2h4a2 2 0 012 2v1" stroke="#22c55e" strokeWidth="1.5"/></svg>
+            </div>
             <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:6}}>{T("noMemories")}</div>
             <div style={{fontSize:12,color:"#9CA3AF"}}>{T("addFirstMemory")}</div>
           </div>
         ):(
           filteredItems.map(item=>{
-            const moodObj = MOOD_LIST.find(m=>m.emoji===item.mood);
+            const moodObj = MOOD_LIST.find(m=>m.symbol===item.mood);
             return (
               <div key={item.id} className="touch-card" onClick={()=>openDetail(item)} style={{
                 ...cardStyle, display:"flex",gap:12,padding:0,overflow:"hidden",marginBottom:10,
@@ -3875,7 +3879,7 @@ function MemoriesRoom({ data, update, onBack }) {
                   </div>
                 ):(
                   <div style={{width:80,height:80,flexShrink:0,background:"rgba(255,255,255,0.04)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:28}}>
-                    {item.mood||"📝"}
+                    {item.mood||<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="#9CA3AF" strokeWidth="1.5"/><path d="M14 2v6h6" stroke="#9CA3AF" strokeWidth="1.5"/><line x1="8" y1="13" x2="16" y2="13" stroke="#9CA3AF" strokeWidth="1" opacity=".5"/><line x1="8" y1="17" x2="12" y2="17" stroke="#9CA3AF" strokeWidth="1" opacity=".5"/></svg>}
                   </div>
                 )}
                 <div style={{flex:1,padding:"10px 12px 10px 0",minWidth:0}}>
@@ -3885,7 +3889,7 @@ function MemoriesRoom({ data, update, onBack }) {
                     display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",overflow:"hidden",lineHeight:1.4}}>{item.text}</div>}
                   <div style={{display:"flex",alignItems:"center",gap:6}}>
                     <span style={{fontSize:10,color:"#9CA3AF"}}>{item.date}</span>
-                    {item.photos?.length>1&&<span style={{fontSize:10,color:"#9CA3AF"}}>📷 {item.photos.length}</span>}
+                    {item.photos?.length>1&&<span style={{fontSize:10,color:"#9CA3AF"}}>+{item.photos.length} foto</span>}
                   </div>
                 </div>
               </div>
@@ -3908,12 +3912,12 @@ function MemoriesRoom({ data, update, onBack }) {
             <div style={{fontSize:12,color:"#9CA3AF",marginBottom:6}}>{T("memoryMood")}</div>
             <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
               {MOOD_LIST.map(m=>(
-                <button key={m.emoji} onClick={()=>setForm({...form,mood:form.mood===m.emoji?"":m.emoji})} style={{
+                <button key={m.symbol} onClick={()=>setForm({...form,mood:form.mood===m.symbol?"":m.symbol})} style={{
                   padding:"6px 12px",borderRadius:10,border:"none",cursor:"pointer",fontSize:13,
-                  background:form.mood===m.emoji?`${m.color}25`:"rgba(255,255,255,0.05)",
-                  color:form.mood===m.emoji?m.color:"#9CA3AF",
-                  border:form.mood===m.emoji?`1px solid ${m.color}40`:"1px solid transparent",
-                }}>{m.emoji} {m.label}</button>
+                  background:form.mood===m.symbol?`${m.color}25`:"rgba(255,255,255,0.05)",
+                  color:form.mood===m.symbol?m.color:"#9CA3AF",
+                  border:form.mood===m.symbol?`1px solid ${m.color}40`:"1px solid transparent",
+                }}>{m.symbol} {m.label}</button>
               ))}
             </div>
           </div>
@@ -3980,7 +3984,9 @@ function MemoriesRoom({ data, update, onBack }) {
       <StickyHeader>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
           <button className="back-btn" onClick={onBack}>◀</button>
-          <span style={{fontSize:20}}>📸</span>
+          <span style={{fontSize:20}}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="14" rx="3" stroke="#22c55e" strokeWidth="1.5"/><circle cx="12" cy="13" r="4" stroke="#22c55e" strokeWidth="1.5"/><path d="M8 6V5a2 2 0 012-2h4a2 2 0 012 2v1" stroke="#22c55e" strokeWidth="1.5"/></svg>
+          </span>
           <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{T("memories")}</h3>
           <span style={{fontSize:11,color:"#9CA3AF"}}>{items.length} {T("memoryCount")}</span>
         </div>
@@ -3993,7 +3999,9 @@ function MemoriesRoom({ data, update, onBack }) {
         border:"1px solid rgba(34,197,94,0.2)",
       }}>
         <div style={{width:44,height:44,borderRadius:12,background:"rgba(34,197,94,0.15)",
-          display:"flex",alignItems:"center",justifyContent:"center",fontSize:20}}>🗂️</div>
+          display:"flex",alignItems:"center",justifyContent:"center"}}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 7v12a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" stroke="#22c55e" strokeWidth="1.5" fill="rgba(34,197,94,0.15)"/></svg>
+          </div>
         <div style={{flex:1}}>
           <div style={{fontSize:15,fontWeight:700}}>{T("allMemories")}</div>
           <div style={{fontSize:12,color:"#9CA3AF"}}>{items.length} {T("memoryCount")}</div>
@@ -4039,7 +4047,9 @@ function MemoriesRoom({ data, update, onBack }) {
               {item.photos?.[0]?(
                 <img src={item.photos[0]} alt="" style={{width:40,height:40,objectFit:"cover",borderRadius:8,flexShrink:0}}/>
               ):(
-                <div style={{width:40,height:40,borderRadius:8,background:"rgba(255,255,255,0.05)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,flexShrink:0}}>{item.mood||"📝"}</div>
+                <div style={{width:40,height:40,borderRadius:8,background:"rgba(255,255,255,0.05)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                  {item.mood ? <span style={{fontSize:16}}>{item.mood}</span> : <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="#9CA3AF" strokeWidth="1.5"/><path d="M14 2v6h6" stroke="#9CA3AF" strokeWidth="1.5"/></svg>}
+                </div>
               )}
               <div style={{flex:1,minWidth:0}}>
                 <div style={{fontSize:13,fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.title}</div>
@@ -4087,11 +4097,11 @@ function MemoriesRoom({ data, update, onBack }) {
           <div style={{fontSize:12,color:"#9CA3AF",marginBottom:6}}>{T("memoryMood")}</div>
           <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
             {MOOD_LIST.map(m=>(
-              <button key={m.emoji} onClick={()=>setForm({...form,mood:form.mood===m.emoji?"":m.emoji})} style={{
-                padding:"6px 12px",borderRadius:10,border:form.mood===m.emoji?`1px solid ${m.color}40`:"1px solid transparent",cursor:"pointer",fontSize:13,
-                background:form.mood===m.emoji?`${m.color}25`:"rgba(255,255,255,0.05)",
-                color:form.mood===m.emoji?m.color:"#9CA3AF",
-              }}>{m.emoji} {m.label}</button>
+              <button key={m.symbol} onClick={()=>setForm({...form,mood:form.mood===m.symbol?"":m.symbol})} style={{
+                padding:"6px 12px",borderRadius:10,border:form.mood===m.symbol?`1px solid ${m.color}40`:"1px solid transparent",cursor:"pointer",fontSize:13,
+                background:form.mood===m.symbol?`${m.color}25`:"rgba(255,255,255,0.05)",
+                color:form.mood===m.symbol?m.color:"#9CA3AF",
+              }}>{m.symbol} {m.label}</button>
             ))}
           </div>
         </div>
@@ -4141,7 +4151,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
   const [roomModal,setRoomModal]=useState(false);
   const [itemModal,setItemModal]=useState(false);
   const [form,setForm]=useState({name:"",status:"Planlama",description:"",deadline:"",tags:""});
-  const [roomForm,setRoomForm]=useState({name:"",icon:"📂",color:"#3b82f6"});
+  const [roomForm,setRoomForm]=useState({name:"",icon:"Pr",color:"#3b82f6"});
   const [itemForm,setItemForm]=useState({title:"",description:"",tags:""});
   const [exp,setExp]=useState(null);
   const [tf,setTf]=useState({title:""});
@@ -4175,7 +4185,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
     if(!roomForm.name.trim())return;
     const nr={id:uid(),...roomForm,type:"collection"};
     update({...data,rooms:[...rooms,nr]});
-    setRoomModal(false);setRoomForm({name:"",icon:"📂",color:"#3b82f6"});
+    setRoomModal(false);setRoomForm({name:"",icon:"Pr",color:"#3b82f6"});
   };
   const delRoom=id=>{
     const newRooms=rooms.filter(r=>r.id!==id);
@@ -4214,7 +4224,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
   const stCol=s=>s==="Tamamlandı"?"#22c55e":s==="Devam Ediyor"?"#3b82f6":s==="Test"?"#f59e0b":"#9CA3AF";
   const statusLabel=s=>({"Planlama":T("statPlanning"),"Devam Ediyor":T("statProgress"),"Test":T("statTest"),"Tamamlandı":T("statDone")}[s]||s);
 
-  const roomIcons=["📂","🎵","👗","📸","🎮","📚","🎨","💼","🏠","✈️","🎯","💡","🛒","🎬","🍳"];
+  const roomIcons=["Pr","Hb","Mz","St","An","Oy","Kt","İş","Ev","Gz","Hd","Fk","Al","Fm","Yc"];
 
   /* Her oda için Unsplash fotoğrafı — koyu tema, konuyla uyumlu */
   const ROOM_IMAGES = {
@@ -4313,7 +4323,7 @@ function Projects({ data, update, initialRoom, onRoomConsumed }) {
                   <div style={{fontSize:16,fontWeight:700}}>{p.name}</div>
                   <div style={{fontSize:11,color:"#9CA3AF",marginTop:4,display:"flex",gap:6,flexWrap:"wrap"}}>
                     {p.tags?.map(t=><span key={t} style={{background:"rgba(59,130,246,0.12)",color:"#3b82f6",padding:"1px 8px",borderRadius:6,fontSize:10}}>{t}</span>)}
-                    {p.deadline&&<span>📅 {p.deadline}</span>}
+                    {p.deadline&&<span>◆ {p.deadline}</span>}
                   </div>
                 </div>
                 <span style={{fontSize:11,fontWeight:600,color:stCol(p.status),background:`${stCol(p.status)}20`,padding:"4px 10px",borderRadius:8}}>{statusLabel(p.status)}</span>
@@ -4464,7 +4474,7 @@ function Notes({ data, update }) {
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(155px,1fr))",gap:10}}>
         {filtered.length===0&&(
           <div style={{gridColumn:"1/-1",textAlign:"center",padding:"40px 20px"}}>
-            <div style={{fontSize:40,marginBottom:8}}>📝</div>
+            <div style={{marginBottom:8}}><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><rect x="8" y="4" width="24" height="32" rx="3" stroke="#9CA3AF" strokeWidth="1.5" fill="none"/><line x1="14" y1="12" x2="26" y2="12" stroke="#9CA3AF" strokeWidth="1.5" strokeLinecap="round"/><line x1="14" y1="18" x2="26" y2="18" stroke="#9CA3AF" strokeWidth="1.5" strokeLinecap="round" opacity=".6"/><line x1="14" y1="24" x2="22" y2="24" stroke="#9CA3AF" strokeWidth="1.5" strokeLinecap="round" opacity=".4"/></svg></div>
             <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:4}}>{data.notes.length===0?T("noNotesYet"):T("noResult")}</div>
             {data.notes.length===0&&<div style={{fontSize:12,color:"#9CA3AF"}}>{T("addFirstNote")}</div>}
           </div>
@@ -4613,9 +4623,9 @@ function Settings({ data, update, onImport, user, onLogout }) {
 
       {/* Language selector */}
       <div style={{background:"#1C1C26",borderRadius:14,padding:16,marginBottom:12}}>
-        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>🌐 {T("language")}</h4>
+        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>{T("language")}</h4>
         <div style={{display:"flex",gap:8}}>
-          {[["tr","🇹🇷 Türkçe"],["en","🇬🇧 English"]].map(([code,label])=>(
+          {[["tr","Türkçe"],["en","English"]].map(([code,label])=>(
             <button key={code} onClick={()=>setLang(code)} style={{
               flex:1,padding:"12px 8px",borderRadius:12,cursor:"pointer",
               fontSize:13,fontWeight:curLang===code?700:400,
@@ -4630,7 +4640,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
 
       {/* User info */}
       <div style={{background:"#1C1C26",borderRadius:14,padding:16,marginBottom:12}}>
-        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>👤 {T("account")}</h4>
+        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>▸ {T("account")}</h4>
         {user ? (
           <div>
             <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
@@ -4671,7 +4681,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
 
       {/* Notifications */}
       <div style={{background:"#1C1C26",borderRadius:14,padding:16,marginBottom:12}}>
-        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>🔔 {T("notifications")}</h4>
+        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>▸ {T("notifications")}</h4>
         {!isNotificationSupported() ? (
           <p style={{fontSize:13,color:"#9CA3AF"}}>Bu tarayıcı bildirimleri desteklemiyor</p>
         ) : notifStatus === "granted" ? (
@@ -4764,7 +4774,7 @@ function Settings({ data, update, onImport, user, onLogout }) {
 
       {/* Data Stats */}
       <div style={{background:"#1C1C26",borderRadius:14,padding:16,marginBottom:12}}>
-        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>📊 {T("dataSummary")}</h4>
+        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>▸ {T("dataSummary")}</h4>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
           {[
             {l:T("task"),v:taskCount},{l:T("eventType"),v:eventCount},
@@ -4781,20 +4791,20 @@ function Settings({ data, update, onImport, user, onLogout }) {
 
       {/* Import / Export */}
       <div style={{background:"#1C1C26",borderRadius:14,padding:16,marginBottom:12}}>
-        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>💾 {T("dataManagement")}</h4>
+        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>▸ {T("dataManagement")}</h4>
         <p style={{fontSize:12,color:"#9CA3AF",margin:"0 0 12px"}}>{T("dataDesc")}</p>
         <button onClick={handleExport} style={{...btnPrimary,marginTop:0,marginBottom:8,background:"#14b8a6"}}>
-          📥 {T("exportData")} (JSON)
+          ▸ {T("exportData")} (JSON)
         </button>
         <button onClick={()=>fileRef.current?.click()} disabled={importing} style={{...btnPrimary,marginTop:0,background:"#a855f7"}}>
-          {importing ? "Aktarılıyor..." : "📤 Dosyadan Aktar (JSON)"}
+          {importing ? "Aktarılıyor..." : "▸ Dosyadan Aktar (JSON)"}
         </button>
         <input ref={fileRef} type="file" accept=".json" onChange={handleImport} style={{display:"none"}}/>
       </div>
 
       {/* AI Kalori Asistanı */}
       <div style={{background:"#1C1C26",borderRadius:14,padding:16,marginBottom:12}}>
-        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>🤖 AI Kalori Asistanı</h4>
+        <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>AI Kalori Asistanı</h4>
         <p style={{fontSize:12,color:"#9CA3AF",margin:"0 0 12px"}}>Yemek fotoğrafı çekerek kalori hesaplatabilirsin. Kendi AI hesabını seç ve API anahtarını gir.</p>
 
         {/* Provider selection */}
@@ -4802,8 +4812,8 @@ function Settings({ data, update, onImport, user, onLogout }) {
           {[
             {id:"none",name:"Manuel Giriş",desc:"AI kullanma, kalorileri kendim girerim",icon:"✏️",color:"#9CA3AF"},
             {id:"gemini",name:"Google Gemini",desc:"Ücretsiz, günde 60 istek",icon:"✨",color:"#3b82f6"},
-            {id:"claude",name:"Claude (Anthropic)",desc:"En akıllı analiz, ücretli",icon:"🧠",color:"#a855f7"},
-            {id:"openai",name:"OpenAI (ChatGPT)",desc:"Popüler, ücretli",icon:"🤖",color:"#22c55e"},
+            {id:"claude",name:"Claude (Anthropic)",desc:"En akıllı analiz, ücretli",icon:"◈",color:"#a855f7"},
+            {id:"openai",name:"OpenAI (ChatGPT)",desc:"Popüler, ücretli",icon:"◈",color:"#22c55e"},
           ].map(p=>{
             const selected = (data.settings?.aiProvider||"none")===p.id;
             return (
@@ -4837,20 +4847,20 @@ function Settings({ data, update, onImport, user, onLogout }) {
               <span style={{fontSize:11,color:"#f59e0b"}}>Anahtar gerekli</span></>
             )}
           </div>
-          <div style={{fontSize:10,color:"#9CA3AF",marginBottom:10}}>🔒 Anahtarın sadece senin telefonunda saklanır, sunucuya gönderilmez</div>
+          <div style={{fontSize:10,color:"#9CA3AF",marginBottom:10}}>● Anahtarın sadece senin telefonunda saklanır, sunucuya gönderilmez</div>
 
           {/* Guide button */}
           <button onClick={()=>setMsg(
             data.settings.aiProvider==="gemini" ?
-              "GOOGLE GEMİNİ REHBERİ:\n\n1. aistudio.google.com/apikey adresine git\n2. Gmail ile giriş yap\n3. 'Create API Key' butonuna bas\n4. Anahtarı kopyala ve yukarıya yapıştır\n\n✅ Ücretsiz: Günde 60 istek, dakikada 15 istek\n💡 Gmail hesabın varsa 2 dakikada hazır!" :
+              "GOOGLE GEMİNİ REHBERİ:\n\n1. aistudio.google.com/apikey adresine git\n2. Gmail ile giriş yap\n3. 'Create API Key' butonuna bas\n4. Anahtarı kopyala ve yukarıya yapıştır\n\n● Ücretsiz: Günde 60 istek, dakikada 15 istek\n● Gmail hesabın varsa 2 dakikada hazır!" :
             data.settings.aiProvider==="claude" ?
-              "CLAUDE (ANTHROPİC) REHBERİ:\n\n1. console.anthropic.com adresine git\n2. Hesap oluştur (kredi kartı gerekli)\n3. API Keys → Create Key\n4. Anahtarı kopyala ve yukarıya yapıştır\n\n💰 Ücretli: İlk $5 ücretsiz kredi\n🧠 En detaylı analiz" :
-              "OPENAİ (CHATGPT) REHBERİ:\n\n1. platform.openai.com adresine git\n2. Hesap oluştur veya giriş yap\n3. API Keys → Create new secret key\n4. Anahtarı kopyala ve yukarıya yapıştır\n\n💰 Ücretli: İlk $5 ücretsiz kredi\n🤖 Popüler ve güvenilir"
+              "CLAUDE (ANTHROPİC) REHBERİ:\n\n1. console.anthropic.com adresine git\n2. Hesap oluştur (kredi kartı gerekli)\n3. API Keys → Create Key\n4. Anahtarı kopyala ve yukarıya yapıştır\n\n● Ücretli: İlk $5 ücretsiz kredi\n● En detaylı analiz" :
+              "OPENAİ (CHATGPT) REHBERİ:\n\n1. platform.openai.com adresine git\n2. Hesap oluştur veya giriş yap\n3. API Keys → Create new secret key\n4. Anahtarı kopyala ve yukarıya yapıştır\n\n● Ücretli: İlk $5 ücretsiz kredi\n● Popüler ve güvenilir"
           )} style={{
             width:"100%",padding:"10px",borderRadius:10,border:"1px solid rgba(59,130,246,0.2)",
             background:"rgba(59,130,246,0.08)",color:"#3b82f6",fontSize:13,cursor:"pointer",fontWeight:600,
           }}>
-            📖 {data.settings.aiProvider==="gemini"?"Gemini":data.settings.aiProvider==="claude"?"Claude":"OpenAI"} API Anahtarı Nasıl Alınır?
+            ▸ {data.settings.aiProvider==="gemini"?"Gemini":data.settings.aiProvider==="claude"?"Claude":"OpenAI"} API Anahtarı Nasıl Alınır?
           </button>
         </>)}
       </div>
