@@ -1255,7 +1255,7 @@ function Dashboard({ data, setTab, goTo, update }) {
               <span style={{fontSize:13}}>{T("newsLoading")}</span>
             </div>
           ) : headlines.slice(0,4).map((item,i)=>(
-            <div key={i} onClick={()=>item.link&&window.open(item.link,"_blank")}
+            <div key={i} onClick={()=>item.link&&window.open(item.link,"_blank","noopener")}
               style={{display:"flex",alignItems:"flex-start",gap:10,cursor:item.link?"pointer":"default",
               paddingBottom: i < headlines.slice(0,4).length-1 ? 8 : 0,
               marginBottom: i < headlines.slice(0,4).length-1 ? 8 : 0,
@@ -1295,7 +1295,7 @@ function Dashboard({ data, setTab, goTo, update }) {
           <div style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:6,WebkitOverflowScrolling:"touch"}}>
             {musicItems.slice(0,6).map((item,i)=>(
               <div key={item.id||i}
-                onClick={()=>item.link&&window.open(item.link,"_blank")}
+                onClick={()=>item.link&&window.open(item.link,"_blank","noopener")}
                 style={{
                   background:"#1C1C26",border:"1px solid rgba(255,255,255,0.05)",borderRadius:14,
                   padding:"10px 12px",minWidth:120,maxWidth:140,flexShrink:0,cursor:"pointer",
@@ -3913,7 +3913,7 @@ function MemoriesRoom({ data, update, onBack }) {
             <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
               {MOOD_LIST.map(m=>(
                 <button key={m.symbol} onClick={()=>setForm({...form,mood:form.mood===m.symbol?"":m.symbol})} style={{
-                  padding:"6px 12px",borderRadius:10,border:"none",cursor:"pointer",fontSize:13,
+                  padding:"6px 12px",borderRadius:10,cursor:"pointer",fontSize:13,
                   background:form.mood===m.symbol?`${m.color}25`:"rgba(255,255,255,0.05)",
                   color:form.mood===m.symbol?m.color:"#9CA3AF",
                   border:form.mood===m.symbol?`1px solid ${m.color}40`:"1px solid transparent",
@@ -5287,7 +5287,7 @@ export default function App() {
         setLoading(false);
         if (!data) {
           loadData(null).then(d => setData(d)).catch(() => {
-            import("./db.js").then(m => setData(m.getDefaultData ? m.getDefaultData() : {tasks:[],events:[],sports:[],projects:[],notes:[],foods:[],rooms:[],roomItems:{},settings:{},dailyThoughts:["","",""]}));
+            setData({tasks:[],events:[],sports:[],projects:[],notes:[],foods:[],rooms:[],roomItems:{},settings:{},dailyThoughts:["","",""],memories:{folders:[],items:[]}});
           });
         }
       }}>
