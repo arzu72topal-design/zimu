@@ -61,13 +61,13 @@ const GLOBAL_CSS = `
   }
   .touch-card:active { transform: scale(0.97) !important; }
   .back-btn {
-    background: rgba(255,255,255,0.05); backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.1);
-    color: #ccc; width: 36px; height: 36px; border-radius: 10px;
+    background: rgba(0,0,0,0.05); backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px); border: 1px solid rgba(0,0,0,0.1);
+    color: #555; width: 36px; height: 36px; border-radius: 10px;
     font-size: 16px; cursor: pointer; display: flex; align-items: center;
     justify-content: center; flex-shrink: 0; transition: background .15s, transform .1s;
   }
-  .back-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.15); }
+  .back-btn:active { transform: scale(0.9); background: rgba(0,0,0,0.1); }
   @keyframes modalOverlayIn { from { opacity:0 } to { opacity:1 } }
   @keyframes modalSlideUp { from { transform:translateY(100%); opacity:0 } to { transform:translateY(0); opacity:1 } }
   @keyframes voiceWave { from { height:8px } to { height:32px } }
@@ -76,14 +76,14 @@ const GLOBAL_CSS = `
   .task-check-done { animation: checkPop .3s ease; }
   * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
   ::-webkit-scrollbar { width:4px; }
-  ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.12);border-radius:4px; }
+  ::-webkit-scrollbar-thumb { background:rgba(0,0,0,0.15);border-radius:4px; }
   ::-webkit-scrollbar-track { background:transparent; }
   input[type="date"]::-webkit-calendar-picker-indicator { filter:invert(0.7); }
-  html, body { margin:0; padding:0; overscroll-behavior:none; background:#1C1C2E; overflow:auto; height:auto; }
+  html, body { margin:0; padding:0; overscroll-behavior:none; background:#F5F5F7; overflow:auto; height:auto; }
   #root { height:auto; }
-  select option { background:#252540; color:#F9FAFB; }
+  select option { background:#fff; color:#1a1a2e; }
   @media(display-mode:standalone){
-    html, body { background:#1C1C2E; overflow:auto; height:auto; }
+    html, body { background:#F5F5F7; overflow:auto; height:auto; }
     #root { height:auto; }
     body { padding-top: env(safe-area-inset-top); }
   }
@@ -273,7 +273,7 @@ export default function App() {
   const CONTENT_PAD_BOTTOM = isMobile ? NAV_HEIGHT + SAFE_BOTTOM + 30 : NAV_HEIGHT + 24;
 
   const phoneContent = (
-    <div lang={T("locale").split("-")[0]} style={{ width: "100%", minHeight: isMobile ? "100dvh" : "100vh", background: "#1C1C2E", color: "#F9FAFB", fontFamily: "'SF Pro Display',-apple-system,'Segoe UI',sans-serif", position: "relative" }}>
+    <div lang={T("locale").split("-")[0]} style={{ width: "100%", minHeight: isMobile ? "100dvh" : "100vh", background: "#F5F5F7", color: "#1a1a2e", fontFamily: "'SF Pro Display',-apple-system,'Segoe UI',sans-serif", position: "relative" }}>
       <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0, overflow: "hidden" }}>
         <div style={{ position: "absolute", width: 300, height: 300, borderRadius: "50%", background: "radial-gradient(circle,rgba(59,130,246,0.12) 0%,transparent 70%)", top: "-80px", left: "-60px", animation: "orb1 12s ease-in-out infinite" }} />
         <div style={{ position: "absolute", width: 250, height: 250, borderRadius: "50%", background: "radial-gradient(circle,rgba(168,85,247,0.10) 0%,transparent 70%)", bottom: "20%", right: "-50px", animation: "orb2 15s ease-in-out infinite" }} />
@@ -290,7 +290,7 @@ export default function App() {
 
       {data && <VoiceCommand data={data} update={update} goTo={goTo} showToast={showToast} />}
 
-      <nav aria-label="Main navigation" style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "rgba(28,28,46,0.95)", backdropFilter: "blur(24px) saturate(180%)", WebkitBackdropFilter: "blur(24px) saturate(180%)", borderTop: "1px solid rgba(255,255,255,0.05)", display: "flex", justifyContent: "center", alignItems: "center", height: NAV_HEIGHT, paddingTop: 4, paddingBottom: isMobile ? "env(safe-area-inset-bottom, 8px)" : "6px", paddingLeft: 4, paddingRight: 4, zIndex: 1000 }}>
+      <nav aria-label="Main navigation" style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "rgba(245,245,247,0.95)", backdropFilter: "blur(24px) saturate(180%)", WebkitBackdropFilter: "blur(24px) saturate(180%)", borderTop: "1px solid rgba(0,0,0,0.08)", display: "flex", justifyContent: "center", alignItems: "center", height: NAV_HEIGHT, paddingTop: 4, paddingBottom: isMobile ? "env(safe-area-inset-bottom, 8px)" : "6px", paddingLeft: 4, paddingRight: 4, zIndex: 1000 }}>
         <div style={{ display: "flex", justifyContent: "space-around", alignItems: "center", width: "100%", maxWidth: isMobile ? undefined : 600 }}>
           {allTabs.map(t => (
             <button key={t.id} className="nav-item" onClick={() => setTab(t.id)} aria-current={tab === t.id ? "page" : undefined} aria-label={t.label} style={{
