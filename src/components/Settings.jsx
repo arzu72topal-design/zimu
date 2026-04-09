@@ -72,16 +72,16 @@ export default function Settings({ data, update, onImport, user, onLogout }) {
       {msg && <div style={{background:"rgba(59,130,246,0.15)",border:"1px solid rgba(59,130,246,0.3)",borderRadius:12,padding:"10px 14px",marginBottom:12,fontSize:13,color:"#3b82f6"}}>{msg}</div>}
 
       {/* Language selector */}
-      <div style={{background:"#1C1C26",borderRadius:14,padding:16,marginBottom:12}}>
+      <div style={{background:"#ffffff",borderRadius:14,padding:16,marginBottom:12}}>
         <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>{T("language")}</h4>
         <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:8}}>
           {SUPPORTED_LANGUAGES.map(({code,label,flag})=>(
             <button key={code} onClick={()=>setLang(code)} style={{
               padding:"12px 10px",borderRadius:12,cursor:"pointer",
               fontSize:13,fontWeight:curLang===code?700:400,
-              background:curLang===code?"rgba(59,130,246,0.15)":"#2A2A35",
+              background:curLang===code?"rgba(59,130,246,0.15)":"#f0f0f5",
               color:curLang===code?"#3b82f6":"#9CA3AF",
-              border:curLang===code?"1px solid rgba(59,130,246,0.3)":"1px solid rgba(255,255,255,0.05)",
+              border:curLang===code?"1px solid rgba(59,130,246,0.3)":"1px solid rgba(0,0,0,0.06)",
               transition:"all .2s",display:"flex",alignItems:"center",justifyContent:"center",gap:6,
             }}><span>{flag}</span> {label}</button>
           ))}
@@ -89,7 +89,7 @@ export default function Settings({ data, update, onImport, user, onLogout }) {
       </div>
 
       {/* User info */}
-      <div style={{background:"#1C1C26",borderRadius:14,padding:16,marginBottom:12}}>
+      <div style={{background:"#ffffff",borderRadius:14,padding:16,marginBottom:12}}>
         <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>▸ {T("account")}</h4>
         {user ? (
           <div>
@@ -130,7 +130,7 @@ export default function Settings({ data, update, onImport, user, onLogout }) {
       </div>
 
       {/* Notifications */}
-      <div style={{background:"#1C1C26",borderRadius:14,padding:16,marginBottom:12}}>
+      <div style={{background:"#ffffff",borderRadius:14,padding:16,marginBottom:12}}>
         <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>▸ {T("notifications")}</h4>
         {!isNotificationSupported() ? (
           <p style={{fontSize:13,color:"#9CA3AF"}}>Bu tarayıcı bildirimleri desteklemiyor</p>
@@ -149,22 +149,22 @@ export default function Settings({ data, update, onImport, user, onLogout }) {
                   const active=(data.settings?.reminderMinutes||15)===m;
                   return <button key={m} onClick={()=>update({...data,settings:{...data.settings,reminderMinutes:m}})} style={{
                     padding:"8px 14px",borderRadius:10,cursor:"pointer",fontSize:12,fontWeight:active?700:400,
-                    background:active?"rgba(34,197,94,0.15)":"#2A2A35",
+                    background:active?"rgba(34,197,94,0.15)":"#f0f0f5",
                     color:active?"#22c55e":"#9CA3AF",
-                    border:active?"1px solid rgba(34,197,94,0.3)":"1px solid rgba(255,255,255,0.05)",
+                    border:active?"1px solid rgba(34,197,94,0.3)":"1px solid rgba(0,0,0,0.06)",
                   }}>{m} {T("reminderMinLabel")}</button>;
                 })}
               </div>
             </div>
 
             {/* Event reminders toggle */}
-            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 0",borderTop:"1px solid rgba(255,255,255,0.05)"}}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 0",borderTop:"1px solid rgba(0,0,0,0.06)"}}>
               <div>
                 <div style={{fontSize:13,fontWeight:600,color:"#F9FAFB"}}>{T("eventReminders")}</div>
               </div>
               <button onClick={()=>update({...data,settings:{...data.settings,eventNotif:!(data.settings?.eventNotif!==false)}})} style={{
                 width:44,height:24,borderRadius:12,border:"none",cursor:"pointer",
-                background:(data.settings?.eventNotif!==false)?"#22c55e":"#2A2A35",
+                background:(data.settings?.eventNotif!==false)?"#22c55e":"#f0f0f5",
                 position:"relative",transition:"background .2s",
               }}>
                 <div style={{width:18,height:18,borderRadius:"50%",background:"#fff",position:"absolute",top:3,
@@ -173,14 +173,14 @@ export default function Settings({ data, update, onImport, user, onLogout }) {
             </div>
 
             {/* Task reminders toggle */}
-            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 0",borderTop:"1px solid rgba(255,255,255,0.05)"}}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 0",borderTop:"1px solid rgba(0,0,0,0.06)"}}>
               <div>
                 <div style={{fontSize:13,fontWeight:600,color:"#F9FAFB"}}>{T("taskReminders")}</div>
                 <div style={{fontSize:11,color:"#9CA3AF",marginTop:2}}>{T("taskRemindDesc")}</div>
               </div>
               <button onClick={()=>update({...data,settings:{...data.settings,taskNotif:!(data.settings?.taskNotif!==false)}})} style={{
                 width:44,height:24,borderRadius:12,border:"none",cursor:"pointer",
-                background:(data.settings?.taskNotif!==false)?"#22c55e":"#2A2A35",
+                background:(data.settings?.taskNotif!==false)?"#22c55e":"#f0f0f5",
                 position:"relative",transition:"background .2s",
               }}>
                 <div style={{width:18,height:18,borderRadius:"50%",background:"#fff",position:"absolute",top:3,
@@ -189,7 +189,7 @@ export default function Settings({ data, update, onImport, user, onLogout }) {
             </div>
 
             {/* Quiet hours */}
-            <div style={{padding:"10px 0",borderTop:"1px solid rgba(255,255,255,0.05)"}}>
+            <div style={{padding:"10px 0",borderTop:"1px solid rgba(0,0,0,0.06)"}}>
               <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
                 <div>
                   <div style={{fontSize:13,fontWeight:600,color:"#F9FAFB"}}>{T("quietHours")}</div>
@@ -197,7 +197,7 @@ export default function Settings({ data, update, onImport, user, onLogout }) {
                 </div>
                 <button onClick={()=>update({...data,settings:{...data.settings,quietEnabled:!data.settings?.quietEnabled}})} style={{
                   width:44,height:24,borderRadius:12,border:"none",cursor:"pointer",
-                  background:data.settings?.quietEnabled?"#22c55e":"#2A2A35",
+                  background:data.settings?.quietEnabled?"#22c55e":"#f0f0f5",
                   position:"relative",transition:"background .2s",
                 }}>
                   <div style={{width:18,height:18,borderRadius:"50%",background:"#fff",position:"absolute",top:3,
@@ -207,10 +207,10 @@ export default function Settings({ data, update, onImport, user, onLogout }) {
               {data.settings?.quietEnabled&&(
                 <div style={{display:"flex",alignItems:"center",gap:8}}>
                   <input type="time" value={data.settings?.quietStart||"23:00"} onChange={e=>update({...data,settings:{...data.settings,quietStart:e.target.value}})}
-                    style={{background:"#2A2A35",border:"1px solid rgba(255,255,255,0.05)",borderRadius:8,padding:"6px 10px",color:"#F9FAFB",fontSize:13,flex:1}}/>
+                    style={{background:"#f0f0f5",border:"1px solid rgba(0,0,0,0.06)",borderRadius:8,padding:"6px 10px",color:"#F9FAFB",fontSize:13,flex:1}}/>
                   <span style={{color:"#9CA3AF",fontSize:12}}>—</span>
                   <input type="time" value={data.settings?.quietEnd||"08:00"} onChange={e=>update({...data,settings:{...data.settings,quietEnd:e.target.value}})}
-                    style={{background:"#2A2A35",border:"1px solid rgba(255,255,255,0.05)",borderRadius:8,padding:"6px 10px",color:"#F9FAFB",fontSize:13,flex:1}}/>
+                    style={{background:"#f0f0f5",border:"1px solid rgba(0,0,0,0.06)",borderRadius:8,padding:"6px 10px",color:"#F9FAFB",fontSize:13,flex:1}}/>
                 </div>
               )}
             </div>
@@ -223,7 +223,7 @@ export default function Settings({ data, update, onImport, user, onLogout }) {
       </div>
 
       {/* Data Stats */}
-      <div style={{background:"#1C1C26",borderRadius:14,padding:16,marginBottom:12}}>
+      <div style={{background:"#ffffff",borderRadius:14,padding:16,marginBottom:12}}>
         <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>▸ {T("dataSummary")}</h4>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
           {[
@@ -231,7 +231,7 @@ export default function Settings({ data, update, onImport, user, onLogout }) {
             {l:T("sportRecord"),v:sportCount},{l:T("project"),v:projectCount},
             {l:T("note"),v:noteCount},{l:T("total"),v:taskCount+eventCount+sportCount+projectCount+noteCount},
           ].map((s,i)=>(
-            <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"6px 0",borderBottom:"1px solid rgba(255,255,255,0.05)"}}>
+            <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"6px 0",borderBottom:"1px solid rgba(0,0,0,0.06)"}}>
               <span style={{fontSize:13,opacity:.6}}>{s.l}</span>
               <span style={{fontSize:13,fontWeight:600}}>{s.v}</span>
             </div>
@@ -240,7 +240,7 @@ export default function Settings({ data, update, onImport, user, onLogout }) {
       </div>
 
       {/* Import / Export */}
-      <div style={{background:"#1C1C26",borderRadius:14,padding:16,marginBottom:12}}>
+      <div style={{background:"#ffffff",borderRadius:14,padding:16,marginBottom:12}}>
         <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>▸ {T("dataManagement")}</h4>
         <p style={{fontSize:12,color:"#9CA3AF",margin:"0 0 12px"}}>{T("dataDesc")}</p>
         <button onClick={handleExport} style={{...btnPrimary,marginTop:0,marginBottom:8,background:"#14b8a6"}}>
@@ -253,7 +253,7 @@ export default function Settings({ data, update, onImport, user, onLogout }) {
       </div>
 
       {/* AI Kalori Asistanı */}
-      <div style={{background:"#1C1C26",borderRadius:14,padding:16,marginBottom:12}}>
+      <div style={{background:"#ffffff",borderRadius:14,padding:16,marginBottom:12}}>
         <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700}}>AI Kalori Asistanı</h4>
         <p style={{fontSize:12,color:"#9CA3AF",margin:"0 0 12px"}}>Yemek fotoğrafı çekerek kalori hesaplatabilirsin. Kendi AI hesabını seç ve API anahtarını gir.</p>
 
@@ -269,8 +269,8 @@ export default function Settings({ data, update, onImport, user, onLogout }) {
             return (
               <div key={p.id} onClick={()=>update({...data,settings:{...data.settings,aiProvider:p.id}})} style={{
                 display:"flex",alignItems:"center",gap:10,padding:"10px 12px",borderRadius:12,cursor:"pointer",
-                background:selected?`${p.color}15`:"rgba(255,255,255,0.02)",
-                border:selected?`1px solid ${p.color}40`:"1px solid rgba(255,255,255,0.05)",
+                background:selected?`${p.color}15`:"rgba(0,0,0,0.02)",
+                border:selected?`1px solid ${p.color}40`:"1px solid rgba(0,0,0,0.06)",
               }}>
                 <span style={{fontSize:20}}>{p.icon}</span>
                 <div style={{flex:1}}>
@@ -316,7 +316,7 @@ export default function Settings({ data, update, onImport, user, onLogout }) {
       </div>
 
       {/* Danger zone */}
-      <div style={{background:"#1C1C26",borderRadius:14,padding:16}}>
+      <div style={{background:"#ffffff",borderRadius:14,padding:16}}>
         <h4 style={{margin:"0 0 12px",fontSize:15,fontWeight:700,color:"#ef4444"}}>⚠️ {T("dangerZone")}</h4>
         <button onClick={clearAll} style={{...btnPrimary,marginTop:0,background:"#ef4444"}}>
           {T("deleteAll")}
