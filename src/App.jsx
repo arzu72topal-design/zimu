@@ -233,12 +233,12 @@ export default function App() {
       }}>
       <style>{`${NEBULA_KEYFRAMES}\n@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }`}</style>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", width: "100%", maxWidth: 400, padding: "0 40px", minHeight: "100dvh", margin: "0 auto", animation: "fadeIn .6s ease both" }}>
-        <div style={{ fontSize: 72, fontWeight: 900, letterSpacing: -4, lineHeight: 1, background: "linear-gradient(135deg,#e0d5f5 0%,#a78bfa 30%,#6366f1 60%,#818cf8 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", animation: "zimuGlow 4s ease-in-out infinite", display: "inline-block", marginBottom: 16 }}>Zimu</div>
-        <div style={{ height: 1, width: "60%", marginBottom: 20, margin: "0 auto 20px", background: "linear-gradient(90deg,transparent,rgba(167,139,250,0.7),transparent)", animation: "lineExpand 1s ease .2s both" }} />
-        <div style={{ fontSize: 17, fontStyle: "italic", color: "rgba(196,181,253,0.85)", letterSpacing: .4, lineHeight: 1.6, animation: "fadeInUp .8s ease .4s both" }}>Kendi destanını yaz.</div>
-        <div style={{ fontSize: 14, fontStyle: "italic", color: "rgba(167,139,250,0.45)", letterSpacing: .3, marginTop: 4, animation: "fadeInUp .8s ease .55s both" }}>Write your own epic.</div>
+        <div style={{ fontSize: 72, fontWeight: 900, letterSpacing: -4, lineHeight: 1, background: "linear-gradient(135deg,#185FA5 0%,#534AB7 40%,#1D9E75 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", animation: "zimuGlow 4s ease-in-out infinite", display: "inline-block", marginBottom: 16 }}>Zimu</div>
+        <div style={{ height: 1, width: "60%", marginBottom: 20, margin: "0 auto 20px", background: "linear-gradient(90deg,transparent,rgba(24,95,165,0.3),transparent)", animation: "lineExpand 1s ease .2s both" }} />
+        <div style={{ fontSize: 17, fontStyle: "italic", color: "rgba(44,42,38,0.6)", letterSpacing: .4, lineHeight: 1.6, animation: "fadeInUp .8s ease .4s both" }}>Kendi destanını yaz.</div>
+        <div style={{ fontSize: 14, fontStyle: "italic", color: "rgba(44,42,38,0.35)", letterSpacing: .3, marginTop: 4, animation: "fadeInUp .8s ease .55s both" }}>Write your own epic.</div>
       </div>
-      <div style={{ position: "absolute", bottom: 44, left: 0, right: 0, textAlign: "center", fontSize: 13, color: "rgba(196,181,253,0.45)", letterSpacing: .5, animation: "tapBlink 2.5s ease-in-out infinite" }}>{T("tapToContinue")}</div>
+      <div style={{ position: "absolute", bottom: 44, left: 0, right: 0, textAlign: "center", fontSize: 13, color: "rgba(44,42,38,0.35)", letterSpacing: .5, animation: "tapBlink 2.5s ease-in-out infinite" }}>{T("tapToContinue")}</div>
     </NebulaBackground>
   );
 
@@ -288,7 +288,7 @@ export default function App() {
 
       {data && <VoiceCommand data={data} update={update} goTo={goTo} showToast={showToast} />}
 
-      <nav aria-label="Main navigation" style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "rgba(245,240,232,0.95)", backdropFilter: "blur(24px) saturate(180%)", WebkitBackdropFilter: "blur(24px) saturate(180%)", borderTop: "1px solid rgba(0,0,0,0.06)", display: "flex", justifyContent: "center", alignItems: "center", height: NAV_HEIGHT, paddingTop: 4, paddingBottom: isMobile ? "env(safe-area-inset-bottom, 8px)" : "6px", paddingLeft: 4, paddingRight: 4, zIndex: 1000 }}>
+      <nav aria-label="Main navigation" style={{ position: "fixed", bottom: isMobile ? 0 : 12, left: isMobile ? 0 : "50%", right: isMobile ? 0 : "auto", transform: isMobile ? undefined : "translateX(-50%)", background: "rgba(245,240,232,0.95)", backdropFilter: "blur(24px) saturate(180%)", WebkitBackdropFilter: "blur(24px) saturate(180%)", borderTop: isMobile ? "1px solid rgba(0,0,0,0.06)" : "none", border: isMobile ? undefined : "1px solid rgba(0,0,0,0.08)", borderRadius: isMobile ? 0 : 20, display: "flex", justifyContent: "center", alignItems: "center", height: NAV_HEIGHT, paddingTop: 4, paddingBottom: isMobile ? "env(safe-area-inset-bottom, 8px)" : "6px", paddingLeft: 4, paddingRight: 4, zIndex: 1000, width: isMobile ? undefined : 480, boxShadow: isMobile ? undefined : "0 4px 20px rgba(0,0,0,0.08)" }}>
         <div style={{ display: "flex", justifyContent: "space-around", alignItems: "center", width: "100%", maxWidth: isMobile ? undefined : 600 }}>
           {allTabs.map(t => (
             <button key={t.id} className="nav-item" onClick={() => setTab(t.id)} aria-current={tab === t.id ? "page" : undefined} aria-label={t.label} style={{
