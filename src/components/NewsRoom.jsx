@@ -9,36 +9,36 @@ const NEWS_SOURCES = {
   teknoloji: [
     { name:"DW Türkçe",      url:"https://rss.dw.com/xml/rss-tur-all",                              lang:"TR", color:"#0284c7" },
     { name:"BBC Türkçe",     url:"https://www.bbc.com/turkce/index.xml",                           lang:"TR", color:"#dc2626" },
-    { name:"BBC Tech",       url:"https://feeds.bbci.co.uk/news/technology/rss.xml",               lang:"EN", color:"#3b82f6" },
-    { name:"Ars Technica",   url:"https://feeds.arstechnica.com/arstechnica/index",                lang:"EN", color:"#f97316" },
+    { name:"BBC Tech",       url:"https://feeds.bbci.co.uk/news/technology/rss.xml",               lang:"EN", color:"#185FA5" },
+    { name:"Ars Technica",   url:"https://feeds.arstechnica.com/arstechnica/index",                lang:"EN", color:"#D85A30" },
     { name:"Hacker News",    url:"https://hnrss.org/frontpage?count=15",                           lang:"EN", color:"#ff6600" },
   ],
   spor: [
     { name:"DW Türkçe",      url:"https://rss.dw.com/xml/rss-tur-all",                              lang:"TR", color:"#0284c7" },
-    { name:"BBC Sport",      url:"https://feeds.bbci.co.uk/sport/rss.xml",                        lang:"EN", color:"#ef4444" },
-    { name:"BBC Football",   url:"https://feeds.bbci.co.uk/sport/football/rss.xml",               lang:"EN", color:"#ef4444" },
+    { name:"BBC Sport",      url:"https://feeds.bbci.co.uk/sport/rss.xml",                        lang:"EN", color:"#D85A30" },
+    { name:"BBC Football",   url:"https://feeds.bbci.co.uk/sport/football/rss.xml",               lang:"EN", color:"#D85A30" },
     { name:"ESPN",           url:"https://www.espn.com/espn/rss/news",                            lang:"EN", color:"#cc0000" },
   ],
   sanat: [
     { name:"DW Türkçe",      url:"https://rss.dw.com/xml/rss-tur-all",                              lang:"TR", color:"#0284c7" },
-    { name:"BBC Arts",       url:"https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml",  lang:"EN", color:"#a855f7" },
+    { name:"BBC Arts",       url:"https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml",  lang:"EN", color:"#534AB7" },
     { name:"NPR Arts",       url:"https://feeds.npr.org/1008/rss.xml",                            lang:"EN", color:"#7c3aed" },
   ],
   saglik: [
     { name:"DW Türkçe",      url:"https://rss.dw.com/xml/rss-tur-all",                              lang:"TR", color:"#0284c7" },
-    { name:"BBC Health",     url:"https://feeds.bbci.co.uk/news/health/rss.xml",                  lang:"EN", color:"#22c55e" },
+    { name:"BBC Health",     url:"https://feeds.bbci.co.uk/news/health/rss.xml",                  lang:"EN", color:"#1D9E75" },
     { name:"NPR Health",     url:"https://feeds.npr.org/1128/rss.xml",                            lang:"EN", color:"#16a34a" },
     { name:"Science Daily",  url:"https://www.sciencedaily.com/rss/health_medicine.xml",          lang:"EN", color:"#0d9488" },
   ],
   ekonomi: [
     { name:"DW Türkçe",      url:"https://rss.dw.com/xml/rss-tur-all",                              lang:"TR", color:"#0284c7" },
-    { name:"BBC Business",   url:"https://feeds.bbci.co.uk/news/business/rss.xml",                lang:"EN", color:"#f59e0b" },
+    { name:"BBC Business",   url:"https://feeds.bbci.co.uk/news/business/rss.xml",                lang:"EN", color:"#BA7517" },
     { name:"NPR Economy",    url:"https://feeds.npr.org/1006/rss.xml",                            lang:"EN", color:"#d97706" },
   ],
   politika: [
     { name:"BBC Türkçe",     url:"https://www.bbc.com/turkce/index.xml",                          lang:"TR", color:"#dc2626" },
     { name:"DW Türkçe",      url:"https://rss.dw.com/xml/rss-tur-all",                              lang:"TR", color:"#0284c7" },
-    { name:"BBC World",      url:"https://feeds.bbci.co.uk/news/world/rss.xml",                   lang:"EN", color:"#ef4444" },
+    { name:"BBC World",      url:"https://feeds.bbci.co.uk/news/world/rss.xml",                   lang:"EN", color:"#D85A30" },
     { name:"NPR Politics",   url:"https://feeds.npr.org/1014/rss.xml",                            lang:"EN", color:"#b91c1c" },
   ],
   bilim: [
@@ -57,7 +57,7 @@ const NEWS_SOURCES = {
     { name:"T24",            url:"https://t24.com.tr/rss/haberler",                               lang:"TR", color:"#e11d48" },
     { name:"BBC Türkçe",     url:"https://www.bbc.com/turkce/index.xml",                          lang:"TR", color:"#dc2626" },
     { name:"DW Türkçe",      url:"https://rss.dw.com/xml/rss-tur-all",                            lang:"TR", color:"#0284c7" },
-    { name:"BBC Breaking",   url:"https://feeds.bbci.co.uk/news/rss.xml",                         lang:"EN", color:"#ef4444" },
+    { name:"BBC Breaking",   url:"https://feeds.bbci.co.uk/news/rss.xml",                         lang:"EN", color:"#D85A30" },
   ],
 };
 
@@ -66,7 +66,7 @@ const SUGGESTED_FEEDS = [
   { name:"T24",           url:"https://t24.com.tr/rss/haberler",           lang:"TR", color:"#e11d48", desc:"Bağımsız haber" },
   { name:"BBC Türkçe",    url:"https://www.bbc.com/turkce/index.xml",      lang:"TR", color:"#dc2626", desc:"Güvenilir dünya haberleri" },
   { name:"DW Türkçe",     url:"https://rss.dw.com/xml/rss-tur-all",       lang:"TR", color:"#0284c7", desc:"Almanya ve dünya" },
-  { name:"Ars Technica",  url:"https://feeds.arstechnica.com/arstechnica/index", lang:"EN", color:"#f97316", desc:"Derinlemesine teknoloji" },
+  { name:"Ars Technica",  url:"https://feeds.arstechnica.com/arstechnica/index", lang:"EN", color:"#D85A30", desc:"Derinlemesine teknoloji" },
   { name:"Hacker News",   url:"https://hnrss.org/frontpage?count=15",      lang:"EN", color:"#ff6600", desc:"Startup & yazılım" },
   { name:"NPR News",      url:"https://feeds.npr.org/1001/rss.xml",        lang:"EN", color:"#2563eb", desc:"ABD ve dünya haberleri" },
   { name:"Science Daily",  url:"https://www.sciencedaily.com/rss/top/science.xml", lang:"EN", color:"#06b6d4", desc:"Günlük bilim" },
@@ -162,13 +162,13 @@ const NEWS_ICONS = {
 
 const NEWS_CATS = [
   { id:"sondakika", label:"Son Dakika", color:"#e11d48", desc:"Anlık gelişmeler & flaş haberler" },
-  { id:"spor",      label:"Spor",      color:"#ef4444",  desc:"Futbol, basketbol & dünya sporları" },
-  { id:"teknoloji", label:"Teknoloji", color:"#3b82f6",  desc:"Yapay zeka, gadget & yazılım" },
-  { id:"ekonomi",   label:"Ekonomi",   color:"#f59e0b",  desc:"Piyasalar, borsa & iş dünyası" },
-  { id:"politika",  label:"Politika",  color:"#ef4444",  desc:"Dünya siyaseti & gündem" },
-  { id:"saglik",    label:"Sağlık",    color:"#22c55e",  desc:"Tıp, beslenme & wellness" },
+  { id:"spor",      label:"Spor",      color:"#D85A30",  desc:"Futbol, basketbol & dünya sporları" },
+  { id:"teknoloji", label:"Teknoloji", color:"#185FA5",  desc:"Yapay zeka, gadget & yazılım" },
+  { id:"ekonomi",   label:"Ekonomi",   color:"#BA7517",  desc:"Piyasalar, borsa & iş dünyası" },
+  { id:"politika",  label:"Politika",  color:"#D85A30",  desc:"Dünya siyaseti & gündem" },
+  { id:"saglik",    label:"Sağlık",    color:"#1D9E75",  desc:"Tıp, beslenme & wellness" },
   { id:"bilim",     label:"Bilim",     color:"#06b6d4",  desc:"Uzay, keşifler & araştırmalar" },
-  { id:"sanat",     label:"Sanat",     color:"#a855f7",  desc:"Kültür, sanat & eğlence" },
+  { id:"sanat",     label:"Sanat",     color:"#534AB7",  desc:"Kültür, sanat & eğlence" },
   { id:"dunya",     label:"Dünya",     color:"#64748b",  desc:"Dünya haberleri & olaylar" },
 ];
 
@@ -259,7 +259,7 @@ export default function NewsRoom({ room, onBack, data, update }) {
 
   const addFeed = (feed) => {
     if(customFeeds.some(f=>f.url===feed.url)) return;
-    setCustomFeeds([...customFeeds, { name:feed.name, url:feed.url, lang:feed.lang||"TR", color:feed.color||"#3b82f6" }]);
+    setCustomFeeds([...customFeeds, { name:feed.name, url:feed.url, lang:feed.lang||"TR", color:feed.color||"#185FA5" }]);
     setLoaded(prev=>({...prev,custom:false}));
   };
   const removeFeed = (url) => {
@@ -297,11 +297,11 @@ export default function NewsRoom({ room, onBack, data, update }) {
           </div>
           <div style={{flex:1}}>
             <h3 style={{margin:0,fontSize:18,fontWeight:800,color:catInfo?.color}}>{catInfo?.label}</h3>
-            <div style={{fontSize:11,color:"#9CA3AF",marginTop:1}}>{catInfo?.desc}</div>
+            <div style={{fontSize:11,color:"#8B8578",marginTop:1}}>{catInfo?.desc}</div>
           </div>
           <button onClick={()=>fetchCategory(activeCat,true)} style={{
-            background:"#f0f0f5",border:"1px solid rgba(0,0,0,0.08)",
-            color:"#9CA3AF",width:34,height:34,borderRadius:10,fontSize:14,cursor:"pointer",
+            background:"#F5F0E8",border:"1px solid rgba(0,0,0,0.08)",
+            color:"#8B8578",width:34,height:34,borderRadius:10,fontSize:14,cursor:"pointer",
             display:"flex",alignItems:"center",justifyContent:"center",
           }}>↻</button>
           {activeCat==="custom"&&(
@@ -319,7 +319,7 @@ export default function NewsRoom({ room, onBack, data, update }) {
               padding:"5px 12px",borderRadius:10,border:"none",cursor:"pointer",
               fontSize:11,fontWeight:langFilter===k?700:400,
               background:langFilter===k?`${catInfo?.color}25`:"rgba(0,0,0,0.06)",
-              color:langFilter===k?catInfo?.color:"#9CA3AF",
+              color:langFilter===k?catInfo?.color:"#8B8578",
             }}>{v}</button>
           ))}
         </div>
@@ -330,14 +330,14 @@ export default function NewsRoom({ room, onBack, data, update }) {
           <div style={{margin:"0 auto 10px",animation:"pulse 1.5s ease-in-out infinite",width:40,height:40,display:"flex",alignItems:"center",justifyContent:"center"}}>
             {NEWS_ICONS[activeCat]?.(catInfo?.color||"#aaa")}
           </div>
-          <div style={{fontSize:13,color:"#9CA3AF",marginBottom:4}}>{T("newsLoading")}</div>
-          <div style={{fontSize:11,color:"#9CA3AF"}}>{NEWS_SOURCES[activeCat]?.map(s=>s.name).join(" · ")}</div>
+          <div style={{fontSize:13,color:"#8B8578",marginBottom:4}}>{T("newsLoading")}</div>
+          <div style={{fontSize:11,color:"#8B8578"}}>{NEWS_SOURCES[activeCat]?.map(s=>s.name).join(" · ")}</div>
         </div>
       )}
 
       {!isLoading&&list.length>0&&(
         <div>
-          <div style={{fontSize:11,color:"#9CA3AF",marginBottom:12,display:"flex",alignItems:"center",gap:6}}>
+          <div style={{fontSize:11,color:"#8B8578",marginBottom:12,display:"flex",alignItems:"center",gap:6}}>
             <span style={{width:5,height:5,borderRadius:"50%",background:catInfo?.color,display:"inline-block"}}/>
             <span>{list.length} haber</span>
           </div>
@@ -363,7 +363,7 @@ export default function NewsRoom({ room, onBack, data, update }) {
                     WebkitBoxOrient:"vertical",overflow:"hidden",
                   }}>{article.title}</div>
                   {!article.thumb&&article.summary&&(
-                    <div style={{fontSize:12,color:"#9CA3AF",lineHeight:1.45,marginBottom:6,
+                    <div style={{fontSize:12,color:"#8B8578",lineHeight:1.45,marginBottom:6,
                       display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",overflow:"hidden",
                     }}>{article.summary}</div>
                   )}
@@ -374,7 +374,7 @@ export default function NewsRoom({ room, onBack, data, update }) {
                       background:`${article.sourceColor}18`,
                       padding:"2px 8px",borderRadius:5,
                     }}>{article.source}</span>
-                    {article.pubDate&&<span style={{fontSize:10,color:"#9CA3AF"}}>{timeAgo(article.pubDate)}</span>}
+                    {article.pubDate&&<span style={{fontSize:10,color:"#8B8578"}}>{timeAgo(article.pubDate)}</span>}
                     <span style={{fontSize:10,opacity:.2,marginLeft:"auto"}}>↗ Habere git</span>
                   </div>
                 </div>
@@ -387,12 +387,12 @@ export default function NewsRoom({ room, onBack, data, update }) {
       {!isLoading&&list.length===0&&loaded[activeCat]&&(
         <div style={{textAlign:"center",padding:"40px 20px"}}>
           <div style={{marginBottom:10}}>
-            <svg width="40" height="40" viewBox="0 0 36 36" fill="none"><circle cx="18" cy="14" r="5" stroke={activeCat==="custom"?"#8b5cf6":"#9CA3AF"} strokeWidth="1.5"/><line x1="18" y1="19" x2="18" y2="30" stroke={activeCat==="custom"?"#8b5cf6":"#9CA3AF"} strokeWidth="1.5"/><line x1="12" y1="26" x2="24" y2="26" stroke={activeCat==="custom"?"#8b5cf6":"#9CA3AF"} strokeWidth="1.5" opacity=".5"/></svg>
+            <svg width="40" height="40" viewBox="0 0 36 36" fill="none"><circle cx="18" cy="14" r="5" stroke={activeCat==="custom"?"#8b5cf6":"#8B8578"} strokeWidth="1.5"/><line x1="18" y1="19" x2="18" y2="30" stroke={activeCat==="custom"?"#8b5cf6":"#8B8578"} strokeWidth="1.5"/><line x1="12" y1="26" x2="24" y2="26" stroke={activeCat==="custom"?"#8b5cf6":"#8B8578"} strokeWidth="1.5" opacity=".5"/></svg>
           </div>
           {activeCat==="custom"&&customFeeds.length===0 ? (
             <>
-              <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:6}}>{T("noCustomFeeds")}</div>
-              <div style={{fontSize:12,color:"#9CA3AF",marginBottom:16}}>{T("addFirstSource")}</div>
+              <div style={{fontSize:14,fontWeight:600,color:"#8B8578",marginBottom:6}}>{T("noCustomFeeds")}</div>
+              <div style={{fontSize:12,color:"#8B8578",marginBottom:16}}>{T("addFirstSource")}</div>
               <button onClick={()=>{setActiveCat(null);setShowSourceModal(true);}} style={{
                 background:"rgba(139,92,246,0.15)",color:"#8b5cf6",
                 border:"1px solid rgba(139,92,246,0.3)",borderRadius:10,
@@ -401,8 +401,8 @@ export default function NewsRoom({ room, onBack, data, update }) {
             </>
           ) : langFilter!=="all"&&rawList.length>0 ? (
             <>
-              <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:6}}>{langFilter==="TR"?"Türkçe":"İngilizce"} haber bulunamadı</div>
-              <div style={{fontSize:12,color:"#9CA3AF",marginBottom:16}}>Diğer dillerde {rawList.length} haber mevcut</div>
+              <div style={{fontSize:14,fontWeight:600,color:"#8B8578",marginBottom:6}}>{langFilter==="TR"?"Türkçe":"İngilizce"} haber bulunamadı</div>
+              <div style={{fontSize:12,color:"#8B8578",marginBottom:16}}>Diğer dillerde {rawList.length} haber mevcut</div>
               <button onClick={()=>setLangFilter("all")} style={{
                 background:`${catInfo?.color}20`,color:catInfo?.color,
                 border:`1px solid ${catInfo?.color}40`,borderRadius:10,
@@ -411,8 +411,8 @@ export default function NewsRoom({ room, onBack, data, update }) {
             </>
           ) : (
             <>
-              <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:6}}>Haber yüklenemedi</div>
-              <div style={{fontSize:12,color:"#9CA3AF",marginBottom:16}}>İnternet bağlantını kontrol et</div>
+              <div style={{fontSize:14,fontWeight:600,color:"#8B8578",marginBottom:6}}>Haber yüklenemedi</div>
+              <div style={{fontSize:12,color:"#8B8578",marginBottom:16}}>İnternet bağlantını kontrol et</div>
               <button onClick={()=>fetchCategory(activeCat,true)} style={{
                 background:`${catInfo?.color}20`,color:catInfo?.color,
                 border:`1px solid ${catInfo?.color}40`,borderRadius:10,
@@ -432,12 +432,12 @@ export default function NewsRoom({ room, onBack, data, update }) {
         <div style={{display:"flex",alignItems:"center",gap:10}}>
           <button className="back-btn" aria-label="Go back" onClick={onBack}>◀</button>
           <span style={{fontSize:22}}>
-            <svg width="22" height="22" viewBox="0 0 36 36" fill="none"><rect x="4" y="7" width="28" height="22" rx="2" stroke="#ef4444" strokeWidth="1.5" fill="rgba(239,68,68,0.1)"/><line x1="9" y1="13" x2="27" y2="13" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round"/><line x1="9" y1="18" x2="27" y2="18" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" opacity=".6"/><line x1="9" y1="23" x2="20" y2="23" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" opacity=".4"/></svg>
+            <svg width="22" height="22" viewBox="0 0 36 36" fill="none"><rect x="4" y="7" width="28" height="22" rx="2" stroke="#D85A30" strokeWidth="1.5" fill="rgba(239,68,68,0.1)"/><line x1="9" y1="13" x2="27" y2="13" stroke="#D85A30" strokeWidth="1.5" strokeLinecap="round"/><line x1="9" y1="18" x2="27" y2="18" stroke="#D85A30" strokeWidth="1.5" strokeLinecap="round" opacity=".6"/><line x1="9" y1="23" x2="20" y2="23" stroke="#D85A30" strokeWidth="1.5" strokeLinecap="round" opacity=".4"/></svg>
           </span>
           <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{T("news")}</h3>
-          <span style={{fontSize:11,color:"#9CA3AF"}}>{localCats.length} {T("categories")}</span>
+          <span style={{fontSize:11,color:"#8B8578"}}>{localCats.length} {T("categories")}</span>
         </div>
-        <p style={{margin:"6px 0 0",fontSize:12,color:"#9CA3AF"}}>{T("touchToExplore")}</p>
+        <p style={{margin:"6px 0 0",fontSize:12,color:"#8B8578"}}>{T("touchToExplore")}</p>
       </StickyHeader>
 
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
@@ -468,7 +468,7 @@ export default function NewsRoom({ room, onBack, data, update }) {
               </div>
             )}
             {loading[cat.id]&&(
-              <div style={{fontSize:10,color:"#9CA3AF",animation:"pulse 1s ease-in-out infinite"}}>yükleniyor...</div>
+              <div style={{fontSize:10,color:"#8B8578",animation:"pulse 1s ease-in-out infinite"}}>yükleniyor...</div>
             )}
           </div>
         ))}
@@ -521,14 +521,14 @@ export default function NewsRoom({ room, onBack, data, update }) {
           onClick={e=>{if(e.target===e.currentTarget)setShowSourceModal(false);}}>
           <div style={{
             width:"100%",maxWidth:420,maxHeight:"85vh",
-            background:"#ffffff",borderRadius:"24px 24px 0 0",
+            background:"#FFFFFF",borderRadius:"24px 24px 0 0",
             padding:"20px 16px calc(20px + env(safe-area-inset-bottom,0px))",
             overflowY:"auto",
           }}>
             {/* Modal Header */}
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
               <h3 style={{margin:0,fontSize:18,fontWeight:800,color:"#fff"}}>{T("addSource")}</h3>
-              <button onClick={()=>setShowSourceModal(false)} style={{background:"rgba(0,0,0,0.08)",border:"none",color:"#9CA3AF",width:32,height:32,borderRadius:10,cursor:"pointer",fontSize:16}}>✕</button>
+              <button onClick={()=>setShowSourceModal(false)} style={{background:"rgba(0,0,0,0.08)",border:"none",color:"#8B8578",width:32,height:32,borderRadius:10,cursor:"pointer",fontSize:16}}>✕</button>
             </div>
 
             {/* Tabs */}
@@ -538,7 +538,7 @@ export default function NewsRoom({ room, onBack, data, update }) {
                   flex:1,padding:"10px",borderRadius:12,border:"none",cursor:"pointer",
                   fontSize:12,fontWeight:sourceTab===k?700:400,
                   background:sourceTab===k?"rgba(139,92,246,0.15)":"rgba(0,0,0,0.06)",
-                  color:sourceTab===k?"#8b5cf6":"#9CA3AF",
+                  color:sourceTab===k?"#8b5cf6":"#8B8578",
                 }}>{v}</button>
               ))}
             </div>
@@ -562,14 +562,14 @@ export default function NewsRoom({ room, onBack, data, update }) {
                       }}>{feed.name.slice(0,2)}</div>
                       <div style={{flex:1,minWidth:0}}>
                         <div style={{fontSize:13,fontWeight:700,color:"#fff"}}>{feed.name}</div>
-                        <div style={{fontSize:10,color:"#9CA3AF",marginTop:1}}>{feed.desc}</div>
+                        <div style={{fontSize:10,color:"#8B8578",marginTop:1}}>{feed.desc}</div>
                         <div style={{fontSize:9,color:feed.color,marginTop:2}}>{feed.lang}</div>
                       </div>
                       <button onClick={()=>added?removeFeed(feed.url):addFeed(feed)} style={{
                         padding:"6px 14px",borderRadius:10,border:"none",cursor:"pointer",
                         fontSize:11,fontWeight:700,
                         background:added?"rgba(239,68,68,0.15)":"rgba(139,92,246,0.15)",
-                        color:added?"#ef4444":"#8b5cf6",
+                        color:added?"#D85A30":"#8b5cf6",
                       }}>{added?"✕":"+ Ekle"}</button>
                     </div>
                   );
@@ -593,7 +593,7 @@ export default function NewsRoom({ room, onBack, data, update }) {
                 <button onClick={addManualFeed} disabled={!manualUrl.trim()} style={{
                   padding:"12px",borderRadius:12,border:"none",cursor:"pointer",
                   background:manualUrl.trim()?"#8b5cf6":"rgba(0,0,0,0.08)",
-                  color:manualUrl.trim()?"#fff":"#9CA3AF",fontSize:13,fontWeight:700,
+                  color:manualUrl.trim()?"#fff":"#8B8578",fontSize:13,fontWeight:700,
                 }}>+ {T("addSource")}</button>
               </div>
             )}
@@ -601,7 +601,7 @@ export default function NewsRoom({ room, onBack, data, update }) {
             {/* Mevcut Kaynaklar */}
             {customFeeds.length>0&&(
               <div style={{marginTop:16}}>
-                <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",marginBottom:8}}>{T("mySources")} ({customFeeds.length})</div>
+                <div style={{fontSize:12,fontWeight:700,color:"#8B8578",marginBottom:8}}>{T("mySources")} ({customFeeds.length})</div>
                 {customFeeds.map(feed=>(
                   <div key={feed.url} style={{
                     display:"flex",alignItems:"center",gap:10,padding:"10px 12px",
@@ -610,9 +610,9 @@ export default function NewsRoom({ room, onBack, data, update }) {
                   }}>
                     <div style={{width:8,height:8,borderRadius:"50%",background:feed.color,flexShrink:0}}/>
                     <div style={{flex:1,fontSize:12,fontWeight:600,color:"#fff"}}>{feed.name}</div>
-                    <div style={{fontSize:9,color:"#9CA3AF"}}>{feed.lang}</div>
+                    <div style={{fontSize:9,color:"#8B8578"}}>{feed.lang}</div>
                     <button onClick={()=>removeFeed(feed.url)} style={{
-                      background:"rgba(239,68,68,0.12)",border:"none",color:"#ef4444",
+                      background:"rgba(239,68,68,0.12)",border:"none",color:"#D85A30",
                       width:26,height:26,borderRadius:8,cursor:"pointer",fontSize:12,
                       display:"flex",alignItems:"center",justifyContent:"center",
                     }}>✕</button>
