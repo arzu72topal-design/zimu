@@ -16,6 +16,9 @@ export default function Sports({ data, update, initialView, onBack }) {
   const [analyzing,setAnalyzing]=useState(false);
   const [aiResult,setAiResult]=useState(null);
   const photoRef=useRef(null);
+  const [showHistory,setShowHistory]=useState(false);
+  const [histStart,setHistStart]=useState(()=>{const d=new Date();d.setDate(d.getDate()-7);return d.toISOString().split("T")[0];});
+  const [histEnd,setHistEnd]=useState(today());
 
   // Dashboard'dan gelen yönlendirme — modalı otomatik aç
   useEffect(() => {
@@ -379,6 +382,100 @@ export default function Sports({ data, update, initialView, onBack }) {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* ── Yemek & Spor Geçmişi ── */}
+      <div style={{marginBottom:14}}>
+        <button onClick={()=>setShowHistory(!showHistory)} style={{
+          width:"100%",padding:"12px 14px",borderRadius:12,cursor:"pointer",
+          background:"#F5F0E8",borderLeft:"3px solid #BA7517",border:"none",borderLeft:"3px solid #BA7517",
+          borderRadius:"0 12px 12px 0",
+          display:"flex",alignItems:"center",justifyContent:"space-between",
+          fontSize:13,fontWeight:600,color:"#2C2A26",
+        }}>
+          <span>📋 Geçmiş Kayıtlar</span>
+          <span style={{color:"#8B8578",fontSize:16}}>{showHistory?"▲":"▼"}</span>
+        </button>
+
+        {showHistory&&(
+          <div style={{marginTop:10}}>
+            <div style={{display:"flex",gap:8,marginBottom:12,alignItems:"center"}}>
+              <div style={{flex:1}}>
+                <div style={{fontSize:10,color:"#8B8578",marginBottom:3}}>Başlangıç</div>
+                <input type="date" value={histStart} onChange={e=>setHistStart(e.target.value)} style={{...inp,marginBottom:0,fontSize:13,padding:"8px 10px"}}/>
+              </div>
+              <div style={{fontSize:14,color:"#8B8578",paddingTop:16}}>→</div>
+              <div style={{flex:1}}>
+                <div style={{fontSize:10,color:"#8B8578",marginBottom:3}}>Bitiş</div>
+                <input type="date" value={histEnd} onChange={e=>setHistEnd(e.target.value)} style={{...inp,marginBottom:0,fontSize:13,padding:"8px 10px"}}/>
+              </div>
+            </div>
+
+            {(()=>{
+              const hFoods=foods.filter(f=>f.date>=histStart&&f.date<=histEnd).sort((a,b)=>b.date.localeCompare(a.date));
+              const hSports=(data.sports||[]).filter(s=>s.date>=histStart&&s.date<=histEnd).sort((a,b)=>b.date.localeCompare(a.date));
+              const dates=[...new Set([...hFoods.map(f=>f.date),...hSports.map(s=>s.date)])].sort((a,b)=>b.localeCompare(a));
+              const totalCal=hFoods.reduce((a,f)=>a+(f.calories||0),0);
+              const totalBurn=hSports.reduce((a,s)=>a+(s.calories||0),0);
+
+              return (
+                <div>
+                  {/* Özet kartları */}
+                  <div style={{display:"flex",gap:8,marginBottom:12}}>
+                    <div style={{flex:1,...cardStyle,padding:"10px",borderLeft:"3px solid #D85A30",borderRadius:"0 12px 12px 0"}}>
+                      <div style={{fontSize:9,color:"#8B8578"}}>Toplam Alınan</div>
+                      <div style={{fontSize:18,fontWeight:700,color:"#D85A30"}}>{totalCal} <span style={{fontSize:10,fontWeight:400}}>kcal</span></div>
+                    </div>
+                    <div style={{flex:1,...cardStyle,padding:"10px",borderLeft:"3px solid #1D9E75",borderRadius:"0 12px 12px 0"}}>
+                      <div style={{fontSize:9,color:"#8B8578"}}>Toplam Yakılan</div>
+                      <div style={{fontSize:18,fontWeight:700,color:"#1D9E75"}}>{totalBurn} <span style={{fontSize:10,fontWeight:400}}>kcal</span></div>
+                    </div>
+                    <div style={{flex:1,...cardStyle,padding:"10px",borderLeft:"3px solid #185FA5",borderRadius:"0 12px 12px 0"}}>
+                      <div style={{fontSize:9,color:"#8B8578"}}>Net</div>
+                      <div style={{fontSize:18,fontWeight:700,color:"#185FA5"}}>{totalCal-totalBurn} <span style={{fontSize:10,fontWeight:400}}>kcal</span></div>
+                    </div>
+                  </div>
+
+                  <div style={{fontSize:11,color:"#8B8578",marginBottom:8}}>{dates.length} gün · {hFoods.length} yemek · {hSports.length} spor</div>
+
+                  {dates.length===0&&<div style={{textAlign:"center",padding:20,color:"#8B8578",fontSize:13}}>Bu tarih aralığında kayıt yok</div>}
+
+                  {dates.map(date=>{
+                    const dayFoods=hFoods.filter(f=>f.date===date);
+                    const daySports=hSports.filter(s=>s.date===date);
+                    const dayCal=dayFoods.reduce((a,f)=>a+(f.calories||0),0);
+                    const dayBurn=daySports.reduce((a,s)=>a+(s.calories||0),0);
+                    const dateLabel=new Date(date).toLocaleDateString("tr-TR",{day:"numeric",month:"short",weekday:"short"});
+
+                    return (
+                      <div key={date} style={{...cardStyle,padding:"12px 14px",marginBottom:6,borderLeft:"3px solid #BA7517",borderRadius:"0 12px 12px 0"}}>
+                        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+                          <span style={{fontSize:13,fontWeight:600,color:"#2C2A26"}}>{dateLabel}</span>
+                          <div style={{display:"flex",gap:8,fontSize:11}}>
+                            <span style={{color:"#D85A30",fontWeight:600}}>+{dayCal}</span>
+                            {dayBurn>0&&<span style={{color:"#1D9E75",fontWeight:600}}>-{dayBurn}</span>}
+                          </div>
+                        </div>
+                        {dayFoods.map(f=>(
+                          <div key={f.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"3px 0",fontSize:12}}>
+                            <span style={{color:"#5F5E5A"}}>{f.meal&&<span style={{color:"#8B8578",fontSize:10,marginRight:4}}>{f.meal}</span>}{f.name}</span>
+                            <span style={{color:"#D85A30",fontWeight:500}}>{f.calories} kcal</span>
+                          </div>
+                        ))}
+                        {daySports.map(s=>(
+                          <div key={s.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"3px 0",fontSize:12}}>
+                            <span style={{color:"#1D9E75"}}>🏃 {s.type} · {s.duration}dk</span>
+                            <span style={{color:"#1D9E75",fontWeight:500}}>-{s.calories||0} kcal</span>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()}
+          </div>
+        )}
       </div>
 
       {/* ═══ YEMEK EKLEME MODAL ═══ */}
