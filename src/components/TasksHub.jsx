@@ -34,9 +34,9 @@ export default function TasksHub({ data, update, initialSubTab, onSubTabConsumed
         {[["tasks",T("tasks"),"✓"],["calendar",T("calendar"),"◫"],["notes",T("notes"),"☰"]].map(([k,v,icon])=>(
           <button key={k} className="nav-item" onClick={()=>setSubTab(k)} style={{
             flex:1,
-            background:subTab===k?"rgba(59,130,246,0.15)":"#f0f0f5",
-            color:subTab===k?"#3b82f6":"#9CA3AF",
-            border:subTab===k?"1px solid rgba(59,130,246,0.3)":"1px solid rgba(0,0,0,0.06)",
+            background:subTab===k?"rgba(24,95,165,0.08)":"#F5F0E8",
+            color:subTab===k?"#185FA5":"#8B8578",
+            border:subTab===k?"1px solid rgba(24,95,165,0.2)":"1px solid rgba(0,0,0,0.06)",
             padding:"10px 4px",borderRadius:10,fontSize:12,fontWeight:subTab===k?700:500,
             cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:3,
           }}>
