@@ -50,7 +50,16 @@ export default function Dashboard({ data, setTab, goTo, update }) {
       fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code&timezone=auto`)
         .then(r=>r.json()).then(d=>{
           const c=d.current;
-          setDashWx({temp:Math.round(c.temperature_2m),humid:Math.round(c.relative_humidity_2m),code:c.weather_code});
+          setDashWx({temp:Math.round(c.temperature_2m),humid:Math.round(c.relative_humidity_2m),code:c.weather_code,city:null});
+          // Reverse geocode for city name
+          fetch(`https://geocoding-api.open-meteo.com/v1/search?name=_&count=1&latitude=${lat}&longitude=${lon}`)
+            .catch(()=>{});
+          fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&zoom=10&accept-language=tr`)
+            .then(r=>r.json()).then(geo=>{
+              const city=geo.address?.city||geo.address?.town||geo.address?.province||geo.address?.state||"";
+              const district=geo.address?.suburb||geo.address?.district||geo.address?.county||"";
+              setDashWx(prev=>prev?{...prev,city:district?`${district}, ${city}`:city}:prev);
+            }).catch(()=>{});
         }).catch(()=>{});
     },()=>{},{timeout:5000,maximumAge:300000});
   },[]);
@@ -163,6 +172,11 @@ export default function Dashboard({ data, setTab, goTo, update }) {
             <div style={{display:"flex",alignItems:"center",gap:5,fontSize:12,color:"#8B8578"}}>
               {WMO_TR[dashWx.code]||""}
             </div>
+            {dashWx.city&&(
+              <div style={{display:"flex",alignItems:"center",gap:5,fontSize:11,color:"#BA7517",fontWeight:500,marginLeft:"auto"}}>
+                📍 {dashWx.city}
+              </div>
+            )}
           </div>
         )}
       </div>
