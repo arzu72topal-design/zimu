@@ -292,7 +292,7 @@ export default function App() {
         <div style={{ display: "flex", justifyContent: "space-around", alignItems: "center", width: "100%", maxWidth: isMobile ? undefined : 600 }}>
           {allTabs.map(t => (
             <button key={t.id} className="nav-item" onClick={() => setTab(t.id)} aria-current={tab === t.id ? "page" : undefined} aria-label={t.label} style={{
-              background: tab === t.id ? "rgba(59,130,246,0.15)" : "none",
+              background: tab === t.id ? "rgba(59,130,246,0.1)" : "none",
               boxShadow: tab === t.id ? "0 0 20px rgba(59,130,246,0.25)" : undefined,
               border: "none", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
               gap: isMobile ? 4 : 3, padding: isMobile ? "10px 6px" : "8px 12px", minWidth: isMobile ? 52 : 50, borderRadius: 14,
