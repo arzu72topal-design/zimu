@@ -273,9 +273,9 @@ export default function App() {
   const phoneContent = (
     <div lang={T("locale").split("-")[0]} style={{ width: "100%", minHeight: isMobile ? "100dvh" : "100vh", background: "#F5F5F7", color: "#1a1a2e", fontFamily: "'SF Pro Display',-apple-system,'Segoe UI',sans-serif", position: "relative" }}>
       <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0, overflow: "hidden" }}>
-        <div style={{ position: "absolute", width: 300, height: 300, borderRadius: "50%", background: "radial-gradient(circle,rgba(59,130,246,0.12) 0%,transparent 70%)", top: "-80px", left: "-60px", animation: "orb1 12s ease-in-out infinite" }} />
-        <div style={{ position: "absolute", width: 250, height: 250, borderRadius: "50%", background: "radial-gradient(circle,rgba(168,85,247,0.10) 0%,transparent 70%)", bottom: "20%", right: "-50px", animation: "orb2 15s ease-in-out infinite" }} />
-        <div style={{ position: "absolute", width: 200, height: 200, borderRadius: "50%", background: "radial-gradient(circle,rgba(34,197,94,0.07) 0%,transparent 70%)", bottom: "-40px", left: "20%" }} />
+        <div style={{ position: "absolute", width: 300, height: 300, borderRadius: "50%", background: "radial-gradient(circle,rgba(59,130,246,0.08) 0%,transparent 70%)", top: "-80px", left: "-60px", animation: "orb1 12s ease-in-out infinite" }} />
+        <div style={{ position: "absolute", width: 250, height: 250, borderRadius: "50%", background: "radial-gradient(circle,rgba(168,85,247,0.06) 0%,transparent 70%)", bottom: "20%", right: "-50px", animation: "orb2 15s ease-in-out infinite" }} />
+        <div style={{ position: "absolute", width: 200, height: 200, borderRadius: "50%", background: "radial-gradient(circle,rgba(34,197,94,0.05) 0%,transparent 70%)", bottom: "-40px", left: "20%" }} />
       </div>
       <main ref={isMobile ? null : scrollRef} onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd} onScroll={handleScroll}
         style={{ padding: `16px ${isMobile ? "20px" : "clamp(20px, 5vw, 60px)"} ${CONTENT_PAD_BOTTOM}px`, minHeight: isMobile ? "100dvh" : "100vh", maxWidth: isMobile ? undefined : 800, margin: isMobile ? undefined : "0 auto", touchAction: "pan-y" }}>
