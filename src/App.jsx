@@ -266,7 +266,7 @@ export default function App() {
   };
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
-  const NAV_HEIGHT = 64;
+  const NAV_HEIGHT = isMobile ? 64 : 72;
   const SAFE_BOTTOM = isMobile ? 20 : 0;
   const CONTENT_PAD_BOTTOM = isMobile ? NAV_HEIGHT + SAFE_BOTTOM + 30 : NAV_HEIGHT + 24;
 
@@ -283,23 +283,23 @@ export default function App() {
       </main>
 
       {showScrollTop && (
-        <button onClick={scrollToTop} aria-label="Scroll to top" style={{ position: "fixed", right: 16, bottom: NAV_HEIGHT + SAFE_BOTTOM + 70, width: 40, height: 40, borderRadius: "50%", background: "rgba(59,130,246,0.9)", color: "#fff", border: "none", fontSize: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 12px rgba(0,0,0,0.3)", zIndex: 999 }}>▲</button>
+        <button onClick={scrollToTop} aria-label="Scroll to top" style={{ position: "fixed", right: 16, bottom: NAV_HEIGHT + SAFE_BOTTOM + 70, width: 40, height: 40, borderRadius: "50%", background: "#185FA5", color: "#fff", border: "none", fontSize: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 12px rgba(0,0,0,0.3)", zIndex: 999 }}>▲</button>
       )}
 
       {data && <VoiceCommand data={data} update={update} goTo={goTo} showToast={showToast} />}
 
-      <nav aria-label="Main navigation" style={{ position: "fixed", bottom: isMobile ? 0 : 12, left: isMobile ? 0 : "50%", right: isMobile ? 0 : "auto", transform: isMobile ? undefined : "translateX(-50%)", background: "rgba(245,240,232,0.95)", backdropFilter: "blur(24px) saturate(180%)", WebkitBackdropFilter: "blur(24px) saturate(180%)", borderTop: isMobile ? "1px solid rgba(0,0,0,0.06)" : "none", border: isMobile ? undefined : "1px solid rgba(0,0,0,0.08)", borderRadius: isMobile ? 0 : 20, display: "flex", justifyContent: "center", alignItems: "center", height: NAV_HEIGHT, paddingTop: 4, paddingBottom: isMobile ? "env(safe-area-inset-bottom, 8px)" : "6px", paddingLeft: 4, paddingRight: 4, zIndex: 1000, width: isMobile ? undefined : 480, boxShadow: isMobile ? undefined : "0 4px 20px rgba(0,0,0,0.08)" }}>
+      <nav aria-label="Main navigation" style={{ position: "fixed", bottom: isMobile ? 0 : 12, left: isMobile ? 0 : "50%", right: isMobile ? 0 : "auto", transform: isMobile ? undefined : "translateX(-50%)", background: "rgba(245,240,232,0.95)", backdropFilter: "blur(24px) saturate(180%)", WebkitBackdropFilter: "blur(24px) saturate(180%)", borderTop: isMobile ? "1px solid rgba(0,0,0,0.06)" : "none", border: isMobile ? undefined : "1px solid rgba(0,0,0,0.08)", borderRadius: isMobile ? 0 : 20, display: "flex", justifyContent: "center", alignItems: "center", height: NAV_HEIGHT, paddingTop: 4, paddingBottom: isMobile ? "env(safe-area-inset-bottom, 8px)" : "6px", paddingLeft: 4, paddingRight: 4, zIndex: 1000, width: isMobile ? undefined : 560, boxShadow: isMobile ? undefined : "0 4px 20px rgba(0,0,0,0.08)" }}>
         <div style={{ display: "flex", justifyContent: "space-around", alignItems: "center", width: "100%", maxWidth: isMobile ? undefined : 600 }}>
           {allTabs.map(t => (
             <button key={t.id} className="nav-item" onClick={() => setTab(t.id)} aria-current={tab === t.id ? "page" : undefined} aria-label={t.label} style={{
               background: tab === t.id ? "rgba(24,95,165,0.08)" : "none",
               boxShadow: tab === t.id ? "0 0 20px rgba(59,130,246,0.25)" : undefined,
               border: "none", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-              gap: isMobile ? 4 : 3, padding: isMobile ? "10px 6px" : "8px 12px", minWidth: isMobile ? 52 : 50, borderRadius: 14,
+              gap: isMobile ? 4 : 4, padding: isMobile ? "10px 6px" : "10px 16px", minWidth: isMobile ? 52 : 60, borderRadius: 14,
               color: tab === t.id ? "#185FA5" : "#8B8578", flex: 1,
             }}>
-              <span style={{ fontSize: isMobile ? 22 : 18, lineHeight: 1 }}>{t.icon}</span>
-              <span style={{ fontSize: isMobile ? 11 : 10, fontWeight: tab === t.id ? 700 : 500, letterSpacing: -.2 }}>{t.label}</span>
+              <span style={{ fontSize: isMobile ? 22 : 22, lineHeight: 1 }}>{t.icon}</span>
+              <span style={{ fontSize: isMobile ? 11 : 12, fontWeight: tab === t.id ? 700 : 500, letterSpacing: -.2 }}>{t.label}</span>
             </button>
           ))}
         </div>
