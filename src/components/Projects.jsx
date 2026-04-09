@@ -148,8 +148,8 @@ export default function Projects({ data, update, initialRoom, onRoomConsumed }) 
                 position:"absolute",bottom:0,left:0,right:0,
                 padding:"14px 16px",zIndex:1,
               }}>
-                <div style={{fontSize:16,fontWeight:700,color:"#2C2A26"}}>{roomLabel(room,data)}</div>
-                <div style={{fontSize:12,color:room.color,fontWeight:600,marginTop:2}}>{count} {T("items")}</div>
+                <div style={{fontSize:18,fontWeight:700,color:"#FFFFFF",textShadow:"0 1px 4px rgba(0,0,0,0.5)"}}>{roomLabel(room,data)}</div>
+                <div style={{fontSize:12,color:"rgba(255,255,255,0.85)",fontWeight:600,marginTop:2,textShadow:"0 1px 3px rgba(0,0,0,0.4)"}}>{count} {T("items")}</div>
               </div>
             </div>
           );
