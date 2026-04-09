@@ -2,7 +2,7 @@ export function GroupLabel({ label, count, color }) {
   return (
     <div style={{
       display:"flex",alignItems:"center",gap:6,
-      fontSize:11,fontWeight:700,color:"#9CA3AF",
+      fontSize:11,fontWeight:700,color:"#8B8578",
       textTransform:"uppercase",letterSpacing:".07em",
       marginBottom:8,marginTop:4,
     }}>
