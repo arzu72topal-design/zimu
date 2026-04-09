@@ -127,8 +127,8 @@ export default function Projects({ data, update, initialRoom, onRoomConsumed }) 
               style={{
                 borderRadius:20,overflow:"hidden",cursor:"pointer",
                 position:"relative",height:160,
-                border:"0.5px solid rgba(255,255,255,0.12)",
-                background:"#1C1C26",
+                border:"0.5px solid rgba(0,0,0,0.1)",
+                background:"#ffffff",
               }}>
               {/* Fotoğraf arka plan */}
               {photo ? (
@@ -141,7 +141,7 @@ export default function Projects({ data, update, initialRoom, onRoomConsumed }) 
               {/* Gradient overlay — alttan koyulaşma */}
               <div style={{
                 position:"absolute",inset:0,
-                background:"linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.75) 100%)",
+                background:"linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 100%)",
               }}/>
               {/* İçerik — sol alt */}
               <div style={{
@@ -217,7 +217,7 @@ export default function Projects({ data, update, initialRoom, onRoomConsumed }) 
         </div>
       )}
       {items.map(item=>(
-        <div key={item.id} style={{background:"#1C1C26",borderRadius:16,padding:14,marginBottom:8,borderLeft:`3px solid ${room.color}`}}>
+        <div key={item.id} style={{background:"#ffffff",borderRadius:16,padding:14,marginBottom:8,borderLeft:`3px solid ${room.color}`}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"start"}}>
             <div style={{flex:1,minWidth:0}}>
               <div style={{fontSize:15,fontWeight:600}}>{item.title}</div>
