@@ -436,16 +436,17 @@ export default function Projelerim() {
   // ─── Claude ────────────────────────────────────────────────────
   const openClaude = (prompt) => {
     if (!proj) return;
+    // Popup blocker engellemesin diye önce pencereyi aç
+    const win = window.open("https://claude.ai/new", "_blank");
+    const full = `[Proje: ${proj.name}] ${proj.desc}\n\nMevcut görevler:\n${proj.tasks.map(t => `${t.d ? "✅" : "⬜"} [${t.p}] ${t.t}`).join("\n")}\n\n${prompt}`;
+    navigator.clipboard?.writeText(full);
     const np = projects.map(p => {
       if (p.id !== selId) return p;
       const sessions = [{ prompt, date: now(), ts: Date.now() }, ...p.sessions].slice(0, 20);
       return { ...p, sessions, lastActivity: Date.now() };
     });
     save(np);
-    const full = `[Proje: ${proj.name}] ${proj.desc}\n\nMevcut görevler:\n${proj.tasks.map(t => `${t.d ? "✅" : "⬜"} [${t.p}] ${t.t}`).join("\n")}\n\n${prompt}`;
-    navigator.clipboard?.writeText(full);
-    window.open("https://claude.ai/new", "_blank");
-    showToast("📋 Prompt kopyalandı, Claude açılıyor...");
+    showToast(win ? "📋 Prompt kopyalandı, Claude açıldı!" : "📋 Prompt kopyalandı! Popup engellenmiş olabilir.");
   };
 
   // ─── Stats ─────────────────────────────────────────────────────
