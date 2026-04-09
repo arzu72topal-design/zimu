@@ -125,12 +125,12 @@ export default function Dashboard({ data, setTab, goTo, update }) {
     <div>
       {/* HERO - Greeting + Weather + Clock */}
       <div className="stagger-1" style={{
-        background:"#1C1C26",
+        background:"#ffffff",
         borderRadius:16,padding:"20px",marginBottom:16,
-        border:"1px solid rgba(255,255,255,0.05)",
+        border:"1px solid rgba(0,0,0,0.06)",
       }}>
         <div style={{display:"flex",alignItems:"center",gap:14}}>
-          <div style={{width:44,height:44,borderRadius:12,background:"#2A2A35",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+          <div style={{width:44,height:44,borderRadius:12,background:"#f0f0f5",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
             {hourIcon==="moon" ? (
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="#a5b4fc" strokeWidth="1.5" fill="rgba(165,180,252,0.15)"/></svg>
             ) : hourIcon==="sunrise" ? (
@@ -151,7 +151,7 @@ export default function Dashboard({ data, setTab, goTo, update }) {
           </div>
         </div>
         {dashWx&&(
-          <div style={{display:"flex",gap:12,marginTop:12,paddingTop:12,borderTop:"1px solid rgba(255,255,255,0.05)"}}>
+          <div style={{display:"flex",gap:12,marginTop:12,paddingTop:12,borderTop:"1px solid rgba(0,0,0,0.06)"}}>
             <div style={{display:"flex",alignItems:"center",gap:5,fontSize:12,color:"#9CA3AF"}}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M14 14.76V3.5a2.5 2.5 0 00-5 0v11.26a4.5 4.5 0 105 0z" stroke="#f59e0b" strokeWidth="1.5" fill="rgba(245,158,11,0.1)"/></svg>
               {dashWx.temp}°C
@@ -288,7 +288,7 @@ export default function Dashboard({ data, setTab, goTo, update }) {
         </div>
         {todayCalIn > 0 ? (
           <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
-            <div style={{flex:1,height:8,background:"#2A2A35",borderRadius:8,overflow:"hidden"}}>
+            <div style={{flex:1,height:8,background:"#f0f0f5",borderRadius:8,overflow:"hidden"}}>
               <div style={{height:"100%",borderRadius:8,width:`${Math.min(100,Math.round(todayCalIn/2000*100))}%`,background:"#10B981",transition:"width .5s"}}/>
             </div>
             <span style={{fontSize:12,color:"#F59E0B",fontWeight:600,flexShrink:0}}>{Math.round(todayCalIn/2000*100)}%</span>
@@ -314,7 +314,7 @@ export default function Dashboard({ data, setTab, goTo, update }) {
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M17.5 19H9.5a7 7 0 117.9-10.5 5 5 0 110 10.5z" stroke="#14b8a6" strokeWidth="1.5" fill="rgba(20,184,166,0.1)"/></svg>
           {T("thoughts")}
         </div>
-        <div style={{background:"#1C1C26",borderRadius:16,padding:"14px 16px",border:"1px solid rgba(255,255,255,0.05)"}}>
+        <div style={{background:"#ffffff",borderRadius:16,padding:"14px 16px",border:"1px solid rgba(0,0,0,0.06)"}}>
           {[0,1,2].map(i=>(
             <div key={i} style={{display:"flex",alignItems:"center",gap:8,marginBottom:i<2?10:0}}>
               <span style={{fontSize:13,color:"#9CA3AF",flexShrink:0,fontWeight:700}}>{i+1}.</span>
@@ -323,7 +323,7 @@ export default function Dashboard({ data, setTab, goTo, update }) {
                 onChange={e=>updateThought(i,e.target.value)}
                 placeholder={[T("thought1"),T("thought2"),T("thought3")][i]}
                 style={{
-                  flex:1,background:"#2A2A35",border:"1px solid rgba(255,255,255,0.05)",
+                  flex:1,background:"#f0f0f5",border:"1px solid rgba(0,0,0,0.06)",
                   borderRadius:10,padding:"10px 12px",color:"#F9FAFB",fontSize:13,outline:"none",
                   WebkitAppearance:"none",boxSizing:"border-box",
                 }}
@@ -351,7 +351,7 @@ export default function Dashboard({ data, setTab, goTo, update }) {
           </div>
           <button onClick={()=>goTo("lifestyle","news")} style={{background:"none",border:"none",color:"#ef4444",fontSize:12,cursor:"pointer",fontWeight:600}}>{T("viewAll")}</button>
         </div>
-        <div style={{background:"#1C1C26",borderRadius:16,padding:"14px 16px",border:"1px solid rgba(255,255,255,0.05)"}}>
+        <div style={{background:"#ffffff",borderRadius:16,padding:"14px 16px",border:"1px solid rgba(0,0,0,0.06)"}}>
           {headlines.length === 0 ? (
             <div style={{display:"flex",alignItems:"center",gap:10,color:"#9CA3AF"}}>
               <svg width="20" height="20" viewBox="0 0 36 36" fill="none" style={{animation:"pulse 1.5s infinite",flexShrink:0}}><circle cx="18" cy="18" r="13" stroke="#ef4444" strokeWidth="1.5" fill="none"/><path d="M14 18 A4 4 0 0 0 22 18" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round"/><line x1="18" y1="5" x2="18" y2="2" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/><line x1="25" y1="7" x2="27" y2="5" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/><line x1="11" y1="7" x2="9" y2="5" stroke="#ef4444" strokeWidth="2" strokeLinecap="round"/></svg>
@@ -362,7 +362,7 @@ export default function Dashboard({ data, setTab, goTo, update }) {
               style={{display:"flex",alignItems:"flex-start",gap:10,cursor:item.link?"pointer":"default",
               paddingBottom: i < headlines.slice(0,4).length-1 ? 8 : 0,
               marginBottom: i < headlines.slice(0,4).length-1 ? 8 : 0,
-              borderBottom: i < headlines.slice(0,4).length-1 ? "1px solid rgba(255,255,255,0.05)" : "none",
+              borderBottom: i < headlines.slice(0,4).length-1 ? "1px solid rgba(0,0,0,0.06)" : "none",
             }}>
               <span style={{fontSize:10,color:"#ef4444",fontWeight:700,marginTop:3,flexShrink:0,minWidth:16}}>{i+1}</span>
               <span style={{fontSize:13,lineHeight:1.4,color:"#F9FAFB",opacity:.85}}>{typeof item==="string"?item:item.title}</span>
@@ -382,10 +382,10 @@ export default function Dashboard({ data, setTab, goTo, update }) {
         </div>
         {musicItems.length === 0 ? (
           <div onClick={()=>goTo("lifestyle","music")} style={{
-            background:"#1C1C26",border:"1px solid rgba(255,255,255,0.05)",borderRadius:16,
+            background:"#ffffff",border:"1px solid rgba(0,0,0,0.06)",borderRadius:16,
             padding:"16px 18px",cursor:"pointer",display:"flex",alignItems:"center",gap:14,
           }}>
-            <div style={{width:48,height:48,borderRadius:14,background:"#2A2A35",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+            <div style={{width:48,height:48,borderRadius:14,background:"#f0f0f5",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
               <svg width="24" height="24" viewBox="0 0 36 36" fill="none"><path d="M6 18 C6 11 11 6 18 6 C25 6 30 11 30 18" stroke="#8B5CF6" strokeWidth="1.5" fill="none"/><rect x="4" y="17" width="6" height="10" rx="3" fill="#8B5CF6" opacity=".7"/><rect x="26" y="17" width="6" height="10" rx="3" fill="#8B5CF6" opacity=".7"/></svg>
             </div>
             <div>
@@ -400,10 +400,10 @@ export default function Dashboard({ data, setTab, goTo, update }) {
               <div key={item.id||i}
                 onClick={()=>item.link&&window.open(item.link,"_blank","noopener")}
                 style={{
-                  background:"#1C1C26",border:"1px solid rgba(255,255,255,0.05)",borderRadius:14,
+                  background:"#ffffff",border:"1px solid rgba(0,0,0,0.06)",borderRadius:14,
                   padding:"10px 12px",minWidth:120,maxWidth:140,flexShrink:0,cursor:"pointer",
                 }}>
-                <div style={{width:44,height:44,borderRadius:10,background:item.albumArt?"#000":"#2A2A35",overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center",marginBottom:8}}>
+                <div style={{width:44,height:44,borderRadius:10,background:item.albumArt?"#000":"#f0f0f5",overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center",marginBottom:8}}>
                   {item.albumArt
                     ? <img src={item.albumArt} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
                     : <svg width="20" height="20" viewBox="0 0 36 36" fill="none"><circle cx="11" cy="27" r="5" stroke="#8B5CF6" strokeWidth="1.5" fill="rgba(139,92,246,0.15)"/><path d="M16 27 L16 9 L30 5 L30 23" stroke="#8B5CF6" strokeWidth="1.5" strokeLinecap="round"/></svg>}
@@ -428,9 +428,9 @@ export default function Dashboard({ data, setTab, goTo, update }) {
             const r = 20; const circ = 2 * Math.PI * r;
             const offset = circ - (pct / 100) * circ;
             return (
-              <div key={i} style={{background:"#1C1C26",border:"1px solid rgba(255,255,255,0.05)",borderRadius:16,padding:"16px 8px",textAlign:"center"}}>
+              <div key={i} style={{background:"#ffffff",border:"1px solid rgba(0,0,0,0.06)",borderRadius:16,padding:"16px 8px",textAlign:"center"}}>
                 <svg width="52" height="52" viewBox="0 0 52 52" style={{display:"block",margin:"0 auto 8px"}}>
-                  <circle cx="26" cy="26" r={r} fill="none" stroke="#2A2A35" strokeWidth="4"/>
+                  <circle cx="26" cy="26" r={r} fill="none" stroke="#f0f0f5" strokeWidth="4"/>
                   <circle cx="26" cy="26" r={r} fill="none" stroke={s.color} strokeWidth="4"
                     strokeDasharray={circ} strokeDashoffset={offset}
                     strokeLinecap="round" transform="rotate(-90 26 26)"
@@ -454,7 +454,7 @@ export default function Dashboard({ data, setTab, goTo, update }) {
           <div style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:4,WebkitOverflowScrolling:"touch"}}>
             {data.notes.slice(0,5).map(n=>(
               <div key={n.id} onClick={()=>goTo("tasks","notes")} style={{
-                background:"#1C1C26",border:"1px solid rgba(255,255,255,0.05)",borderRadius:14,padding:"12px",
+                background:"#ffffff",border:"1px solid rgba(0,0,0,0.06)",borderRadius:14,padding:"12px",
                 minWidth:130,maxWidth:160,cursor:"pointer",flexShrink:0,
                 borderTop:`3px solid ${n.color||"#14b8a6"}`,
               }}>
