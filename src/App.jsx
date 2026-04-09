@@ -78,11 +78,11 @@ const GLOBAL_CSS = `
   ::-webkit-scrollbar-thumb { background:rgba(0,0,0,0.15);border-radius:4px; }
   ::-webkit-scrollbar-track { background:transparent; }
   input[type="date"]::-webkit-calendar-picker-indicator { filter:invert(0.7); }
-  html, body { margin:0; padding:0; overscroll-behavior:none; background:#F5F5F7; overflow:auto; height:auto; }
+  html, body { margin:0; padding:0; overscroll-behavior:none; background:#FFFFFF; overflow:auto; height:auto; }
   #root { height:auto; }
-  select option { background:#fff; color:#1a1a2e; }
+  select option { background:#fff; color:#2C2A26; }
   @media(display-mode:standalone){
-    html, body { background:#F5F5F7; overflow:auto; height:auto; }
+    html, body { background:#FFFFFF; overflow:auto; height:auto; }
     #root { height:auto; }
     body { padding-top: env(safe-area-inset-top); }
   }
@@ -271,7 +271,7 @@ export default function App() {
   const CONTENT_PAD_BOTTOM = isMobile ? NAV_HEIGHT + SAFE_BOTTOM + 30 : NAV_HEIGHT + 24;
 
   const phoneContent = (
-    <div lang={T("locale").split("-")[0]} style={{ width: "100%", minHeight: isMobile ? "100dvh" : "100vh", background: "#F5F5F7", color: "#1a1a2e", fontFamily: "'SF Pro Display',-apple-system,'Segoe UI',sans-serif", position: "relative" }}>
+    <div lang={T("locale").split("-")[0]} style={{ width: "100%", minHeight: isMobile ? "100dvh" : "100vh", background: "#FFFFFF", color: "#2C2A26", fontFamily: "'SF Pro Display',-apple-system,'Segoe UI',sans-serif", position: "relative" }}>
       <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0, overflow: "hidden" }}>
         <div style={{ position: "absolute", width: 300, height: 300, borderRadius: "50%", background: "radial-gradient(circle,rgba(59,130,246,0.08) 0%,transparent 70%)", top: "-80px", left: "-60px", animation: "orb1 12s ease-in-out infinite" }} />
         <div style={{ position: "absolute", width: 250, height: 250, borderRadius: "50%", background: "radial-gradient(circle,rgba(168,85,247,0.06) 0%,transparent 70%)", bottom: "20%", right: "-50px", animation: "orb2 15s ease-in-out infinite" }} />
@@ -288,15 +288,15 @@ export default function App() {
 
       {data && <VoiceCommand data={data} update={update} goTo={goTo} showToast={showToast} />}
 
-      <nav aria-label="Main navigation" style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "rgba(245,245,247,0.95)", backdropFilter: "blur(24px) saturate(180%)", WebkitBackdropFilter: "blur(24px) saturate(180%)", borderTop: "1px solid rgba(0,0,0,0.08)", display: "flex", justifyContent: "center", alignItems: "center", height: NAV_HEIGHT, paddingTop: 4, paddingBottom: isMobile ? "env(safe-area-inset-bottom, 8px)" : "6px", paddingLeft: 4, paddingRight: 4, zIndex: 1000 }}>
+      <nav aria-label="Main navigation" style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "rgba(245,240,232,0.95)", backdropFilter: "blur(24px) saturate(180%)", WebkitBackdropFilter: "blur(24px) saturate(180%)", borderTop: "1px solid rgba(0,0,0,0.06)", display: "flex", justifyContent: "center", alignItems: "center", height: NAV_HEIGHT, paddingTop: 4, paddingBottom: isMobile ? "env(safe-area-inset-bottom, 8px)" : "6px", paddingLeft: 4, paddingRight: 4, zIndex: 1000 }}>
         <div style={{ display: "flex", justifyContent: "space-around", alignItems: "center", width: "100%", maxWidth: isMobile ? undefined : 600 }}>
           {allTabs.map(t => (
             <button key={t.id} className="nav-item" onClick={() => setTab(t.id)} aria-current={tab === t.id ? "page" : undefined} aria-label={t.label} style={{
-              background: tab === t.id ? "rgba(59,130,246,0.1)" : "none",
+              background: tab === t.id ? "rgba(24,95,165,0.08)" : "none",
               boxShadow: tab === t.id ? "0 0 20px rgba(59,130,246,0.25)" : undefined,
               border: "none", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
               gap: isMobile ? 4 : 3, padding: isMobile ? "10px 6px" : "8px 12px", minWidth: isMobile ? 52 : 50, borderRadius: 14,
-              color: tab === t.id ? "#60a5fa" : "#9CA3AF", flex: 1,
+              color: tab === t.id ? "#185FA5" : "#8B8578", flex: 1,
             }}>
               <span style={{ fontSize: isMobile ? 22 : 18, lineHeight: 1 }}>{t.icon}</span>
               <span style={{ fontSize: isMobile ? 11 : 10, fontWeight: tab === t.id ? 700 : 500, letterSpacing: -.2 }}>{t.label}</span>
