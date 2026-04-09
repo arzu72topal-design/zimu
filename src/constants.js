@@ -11,17 +11,17 @@ export const SPORT_EMOJI = {"Koşu":"▸","Yüzme":"≈","Bisiklet":"◎","Yoga"
 export const SPORT_KCAL_PER_MIN = {"Koşu":10,"Yüzme":7,"Bisiklet":7,"Yoga":3.3,"Ağırlık":5,"Yürüyüş":4.7,"Diğer":5};
 export const calcSportCal = (type, durationMin) => Math.round((SPORT_KCAL_PER_MIN[type]||5) * (+durationMin||0));
 export const PRIORITIES = { high: "Yüksek", medium: "Orta", low: "Düşük" };
-export const PCOL = { high: "#ef4444", medium: "#f59e0b", low: "#22c55e" };
+export const PCOL = { high: "#D85A30", medium: "#BA7517", low: "#1D9E75" };
 export const PROJECT_STATUSES = ["Planlama","Devam Ediyor","Test","Tamamlandı"];
-export const COLORS = ["#3b82f6","#ef4444","#22c55e","#f59e0b","#a855f7","#f97316","#14b8a6"];
+export const COLORS = ["#185FA5","#D85A30","#1D9E75","#BA7517","#534AB7","#D85A30","#1D9E75"];
 
 export const DEFAULT_ROOMS = [
-  { id: "projects", name: "Projeler", icon: "Pr", color: "#3b82f6", type: "project" },
-  { id: "news", name: "Haberler", icon: "Hb", color: "#ef4444", type: "news" },
-  { id: "music", name: "Müziklerim", icon: "Mz", color: "#a855f7", type: "collection" },
-  { id: "clothes", name: "Kıyafetlerim", icon: "St", color: "#f97316", type: "collection" },
-  { id: "memories", name: "Anılar", icon: "An", color: "#22c55e", type: "collection" },
-  { id: "healthcoach", name: "Sağlık Koçu", icon: "Sk", color: "#14b8a6", type: "health" },
+  { id: "projects", name: "Projeler", icon: "Pr", color: "#185FA5", type: "project" },
+  { id: "news", name: "Haberler", icon: "Hb", color: "#D85A30", type: "news" },
+  { id: "music", name: "Müziklerim", icon: "Mz", color: "#534AB7", type: "collection" },
+  { id: "clothes", name: "Kıyafetlerim", icon: "St", color: "#D85A30", type: "collection" },
+  { id: "memories", name: "Anılar", icon: "An", color: "#1D9E75", type: "collection" },
+  { id: "healthcoach", name: "Sağlık Koçu", icon: "Sk", color: "#1D9E75", type: "health" },
 ];
 
 /* Eski kullanıcılarda eksik odaları otomatik ekle */
