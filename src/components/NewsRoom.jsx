@@ -300,7 +300,7 @@ export default function NewsRoom({ room, onBack, data, update }) {
             <div style={{fontSize:11,color:"#9CA3AF",marginTop:1}}>{catInfo?.desc}</div>
           </div>
           <button onClick={()=>fetchCategory(activeCat,true)} style={{
-            background:"#2A2A35",border:"1px solid rgba(255,255,255,0.1)",
+            background:"#f0f0f5",border:"1px solid rgba(0,0,0,0.08)",
             color:"#9CA3AF",width:34,height:34,borderRadius:10,fontSize:14,cursor:"pointer",
             display:"flex",alignItems:"center",justifyContent:"center",
           }}>↻</button>
@@ -318,7 +318,7 @@ export default function NewsRoom({ room, onBack, data, update }) {
             <button key={k} onClick={()=>setLangFilter(k)} style={{
               padding:"5px 12px",borderRadius:10,border:"none",cursor:"pointer",
               fontSize:11,fontWeight:langFilter===k?700:400,
-              background:langFilter===k?`${catInfo?.color}25`:"rgba(255,255,255,0.05)",
+              background:langFilter===k?`${catInfo?.color}25`:"rgba(0,0,0,0.06)",
               color:langFilter===k?catInfo?.color:"#9CA3AF",
             }}>{v}</button>
           ))}
@@ -444,11 +444,11 @@ export default function NewsRoom({ room, onBack, data, update }) {
         {localCats.map((cat,idx)=>(
           <div key={cat.id} className={`touch-card stagger-${Math.min(idx+1,6)}`} onClick={()=>openCat(cat.id)}
             style={{
-              background:`linear-gradient(145deg,rgba(255,255,255,0.05) 0%,rgba(255,255,255,0.02) 100%)`,
+              background:`linear-gradient(145deg,rgba(0,0,0,0.06) 0%,rgba(0,0,0,0.02) 100%)`,
               
               borderRadius:20,padding:"20px 16px",cursor:"pointer",
               border:`1px solid ${cat.color}45`,
-              boxShadow:`0 0 28px ${cat.color}22, 0 0 56px ${cat.color}0a, inset 0 1px 0 rgba(255,255,255,0.05)`,
+              boxShadow:`0 0 28px ${cat.color}22, 0 0 56px ${cat.color}0a, inset 0 1px 0 rgba(0,0,0,0.06)`,
               minHeight:110,
               display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:8,
             }}
@@ -479,7 +479,7 @@ export default function NewsRoom({ room, onBack, data, update }) {
             background:"linear-gradient(145deg,rgba(139,92,246,0.12) 0%,rgba(139,92,246,0.04) 100%)",
             borderRadius:20,padding:"20px 16px",cursor:"pointer",
             border:"1px solid rgba(139,92,246,0.35)",
-            boxShadow:"0 0 28px rgba(139,92,246,0.15), inset 0 1px 0 rgba(255,255,255,0.05)",
+            boxShadow:"0 0 28px rgba(139,92,246,0.15), inset 0 1px 0 rgba(0,0,0,0.06)",
             minHeight:110,
             display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:8,
           }}
@@ -521,14 +521,14 @@ export default function NewsRoom({ room, onBack, data, update }) {
           onClick={e=>{if(e.target===e.currentTarget)setShowSourceModal(false);}}>
           <div style={{
             width:"100%",maxWidth:420,maxHeight:"85vh",
-            background:"#1C1C26",borderRadius:"24px 24px 0 0",
+            background:"#ffffff",borderRadius:"24px 24px 0 0",
             padding:"20px 16px calc(20px + env(safe-area-inset-bottom,0px))",
             overflowY:"auto",
           }}>
             {/* Modal Header */}
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
               <h3 style={{margin:0,fontSize:18,fontWeight:800,color:"#fff"}}>{T("addSource")}</h3>
-              <button onClick={()=>setShowSourceModal(false)} style={{background:"rgba(255,255,255,0.1)",border:"none",color:"#9CA3AF",width:32,height:32,borderRadius:10,cursor:"pointer",fontSize:16}}>✕</button>
+              <button onClick={()=>setShowSourceModal(false)} style={{background:"rgba(0,0,0,0.08)",border:"none",color:"#9CA3AF",width:32,height:32,borderRadius:10,cursor:"pointer",fontSize:16}}>✕</button>
             </div>
 
             {/* Tabs */}
@@ -537,7 +537,7 @@ export default function NewsRoom({ room, onBack, data, update }) {
                 <button key={k} onClick={()=>setSourceTab(k)} style={{
                   flex:1,padding:"10px",borderRadius:12,border:"none",cursor:"pointer",
                   fontSize:12,fontWeight:sourceTab===k?700:400,
-                  background:sourceTab===k?"rgba(139,92,246,0.15)":"rgba(255,255,255,0.05)",
+                  background:sourceTab===k?"rgba(139,92,246,0.15)":"rgba(0,0,0,0.06)",
                   color:sourceTab===k?"#8b5cf6":"#9CA3AF",
                 }}>{v}</button>
               ))}
@@ -551,8 +551,8 @@ export default function NewsRoom({ room, onBack, data, update }) {
                   return (
                     <div key={feed.url} style={{
                       display:"flex",alignItems:"center",gap:12,padding:"12px 14px",
-                      background:"rgba(255,255,255,0.04)",borderRadius:14,
-                      border:`1px solid ${added?"rgba(139,92,246,0.3)":"rgba(255,255,255,0.06)"}`,
+                      background:"rgba(0,0,0,0.03)",borderRadius:14,
+                      border:`1px solid ${added?"rgba(139,92,246,0.3)":"rgba(0,0,0,0.06)"}`,
                     }}>
                       <div style={{
                         width:36,height:36,borderRadius:10,flexShrink:0,
@@ -582,17 +582,17 @@ export default function NewsRoom({ room, onBack, data, update }) {
               <div style={{display:"flex",flexDirection:"column",gap:10}}>
                 <input value={manualName} onChange={e=>setManualName(e.target.value)}
                   placeholder={T("feedName")} style={{
-                  padding:"12px 14px",borderRadius:12,border:"1px solid rgba(255,255,255,0.1)",
-                  background:"rgba(255,255,255,0.05)",color:"#fff",fontSize:13,outline:"none",
+                  padding:"12px 14px",borderRadius:12,border:"1px solid rgba(0,0,0,0.08)",
+                  background:"rgba(0,0,0,0.06)",color:"#fff",fontSize:13,outline:"none",
                 }}/>
                 <input value={manualUrl} onChange={e=>setManualUrl(e.target.value)}
                   placeholder="https://example.com/rss.xml" style={{
-                  padding:"12px 14px",borderRadius:12,border:"1px solid rgba(255,255,255,0.1)",
-                  background:"rgba(255,255,255,0.05)",color:"#fff",fontSize:13,outline:"none",
+                  padding:"12px 14px",borderRadius:12,border:"1px solid rgba(0,0,0,0.08)",
+                  background:"rgba(0,0,0,0.06)",color:"#fff",fontSize:13,outline:"none",
                 }}/>
                 <button onClick={addManualFeed} disabled={!manualUrl.trim()} style={{
                   padding:"12px",borderRadius:12,border:"none",cursor:"pointer",
-                  background:manualUrl.trim()?"#8b5cf6":"rgba(255,255,255,0.1)",
+                  background:manualUrl.trim()?"#8b5cf6":"rgba(0,0,0,0.08)",
                   color:manualUrl.trim()?"#fff":"#9CA3AF",fontSize:13,fontWeight:700,
                 }}>+ {T("addSource")}</button>
               </div>
@@ -605,7 +605,7 @@ export default function NewsRoom({ room, onBack, data, update }) {
                 {customFeeds.map(feed=>(
                   <div key={feed.url} style={{
                     display:"flex",alignItems:"center",gap:10,padding:"10px 12px",
-                    background:"rgba(255,255,255,0.04)",borderRadius:12,marginBottom:6,
+                    background:"rgba(0,0,0,0.03)",borderRadius:12,marginBottom:6,
                     border:"1px solid rgba(139,92,246,0.2)",
                   }}>
                     <div style={{width:8,height:8,borderRadius:"50%",background:feed.color,flexShrink:0}}/>
