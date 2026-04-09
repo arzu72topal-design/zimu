@@ -10,6 +10,7 @@ import MusicRoom from "./MusicRoom";
 import BenimStilimRoom from "./BenimStilimRoom";
 import MemoriesRoom from "./MemoriesRoom";
 import Sports from "./Sports";
+import Projelerim from "./Projelerim";
 import { VoiceMic } from "./VoiceMic";
 
 export default function Projects({ data, update, initialRoom, onRoomConsumed }) {
@@ -173,70 +174,10 @@ export default function Projects({ data, update, initialRoom, onRoomConsumed }) 
 
   if(room.type==="project"||activeRoom==="projects") return (
     <div className="room-enter">
-      <StickyHeader>
-        <div style={{display:"flex",alignItems:"center",gap:10}}>
-          <button className="back-btn" aria-label="Go back" onClick={()=>setActiveRoom(null)}>◀</button>
-          <div style={{width:28,height:28,borderRadius:8,background:`${room.color}25`,border:`1px solid ${room.color}50`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:room.color,flexShrink:0}}>{roomLabel(room,data)[0]}</div>
-          <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{roomLabel(room,data)}</h3>
-        </div>
-      </StickyHeader>
-      {(data.projects||[]).length===0&&<p style={{textAlign:"center",color:"#9CA3AF",fontSize:14,padding:40}}>{T("noProjects")}</p>}
-      {(data.projects||[]).map(p=>{
-        const tasks=p.tasks||[];const d=tasks.filter(t=>t.done).length;
-        const pct=tasks.length?Math.round(d/tasks.length*100):0;const open=exp===p.id;
-        return (
-          <div key={p.id} style={{background:"#1C1C26",borderRadius:14,padding:16,marginBottom:8}}>
-            <div onClick={()=>setExp(open?null:p.id)} style={{cursor:"pointer"}}>
-              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8}}>
-                <div style={{flex:1,minWidth:0}}>
-                  <div style={{fontSize:16,fontWeight:700}}>{p.name}</div>
-                  <div style={{fontSize:11,color:"#9CA3AF",marginTop:4,display:"flex",gap:6,flexWrap:"wrap"}}>
-                    {p.tags?.map(t=><span key={t} style={{background:"rgba(59,130,246,0.12)",color:"#3b82f6",padding:"1px 8px",borderRadius:6,fontSize:10}}>{t}</span>)}
-                    {p.deadline&&<span>◆ {p.deadline}</span>}
-                  </div>
-                </div>
-                <span style={{fontSize:11,fontWeight:600,color:stCol(p.status),background:`${stCol(p.status)}20`,padding:"4px 10px",borderRadius:8}}>{statusLabel(p.status)}</span>
-              </div>
-              {tasks.length>0&&(<div style={{marginTop:10}}>
-                <div style={{height:6,background:"#2A2A35",borderRadius:3,overflow:"hidden"}}>
-                  <div style={{height:"100%",background:"#3b82f6",borderRadius:3,width:`${pct}%`,transition:"width .3s"}}/>
-                </div>
-                <div style={{fontSize:11,color:"#9CA3AF",marginTop:4}}>{d}/{tasks.length} — %{pct}</div>
-              </div>)}
-            </div>
-            {open&&(<div style={{marginTop:12,paddingTop:12,borderTop:"1px solid rgba(255,255,255,0.05)"}}>
-              {p.description&&<p style={{fontSize:13,opacity:.6,margin:"0 0 10px"}}>{p.description}</p>}
-              <div style={{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap"}}>
-                {PROJECT_STATUSES.map(s=>(<button key={s} onClick={()=>upSt(p.id,s)} style={{background:p.status===s?`${stCol(s)}20`:"#2A2A35",color:p.status===s?stCol(s):"#9CA3AF",border:`1px solid ${p.status===s?stCol(s)+"40":"rgba(255,255,255,0.05)"}`,padding:"7px 14px",borderRadius:8,fontSize:12,cursor:"pointer"}}>{statusLabel(s)}</button>))}
-              </div>
-              {tasks.map(t=>(<div key={t.id} style={{display:"flex",alignItems:"center",gap:10,padding:"7px 0"}}>
-                <button onClick={()=>togPT(p.id,t.id)} style={checkBtnStyle(t.done)} aria-label={t.done?"Mark incomplete":"Mark complete"}>{t.done&&"✓"}</button>
-                <span style={{fontSize:13,textDecoration:t.done?"line-through":"none",opacity:t.done?.4:1}}>{t.title}</span>
-              </div>))}
-              <div style={{display:"flex",gap:8,marginTop:10}}>
-                <input style={{...inp,flex:1,marginBottom:0}} placeholder={T("addSubtask")} value={tf.title} onChange={e=>setTf({title:e.target.value})} onKeyDown={e=>e.key==="Enter"&&addPT(p.id)}/>
-                <button onClick={()=>addPT(p.id)} style={{background:"#3b82f6",color:"#fff",border:"none",borderRadius:10,padding:"0 18px",fontSize:18,cursor:"pointer"}}>+</button>
-              </div>
-              <button onClick={()=>delProject(p.id)} style={{background:"rgba(239,68,68,0.1)",color:"#ef4444",border:"1px solid rgba(239,68,68,0.2)",borderRadius:10,padding:"10px",width:"100%",marginTop:12,fontSize:13,cursor:"pointer"}}>{T("deleteProject")}</button>
-            </div>)}
-          </div>
-        );
-      })}
-      <FAB onClick={()=>setModal(true)}/>
-      <Modal open={modal} onClose={()=>setModal(false)} title={T("newProject")}>
-        <div style={{display:"flex",gap:8,alignItems:"center"}}>
-          <input style={{...inp,flex:1,marginBottom:0}} placeholder={T("projectName")} value={form.name} onChange={e=>setForm({...form,name:e.target.value})} autoFocus/>
-          <VoiceMic onResult={(t)=>setForm(f=>({...f,name:t}))}/>
-        </div>
-        <div style={{height:10}}/>
-        <input style={inp} placeholder={T("descField")} value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/>
-        <div style={{display:"flex",gap:8}}>
-          <select style={{...inp,flex:1}} value={form.status} onChange={e=>setForm({...form,status:e.target.value})}>{PROJECT_STATUSES.map(s=><option key={s} value={s}>{statusLabel(s)}</option>)}</select>
-          <input style={{...inp,flex:1}} type="date" value={form.deadline} onChange={e=>setForm({...form,deadline:e.target.value})}/>
-        </div>
-        <input style={inp} placeholder={T("tagsField")} value={form.tags} onChange={e=>setForm({...form,tags:e.target.value})}/>
-        <button style={btnPrimary} onClick={addProject}>{T("create")}</button>
-      </Modal>
+      <div style={{marginBottom:12}}>
+        <button className="back-btn" aria-label="Go back" onClick={()=>setActiveRoom(null)}>◀</button>
+      </div>
+      <Projelerim />
     </div>
   );
 
