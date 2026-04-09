@@ -16,9 +16,9 @@ function ClothingIcon({type,size=28,color="#a78bfa"}){const s=size;
   if(type==="linen")return(<svg width={s} height={s} viewBox="0 0 32 32" fill="none"><path d="M11 4C11 4 8 5 6 7L3 12L8 14L8 28L24 28L24 14L29 12L26 7C24 5 21 4 21 4C21 6 19 8 16 8C13 8 11 6 11 4Z" stroke={color} strokeWidth="1.5" fill={color+"15"}/><line x1="12" y1="18" x2="20" y2="18" stroke={color} strokeWidth="1" opacity=".4"/></svg>);
   return(<svg width={s} height={s} viewBox="0 0 32 32" fill="none"><path d="M11 4C11 4 8 5 6 7L3 12L8 14L8 28L24 28L24 14L29 12L26 7C24 5 21 4 21 4C21 6 19 8 16 8C13 8 11 6 11 4Z" stroke={color} strokeWidth="1.5" fill={color+"15"}/><path d="M16 8L16 14" stroke={color} strokeWidth="1.5" strokeLinecap="round" opacity=".6"/></svg>);
 }
-const CLOTH_CATS=[{id:"top",label:"Üst Giyim",color:"#6366f1",svgType:"smart"},{id:"alt",label:"Alt Giyim",color:"#a78bfa",svgType:"bottom"},{id:"dis",label:"Dış Giyim",color:"#3b82f6",svgType:"coat"},{id:"elbise",label:"Elbise/Etek",color:"#ec4899",svgType:"dress"}];
+const CLOTH_CATS=[{id:"top",label:"Üst Giyim",color:"#534AB7",svgType:"smart"},{id:"alt",label:"Alt Giyim",color:"#a78bfa",svgType:"bottom"},{id:"dis",label:"Dış Giyim",color:"#185FA5",svgType:"coat"},{id:"elbise",label:"Elbise/Etek",color:"#ec4899",svgType:"dress"}];
 const CLOTH_FREQ={favorite:{bg:"rgba(34,197,94,0.15)",border:"rgba(34,197,94,0.3)",text:"#86efac",label:"Favori"},frequent:{bg:"rgba(99,102,241,0.15)",border:"rgba(99,102,241,0.3)",text:"#a5b4fc",label:"Sık"},waiting:{bg:"rgba(239,68,68,0.15)",border:"rgba(239,68,68,0.3)",text:"#fca5a5",label:"Bekliyor"},new:{bg:"rgba(167,139,250,0.15)",border:"rgba(167,139,250,0.3)",text:"#c4b5fd",label:"Yeni"}};
-const TAG_COL={work:{bg:"rgba(59,130,246,0.2)",text:"#93c5fd"},casual:{bg:"rgba(34,197,94,0.2)",text:"#86efac"},elegant:{bg:"rgba(168,85,247,0.2)",text:"#d8b4fe"},warm:{bg:"rgba(249,115,22,0.2)",text:"#fdba74"},cool:{bg:"rgba(99,102,241,0.15)",text:"#a5b4fc"}};
+const TAG_COL={work:{bg:"rgba(24,95,165,0.12)",text:"#93c5fd"},casual:{bg:"rgba(34,197,94,0.2)",text:"#86efac"},elegant:{bg:"rgba(168,85,247,0.2)",text:"#d8b4fe"},warm:{bg:"rgba(249,115,22,0.2)",text:"#fdba74"},cool:{bg:"rgba(99,102,241,0.15)",text:"#a5b4fc"}};
 const PALETTE_COLS=[{hex:"#c8b8a2",name:"Bej"},{hex:"#9fa8a3",name:"Gri"},{hex:"#1e3a5f",name:"Lacivert"},{hex:"#3d3d3d",name:"Antrasit"},{hex:"#f5f0e8",name:"Krem"},{hex:"#8b7355",name:"Kahve"},{hex:"#6b4c3b",name:"Terracotta"},{hex:"#2c4a3e",name:"Koyu Yeşil"}];
 const DEFAULT_WARDROBE2=[{id:"w1",name:"Lacivert Blazer",cat:"dis",wornCount:3,lastWorn:"12 gün önce",freq:60,freqStatus:"frequent",color:"#1e3a5f"},{id:"w2",name:"Bej Oversize Bluz",cat:"top",wornCount:1,lastWorn:"25 gün önce",freq:20,freqStatus:"waiting",color:"#c8b8a2"},{id:"w3",name:"Antrasit Slim Pantolon",cat:"alt",wornCount:5,lastWorn:"5 gün önce",freq:85,freqStatus:"favorite",color:"#3d3d3d"},{id:"w4",name:"Beyaz Basic Tişört",cat:"top",wornCount:7,lastWorn:"2 gün önce",freq:95,freqStatus:"frequent",color:"#f5f0e8"}];
 const DEFAULT_RULES2=[{id:"r1",label:"İş ortamına uygun",on:true},{id:"r2",label:"Sürdürülebilir palet",on:true},{id:"r3",label:"Bu ay yeni alım yok",on:false},{id:"r4",label:"Tekrar giymeden ekleme yok",on:true}];
@@ -77,35 +77,35 @@ export default function BenimStilimRoom({data,update,onBack}){
           <button className="back-btn" aria-label="Go back" onClick={onBack}>◀</button>
           <div>
             <div style={{fontSize:18,fontWeight:900,background:"linear-gradient(135deg,#e0d5f5,#a78bfa)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>{T("myStyle")}</div>
-            <div style={{fontSize:10,color:"#9CA3AF"}}>{T("lifestyleDesc")}</div>
+            <div style={{fontSize:10,color:"#8B8578"}}>{T("lifestyleDesc")}</div>
           </div>
         </div>
       </StickyHeader>
-      <div style={{background:"linear-gradient(135deg,rgba(59,130,246,0.1),rgba(99,102,241,0.1))",border:"1px solid rgba(59,130,246,0.2)",borderRadius:16,padding:"14px 16px",marginBottom:16}}>
+      <div style={{background:"linear-gradient(135deg,rgba(59,130,246,0.1),rgba(99,102,241,0.1))",border:"1px solid rgba(24,95,165,0.12)",borderRadius:16,padding:"14px 16px",marginBottom:16}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-          <div><div style={{fontSize:10,fontWeight:700,color:"#9CA3AF",letterSpacing:1,textTransform:"uppercase"}}>{T("todayWeather")}</div><div style={{fontSize:12,color:"#9CA3AF",marginTop:2}}>{cityName}</div></div>
-          <div style={{textAlign:"right"}}>{wxLoad?<div style={{fontSize:12,color:"#9CA3AF",animation:"pulse 1.5s infinite"}}>Yükleniyor...</div>:weather?<><div style={{fontSize:26,fontWeight:800,color:"#e0d5f5"}}>{weather.temp}°C</div><div style={{fontSize:11,color:"#9CA3AF"}}>{weather.desc}</div></>:<div style={{fontSize:11,color:"#9CA3AF"}}>Veri alınamadı</div>}</div>
+          <div><div style={{fontSize:10,fontWeight:700,color:"#8B8578",letterSpacing:1,textTransform:"uppercase"}}>{T("todayWeather")}</div><div style={{fontSize:12,color:"#8B8578",marginTop:2}}>{cityName}</div></div>
+          <div style={{textAlign:"right"}}>{wxLoad?<div style={{fontSize:12,color:"#8B8578",animation:"pulse 1.5s infinite"}}>Yükleniyor...</div>:weather?<><div style={{fontSize:26,fontWeight:800,color:"#e0d5f5"}}>{weather.temp}°C</div><div style={{fontSize:11,color:"#8B8578"}}>{weather.desc}</div></>:<div style={{fontSize:11,color:"#8B8578"}}>Veri alınamadı</div>}</div>
         </div>
-        {weather&&<div style={{marginTop:8,paddingTop:8,borderTop:"1px solid rgba(0,0,0,0.06)",display:"flex",gap:16}}><div style={{fontSize:10,color:"#9CA3AF"}}>{weather.wind} km/s {T("wind")}</div><div style={{fontSize:10,color:"#9CA3AF"}}>%{weather.humid} {T("humidity")}</div><div style={{fontSize:10,color:"#9CA3AF"}}>{weather.feel}°C {T("feelsLike")}</div></div>}
-        <div style={{marginTop:10,background:"#f0f0f5",borderRadius:10,padding:"8px 12px"}}><div style={{fontSize:10,color:"#9CA3AF",marginBottom:3}}>{T("styleAdvice")}</div><div style={{fontSize:13,color:"#c4b5fd",fontWeight:600}}>{wxLoad?T("calculating"):weather?getStyleHint(weather.temp,T):T("noWeather")}</div></div>
+        {weather&&<div style={{marginTop:8,paddingTop:8,borderTop:"1px solid rgba(0,0,0,0.06)",display:"flex",gap:16}}><div style={{fontSize:10,color:"#8B8578"}}>{weather.wind} km/s {T("wind")}</div><div style={{fontSize:10,color:"#8B8578"}}>%{weather.humid} {T("humidity")}</div><div style={{fontSize:10,color:"#8B8578"}}>{weather.feel}°C {T("feelsLike")}</div></div>}
+        <div style={{marginTop:10,background:"#F5F0E8",borderRadius:10,padding:"8px 12px"}}><div style={{fontSize:10,color:"#8B8578",marginBottom:3}}>{T("styleAdvice")}</div><div style={{fontSize:13,color:"#c4b5fd",fontWeight:600}}>{wxLoad?T("calculating"):weather?getStyleHint(weather.temp,T):T("noWeather")}</div></div>
       </div>
-      <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,color:"#9CA3AF",textTransform:"uppercase",marginBottom:10}}>{T("todayLooks")}</div>
+      <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,color:"#8B8578",textTransform:"uppercase",marginBottom:10}}>{T("todayLooks")}</div>
       <div style={{display:"flex",gap:8,marginBottom:16}}>
         {looks.map((look,i)=>(
-          <div key={i} onClick={()=>setActiveLook(i)} style={{background:activeLook===i?"rgba(167,139,250,0.1)":"#f0f0f5",border:`1px solid ${activeLook===i?"rgba(167,139,250,0.5)":"rgba(0,0,0,0.06)"}`,borderRadius:14,padding:"12px 8px",cursor:"pointer",flex:1,minWidth:0,transition:"all .2s"}}>
-            <div style={{marginBottom:6,display:"flex",justifyContent:"center"}}><ClothingIcon type={look.icon} size={26} color={activeLook===i?"#a78bfa":"#9CA3AF"}/></div>
+          <div key={i} onClick={()=>setActiveLook(i)} style={{background:activeLook===i?"rgba(167,139,250,0.1)":"#F5F0E8",border:`1px solid ${activeLook===i?"rgba(167,139,250,0.5)":"rgba(0,0,0,0.06)"}`,borderRadius:14,padding:"12px 8px",cursor:"pointer",flex:1,minWidth:0,transition:"all .2s"}}>
+            <div style={{marginBottom:6,display:"flex",justifyContent:"center"}}><ClothingIcon type={look.icon} size={26} color={activeLook===i?"#a78bfa":"#8B8578"}/></div>
             <div style={{fontSize:11,fontWeight:700,marginBottom:4,textAlign:"center",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{look.name}</div>
             <div style={{display:"flex",flexWrap:"wrap",gap:2,justifyContent:"center"}}>{look.tags.map((t,ti)=><span key={ti} style={{fontSize:9,fontWeight:600,padding:"2px 5px",borderRadius:20,background:TAG_COL[t.c]?.bg,color:TAG_COL[t.c]?.text}}>{t.l}</span>)}</div>
-            <div style={{fontSize:9,color:"#9CA3AF",marginTop:4,textAlign:"center"}}>{look.mood}</div>
+            <div style={{fontSize:9,color:"#8B8578",marginTop:4,textAlign:"center"}}>{look.mood}</div>
           </div>
         ))}
       </div>
-      <div style={{background:"#ffffff",border:"1px solid rgba(0,0,0,0.06)",borderRadius:16,padding:"14px 16px",marginBottom:12}}>
-        <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,color:"#9CA3AF",textTransform:"uppercase",marginBottom:12}}>{T("styleRules")}</div>
+      <div style={{background:"#FFFFFF",border:"1px solid rgba(0,0,0,0.06)",borderRadius:16,padding:"14px 16px",marginBottom:12}}>
+        <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,color:"#8B8578",textTransform:"uppercase",marginBottom:12}}>{T("styleRules")}</div>
         <div style={{marginBottom:14}}>
           <div style={{display:"flex",justifyContent:"space-between",fontSize:12,opacity:.7,marginBottom:4}}><span>{T("wearScore")}</span><span style={{color:"#a78bfa",fontWeight:700}}>{freqScore}%</span></div>
-          <div style={{height:6,borderRadius:3,background:"#f0f0f5"}}><div style={{height:"100%",borderRadius:3,background:"linear-gradient(90deg,#6366f1,#a78bfa)",width:`${freqScore}%`,transition:"width .8s"}}/></div>
-          <div style={{fontSize:10,color:"#9CA3AF",marginTop:4}}>{freqScore<50?T("wardrobeWaiting"):freqScore<80?T("wardrobeOptimal"):T("wardrobePerfect")}</div>
+          <div style={{height:6,borderRadius:3,background:"#F5F0E8"}}><div style={{height:"100%",borderRadius:3,background:"linear-gradient(90deg,#534AB7,#a78bfa)",width:`${freqScore}%`,transition:"width .8s"}}/></div>
+          <div style={{fontSize:10,color:"#8B8578",marginTop:4}}>{freqScore<50?T("wardrobeWaiting"):freqScore<80?T("wardrobeOptimal"):T("wardrobePerfect")}</div>
         </div>
         {rules.map(r=>(
           <div key={r.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"9px 0",borderBottom:"1px solid rgba(0,0,0,0.06)"}}>
@@ -116,35 +116,35 @@ export default function BenimStilimRoom({data,update,onBack}){
           </div>
         ))}
       </div>
-      <div style={{background:"#ffffff",border:"1px solid rgba(0,0,0,0.06)",borderRadius:16,padding:"14px 16px",marginBottom:12}}>
-        <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,color:"#9CA3AF",textTransform:"uppercase",marginBottom:12}}>{T("colorPalette")}</div>
+      <div style={{background:"#FFFFFF",border:"1px solid rgba(0,0,0,0.06)",borderRadius:16,padding:"14px 16px",marginBottom:12}}>
+        <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,color:"#8B8578",textTransform:"uppercase",marginBottom:12}}>{T("colorPalette")}</div>
         <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
           {PALETTE_COLS.map(p=>(<div key={p.hex} title={p.name} onClick={()=>togglePalette(p.hex)} style={{width:36,height:36,borderRadius:10,background:p.hex,cursor:"pointer",flexShrink:0,transition:"transform .15s",outline:paletteActive.includes(p.hex)?"2.5px solid rgba(167,139,250,0.9)":"none",transform:paletteActive.includes(p.hex)?"scale(1.12)":"scale(1)"}}/>))}
-          <div style={{width:36,height:36,borderRadius:10,border:"1.5px dashed rgba(0,0,0,0.15)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,color:"#9CA3AF",cursor:"pointer"}}>+</div>
+          <div style={{width:36,height:36,borderRadius:10,border:"1.5px dashed rgba(0,0,0,0.15)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,color:"#8B8578",cursor:"pointer"}}>+</div>
         </div>
-        <div style={{fontSize:10,color:"#9CA3AF",marginTop:8}}>{paletteActive.length===0?T("paletteTap"):T("paletteActive").replace("{0}",paletteActive.length)}</div>
+        <div style={{fontSize:10,color:"#8B8578",marginTop:8}}>{paletteActive.length===0?T("paletteTap"):T("paletteActive").replace("{0}",paletteActive.length)}</div>
       </div>
       <div style={{marginBottom:12}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-          <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,color:"#9CA3AF",textTransform:"uppercase"}}>{T("myCloset")}</div>
+          <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,color:"#8B8578",textTransform:"uppercase"}}>{T("myCloset")}</div>
           <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
             {[{id:"all",l:T("all")},{id:"top",l:T("top")},{id:"alt",l:T("bottom")},{id:"dis",l:T("outer")},{id:"elbise",l:T("dress")}].map(f=>(
-              <button key={f.id} onClick={()=>setWardFilter(f.id)} style={{background:wardFilter===f.id?"rgba(167,139,250,0.15)":"#f0f0f5",border:`1px solid ${wardFilter===f.id?"rgba(167,139,250,0.4)":"rgba(0,0,0,0.06)"}`,color:wardFilter===f.id?"#c4b5fd":"#9CA3AF",borderRadius:20,padding:"4px 10px",fontSize:10,cursor:"pointer",fontWeight:wardFilter===f.id?700:400}}>{f.l}</button>
+              <button key={f.id} onClick={()=>setWardFilter(f.id)} style={{background:wardFilter===f.id?"rgba(167,139,250,0.15)":"#F5F0E8",border:`1px solid ${wardFilter===f.id?"rgba(167,139,250,0.4)":"rgba(0,0,0,0.06)"}`,color:wardFilter===f.id?"#c4b5fd":"#8B8578",borderRadius:20,padding:"4px 10px",fontSize:10,cursor:"pointer",fontWeight:wardFilter===f.id?700:400}}>{f.l}</button>
             ))}
           </div>
         </div>
-        {filtered.length===0&&<div style={{textAlign:"center",padding:"30px 0",color:"#9CA3AF",fontSize:13}}>Bu kategoride kıyafet yok</div>}
+        {filtered.length===0&&<div style={{textAlign:"center",padding:"30px 0",color:"#8B8578",fontSize:13}}>Bu kategoride kıyafet yok</div>}
         {filtered.map(item=>{
           const fc=CLOTH_FREQ[item.freqStatus]||CLOTH_FREQ.new;
           return(
-            <div key={item.id} style={{background:"#ffffff",border:"1px solid rgba(0,0,0,0.06)",borderRadius:14,padding:"10px 12px",display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
+            <div key={item.id} style={{background:"#FFFFFF",border:"1px solid rgba(0,0,0,0.06)",borderRadius:14,padding:"10px 12px",display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
               <div style={{width:44,height:44,borderRadius:12,background:(item.color||"#a78bfa")+"25",border:`1px solid ${(item.color||"#a78bfa")}40`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
                 <ClothingIcon type={catIconMap[item.cat]||"smart"} size={24} color={item.color||"#a78bfa"}/>
               </div>
               <div style={{flex:1,minWidth:0}}>
                 <div style={{fontSize:13,fontWeight:600}}>{item.name}</div>
-                <div style={{fontSize:10,color:"#9CA3AF",marginTop:2}}>{T("timesWorn").replace("{0}",item.wornCount)} · {item.lastWorn}</div>
-                <div style={{height:5,borderRadius:3,background:"#f0f0f5",marginTop:5}}><div style={{height:"100%",borderRadius:3,width:`${item.freq}%`,background:item.freqStatus==="favorite"?"linear-gradient(90deg,#22c55e,#14b8a6)":item.freqStatus==="waiting"?"linear-gradient(90deg,#f59e0b,#ef4444)":"linear-gradient(90deg,#6366f1,#a78bfa)",transition:"width .6s"}}/></div>
+                <div style={{fontSize:10,color:"#8B8578",marginTop:2}}>{T("timesWorn").replace("{0}",item.wornCount)} · {item.lastWorn}</div>
+                <div style={{height:5,borderRadius:3,background:"#F5F0E8",marginTop:5}}><div style={{height:"100%",borderRadius:3,width:`${item.freq}%`,background:item.freqStatus==="favorite"?"linear-gradient(90deg,#1D9E75,#1D9E75)":item.freqStatus==="waiting"?"linear-gradient(90deg,#BA7517,#D85A30)":"linear-gradient(90deg,#534AB7,#a78bfa)",transition:"width .6s"}}/></div>
               </div>
               <div style={{display:"flex",flexDirection:"column",gap:4,alignItems:"flex-end"}}>
                 <div style={{background:fc.bg,border:`1px solid ${fc.border}`,color:fc.text,fontSize:10,padding:"2px 8px",borderRadius:20,whiteSpace:"nowrap"}}>{{favorite:T("freqFavorite"),frequent:T("freqFrequent"),waiting:T("freqWaiting"),new:T("freqNew")}[item.freqStatus]||fc.label}</div>
@@ -156,16 +156,16 @@ export default function BenimStilimRoom({data,update,onBack}){
         })}
       </div>
       <div style={{height:20}}/>
-      <button onClick={()=>setAddModal(true)} style={{position:"fixed",bottom:84,right:16,background:"linear-gradient(135deg,#6366f1,#a78bfa)",border:"none",borderRadius:18,padding:"12px 18px",color:"#fff",fontSize:13,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:8,boxShadow:"0 4px 20px rgba(99,102,241,0.5)",zIndex:100}}>
+      <button onClick={()=>setAddModal(true)} style={{position:"fixed",bottom:84,right:16,background:"linear-gradient(135deg,#534AB7,#a78bfa)",border:"none",borderRadius:18,padding:"12px 18px",color:"#fff",fontSize:13,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:8,boxShadow:"0 4px 20px rgba(99,102,241,0.5)",zIndex:100}}>
         <span style={{fontSize:18}}>+</span> Kıyafet Ekle
       </button>
       <Modal open={addModal} onClose={()=>setAddModal(false)} title={T("addClothing")}>
         <input style={inp} placeholder={T("clothingName")} value={addForm.name} onChange={e=>setAddForm({...addForm,name:e.target.value})} autoFocus/>
-        <div style={{fontSize:12,color:"#9CA3AF",marginBottom:6}}>{T("categoryLabel")}</div>
+        <div style={{fontSize:12,color:"#8B8578",marginBottom:6}}>{T("categoryLabel")}</div>
         <div style={{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap"}}>
-          {CLOTH_CATS.map(c=>(<button key={c.id} onClick={()=>setAddForm({...addForm,cat:c.id})} style={{background:addForm.cat===c.id?`${c.color}25`:"#f0f0f5",border:`1px solid ${addForm.cat===c.id?c.color+"60":"rgba(0,0,0,0.06)"}`,color:addForm.cat===c.id?c.color:"#777",borderRadius:10,padding:"6px 12px",fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",gap:6}}><ClothingIcon type={c.svgType} size={14} color={addForm.cat===c.id?c.color:"#9CA3AF"}/>{c.label}</button>))}
+          {CLOTH_CATS.map(c=>(<button key={c.id} onClick={()=>setAddForm({...addForm,cat:c.id})} style={{background:addForm.cat===c.id?`${c.color}25`:"#F5F0E8",border:`1px solid ${addForm.cat===c.id?c.color+"60":"rgba(0,0,0,0.06)"}`,color:addForm.cat===c.id?c.color:"#777",borderRadius:10,padding:"6px 12px",fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",gap:6}}><ClothingIcon type={c.svgType} size={14} color={addForm.cat===c.id?c.color:"#8B8578"}/>{c.label}</button>))}
         </div>
-        <div style={{fontSize:12,color:"#9CA3AF",marginBottom:6}}>{T("clothColor")}</div>
+        <div style={{fontSize:12,color:"#8B8578",marginBottom:6}}>{T("clothColor")}</div>
         <div style={{display:"flex",gap:6,marginBottom:16,flexWrap:"wrap"}}>
           {PALETTE_COLS.map(p=>(<div key={p.hex} title={p.name} onClick={()=>setAddForm({...addForm,color:p.hex})} style={{width:30,height:30,borderRadius:8,background:p.hex,cursor:"pointer",outline:addForm.color===p.hex?"2.5px solid #a78bfa":"none",transform:addForm.color===p.hex?"scale(1.15)":"scale(1)",transition:"all .15s"}}/>))}
         </div>
