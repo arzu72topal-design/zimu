@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { VoiceMic } from "./VoiceMic";
 import { i18n } from "../i18n";
 import { today, uid, SPORT_TYPES, SPORT_EMOJI, SPORT_KCAL_PER_MIN, calcSportCal, COMMON_FOODS, MN, DN } from "../constants";
@@ -239,7 +239,7 @@ export default function Sports({ data, update, initialView, onBack }) {
       </div>
 
       {/* Kalori denge kartı */}
-      <div className="stagger-2" style={{background:"#1C1C26",borderRadius:14,padding:"14px 16px",marginBottom:12}}>
+      <div className="stagger-2" style={{background:"#ffffff",borderRadius:14,padding:"14px 16px",marginBottom:12}}>
         <div style={{display:"flex",justifyContent:"space-around",textAlign:"center",marginBottom:10}}>
           <div>
             <div style={{fontSize:22,fontWeight:800,color:"#f97316"}}>{todayCalIn}</div>
@@ -256,7 +256,7 @@ export default function Sports({ data, update, initialView, onBack }) {
             <div style={{fontSize:10,color:"#9CA3AF"}}>{T("net")}</div>
           </div>
         </div>
-        <div style={{height:6,background:"#2A2A35",borderRadius:3,overflow:"hidden"}}>
+        <div style={{height:6,background:"#f0f0f5",borderRadius:3,overflow:"hidden"}}>
           <div style={{height:"100%",background:netCal>dailyGoal?"#ef4444":"#3b82f6",borderRadius:3,width:`${Math.min(100,netCal/dailyGoal*100)}%`,transition:"width .3s"}}/>
         </div>
         <div style={{fontSize:10,color:"#9CA3AF",marginTop:4,textAlign:"center"}}>{T("targetKcal").replace("{0}",dailyGoal)}</div>
@@ -387,9 +387,9 @@ export default function Sports({ data, update, initialView, onBack }) {
           <div style={{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap"}}>
             {mealGroups.map(m=>(
               <button key={m} onClick={()=>setFoodForm({...foodForm,meal:m})} style={{
-                background:foodForm.meal===m?"rgba(59,130,246,0.2)":"#2A2A35",
+                background:foodForm.meal===m?"rgba(59,130,246,0.2)":"#f0f0f5",
                 color:foodForm.meal===m?"#3b82f6":"#aaa",
-                border:foodForm.meal===m?"1px solid rgba(59,130,246,0.3)":"1px solid rgba(255,255,255,0.05)",
+                border:foodForm.meal===m?"1px solid rgba(59,130,246,0.3)":"1px solid rgba(0,0,0,0.06)",
                 padding:"7px 12px",borderRadius:10,fontSize:13,cursor:"pointer",
               }}>{m}</button>
             ))}
@@ -413,7 +413,7 @@ export default function Sports({ data, update, initialView, onBack }) {
               {filteredFoods.map(([name,cal,source])=>(
                 <div key={name} onClick={()=>selectCommonFood(name,cal)} style={{
                   display:"flex",justifyContent:"space-between",alignItems:"center",padding:"9px 10px",cursor:"pointer",
-                  borderRadius:8,background:"#1C1C26",marginBottom:2,
+                  borderRadius:8,background:"#ffffff",marginBottom:2,
                 }}>
                   <div style={{display:"flex",alignItems:"center",gap:6}}>
                     {(source==="my"||myFoods[name])&&<span style={{fontSize:10,color:"#f59e0b"}}>⭐</span>}
@@ -464,9 +464,9 @@ export default function Sports({ data, update, initialView, onBack }) {
         <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:12}}>
           {SPORT_TYPES.map((s,si)=>(
             <button key={s} onClick={()=>setForm({...form,type:s})} style={{
-              background:form.type===s?"rgba(34,197,94,0.2)":"#2A2A35",
+              background:form.type===s?"rgba(34,197,94,0.2)":"#f0f0f5",
               color:form.type===s?"#22c55e":"#9CA3AF",
-              border:form.type===s?"1px solid rgba(34,197,94,0.3)":"1px solid rgba(255,255,255,0.05)",
+              border:form.type===s?"1px solid rgba(34,197,94,0.3)":"1px solid rgba(0,0,0,0.06)",
               padding:"7px 14px",borderRadius:10,fontSize:13,cursor:"pointer",
               display:"flex",alignItems:"center",gap:4,
             }}><span>{SPORT_EMOJI[s]}</span>{(T("sportNames")||SPORT_TYPES)[si]}</button>
