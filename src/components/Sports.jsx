@@ -382,8 +382,51 @@ export default function Sports({ data, update, initialView, onBack }) {
       </div>
 
       {/* ═══ YEMEK EKLEME MODAL ═══ */}
-      <Modal open={foodModal} onClose={()=>{setFoodModal(false);setFoodSearch("");}} title={T("addMealTitle")}>
+      <Modal open={foodModal} onClose={()=>{setFoodModal(false);setFoodSearch("");setAiResult(null);}} title={T("addMealTitle")}>
         <div style={{marginBottom:12}}>
+          {/* AI Photo Button */}
+          {hasAI&&(
+            <div style={{marginBottom:12}}>
+              <button onClick={()=>photoRef.current?.click()} disabled={analyzing} style={{
+                width:"100%",padding:"14px",borderRadius:12,fontSize:14,fontWeight:600,cursor:"pointer",
+                background:analyzing?"#F5F0E8":"#F5F0E8",
+                borderLeft:"3px solid #1D9E75",border:"none",borderLeft:"3px solid #1D9E75",
+                borderRadius:"0 12px 12px 0",
+                color:analyzing?"#8B8578":"#1D9E75",
+                display:"flex",alignItems:"center",justifyContent:"center",gap:8,
+              }}>
+                <span style={{fontSize:20}}>{analyzing?"⏳":"📷"}</span>
+                {analyzing?T("analyzing"):"Fotoğrafla Kalori Bul"}
+              </button>
+              <input ref={photoRef} type="file" accept="image/*" capture="environment"
+                onChange={e=>{if(e.target.files?.[0])analyzePhoto(e.target.files[0]);e.target.value="";}}
+                style={{display:"none"}}/>
+            </div>
+          )}
+          {/* AI Result inside modal */}
+          {aiResult&&!aiResult.error&&(
+            <div style={{background:"rgba(29,158,117,0.06)",borderLeft:"3px solid #1D9E75",borderRadius:"0 12px 12px 0",padding:14,marginBottom:12}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+                <span style={{fontSize:13,fontWeight:700,color:"#1D9E75"}}>AI Analiz Sonucu</span>
+                <span style={{fontSize:14,fontWeight:800,color:"#D85A30"}}>{aiResult.total} kcal</span>
+              </div>
+              {aiResult.items.map((item,i)=>(
+                <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"4px 0",fontSize:13}}>
+                  <span style={{color:"#5F5E5A"}}>{item.name}</span>
+                  <span style={{fontWeight:600,color:"#D85A30"}}>{item.calories} kcal</span>
+                </div>
+              ))}
+              <div style={{display:"flex",gap:8,marginTop:10}}>
+                <button onClick={saveAiResult} style={{flex:1,padding:"10px",borderRadius:10,border:"none",background:"#1D9E75",color:"#fff",fontSize:13,fontWeight:600,cursor:"pointer"}}>✓ Hepsini Kaydet</button>
+                <button onClick={()=>setAiResult(null)} style={{flex:1,padding:"10px",borderRadius:10,border:"1px solid rgba(0,0,0,0.08)",background:"#F5F0E8",color:"#D85A30",fontSize:13,fontWeight:600,cursor:"pointer"}}>✕ İptal</button>
+              </div>
+            </div>
+          )}
+          {aiResult?.error&&(
+            <div style={{background:"rgba(216,90,48,0.06)",borderLeft:"3px solid #D85A30",borderRadius:"0 12px 12px 0",padding:14,marginBottom:12}}>
+              <span style={{fontSize:13,color:"#D85A30"}}>{aiResult.error}</span>
+            </div>
+          )}
           <div style={{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap"}}>
             {mealGroups.map(m=>(
               <button key={m} onClick={()=>setFoodForm({...foodForm,meal:m})} style={{
