@@ -31,7 +31,6 @@ import TasksHub from "./components/TasksHub";
 import Projects from "./components/Projects";
 import Settings from "./components/Settings";
 import LoginScreen from "./components/LoginScreen";
-import Projelerim from "./components/Projelerim";
 import NebulaBackground, { NEBULA_KEYFRAMES } from "./components/NebulaBackground";
 
 /* ── Global Styles ── */
@@ -214,7 +213,7 @@ export default function App() {
   };
 
   const T = (key) => i18n(key, data);
-  const allTabs = [...TABS_KEYS.map(tb => ({ ...tb, label: T(tb.labelKey) })), { id: "projelerim", label: "Projelerim", icon: "📂" }, { id: "settings", label: T("settings"), icon: "⚙" }];
+  const allTabs = [...TABS_KEYS.map(tb => ({ ...tb, label: T(tb.labelKey) })), { id: "settings", label: T("settings"), icon: "⚙" }];
 
   // Show login screen
   if (!splash && user === undefined && !loading) {
@@ -248,7 +247,6 @@ export default function App() {
       case "dashboard": return <Dashboard data={data} setTab={setTab} goTo={goTo} update={update} />;
       case "tasks": return <TasksHub data={data} update={update} initialSubTab={pendingSubTab} onSubTabConsumed={() => setPendingSubTab(null)} />;
       case "lifestyle": return <Projects data={data} update={update} initialRoom={pendingRoom} onRoomConsumed={() => setPendingRoom(null)} />;
-      case "projelerim": return <Projelerim />;
       case "settings": return <Settings data={data} update={update} onImport={d => { setData(d); showToast(T("dataImported")); }} user={user} onLogout={handleLogout} />;
     }
   };
