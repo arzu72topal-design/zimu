@@ -21,7 +21,7 @@ export default function Projects({ data, update, initialRoom, onRoomConsumed }) 
   const [roomModal,setRoomModal]=useState(false);
   const [itemModal,setItemModal]=useState(false);
   const [form,setForm]=useState({name:"",status:"Planlama",description:"",deadline:"",tags:""});
-  const [roomForm,setRoomForm]=useState({name:"",icon:"Pr",color:"#3b82f6"});
+  const [roomForm,setRoomForm]=useState({name:"",icon:"Pr",color:"#185FA5"});
   const [itemForm,setItemForm]=useState({title:"",description:"",tags:""});
   const [exp,setExp]=useState(null);
   const [tf,setTf]=useState({title:""});
@@ -55,7 +55,7 @@ export default function Projects({ data, update, initialRoom, onRoomConsumed }) 
     if(!roomForm.name.trim())return;
     const nr={id:uid(),...roomForm,type:"collection"};
     update({...data,rooms:[...rooms,nr]});
-    setRoomModal(false);setRoomForm({name:"",icon:"Pr",color:"#3b82f6"});
+    setRoomModal(false);setRoomForm({name:"",icon:"Pr",color:"#185FA5"});
   };
   const delRoom=id=>{
     const newRooms=rooms.filter(r=>r.id!==id);
@@ -91,7 +91,7 @@ export default function Projects({ data, update, initialRoom, onRoomConsumed }) 
   const togPT=(pid,tid)=>{
     update({...data,projects:(data.projects||[]).map(p=>p.id===pid?{...p,tasks:(p.tasks||[]).map(t=>t.id===tid?{...t,done:!t.done}:t)}:p)});
   };
-  const stCol=s=>s==="Tamamlandı"?"#22c55e":s==="Devam Ediyor"?"#3b82f6":s==="Test"?"#f59e0b":"#9CA3AF";
+  const stCol=s=>s==="Tamamlandı"?"#1D9E75":s==="Devam Ediyor"?"#185FA5":s==="Test"?"#BA7517":"#8B8578";
   const statusLabel=s=>({"Planlama":T("statPlanning"),"Devam Ediyor":T("statProgress"),"Test":T("statTest"),"Tamamlandı":T("statDone")}[s]||s);
 
   const roomIcons=["Pr","Hb","Mz","St","An","Oy","Kt","İş","Ev","Gz","Hd","Fk","Al","Fm","Yc"];
@@ -116,7 +116,7 @@ export default function Projects({ data, update, initialRoom, onRoomConsumed }) 
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
           <h3 style={{margin:0,fontSize:20,fontWeight:800}}>{T("lifestyleTitle")}</h3>
         </div>
-        <p style={{margin:"6px 0 0",fontSize:12,color:"#9CA3AF"}}>{T("lifestyleDesc")}</p>
+        <p style={{margin:"6px 0 0",fontSize:12,color:"#8B8578"}}>{T("lifestyleDesc")}</p>
       </StickyHeader>
       <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:12}}>
         {rooms.map((room,idx)=>{
@@ -128,7 +128,7 @@ export default function Projects({ data, update, initialRoom, onRoomConsumed }) 
                 borderRadius:20,overflow:"hidden",cursor:"pointer",
                 position:"relative",height:160,
                 border:"0.5px solid rgba(0,0,0,0.1)",
-                background:"#ffffff",
+                background:"#FFFFFF",
               }}>
               {/* Fotoğraf arka plan */}
               {photo ? (
@@ -136,7 +136,7 @@ export default function Projects({ data, update, initialRoom, onRoomConsumed }) 
                   style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",display:"block"}}
                   onError={e=>{e.target.style.display="none";}}/>
               ) : (
-                <div style={{position:"absolute",inset:0,background:`linear-gradient(135deg,${room.color}25 0%,#1C1C26 100%)`}}/>
+                <div style={{position:"absolute",inset:0,background:`linear-gradient(135deg,${room.color}25 0%,#F5F0E8 100%)`}}/>
               )}
               {/* Gradient overlay — alttan koyulaşma */}
               <div style={{
@@ -148,17 +148,17 @@ export default function Projects({ data, update, initialRoom, onRoomConsumed }) 
                 position:"absolute",bottom:0,left:0,right:0,
                 padding:"14px 16px",zIndex:1,
               }}>
-                <div style={{fontSize:16,fontWeight:700,color:"#F9FAFB"}}>{roomLabel(room,data)}</div>
+                <div style={{fontSize:16,fontWeight:700,color:"#2C2A26"}}>{roomLabel(room,data)}</div>
                 <div style={{fontSize:12,color:room.color,fontWeight:600,marginTop:2}}>{count} {T("items")}</div>
               </div>
             </div>
           );
         })}
       </div>
-      <FAB onClick={()=>setRoomModal(true)} color="#f97316"/>
+      <FAB onClick={()=>setRoomModal(true)} color="#D85A30"/>
       <Modal open={roomModal} onClose={()=>setRoomModal(false)} title={T("newRoom")}>
         <input style={inp} placeholder={T("roomName")} value={roomForm.name} onChange={e=>setRoomForm({...roomForm,name:e.target.value})} autoFocus/>
-        <div style={{fontSize:12,color:"#9CA3AF",marginBottom:6}}>Renk seç:</div>
+        <div style={{fontSize:12,color:"#8B8578",marginBottom:6}}>Renk seç:</div>
         <div style={{display:"flex",gap:8,marginBottom:14}}>
           {COLORS.map(c=>(
             <button key={c} onClick={()=>setRoomForm({...roomForm,color:c})} style={{width:30,height:30,borderRadius:"50%",background:c,border:roomForm.color===c?"3px solid #fff":"3px solid transparent",cursor:"pointer"}}/>
@@ -201,7 +201,7 @@ export default function Projects({ data, update, initialRoom, onRoomConsumed }) 
           <button className="back-btn" aria-label="Go back" onClick={()=>setActiveRoom(null)}>◀</button>
           <div style={{width:28,height:28,borderRadius:8,background:`${room.color}25`,border:`1px solid ${room.color}50`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:room.color,flexShrink:0}}>{roomLabel(room,data)[0]}</div>
           <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{roomLabel(room,data)}</h3>
-          <button onClick={()=>delRoom(activeRoom)} style={{background:"none",border:"none",color:"#ef4444",fontSize:11,cursor:"pointer"}}>{T("del")}</button>
+          <button onClick={()=>delRoom(activeRoom)} style={{background:"none",border:"none",color:"#D85A30",fontSize:11,cursor:"pointer"}}>{T("del")}</button>
         </div>
       </StickyHeader>
       {items.length===0&&(
@@ -212,16 +212,16 @@ export default function Projects({ data, update, initialRoom, onRoomConsumed }) 
             <path d="M18 20 L18 10 L34 10 L34 20" stroke="#6B7280" strokeWidth="1.5" fill="none"/>
             <path d="M20 15 L32 15" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round" opacity=".5"/>
           </svg>
-          <div style={{fontSize:14,fontWeight:600,color:"#9CA3AF",marginBottom:4}}>{T("roomEmpty")}</div>
-          <div style={{fontSize:12,color:"#9CA3AF"}}>{T("addItemHint")}</div>
+          <div style={{fontSize:14,fontWeight:600,color:"#8B8578",marginBottom:4}}>{T("roomEmpty")}</div>
+          <div style={{fontSize:12,color:"#8B8578"}}>{T("addItemHint")}</div>
         </div>
       )}
       {items.map(item=>(
-        <div key={item.id} style={{background:"#ffffff",borderRadius:16,padding:14,marginBottom:8,borderLeft:`3px solid ${room.color}`}}>
+        <div key={item.id} style={{background:"#FFFFFF",borderRadius:16,padding:14,marginBottom:8,borderLeft:`3px solid ${room.color}`}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"start"}}>
             <div style={{flex:1,minWidth:0}}>
               <div style={{fontSize:15,fontWeight:600}}>{item.title}</div>
-              {item.description&&<div style={{fontSize:12,color:"#9CA3AF",marginTop:4,lineHeight:1.4}}>{item.description}</div>}
+              {item.description&&<div style={{fontSize:12,color:"#8B8578",marginTop:4,lineHeight:1.4}}>{item.description}</div>}
               {item.tags?.length>0&&(<div style={{display:"flex",gap:4,marginTop:6,flexWrap:"wrap"}}>
                 {item.tags.map(t=><span key={t} style={{background:`${room.color}20`,color:room.color,padding:"1px 8px",borderRadius:6,fontSize:10}}>{t}</span>)}
               </div>)}
