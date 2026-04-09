@@ -1,15 +1,14 @@
-/* ── Modal ── */
 export function Modal({ open, onClose, title, children }) {
   if (!open) return null;
   return (
     <div onClick={onClose} role="presentation" style={{
-      position:"fixed",inset:0,background:"rgba(0,0,0,0.8)",display:"flex",
+      position:"fixed",inset:0,background:"rgba(0,0,0,0.3)",display:"flex",
       alignItems:"flex-end",justifyContent:"center",zIndex:9999,
       padding:0,
       animation:"modalOverlayIn .2s ease both",
     }}>
       <div onClick={e=>e.stopPropagation()} role="dialog" aria-modal="true" aria-label={title} style={{
-        background:"#1C1C26",
+        background:"#FFFFFF",
         backdropFilter:"blur(24px)",WebkitBackdropFilter:"blur(24px)",
         width:"100%",maxWidth:480,
         maxHeight:"85vh",
@@ -18,10 +17,10 @@ export function Modal({ open, onClose, title, children }) {
         animation:"modalSlideUp .3s cubic-bezier(.22,1,.36,1) both",
       }}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",
-          padding:"16px 20px",borderBottom:"1px solid rgba(255,255,255,0.05)",
+          padding:"16px 20px",borderBottom:"1px solid rgba(0,0,0,0.06)",
           flexShrink:0,
         }}>
-          <h3 style={{margin:0,fontSize:16,fontWeight:600,color:"#F9FAFB"}}>{title}</h3>
+          <h3 style={{margin:0,fontSize:16,fontWeight:600,color:"#2C2A26"}}>{title}</h3>
           <button className="back-btn" onClick={onClose} aria-label="Close" style={{width:32,height:32,fontSize:14}}>✕</button>
         </div>
         <div style={{
