@@ -196,12 +196,12 @@ export default function Sports({ data, update, initialView, onBack }) {
 
   // AI Coach advice
   const getCoachTip=()=>{
-    if(todayCalIn===0&&todayCalOut===0) return {icon:"●",text:T("noRecordYet"),color:"#3b82f6"};
-    if(netCal>dailyGoal+300) return {icon:"⚠️",text:`Bugün ${netCal} kcal net kalori — hedefin üzerinde. Hafif bir yürüyüş veya koşu iyi gelir!`,color:"#f59e0b"};
-    if(netCal<1200&&todayCalIn>0) return {icon:"★",text:`Harika gidiyorsun! ${netCal} kcal net — dengeli ve sağlıklı.`,color:"#22c55e"};
-    if(todayCalOut>300) return {icon:"▲",text:`Bugün ${todayCalOut} kcal yaktın, süpersin! Protein ağırlıklı beslenmeyi unutma.`,color:"#22c55e"};
-    if(todayCalIn>0&&todayCalOut===0) return {icon:"▸",text:`${todayCalIn} kcal aldın ama henüz spor yapmadın. 30dk yürüyüş ~150 kcal yakar!`,color:"#f97316"};
-    return {icon:"✨",text:"Günü dengeli geçiriyorsun, böyle devam!",color:"#3b82f6"};
+    if(todayCalIn===0&&todayCalOut===0) return {icon:"●",text:T("noRecordYet"),color:"#185FA5"};
+    if(netCal>dailyGoal+300) return {icon:"⚠️",text:`Bugün ${netCal} kcal net kalori — hedefin üzerinde. Hafif bir yürüyüş veya koşu iyi gelir!`,color:"#BA7517"};
+    if(netCal<1200&&todayCalIn>0) return {icon:"★",text:`Harika gidiyorsun! ${netCal} kcal net — dengeli ve sağlıklı.`,color:"#1D9E75"};
+    if(todayCalOut>300) return {icon:"▲",text:`Bugün ${todayCalOut} kcal yaktın, süpersin! Protein ağırlıklı beslenmeyi unutma.`,color:"#1D9E75"};
+    if(todayCalIn>0&&todayCalOut===0) return {icon:"▸",text:`${todayCalIn} kcal aldın ama henüz spor yapmadın. 30dk yürüyüş ~150 kcal yakar!`,color:"#D85A30"};
+    return {icon:"✨",text:"Günü dengeli geçiriyorsun, böyle devam!",color:"#185FA5"};
   };
   const tip=getCoachTip();
 
@@ -239,33 +239,33 @@ export default function Sports({ data, update, initialView, onBack }) {
       </div>
 
       {/* Kalori denge kartı */}
-      <div className="stagger-2" style={{background:"#ffffff",borderRadius:14,padding:"14px 16px",marginBottom:12}}>
+      <div className="stagger-2" style={{background:"#FFFFFF",borderRadius:14,padding:"14px 16px",marginBottom:12}}>
         <div style={{display:"flex",justifyContent:"space-around",textAlign:"center",marginBottom:10}}>
           <div>
-            <div style={{fontSize:22,fontWeight:800,color:"#f97316"}}>{todayCalIn}</div>
-            <div style={{fontSize:10,color:"#9CA3AF"}}>{T("intake")}</div>
+            <div style={{fontSize:22,fontWeight:800,color:"#D85A30"}}>{todayCalIn}</div>
+            <div style={{fontSize:10,color:"#8B8578"}}>{T("intake")}</div>
           </div>
           <div style={{fontSize:18,opacity:.2,alignSelf:"center"}}>−</div>
           <div>
-            <div style={{fontSize:22,fontWeight:800,color:"#22c55e"}}>{todayCalOut}</div>
-            <div style={{fontSize:10,color:"#9CA3AF"}}>{T("burned")}</div>
+            <div style={{fontSize:22,fontWeight:800,color:"#1D9E75"}}>{todayCalOut}</div>
+            <div style={{fontSize:10,color:"#8B8578"}}>{T("burned")}</div>
           </div>
           <div style={{fontSize:18,opacity:.2,alignSelf:"center"}}>=</div>
           <div>
-            <div style={{fontSize:22,fontWeight:800,color:netCal>dailyGoal?"#ef4444":"#3b82f6"}}>{netCal}</div>
-            <div style={{fontSize:10,color:"#9CA3AF"}}>{T("net")}</div>
+            <div style={{fontSize:22,fontWeight:800,color:netCal>dailyGoal?"#D85A30":"#185FA5"}}>{netCal}</div>
+            <div style={{fontSize:10,color:"#8B8578"}}>{T("net")}</div>
           </div>
         </div>
-        <div style={{height:6,background:"#f0f0f5",borderRadius:3,overflow:"hidden"}}>
-          <div style={{height:"100%",background:netCal>dailyGoal?"#ef4444":"#3b82f6",borderRadius:3,width:`${Math.min(100,netCal/dailyGoal*100)}%`,transition:"width .3s"}}/>
+        <div style={{height:6,background:"#F5F0E8",borderRadius:3,overflow:"hidden"}}>
+          <div style={{height:"100%",background:netCal>dailyGoal?"#D85A30":"#185FA5",borderRadius:3,width:`${Math.min(100,netCal/dailyGoal*100)}%`,transition:"width .3s"}}/>
         </div>
-        <div style={{fontSize:10,color:"#9CA3AF",marginTop:4,textAlign:"center"}}>{T("targetKcal").replace("{0}",dailyGoal)}</div>
+        <div style={{fontSize:10,color:"#8B8578",marginTop:4,textAlign:"center"}}>{T("targetKcal").replace("{0}",dailyGoal)}</div>
       </div>
 
       {/* +Yemek / +Spor butonları */}
       <div className="stagger-3" style={{display:"flex",gap:8,marginBottom:14}}>
         <button onClick={()=>{setFoodModal(true);setFoodSearch("");}} style={{
-          flex:1,background:"rgba(249,115,22,0.1)",color:"#f97316",
+          flex:1,background:"rgba(249,115,22,0.1)",color:"#D85A30",
           border:"1px solid rgba(249,115,22,0.3)",borderRadius:12,
           padding:"14px 8px",fontSize:14,fontWeight:700,cursor:"pointer",
           display:"flex",alignItems:"center",justifyContent:"center",gap:6,
@@ -273,7 +273,7 @@ export default function Sports({ data, update, initialView, onBack }) {
           <span style={{fontSize:18}}>+</span> {T("addMeal")}
         </button>
         <button onClick={()=>setModal(true)} style={{
-          flex:1,background:"rgba(34,197,94,0.1)",color:"#22c55e",
+          flex:1,background:"rgba(34,197,94,0.1)",color:"#1D9E75",
           border:"1px solid rgba(34,197,94,0.3)",borderRadius:12,
           padding:"14px 8px",fontSize:14,fontWeight:700,cursor:"pointer",
           display:"flex",alignItems:"center",justifyContent:"center",gap:6,
@@ -285,7 +285,7 @@ export default function Sports({ data, update, initialView, onBack }) {
       {hasAI&&(
         <div style={{marginBottom:12}}>
           <button onClick={()=>photoRef.current?.click()} disabled={analyzing} style={{
-            ...addBtnStyle,background:analyzing?"#6B7280":"#22c55e",width:"100%",padding:"12px",borderRadius:12,fontSize:14,
+            ...addBtnStyle,background:analyzing?"#6B7280":"#1D9E75",width:"100%",padding:"12px",borderRadius:12,fontSize:14,
           }}>{analyzing?`◌ ${T("analyzing")}`:` ◎ ${T("photoCalorie")}`}</button>
           <input ref={photoRef} type="file" accept="image/*" capture="environment"
             onChange={e=>{if(e.target.files?.[0])analyzePhoto(e.target.files[0]);e.target.value="";}}
@@ -297,33 +297,33 @@ export default function Sports({ data, update, initialView, onBack }) {
       {aiResult&&!aiResult.error&&(
         <div style={{background:"rgba(34,197,94,0.08)",border:"1px solid rgba(34,197,94,0.2)",borderRadius:14,padding:14,marginBottom:12}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
-            <span style={{fontSize:13,fontWeight:700,color:"#22c55e"}}>AI Analiz Sonucu</span>
-            <span style={{fontSize:14,fontWeight:800,color:"#f97316"}}>{aiResult.total} kcal</span>
+            <span style={{fontSize:13,fontWeight:700,color:"#1D9E75"}}>AI Analiz Sonucu</span>
+            <span style={{fontSize:14,fontWeight:800,color:"#D85A30"}}>{aiResult.total} kcal</span>
           </div>
           {aiResult.items.map((item,i)=>(
             <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"4px 0",fontSize:13}}>
               <span style={{opacity:.7}}>{item.name}</span>
-              <span style={{fontWeight:600,color:"#f97316"}}>{item.calories} kcal</span>
+              <span style={{fontWeight:600,color:"#D85A30"}}>{item.calories} kcal</span>
             </div>
           ))}
           <div style={{display:"flex",gap:8,marginTop:10}}>
-            <button onClick={saveAiResult} style={{...btnPrimary,flex:1,marginTop:0,background:"#22c55e",padding:"10px"}}>✓ Kaydet</button>
-            <button onClick={()=>setAiResult(null)} style={{...btnPrimary,flex:1,marginTop:0,background:"rgba(239,68,68,0.15)",color:"#ef4444",padding:"10px",border:"1px solid rgba(239,68,68,0.2)"}}>✕ İptal</button>
+            <button onClick={saveAiResult} style={{...btnPrimary,flex:1,marginTop:0,background:"#1D9E75",padding:"10px"}}>✓ Kaydet</button>
+            <button onClick={()=>setAiResult(null)} style={{...btnPrimary,flex:1,marginTop:0,background:"rgba(239,68,68,0.15)",color:"#D85A30",padding:"10px",border:"1px solid rgba(239,68,68,0.2)"}}>✕ İptal</button>
           </div>
         </div>
       )}
       {aiResult?.error&&(
         <div style={{background:"rgba(239,68,68,0.08)",border:"1px solid rgba(239,68,68,0.2)",borderRadius:14,padding:14,marginBottom:12}}>
-          <span style={{fontSize:13,color:"#ef4444"}}>{aiResult.error}</span>
-          <button onClick={()=>setAiResult(null)} style={{display:"block",marginTop:6,background:"none",border:"none",color:"#ef4444",fontSize:12,cursor:"pointer",textDecoration:"underline"}}>Kapat</button>
+          <span style={{fontSize:13,color:"#D85A30"}}>{aiResult.error}</span>
+          <button onClick={()=>setAiResult(null)} style={{display:"block",marginTop:6,background:"none",border:"none",color:"#D85A30",fontSize:12,cursor:"pointer",textDecoration:"underline"}}>Kapat</button>
         </div>
       )}
 
       {/* ── Bugünün Yemekleri ── */}
       <div style={{marginBottom:14}}>
-        <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:8}}>{T("todayFoods")}</div>
+        <div style={{fontSize:12,fontWeight:700,color:"#8B8578",textTransform:"uppercase",letterSpacing:"1px",marginBottom:8}}>{T("todayFoods")}</div>
         {todayFoods.length===0 ? (
-          <div style={{textAlign:"center",padding:"20px",color:"#9CA3AF",fontSize:13}}>{T("noFoodYet")}</div>
+          <div style={{textAlign:"center",padding:"20px",color:"#8B8578",fontSize:13}}>{T("noFoodYet")}</div>
         ) : mealGroups.map(meal=>{
           const mealFoods=todayFoods.filter(f=>f.meal===meal);
           if(mealFoods.length===0)return null;
@@ -332,12 +332,12 @@ export default function Sports({ data, update, initialView, onBack }) {
             <div key={meal} style={{marginBottom:10}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}>
                 <span style={{fontSize:12,fontWeight:700,opacity:.6}}>{meal}</span>
-                <span style={{fontSize:11,fontWeight:600,color:"#f97316"}}>{mealCal} kcal</span>
+                <span style={{fontSize:11,fontWeight:600,color:"#D85A30"}}>{mealCal} kcal</span>
               </div>
               {mealFoods.map(f=>(
                 <div key={f.id} style={{...cardStyle,display:"flex",alignItems:"center",gap:10,padding:"10px 14px"}}>
                   <span style={{fontSize:13,flex:1}}>{f.name}</span>
-                  <span style={{fontSize:12,fontWeight:600,color:"#f97316"}}>{f.calories}</span>
+                  <span style={{fontSize:12,fontWeight:600,color:"#D85A30"}}>{f.calories}</span>
                   <button onClick={()=>delFood(f.id)} style={delBtnStyle} aria-label="Delete">✕</button>
                 </div>
               ))}
@@ -348,15 +348,15 @@ export default function Sports({ data, update, initialView, onBack }) {
 
       {/* ── Bugünün Sporları ── */}
       <div style={{marginBottom:14}}>
-        <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:8}}>{T("todaySports")}</div>
+        <div style={{fontSize:12,fontWeight:700,color:"#8B8578",textTransform:"uppercase",letterSpacing:"1px",marginBottom:8}}>{T("todaySports")}</div>
         {todaySports.length===0 ? (
-          <div style={{textAlign:"center",padding:"20px",color:"#9CA3AF",fontSize:13}}>{T("noSportYet")}</div>
+          <div style={{textAlign:"center",padding:"20px",color:"#8B8578",fontSize:13}}>{T("noSportYet")}</div>
         ) : todaySports.map(s=>(
           <div key={s.id} style={{...cardStyle,display:"flex",alignItems:"center",gap:10,padding:"10px 14px"}}>
             <div style={{fontSize:20,width:36,height:36,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(34,197,94,0.1)",borderRadius:10}}>{SPORT_EMOJI[s.type]||"⚡"}</div>
             <div style={{flex:1,minWidth:0}}>
               <div style={{fontSize:14,fontWeight:600}}>{s.type}</div>
-              <div style={{fontSize:11,color:"#9CA3AF"}}>{s.duration}dk {s.distance>0&&`· ${s.distance}km`} · {s.calories||calcSportCal(s.type,s.duration)} kcal</div>
+              <div style={{fontSize:11,color:"#8B8578"}}>{s.duration}dk {s.distance>0&&`· ${s.distance}km`} · {s.calories||calcSportCal(s.type,s.duration)} kcal</div>
             </div>
             <button onClick={()=>delSport(s.id)} style={delBtnStyle} aria-label="Delete">✕</button>
           </div>
@@ -365,16 +365,16 @@ export default function Sports({ data, update, initialView, onBack }) {
 
       {/* ── Haftalık Özet ── */}
       <div style={{marginBottom:14}}>
-        <div style={{fontSize:12,fontWeight:700,color:"#9CA3AF",textTransform:"uppercase",letterSpacing:"1px",marginBottom:8}}>{T("thisWeek")}</div>
+        <div style={{fontSize:12,fontWeight:700,color:"#8B8578",textTransform:"uppercase",letterSpacing:"1px",marginBottom:8}}>{T("thisWeek")}</div>
         <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:8}}>
           {[
-            {icon:"⏱",val:`${tMin} ${T("locale")==="tr-TR"?"dk":"min"}`,label:T("sportDuration"),color:"#3b82f6"},
-            {icon:"▸",val:`${burnedCal}`,label:T("burnedKcal"),color:"#ef4444"},
-            {icon:"―",val:`${tDist.toFixed(1)} km`,label:T("distanceLabel"),color:"#22c55e"},
-            {icon:"▲",val:wk.length,label:T("workout"),color:"#f97316"},
+            {icon:"⏱",val:`${tMin} ${T("locale")==="tr-TR"?"dk":"min"}`,label:T("sportDuration"),color:"#185FA5"},
+            {icon:"▸",val:`${burnedCal}`,label:T("burnedKcal"),color:"#D85A30"},
+            {icon:"―",val:`${tDist.toFixed(1)} km`,label:T("distanceLabel"),color:"#1D9E75"},
+            {icon:"▲",val:wk.length,label:T("workout"),color:"#D85A30"},
           ].map((s,i)=>(
             <div key={i} style={{...cardStyle,padding:"12px",borderLeft:`3px solid ${s.color}`,boxShadow:`0 0 12px ${s.color}15`}}>
-              <div style={{fontSize:10,color:"#9CA3AF"}}>{s.icon} {s.label}</div>
+              <div style={{fontSize:10,color:"#8B8578"}}>{s.icon} {s.label}</div>
               <div style={{fontSize:18,fontWeight:800,color:s.color,marginTop:3}}>{s.val}</div>
             </div>
           ))}
@@ -387,9 +387,9 @@ export default function Sports({ data, update, initialView, onBack }) {
           <div style={{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap"}}>
             {mealGroups.map(m=>(
               <button key={m} onClick={()=>setFoodForm({...foodForm,meal:m})} style={{
-                background:foodForm.meal===m?"rgba(59,130,246,0.2)":"#f0f0f5",
-                color:foodForm.meal===m?"#3b82f6":"#aaa",
-                border:foodForm.meal===m?"1px solid rgba(59,130,246,0.3)":"1px solid rgba(0,0,0,0.06)",
+                background:foodForm.meal===m?"rgba(24,95,165,0.12)":"#F5F0E8",
+                color:foodForm.meal===m?"#185FA5":"#aaa",
+                border:foodForm.meal===m?"1px solid rgba(24,95,165,0.2)":"1px solid rgba(0,0,0,0.06)",
                 padding:"7px 12px",borderRadius:10,fontSize:13,cursor:"pointer",
               }}>{m}</button>
             ))}
@@ -408,30 +408,30 @@ export default function Sports({ data, update, initialView, onBack }) {
           {(foodSearch||!foodForm.name)&&(
             <div style={{maxHeight:180,overflow:"auto",marginBottom:10}}>
               {!foodSearch&&Object.keys(myFoods).length>0&&(
-                <div style={{fontSize:10,color:"#9CA3AF",padding:"4px 8px",fontWeight:700}}>⭐ {T("myFoodsLabel")}</div>
+                <div style={{fontSize:10,color:"#8B8578",padding:"4px 8px",fontWeight:700}}>⭐ {T("myFoodsLabel")}</div>
               )}
               {filteredFoods.map(([name,cal,source])=>(
                 <div key={name} onClick={()=>selectCommonFood(name,cal)} style={{
                   display:"flex",justifyContent:"space-between",alignItems:"center",padding:"9px 10px",cursor:"pointer",
-                  borderRadius:8,background:"#ffffff",marginBottom:2,
+                  borderRadius:8,background:"#FFFFFF",marginBottom:2,
                 }}>
                   <div style={{display:"flex",alignItems:"center",gap:6}}>
-                    {(source==="my"||myFoods[name])&&<span style={{fontSize:10,color:"#f59e0b"}}>⭐</span>}
+                    {(source==="my"||myFoods[name])&&<span style={{fontSize:10,color:"#BA7517"}}>⭐</span>}
                     <span style={{fontSize:13}}>{name}</span>
                   </div>
-                  <span style={{fontSize:12,color:"#f97316",fontWeight:600}}>{cal} kcal</span>
+                  <span style={{fontSize:12,color:"#D85A30",fontWeight:600}}>{cal} kcal</span>
                 </div>
               ))}
               {noResults&&(
                 <div style={{textAlign:"center",padding:12}}>
-                  <p style={{fontSize:12,color:"#9CA3AF",margin:"0 0 8px"}}>"{foodSearch}" bulunamadı</p>
+                  <p style={{fontSize:12,color:"#8B8578",margin:"0 0 8px"}}>"{foodSearch}" bulunamadı</p>
                   {hasAI?(
                     <button onClick={()=>askAiCalorie(foodSearch)} disabled={aiLookup} style={{
-                      background:"rgba(34,197,94,0.15)",color:"#22c55e",border:"1px solid rgba(34,197,94,0.3)",
+                      background:"rgba(34,197,94,0.15)",color:"#1D9E75",border:"1px solid rgba(34,197,94,0.3)",
                       padding:"8px 16px",borderRadius:10,fontSize:13,cursor:"pointer",fontWeight:600,
                     }}>{aiLookup?`◌ ${T("analyzing")}`:` ◈ ${T("askAI")}`}</button>
                   ):(
-                    <p style={{fontSize:11,color:"#9CA3AF"}}>Kaloriyi elle gir veya Ayarlar'dan AI aç</p>
+                    <p style={{fontSize:11,color:"#8B8578"}}>Kaloriyi elle gir veya Ayarlar'dan AI aç</p>
                   )}
                 </div>
               )}
@@ -450,12 +450,12 @@ export default function Sports({ data, update, initialView, onBack }) {
             </div>
           </div>
           {foodForm.name&&foodForm.calories&&!allFoodDB[foodForm.name.trim()]&&(
-            <div style={{fontSize:10,color:"#9CA3AF",marginBottom:8,display:"flex",alignItems:"center",gap:4}}>
+            <div style={{fontSize:10,color:"#8B8578",marginBottom:8,display:"flex",alignItems:"center",gap:4}}>
               <span>⭐</span> "{foodForm.name}" kişisel listene kaydedilecek
             </div>
           )}
           <input style={inp} type="date" value={foodForm.date} onChange={e=>setFoodForm({...foodForm,date:e.target.value})}/>
-          <button style={{...btnPrimary,background:"linear-gradient(135deg,#f97316,#ef4444)"}} onClick={()=>{addFood();setFoodModal(false);setFoodSearch("");}}>{T("add")}</button>
+          <button style={{...btnPrimary,background:"linear-gradient(135deg,#D85A30,#D85A30)"}} onClick={()=>{addFood();setFoodModal(false);setFoodSearch("");}}>{T("add")}</button>
         </div>
       </Modal>
 
@@ -464,8 +464,8 @@ export default function Sports({ data, update, initialView, onBack }) {
         <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:12}}>
           {SPORT_TYPES.map((s,si)=>(
             <button key={s} onClick={()=>setForm({...form,type:s})} style={{
-              background:form.type===s?"rgba(34,197,94,0.2)":"#f0f0f5",
-              color:form.type===s?"#22c55e":"#9CA3AF",
+              background:form.type===s?"rgba(34,197,94,0.2)":"#F5F0E8",
+              color:form.type===s?"#1D9E75":"#8B8578",
               border:form.type===s?"1px solid rgba(34,197,94,0.3)":"1px solid rgba(0,0,0,0.06)",
               padding:"7px 14px",borderRadius:10,fontSize:13,cursor:"pointer",
               display:"flex",alignItems:"center",gap:4,
@@ -481,7 +481,7 @@ export default function Sports({ data, update, initialView, onBack }) {
           <input style={{...inp,flex:1}} type="date" value={form.date} onChange={e=>setForm({...form,date:e.target.value})}/>
         </div>
         <input style={inp} placeholder={T("notesOpt")} value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})}/>
-        <button style={{...btnPrimary,background:"linear-gradient(135deg,#22c55e,#14b8a6)"}} onClick={()=>{addSport();setModal(false);}}>{T("add")}</button>
+        <button style={{...btnPrimary,background:"linear-gradient(135deg,#1D9E75,#1D9E75)"}} onClick={()=>{addSport();setModal(false);}}>{T("add")}</button>
       </Modal>
     </div>
   );
