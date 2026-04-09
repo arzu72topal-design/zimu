@@ -6,39 +6,39 @@ const STORAGE_KEY = "projelerim-hub-v8";
 const EMOJIS = ["📋","⚡","⚖️","📱","🚀","🎯","💼","🏗️","🔬","📈","🎨","💡","🌍","🛒","📚","🔧","🎪","🏥"];
 
 const COLORS = [
-  { color: "#E86C47", gradient: "linear-gradient(135deg,#E86C47,#ff9a76)" },
-  { color: "#5B8DEF", gradient: "linear-gradient(135deg,#5B8DEF,#8bb4ff)" },
-  { color: "#D4A843", gradient: "linear-gradient(135deg,#D4A843,#f0d078)" },
-  { color: "#6BC9A2", gradient: "linear-gradient(135deg,#6BC9A2,#a0e8cc)" },
-  { color: "#8B5CF6", gradient: "linear-gradient(135deg,#8B5CF6,#b794f6)" },
-  { color: "#EC4899", gradient: "linear-gradient(135deg,#EC4899,#f9a8d4)" },
-  { color: "#14B8A6", gradient: "linear-gradient(135deg,#14B8A6,#5eead4)" },
-  { color: "#F59E0B", gradient: "linear-gradient(135deg,#F59E0B,#fcd34d)" },
+  { color: "#D85A30", gradient: "linear-gradient(135deg,#D85A30,#ff9a76)" },
+  { color: "#185FA5", gradient: "linear-gradient(135deg,#185FA5,#8bb4ff)" },
+  { color: "#BA7517", gradient: "linear-gradient(135deg,#BA7517,#f0d078)" },
+  { color: "#1D9E75", gradient: "linear-gradient(135deg,#1D9E75,#a0e8cc)" },
+  { color: "#534AB7", gradient: "linear-gradient(135deg,#534AB7,#b794f6)" },
+  { color: "#D85A30", gradient: "linear-gradient(135deg,#D85A30,#f9a8d4)" },
+  { color: "#1D9E75", gradient: "linear-gradient(135deg,#1D9E75,#5eead4)" },
+  { color: "#BA7517", gradient: "linear-gradient(135deg,#BA7517,#fcd34d)" },
 ];
 
 const MODULES = [
-  { id:"strategy", name:"Strateji Planlama", icon:"🎯", color:"#8B5CF6", desc:"Hedef, SWOT, yol haritası", prompts:["SWOT analizi yap","Yol haritası oluştur","Önceliklendirme matrisi","Risk analizi yap"] },
-  { id:"legal", name:"Hukuki Yazışma", icon:"⚖️", color:"#D4A843", desc:"Yazışma, sözleşme, ihtar", prompts:["Resmi yazışma taslağı","İhtar mektubu taslağı","Toplantı özeti","Sözleşme maddeleri"] },
-  { id:"dev", name:"Yazılım Geliştirme", icon:"💻", color:"#5B8DEF", desc:"Kod, debug, API, mimari", prompts:["Veritabanı şeması","API endpoint planla","Bug analizi","Kod review"] },
-  { id:"uiux", name:"UI/UX Tasarım", icon:"🎨", color:"#E86C47", desc:"Arayüz, akış, wireframe", prompts:["Kullanıcı akışı","Wireframe açıkla","Renk paleti","Erişilebilirlik"] },
-  { id:"content", name:"İçerik Üretimi", icon:"✍️", color:"#6BC9A2", desc:"Blog, sosyal medya", prompts:["Blog taslağı","Sosyal medya","E-posta şablonu","Landing page"] },
-  { id:"data", name:"Veri Analizi", icon:"📊", color:"#EC4899", desc:"Rapor, grafik, veri", prompts:["Veri özeti","KPI dashboard","Trend analizi","Karşılaştırma"] },
-  { id:"pm", name:"Proje Yönetimi", icon:"📋", color:"#14B8A6", desc:"Sprint, görev, timeline", prompts:["Sprint planı","Gantt chart","Meeting notları","Haftalık rapor"] },
-  { id:"research", name:"Araştırma", icon:"🔍", color:"#F59E0B", desc:"Pazar, rakip analizi", prompts:["Pazar araştırması","Rakip analizi","Trend raporu","Persona yaz"] },
+  { id:"strategy", name:"Strateji Planlama", icon:"🎯", color:"#534AB7", desc:"Hedef, SWOT, yol haritası", prompts:["SWOT analizi yap","Yol haritası oluştur","Önceliklendirme matrisi","Risk analizi yap"] },
+  { id:"legal", name:"Hukuki Yazışma", icon:"⚖️", color:"#BA7517", desc:"Yazışma, sözleşme, ihtar", prompts:["Resmi yazışma taslağı","İhtar mektubu taslağı","Toplantı özeti","Sözleşme maddeleri"] },
+  { id:"dev", name:"Yazılım Geliştirme", icon:"💻", color:"#185FA5", desc:"Kod, debug, API, mimari", prompts:["Veritabanı şeması","API endpoint planla","Bug analizi","Kod review"] },
+  { id:"uiux", name:"UI/UX Tasarım", icon:"🎨", color:"#D85A30", desc:"Arayüz, akış, wireframe", prompts:["Kullanıcı akışı","Wireframe açıkla","Renk paleti","Erişilebilirlik"] },
+  { id:"content", name:"İçerik Üretimi", icon:"✍️", color:"#1D9E75", desc:"Blog, sosyal medya", prompts:["Blog taslağı","Sosyal medya","E-posta şablonu","Landing page"] },
+  { id:"data", name:"Veri Analizi", icon:"📊", color:"#D85A30", desc:"Rapor, grafik, veri", prompts:["Veri özeti","KPI dashboard","Trend analizi","Karşılaştırma"] },
+  { id:"pm", name:"Proje Yönetimi", icon:"📋", color:"#1D9E75", desc:"Sprint, görev, timeline", prompts:["Sprint planı","Gantt chart","Meeting notları","Haftalık rapor"] },
+  { id:"research", name:"Araştırma", icon:"🔍", color:"#BA7517", desc:"Pazar, rakip analizi", prompts:["Pazar araştırması","Rakip analizi","Trend raporu","Persona yaz"] },
 ];
 
 const NOTE_TAGS = [
-  { label: "Karar", color: "#E86C47" },
-  { label: "Bilgi", color: "#5B8DEF" },
-  { label: "Önemli", color: "#EC4899" },
-  { label: "Fikir", color: "#F59E0B" },
+  { label: "Karar", color: "#D85A30" },
+  { label: "Bilgi", color: "#185FA5" },
+  { label: "Önemli", color: "#D85A30" },
+  { label: "Fikir", color: "#BA7517" },
 ];
 
 const DEFAULTS = [
-  { id:"egura", name:"Egura", emoji:"📋", color:"#E86C47", gradient:"linear-gradient(135deg,#E86C47,#ff9a76)", desc:"Biten app için yeni başvuru kararları", status:"active", completedAt:null, lastActivity:Date.now(), tasks:[{id:1,t:"Başvuru sürecini gözden geçir",d:false,p:"high"},{id:2,t:"Başvuru kriterlerini belirle",d:false,p:"high"},{id:3,t:"Karar matrisi oluştur",d:false,p:"medium"},{id:4,t:"Başvuru formu hazırla",d:false,p:"low"}], notes:[], files:[], sessions:[] },
-  { id:"zibu", name:"Zibu", emoji:"⚡", color:"#5B8DEF", gradient:"linear-gradient(135deg,#5B8DEF,#8bb4ff)", desc:"App tamamlama", status:"active", completedAt:null, lastActivity:Date.now()-60000, tasks:[{id:1,t:"Kalan modülleri listele",d:false,p:"high"},{id:2,t:"UI/UX düzeltmeleri",d:false,p:"medium"},{id:3,t:"Test yazımı",d:false,p:"medium"},{id:4,t:"Deploy hazırlığı",d:false,p:"low"}], notes:[], files:[], sessions:[] },
-  { id:"finland", name:"Finland", emoji:"⚖️", color:"#D4A843", gradient:"linear-gradient(135deg,#D4A843,#f0d078)", desc:"Hukuki ticari anlaşmazlık çözümü", status:"active", completedAt:null, lastActivity:Date.now()-120000, tasks:[{id:1,t:"Anlaşmazlık özetini hazırla",d:false,p:"high"},{id:2,t:"Hukuki belgeleri topla",d:false,p:"high"},{id:3,t:"Strateji seçenekleri belirle",d:false,p:"high"},{id:4,t:"Yazışma taslakları oluştur",d:false,p:"medium"}], notes:[], files:[], sessions:[] },
-  { id:"dudu", name:"Dudu", emoji:"📱", color:"#6BC9A2", gradient:"linear-gradient(135deg,#6BC9A2,#a0e8cc)", desc:"App uygulamasını tamamlama", status:"active", completedAt:null, lastActivity:Date.now()-180000, tasks:[{id:1,t:"Mevcut durumu değerlendir",d:false,p:"high"},{id:2,t:"Eksik özellikleri kodla",d:false,p:"medium"},{id:3,t:"Hata düzeltmeleri",d:false,p:"medium"},{id:4,t:"Yayın öncesi test",d:false,p:"low"}], notes:[], files:[], sessions:[] },
+  { id:"egura", name:"Egura", emoji:"📋", color:"#D85A30", gradient:"linear-gradient(135deg,#D85A30,#ff9a76)", desc:"Biten app için yeni başvuru kararları", status:"active", completedAt:null, lastActivity:Date.now(), tasks:[{id:1,t:"Başvuru sürecini gözden geçir",d:false,p:"high"},{id:2,t:"Başvuru kriterlerini belirle",d:false,p:"high"},{id:3,t:"Karar matrisi oluştur",d:false,p:"medium"},{id:4,t:"Başvuru formu hazırla",d:false,p:"low"}], notes:[], files:[], sessions:[] },
+  { id:"zibu", name:"Zibu", emoji:"⚡", color:"#185FA5", gradient:"linear-gradient(135deg,#185FA5,#8bb4ff)", desc:"App tamamlama", status:"active", completedAt:null, lastActivity:Date.now()-60000, tasks:[{id:1,t:"Kalan modülleri listele",d:false,p:"high"},{id:2,t:"UI/UX düzeltmeleri",d:false,p:"medium"},{id:3,t:"Test yazımı",d:false,p:"medium"},{id:4,t:"Deploy hazırlığı",d:false,p:"low"}], notes:[], files:[], sessions:[] },
+  { id:"finland", name:"Finland", emoji:"⚖️", color:"#BA7517", gradient:"linear-gradient(135deg,#BA7517,#f0d078)", desc:"Hukuki ticari anlaşmazlık çözümü", status:"active", completedAt:null, lastActivity:Date.now()-120000, tasks:[{id:1,t:"Anlaşmazlık özetini hazırla",d:false,p:"high"},{id:2,t:"Hukuki belgeleri topla",d:false,p:"high"},{id:3,t:"Strateji seçenekleri belirle",d:false,p:"high"},{id:4,t:"Yazışma taslakları oluştur",d:false,p:"medium"}], notes:[], files:[], sessions:[] },
+  { id:"dudu", name:"Dudu", emoji:"📱", color:"#1D9E75", gradient:"linear-gradient(135deg,#1D9E75,#a0e8cc)", desc:"App uygulamasını tamamlama", status:"active", completedAt:null, lastActivity:Date.now()-180000, tasks:[{id:1,t:"Mevcut durumu değerlendir",d:false,p:"high"},{id:2,t:"Eksik özellikleri kodla",d:false,p:"medium"},{id:3,t:"Hata düzeltmeleri",d:false,p:"medium"},{id:4,t:"Yayın öncesi test",d:false,p:"low"}], notes:[], files:[], sessions:[] },
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────
@@ -96,7 +96,7 @@ const css = `
 }
 .plm .stat-card:hover { transform: translateY(-2px); border-color: rgba(0,0,0,0.1); }
 .plm .stat-card .num { font-size: 28px; font-weight: 700; }
-.plm .stat-card .lbl { font-size: 12px; color: #777; margin-top: 4px; }
+.plm .stat-card .lbl { font-size: 12px; color: #8B8578; margin-top: 4px; }
 
 /* ── Header ── */
 .plm .page-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
@@ -115,9 +115,9 @@ const css = `
   white-space: nowrap;
 }
 .plm .btn:hover { background: rgba(0,0,0,0.08); transform: translateY(-1px); }
-.plm .btn-primary { background: #5B8DEF; border-color: #5B8DEF; color: #fff; }
+.plm .btn-primary { background: #185FA5; border-color: #185FA5; color: #fff; }
 .plm .btn-primary:hover { background: #4a7de0; }
-.plm .btn-danger { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.3); color: #f87171; }
+.plm .btn-danger { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.3); color: #D85A30; }
 .plm .btn-danger:hover { background: rgba(239,68,68,0.25); }
 .plm .btn-sm { padding: 5px 10px; font-size: 12px; }
 
@@ -140,8 +140,8 @@ const css = `
 .plm .pcard-bottom { padding: 14px 20px; background: rgba(0,0,0,0.05); }
 .plm .progress-bar { height: 6px; background: rgba(0,0,0,0.08); border-radius: 3px; overflow: hidden; margin-bottom: 8px; }
 .plm .progress-fill { height: 100%; border-radius: 3px; transition: width .4s ease; }
-.plm .pcard-meta { font-size: 11px; color: #777; display: flex; justify-content: space-between; }
-.plm .pcard-sessions { margin-top: 8px; font-size: 10px; color: #777; }
+.plm .pcard-meta { font-size: 11px; color: #8B8578; display: flex; justify-content: space-between; }
+.plm .pcard-sessions { margin-top: 8px; font-size: 10px; color: #8B8578; }
 .plm .pcard-sessions div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* ── Add Card ── */
@@ -154,15 +154,15 @@ const css = `
   min-height: 180px;
   cursor: pointer;
   font-size: 40px;
-  color: #999;
+  color: #8B8578;
   transition: all .2s;
 }
-.plm .add-card:hover { border-color: rgba(0,0,0,0.2); color: #777; transform: translateY(-2px); }
+.plm .add-card:hover { border-color: rgba(0,0,0,0.2); color: #8B8578; transform: translateY(-2px); }
 
 /* ── Completed Section ── */
 .plm .completed-section { opacity: 0.5; margin-top: 16px; }
 .plm .completed-section:hover { opacity: 0.75; }
-.plm .section-title { font-size: 14px; font-weight: 600; color: #777; margin-bottom: 12px; }
+.plm .section-title { font-size: 14px; font-weight: 600; color: #8B8578; margin-bottom: 12px; }
 
 /* ── Modal ── */
 .plm .overlay {
@@ -171,18 +171,18 @@ const css = `
   animation: fadeIn .2s ease;
 }
 .plm .modal {
-  background: #ffffff; border: 1px solid rgba(0,0,0,0.05);
+  background: #FFFFFF; border: 1px solid rgba(0,0,0,0.05);
   border-radius: 20px; padding: 28px; width: 100%; max-width: 520px;
   max-height: 90vh; overflow-y: auto; animation: slideUp .3s ease;
 }
 .plm .modal h2 { font-size: 20px; margin-bottom: 20px; }
-.plm .modal label { display: block; font-size: 12px; color: #777; margin-bottom: 6px; margin-top: 16px; }
+.plm .modal label { display: block; font-size: 12px; color: #8B8578; margin-bottom: 6px; margin-top: 16px; }
 .plm .modal input, .plm .modal textarea {
   width: 100%; background: rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.08);
   border-radius: 10px; padding: 10px 14px; color: #1a1a2e; font-family: inherit; font-size: 14px;
   outline: none; transition: border-color .2s;
 }
-.plm .modal input:focus, .plm .modal textarea:focus { border-color: #5B8DEF; }
+.plm .modal input:focus, .plm .modal textarea:focus { border-color: #185FA5; }
 .plm .modal textarea { resize: vertical; min-height: 60px; }
 
 .plm .emoji-grid { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -192,7 +192,7 @@ const css = `
   font-size: 20px; cursor: pointer; transition: all .15s;
 }
 .plm .emoji-opt:hover { background: rgba(0,0,0,0.08); }
-.plm .emoji-opt.sel { border-color: #5B8DEF; background: rgba(91,141,239,0.15); }
+.plm .emoji-opt.sel { border-color: #185FA5; background: rgba(91,141,239,0.15); }
 
 .plm .color-grid { display: flex; gap: 8px; flex-wrap: wrap; }
 .plm .color-opt {
@@ -206,7 +206,7 @@ const css = `
   background: rgba(0,0,0,0.03); border-radius: 14px; overflow: hidden; margin-top: 20px;
 }
 .plm .preview-top { padding: 16px; min-height: 60px; display: flex; align-items: center; gap: 10px; }
-.plm .preview-bottom { padding: 10px 16px; background: rgba(0,0,0,0.05); font-size: 12px; color: #777; }
+.plm .preview-bottom { padding: 10px 16px; background: rgba(0,0,0,0.05); font-size: 12px; color: #8B8578; }
 
 .plm .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
 
@@ -219,7 +219,7 @@ const css = `
 .plm .detail-hdr .desc { color: rgba(255,255,255,0.8); margin-top: 6px; font-size: 14px; }
 .plm .detail-btns { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
 
-.plm .back-btn { background: none; border: none; color: #777; cursor: pointer; font-size: 14px; margin-bottom: 12px; font-family: inherit; }
+.plm .back-btn { background: none; border: none; color: #8B8578; cursor: pointer; font-size: 14px; margin-bottom: 12px; font-family: inherit; }
 .plm .back-btn:hover { color: #1a1a2e; }
 
 /* ── Tabs ── */
@@ -227,7 +227,7 @@ const css = `
 .plm .tab {
   padding: 8px 14px; border-radius: 10px; font-size: 13px; cursor: pointer;
   background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.06);
-  color: #777; white-space: nowrap; font-family: inherit; transition: all .2s;
+  color: #8B8578; white-space: nowrap; font-family: inherit; transition: all .2s;
 }
 .plm .tab:hover { background: rgba(0,0,0,0.05); color: #1a1a2e; }
 .plm .tab.active { background: rgba(0,0,0,0.08); color: #fff; border-color: rgba(0,0,0,0.1); }
@@ -248,12 +248,12 @@ const css = `
   transition: background .15s;
 }
 .plm .task-item:hover { background: rgba(0,0,0,0.06); }
-.plm .task-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: #5B8DEF; cursor: pointer; }
+.plm .task-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: #185FA5; cursor: pointer; }
 .plm .task-item .task-text { flex: 1; font-size: 14px; }
 .plm .task-item .task-text.done { text-decoration: line-through; opacity: 0.5; }
 .plm .task-item .pri { font-size: 12px; }
-.plm .task-item .del { background: none; border: none; color: #999; cursor: pointer; font-size: 16px; }
-.plm .task-item .del:hover { color: #f87171; }
+.plm .task-item .del { background: none; border: none; color: #8B8578; cursor: pointer; font-size: 16px; }
+.plm .task-item .del:hover { color: #D85A30; }
 
 .plm .add-row { display: flex; gap: 8px; margin-top: 12px; }
 .plm .add-row input { flex: 1; }
@@ -269,16 +269,16 @@ const css = `
 }
 .plm .note-card .note-tag { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 6px; display: inline-block; margin-bottom: 6px; }
 .plm .note-card .note-text { font-size: 14px; line-height: 1.5; }
-.plm .note-card .note-date { font-size: 11px; color: #777; margin-top: 6px; }
-.plm .note-card .note-del { float: right; background: none; border: none; color: #999; cursor: pointer; }
+.plm .note-card .note-date { font-size: 11px; color: #8B8578; margin-top: 6px; }
+.plm .note-card .note-del { float: right; background: none; border: none; color: #8B8578; cursor: pointer; }
 
 /* ── Files ── */
 .plm .drop-zone {
   border: 2px dashed rgba(0,0,0,0.1); border-radius: 14px;
-  padding: 40px; text-align: center; color: #777; cursor: pointer;
+  padding: 40px; text-align: center; color: #8B8578; cursor: pointer;
   transition: all .2s; margin-bottom: 16px;
 }
-.plm .drop-zone:hover, .plm .drop-zone.over { border-color: #5B8DEF; color: #5B8DEF; background: rgba(91,141,239,0.05); }
+.plm .drop-zone:hover, .plm .drop-zone.over { border-color: #185FA5; color: #185FA5; background: rgba(91,141,239,0.05); }
 .plm .file-item {
   display: flex; align-items: center; gap: 12px; padding: 10px 14px;
   background: rgba(0,0,0,0.03); border-radius: 10px; margin-bottom: 6px;
@@ -286,14 +286,14 @@ const css = `
 .plm .file-item .file-icon { font-size: 24px; }
 .plm .file-item .file-info { flex: 1; }
 .plm .file-item .file-name { font-size: 14px; }
-.plm .file-item .file-meta { font-size: 11px; color: #777; }
+.plm .file-item .file-meta { font-size: 11px; color: #8B8578; }
 
 /* ── Sessions ── */
 .plm .session-item {
   background: rgba(0,0,0,0.03); border-radius: 10px; padding: 12px 16px; margin-bottom: 8px;
 }
 .plm .session-item .s-prompt { font-size: 13px; line-height: 1.4; }
-.plm .session-item .s-date { font-size: 11px; color: #777; margin-top: 4px; }
+.plm .session-item .s-date { font-size: 11px; color: #8B8578; margin-top: 4px; }
 
 /* ── Modules ── */
 .plm .mod-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
@@ -304,7 +304,7 @@ const css = `
 .plm .mod-card:hover { transform: translateY(-2px); border-color: rgba(0,0,0,0.1); }
 .plm .mod-card .mod-icon { font-size: 28px; margin-bottom: 8px; }
 .plm .mod-card .mod-name { font-size: 14px; font-weight: 600; }
-.plm .mod-card .mod-desc { font-size: 12px; color: #777; margin-top: 4px; }
+.plm .mod-card .mod-desc { font-size: 12px; color: #8B8578; margin-top: 4px; }
 
 .plm .mod-prompts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
 .plm .mod-prompt-btn {
@@ -317,14 +317,14 @@ const css = `
 /* ── Toast ── */
 .plm .toast {
   position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-  background: #333; color: #fff; padding: 12px 24px; border-radius: 12px;
+  background: #2C2A26; color: #fff; padding: 12px 24px; border-radius: 12px;
   font-size: 13px; z-index: 2000; animation: slideUp .3s ease;
   box-shadow: 0 8px 24px rgba(0,0,0,0.5);
 }
 
 /* ── Manual file add ── */
 .plm details { margin-top: 12px; }
-.plm summary { cursor: pointer; color: #777; font-size: 13px; }
+.plm summary { cursor: pointer; color: #8B8578; font-size: 13px; }
 .plm summary:hover { color: #1a1a2e; }
 `;
 
@@ -436,17 +436,23 @@ export default function Projelerim() {
   // ─── Claude ────────────────────────────────────────────────────
   const openClaude = (prompt) => {
     if (!proj) return;
-    // Popup blocker engellemesin diye önce pencereyi aç
-    const win = window.open("https://claude.ai/new", "_blank");
     const full = `[Proje: ${proj.name}] ${proj.desc}\n\nMevcut görevler:\n${proj.tasks.map(t => `${t.d ? "✅" : "⬜"} [${t.p}] ${t.t}`).join("\n")}\n\n${prompt}`;
-    navigator.clipboard?.writeText(full);
+    navigator.clipboard?.writeText(full).catch(() => {});
     const np = projects.map(p => {
       if (p.id !== selId) return p;
       const sessions = [{ prompt, date: now(), ts: Date.now() }, ...p.sessions].slice(0, 20);
       return { ...p, sessions, lastActivity: Date.now() };
     });
     save(np);
-    showToast(win ? "📋 Prompt kopyalandı, Claude açıldı!" : "📋 Prompt kopyalandı! Popup engellenmiş olabilir.");
+    // Anchor tag ile aç — popup blocker engellemez
+    const a = document.createElement("a");
+    a.href = "https://claude.ai/new";
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    showToast("📋 Prompt kopyalandı, Claude açılıyor...");
   };
 
   // ─── Stats ─────────────────────────────────────────────────────
@@ -477,10 +483,10 @@ export default function Projelerim() {
             </div>
 
             <div className="stats">
-              <div className="stat-card"><div className="num" style={{ color: "#5B8DEF" }}>{active.length}</div><div className="lbl">Aktif Proje</div></div>
-              <div className="stat-card"><div className="num" style={{ color: "#6BC9A2" }}>{done.length}</div><div className="lbl">Tamamlanan</div></div>
+              <div className="stat-card"><div className="num" style={{ color: "#185FA5" }}>{active.length}</div><div className="lbl">Aktif Proje</div></div>
+              <div className="stat-card"><div className="num" style={{ color: "#1D9E75" }}>{done.length}</div><div className="lbl">Tamamlanan</div></div>
               <div className="stat-card"><div className="num">{doneTasks}/{totalTasks}</div><div className="lbl">Görev İlerleme</div></div>
-              <div className="stat-card"><div className="num" style={{ color: "#F59E0B" }}>%{pct}</div><div className="lbl">Genel İlerleme</div></div>
+              <div className="stat-card"><div className="num" style={{ color: "#BA7517" }}>%{pct}</div><div className="lbl">Genel İlerleme</div></div>
               <div className="stat-card"><div className="num">{totalNotes}</div><div className="lbl">Not</div></div>
               <div className="stat-card"><div className="num">{totalFiles}</div><div className="lbl">Dosya</div></div>
             </div>
