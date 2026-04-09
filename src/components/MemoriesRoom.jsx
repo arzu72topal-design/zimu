@@ -194,7 +194,7 @@ export default function MemoriesRoom({ data, update, onBack }) {
           <input value={search} onChange={e=>setSearch(e.target.value)}
             placeholder={T("searchMemories")} style={{
             width:"100%",padding:"8px 12px",borderRadius:10,
-            background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",
+            background:"rgba(0,0,0,0.06)",border:"1px solid rgba(0,0,0,0.06)",
             color:"#F9FAFB",fontSize:13,outline:"none",boxSizing:"border-box",
           }}/>
         </StickyHeader>
@@ -213,7 +213,7 @@ export default function MemoriesRoom({ data, update, onBack }) {
             return (
               <div key={item.id} className="touch-card" onClick={()=>openDetail(item)} style={{
                 ...cardStyle, display:"flex",gap:12,padding:0,overflow:"hidden",marginBottom:10,
-                border:`1px solid ${moodObj?.color||"rgba(255,255,255,0.05)"}25`,
+                border:`1px solid ${moodObj?.color||"rgba(0,0,0,0.06)"}25`,
               }}>
                 {/* Thumbnail */}
                 {item.photos?.[0]?(
@@ -221,7 +221,7 @@ export default function MemoriesRoom({ data, update, onBack }) {
                     <img src={item.photos[0]} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
                   </div>
                 ):(
-                  <div style={{width:80,height:80,flexShrink:0,background:"rgba(255,255,255,0.04)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:28}}>
+                  <div style={{width:80,height:80,flexShrink:0,background:"rgba(0,0,0,0.03)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:28}}>
                     {item.mood||<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="#9CA3AF" strokeWidth="1.5"/><path d="M14 2v6h6" stroke="#9CA3AF" strokeWidth="1.5"/><line x1="8" y1="13" x2="16" y2="13" stroke="#9CA3AF" strokeWidth="1" opacity=".5"/><line x1="8" y1="17" x2="12" y2="17" stroke="#9CA3AF" strokeWidth="1" opacity=".5"/></svg>}
                   </div>
                 )}
@@ -257,7 +257,7 @@ export default function MemoriesRoom({ data, update, onBack }) {
               {MOOD_LIST.map(m=>(
                 <button key={m.symbol} onClick={()=>setForm({...form,mood:form.mood===m.symbol?"":m.symbol})} style={{
                   padding:"6px 12px",borderRadius:10,cursor:"pointer",fontSize:13,
-                  background:form.mood===m.symbol?`${m.color}25`:"rgba(255,255,255,0.05)",
+                  background:form.mood===m.symbol?`${m.color}25`:"rgba(0,0,0,0.06)",
                   color:form.mood===m.symbol?m.color:"#9CA3AF",
                   border:form.mood===m.symbol?`1px solid ${m.color}40`:"1px solid transparent",
                 }}>{m.symbol} {m.label}</button>
@@ -271,13 +271,13 @@ export default function MemoriesRoom({ data, update, onBack }) {
             <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
               <button onClick={()=>setForm({...form,folder:""})} style={{
                 padding:"6px 12px",borderRadius:10,border:"none",cursor:"pointer",fontSize:12,
-                background:!form.folder?"rgba(156,163,175,0.2)":"rgba(255,255,255,0.05)",
+                background:!form.folder?"rgba(156,163,175,0.2)":"rgba(0,0,0,0.06)",
                 color:!form.folder?"#F9FAFB":"#9CA3AF",
               }}>{T("noFolder")}</button>
               {folders.map(f=>(
                 <button key={f.id} onClick={()=>setForm({...form,folder:f.id})} style={{
                   padding:"6px 12px",borderRadius:10,border:"none",cursor:"pointer",fontSize:12,
-                  background:form.folder===f.id?`${f.color}25`:"rgba(255,255,255,0.05)",
+                  background:form.folder===f.id?`${f.color}25`:"rgba(0,0,0,0.06)",
                   color:form.folder===f.id?f.color:"#9CA3AF",
                 }}>{f.icon} {f.name}</button>
               ))}
@@ -303,8 +303,8 @@ export default function MemoriesRoom({ data, update, onBack }) {
               ))}
               {form.photos.length<8&&(
                 <button onClick={()=>fileRef.current?.click()} style={{
-                  width:72,height:72,borderRadius:10,border:"2px dashed rgba(255,255,255,0.15)",
-                  background:"rgba(255,255,255,0.03)",color:"#9CA3AF",cursor:"pointer",
+                  width:72,height:72,borderRadius:10,border:"2px dashed rgba(0,0,0,0.1)",
+                  background:"rgba(0,0,0,0.03)",color:"#9CA3AF",cursor:"pointer",
                   display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,fontSize:10,
                 }}>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="#9CA3AF" strokeWidth="1.5"/><circle cx="8.5" cy="10.5" r="2" stroke="#9CA3AF" strokeWidth="1.5"/><path d="M3 16l4-4 3 3 4-5 7 6" stroke="#9CA3AF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -370,8 +370,8 @@ export default function MemoriesRoom({ data, update, onBack }) {
 
         {/* Add folder card */}
         <div className="touch-card" onClick={()=>setShowFolderModal(true)} style={{
-          background:"rgba(255,255,255,0.03)",borderRadius:18,padding:"18px 14px",
-          cursor:"pointer",border:"2px dashed rgba(255,255,255,0.1)",
+          background:"rgba(0,0,0,0.03)",borderRadius:18,padding:"18px 14px",
+          cursor:"pointer",border:"2px dashed rgba(0,0,0,0.08)",
           display:"flex",flexDirection:"column",alignItems:"center",gap:6,minHeight:100,justifyContent:"center",
         }}>
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round"/></svg>
@@ -390,7 +390,7 @@ export default function MemoriesRoom({ data, update, onBack }) {
               {item.photos?.[0]?(
                 <img src={item.photos[0]} alt="" style={{width:40,height:40,objectFit:"cover",borderRadius:8,flexShrink:0}}/>
               ):(
-                <div style={{width:40,height:40,borderRadius:8,background:"rgba(255,255,255,0.05)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                <div style={{width:40,height:40,borderRadius:8,background:"rgba(0,0,0,0.06)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
                   {item.mood ? <span style={{fontSize:16}}>{item.mood}</span> : <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="#9CA3AF" strokeWidth="1.5"/><path d="M14 2v6h6" stroke="#9CA3AF" strokeWidth="1.5"/></svg>}
                 </div>
               )}
@@ -422,8 +422,8 @@ export default function MemoriesRoom({ data, update, onBack }) {
         <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:12}}>
           {FOLDER_ICONS.map(ic=>(
             <button key={ic} onClick={()=>setFolderForm({...folderForm,icon:ic})} style={{
-              width:36,height:36,borderRadius:10,border:folderForm.icon===ic?"2px solid #22c55e":"2px solid rgba(255,255,255,0.1)",
-              background:folderForm.icon===ic?"rgba(34,197,94,0.15)":"rgba(255,255,255,0.05)",
+              width:36,height:36,borderRadius:10,border:folderForm.icon===ic?"2px solid #22c55e":"2px solid rgba(0,0,0,0.08)",
+              background:folderForm.icon===ic?"rgba(34,197,94,0.15)":"rgba(0,0,0,0.06)",
               cursor:"pointer",fontSize:18,display:"flex",alignItems:"center",justifyContent:"center",
             }}>{ic}</button>
           ))}
@@ -442,7 +442,7 @@ export default function MemoriesRoom({ data, update, onBack }) {
             {MOOD_LIST.map(m=>(
               <button key={m.symbol} onClick={()=>setForm({...form,mood:form.mood===m.symbol?"":m.symbol})} style={{
                 padding:"6px 12px",borderRadius:10,border:form.mood===m.symbol?`1px solid ${m.color}40`:"1px solid transparent",cursor:"pointer",fontSize:13,
-                background:form.mood===m.symbol?`${m.color}25`:"rgba(255,255,255,0.05)",
+                background:form.mood===m.symbol?`${m.color}25`:"rgba(0,0,0,0.06)",
                 color:form.mood===m.symbol?m.color:"#9CA3AF",
               }}>{m.symbol} {m.label}</button>
             ))}
@@ -454,7 +454,7 @@ export default function MemoriesRoom({ data, update, onBack }) {
             {folders.map(f=>(
               <button key={f.id} onClick={()=>setForm({...form,folder:f.id})} style={{
                 padding:"6px 12px",borderRadius:10,border:"none",cursor:"pointer",fontSize:12,
-                background:form.folder===f.id?`${f.color}25`:"rgba(255,255,255,0.05)",
+                background:form.folder===f.id?`${f.color}25`:"rgba(0,0,0,0.06)",
                 color:form.folder===f.id?f.color:"#9CA3AF",
               }}>{f.icon} {f.name}</button>
             ))}
@@ -471,7 +471,7 @@ export default function MemoriesRoom({ data, update, onBack }) {
               </div>
             ))}
             {form.photos.length<8&&(
-              <button onClick={()=>fileRef.current?.click()} style={{width:72,height:72,borderRadius:10,border:"2px dashed rgba(255,255,255,0.15)",background:"rgba(255,255,255,0.03)",color:"#9CA3AF",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,fontSize:10}}>
+              <button onClick={()=>fileRef.current?.click()} style={{width:72,height:72,borderRadius:10,border:"2px dashed rgba(0,0,0,0.1)",background:"rgba(0,0,0,0.03)",color:"#9CA3AF",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,fontSize:10}}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="#9CA3AF" strokeWidth="1.5"/><circle cx="8.5" cy="10.5" r="2" stroke="#9CA3AF" strokeWidth="1.5"/><path d="M3 16l4-4 3 3 4-5 7 6" stroke="#9CA3AF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 {T("addPhoto")}
               </button>
