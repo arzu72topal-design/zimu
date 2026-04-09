@@ -7,6 +7,21 @@ import { cardStyle, inp, btnPrimary, filterBtnStyle, addBtnStyle, delBtnStyle } 
 
 export default function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
   const T = (key) => i18n(key, data);
+
+  // CORS proxy for Deezer API
+  const proxyFetch = async (url) => {
+    const proxies = [
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+      `https://corsproxy.io/?${encodeURIComponent(url)}`,
+    ];
+    for (const p of proxies) {
+      try {
+        const r = await fetch(p);
+        if (r.ok) return await r.json();
+      } catch {}
+    }
+    throw new Error("Fetch failed");
+  };
   const [tab, setTab] = useState("collection"); // collection | search | link | charts
   const [searchQ, setSearchQ] = useState("");
   const [searchResults, setSearchResults] = useState([]);
