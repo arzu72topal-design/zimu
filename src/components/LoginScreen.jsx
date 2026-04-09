@@ -34,10 +34,10 @@ export default function LoginScreen({ onLogin }) {
 
   const glassInp = {
     width:"100%",
-    background:"#2A2A35",
+    background:"#F5F0E8",
     backdropFilter:"blur(10px)",WebkitBackdropFilter:"blur(10px)",
-    border:"1px solid rgba(167,139,250,0.18)",
-    borderRadius:14,padding:"13px 16px",color:"#F9FAFB",fontSize:15,
+    border:"1px solid rgba(0,0,0,0.08)",
+    borderRadius:14,padding:"13px 16px",color:"#2C2A26",fontSize:15,
     marginBottom:10,outline:"none",boxSizing:"border-box",
     transition:"border-color .2s",
   };
@@ -53,7 +53,7 @@ export default function LoginScreen({ onLogin }) {
         <div style={{textAlign:"center",marginBottom:40}}>
           <div style={{
             fontSize:62,fontWeight:900,letterSpacing:-3,lineHeight:1,
-            background:"linear-gradient(135deg,#e0d5f5 0%,#a78bfa 35%,#6366f1 65%,#818cf8 100%)",
+            background:"linear-gradient(135deg,#185FA5 0%,#534AB7 40%,#1D9E75 100%)",
             WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",
             animation:"zimuGlow 4s ease-in-out infinite",
             display:"inline-block",
@@ -62,30 +62,30 @@ export default function LoginScreen({ onLogin }) {
           {/* Decorative line */}
           <div style={{
             height:1,margin:"14px auto 16px",
-            background:"linear-gradient(90deg,transparent,rgba(167,139,250,0.6),transparent)",
+            background:"linear-gradient(90deg,transparent,rgba(24,95,165,0.3),transparent)",
             animation:"lineExpand 1s ease .3s both",
           }}/>
 
           <div style={{fontSize:15,fontStyle:"italic",opacity:.7,lineHeight:1.7,letterSpacing:.3}}>
             Kendi destanını yaz.
           </div>
-          <div style={{fontSize:13,fontStyle:"italic",color:"#9CA3AF",marginTop:2,letterSpacing:.2}}>
+          <div style={{fontSize:13,fontStyle:"italic",color:"#8B8578",marginTop:2,letterSpacing:.2}}>
             Write your own epic.
           </div>
         </div>
 
         {/* Glass card */}
         <div style={{
-          background:"#1C1C26",
+          background:"#FFFFFF",
           backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",
-          border:"1px solid rgba(167,139,250,0.15)",
+          border:"1px solid rgba(0,0,0,0.06)",
           borderRadius:24,padding:"26px 22px",
-          boxShadow:"0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)",
+          boxShadow:"0 8px 40px rgba(0,0,0,0.06), inset 0 1px 0 rgba(0,0,0,0.02)",
           animation:"glassIn .8s ease .2s both",
         }}>
           {error && (
-            <div style={{background:"rgba(239,68,68,0.1)",border:"1px solid rgba(239,68,68,0.25)",
-              borderRadius:12,padding:"10px 14px",marginBottom:14,fontSize:13,color:"#f87171",textAlign:"center"}}>
+            <div style={{background:"rgba(216,90,48,0.1)",border:"1px solid rgba(216,90,48,0.25)",
+              borderRadius:12,padding:"10px 14px",marginBottom:14,fontSize:13,color:"#D85A30",textAlign:"center"}}>
               {error}
             </div>
           )}
@@ -93,9 +93,9 @@ export default function LoginScreen({ onLogin }) {
           {/* Google */}
           <button onClick={handleGoogle} disabled={loading} style={{
             width:"100%",padding:"14px",borderRadius:14,
-            border:"1px solid rgba(167,139,250,0.25)",
-            background:"rgba(99,102,241,0.08)",
-            color:"#F9FAFB",fontSize:15,fontWeight:600,cursor:"pointer",
+            border:"1px solid rgba(24,95,165,0.2)",
+            background:"rgba(24,95,165,0.06)",
+            color:"#2C2A26",fontSize:15,fontWeight:600,cursor:"pointer",
             display:"flex",alignItems:"center",justifyContent:"center",gap:10,marginBottom:18,
             opacity:loading?.6:1,transition:"all .2s",
             backdropFilter:"blur(8px)",
@@ -111,9 +111,9 @@ export default function LoginScreen({ onLogin }) {
 
           {/* Divider */}
           <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:16}}>
-            <div style={{flex:1,height:1,background:"#2A2A35"}}/>
-            <span style={{fontSize:12,color:"#9CA3AF",letterSpacing:.5}}>{T("orDivider")}</span>
-            <div style={{flex:1,height:1,background:"#2A2A35"}}/>
+            <div style={{flex:1,height:1,background:"#F5F0E8"}}/>
+            <span style={{fontSize:12,color:"#8B8578",letterSpacing:.5}}>{T("orDivider")}</span>
+            <div style={{flex:1,height:1,background:"#F5F0E8"}}/>
           </div>
 
           <input type="email" placeholder={T("emailPlaceholder")} value={email}
@@ -126,10 +126,10 @@ export default function LoginScreen({ onLogin }) {
 
           <button onClick={handleEmail} disabled={loading} style={{
             width:"100%",
-            background:"linear-gradient(135deg,#6366f1,#a78bfa)",
+            background:"linear-gradient(135deg,#185FA5,#534AB7)",
             color:"#fff",border:"none",borderRadius:14,
             padding:"14px",cursor:"pointer",fontSize:15,fontWeight:700,marginTop:4,
-            boxShadow:"0 4px 24px rgba(99,102,241,0.45)",
+            boxShadow:"0 4px 24px rgba(24,95,165,0.2)",
             opacity:loading?.6:1,transition:"all .2s",letterSpacing:.3,
           }}>
             {loading ? T("waitLogin") : mode === "register" ? T("registerTitle") : T("loginTitle")}
@@ -137,7 +137,7 @@ export default function LoginScreen({ onLogin }) {
 
           <div style={{textAlign:"center",marginTop:16}}>
             <button onClick={()=>{setMode(mode==="login"?"register":"login");setError("");}} style={{
-              background:"none",border:"none",color:"#a78bfa",fontSize:13,cursor:"pointer",opacity:.8,
+              background:"none",border:"none",color:"#185FA5",fontSize:13,cursor:"pointer",opacity:.8,
             }}>
               {mode === "login" ? T("noAccount") : T("hasAccount")}
             </button>
@@ -147,7 +147,7 @@ export default function LoginScreen({ onLogin }) {
         {/* Skip */}
         <div style={{textAlign:"center",marginTop:20}}>
           <button onClick={handleSkip} style={{
-            background:"none",border:"none",color:"#9CA3AF",fontSize:12,cursor:"pointer",
+            background:"none",border:"none",color:"#8B8578",fontSize:12,cursor:"pointer",
           }}>
             {T("skipLogin")}
           </button>
