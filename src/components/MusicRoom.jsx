@@ -237,16 +237,16 @@ export default function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
           <button className="back-btn" aria-label="Go back" onClick={onBack}>◀</button>
           <span style={{fontSize:22}}>♪</span>
           <h3 style={{margin:0,fontSize:19,fontWeight:800,flex:1}}>{roomLabel(room,data)}</h3>
-          <span style={{fontSize:12,color:"#9CA3AF"}}>{items.length} parça</span>
+          <span style={{fontSize:12,color:"#8B8578"}}>{items.length} parça</span>
         </div>
         {/* Tab switcher — 4 tabs */}
-        <div style={{background:"#f0f0f5",borderRadius:12,padding:3,display:"flex",gap:1}}>
+        <div style={{background:"#F5F0E8",borderRadius:12,padding:3,display:"flex",gap:1}}>
           {[["collection",T("musicTabMine")],["charts","Top"],["search",T("musicTabSearch")],["link","Link"]].map(([k,v])=>(
             <button key={k} onClick={()=>setTab(k)} style={{
               flex:1,padding:"8px 2px",borderRadius:9,border:"none",cursor:"pointer",
               fontSize:11,fontWeight:tab===k?700:500,
               background:tab===k?"rgba(0,0,0,0.08)":"transparent",
-              color:tab===k?"#F9FAFB":"#9CA3AF",transition:"all .2s",
+              color:tab===k?"#2C2A26":"#8B8578",transition:"all .2s",
             }}>{v}</button>
           ))}
         </div>
@@ -257,11 +257,11 @@ export default function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
         items.length===0 ? (
           <div style={{textAlign:"center",padding:"40px 20px"}}>
             <div style={{fontSize:44,marginBottom:10}}>♪</div>
-            <div style={{fontSize:15,fontWeight:700,color:"#9CA3AF",marginBottom:6}}>Koleksiyonun boş</div>
-            <div style={{fontSize:12,color:"#9CA3AF",marginBottom:20}}>Deezer'dan ara veya link yapıştır</div>
+            <div style={{fontSize:15,fontWeight:700,color:"#8B8578",marginBottom:6}}>Koleksiyonun boş</div>
+            <div style={{fontSize:12,color:"#8B8578",marginBottom:20}}>Deezer'dan ara veya link yapıştır</div>
             <div style={{display:"flex",gap:8,justifyContent:"center"}}>
               <button onClick={()=>setTab("search")} style={{background:"rgba(162,56,255,0.15)",color:"#a238ff",border:"1px solid rgba(162,56,255,0.3)",borderRadius:12,padding:"10px 20px",fontSize:13,fontWeight:700,cursor:"pointer"}}>▸ Deezer'da Ara</button>
-              <button onClick={()=>setTab("link")} style={{background:"rgba(59,130,246,0.15)",color:"#3b82f6",border:"1px solid rgba(59,130,246,0.3)",borderRadius:12,padding:"10px 20px",fontSize:13,fontWeight:700,cursor:"pointer"}}>▸ Link Ekle</button>
+              <button onClick={()=>setTab("link")} style={{background:"rgba(24,95,165,0.08)",color:"#185FA5",border:"1px solid rgba(24,95,165,0.2)",borderRadius:12,padding:"10px 20px",fontSize:13,fontWeight:700,cursor:"pointer"}}>▸ Link Ekle</button>
             </div>
           </div>
         ) : (
@@ -288,8 +288,8 @@ export default function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
               </div>
               <div style={{flex:1,minWidth:0,cursor:item.link?"pointer":"default"}} onClick={()=>{if(item.link&&!embed&&!item.preview)window.open(item.link,"_blank","noopener");}}>
                 <div style={{fontSize:14,fontWeight:700,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.title}</div>
-                {item.artist&&<div style={{fontSize:12,color:"#9CA3AF",marginTop:2}}>{item.artist}</div>}
-                <div style={{fontSize:11,color:"#9CA3AF",marginTop:2,display:"flex",alignItems:"center",gap:4}}>
+                {item.artist&&<div style={{fontSize:12,color:"#8B8578",marginTop:2}}>{item.artist}</div>}
+                <div style={{fontSize:11,color:"#8B8578",marginTop:2,display:"flex",alignItems:"center",gap:4}}>
                   <span>{platformIcon(item)}</span>
                   <span>{item.platform||item.source||"Müzik"}</span>
                 </div>
@@ -320,11 +320,11 @@ export default function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
               {item.link&&!embed&&!item.preview&&(
                 <button onClick={()=>window.open(item.link,"_blank","noopener")} style={{
                   width:36,height:36,borderRadius:"50%",
-                  background:"rgba(59,130,246,0.15)",border:"1px solid rgba(59,130,246,0.25)",
-                  color:"#3b82f6",fontSize:14,cursor:"pointer",
+                  background:"rgba(24,95,165,0.08)",border:"1px solid rgba(59,130,246,0.25)",
+                  color:"#185FA5",fontSize:14,cursor:"pointer",
                   display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,
                 }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" stroke="#185FA5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 </button>
               )}
               <button onClick={()=>onDel(item.id)} style={delBtnStyle} aria-label="Delete">✕</button>
@@ -332,7 +332,7 @@ export default function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
             {/* Embedded player (Spotify/YouTube iframe) */}
             {isExpanded&&embed&&(
               <div style={{
-                background:"#ffffff",borderRadius:"0 0 16px 16px",overflow:"hidden",
+                background:"#FFFFFF",borderRadius:"0 0 16px 16px",overflow:"hidden",
                 border:"1px solid rgba(0,0,0,0.06)",borderTop:"none",
               }}>
                 <iframe
@@ -365,15 +365,15 @@ export default function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
             {searching?"Aranıyor...":"Deezer'da Ara"}
           </button>
           {searching&&(
-            <div style={{textAlign:"center",padding:20,color:"#9CA3AF",fontSize:13}}>♪ Aranıyor...</div>
+            <div style={{textAlign:"center",padding:20,color:"#8B8578",fontSize:13}}>♪ Aranıyor...</div>
           )}
           {!searching&&searchResults.length===0&&searchQ&&(
-            <div style={{textAlign:"center",padding:"20px 0",color:"#9CA3AF",fontSize:13}}>Sonuç bulunamadı</div>
+            <div style={{textAlign:"center",padding:"20px 0",color:"#8B8578",fontSize:13}}>Sonuç bulunamadı</div>
           )}
           {!searching&&searchResults.length===0&&!searchQ&&(
             <div style={{textAlign:"center",padding:"20px 0"}}>
               <div style={{fontSize:32,marginBottom:8}}>♪</div>
-              <div style={{fontSize:13,color:"#9CA3AF"}}>Deezer veritabanında 90M+ parça</div>
+              <div style={{fontSize:13,color:"#8B8578"}}>Deezer veritabanında 90M+ parça</div>
               <div style={{fontSize:11,opacity:.25,marginTop:4}}>Arama yap → 30 sn önizleme dinle → Ekle</div>
             </div>
           )}
@@ -381,7 +381,7 @@ export default function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
             const inColl = items.some(i=>i.link===track.link);
             return (
               <div key={track.id} style={{
-                background:"#ffffff",borderRadius:16,padding:"10px 12px",marginBottom:6,
+                background:"#FFFFFF",borderRadius:16,padding:"10px 12px",marginBottom:6,
                 display:"flex",alignItems:"center",gap:10,minHeight:60,
                 opacity:inColl?.6:1,
               }}>
@@ -393,7 +393,7 @@ export default function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
                 </div>
                 <div style={{flex:1,minWidth:0}}>
                   <div style={{fontSize:13,fontWeight:700,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{track.title}</div>
-                  <div style={{fontSize:11,color:"#9CA3AF",marginTop:1}}>{track.artist?.name}</div>
+                  <div style={{fontSize:11,color:"#8B8578",marginTop:1}}>{track.artist?.name}</div>
                   {track.preview&&(
                     <div style={{fontSize:10,color:"#a238ff",marginTop:1,opacity:.7}}>▶ 30sn önizleme var</div>
                   )}
@@ -412,7 +412,7 @@ export default function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
                   width:34,height:34,borderRadius:"50%",flexShrink:0,
                   background:inColl?"rgba(34,197,94,0.15)":"rgba(162,56,255,0.15)",
                   border:inColl?"1px solid rgba(34,197,94,0.3)":"1px solid rgba(162,56,255,0.3)",
-                  color:inColl?"#22c55e":"#a238ff",
+                  color:inColl?"#1D9E75":"#a238ff",
                   fontSize:inColl?14:18,cursor:inColl?"default":"pointer",
                   display:"flex",alignItems:"center",justifyContent:"center",
                 }}>{inColl?"✓":"+"}</button>
@@ -425,7 +425,7 @@ export default function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
       {/* ── LINK ── */}
       {tab==="link"&&(
         <div>
-          <div style={{fontSize:12,color:"#9CA3AF",marginBottom:8,lineHeight:1.5}}>
+          <div style={{fontSize:12,color:"#8B8578",marginBottom:8,lineHeight:1.5}}>
             Spotify, YouTube, SoundCloud, Apple Music veya herhangi bir müzik linkini yapıştır.
           </div>
           <input
@@ -444,17 +444,17 @@ export default function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
               {name:"Apple Music",color:"#FC3C44",icon:"●"},
               {name:"Deezer",color:"#A238FF",icon:"●"},
             ].map(p=>(
-              <div key={p.name} style={{display:"flex",alignItems:"center",gap:4,background:"#ffffff",borderRadius:8,padding:"4px 10px",fontSize:11,opacity:.6}}>
+              <div key={p.name} style={{display:"flex",alignItems:"center",gap:4,background:"#FFFFFF",borderRadius:8,padding:"4px 10px",fontSize:11,opacity:.6}}>
                 <span>{p.icon}</span><span>{p.name}</span>
               </div>
             ))}
           </div>
 
           {/* Link preview card */}
-          {linkFetching&&<div style={{textAlign:"center",color:"#9CA3AF",fontSize:13,padding:12}}>Kontrol ediliyor...</div>}
+          {linkFetching&&<div style={{textAlign:"center",color:"#8B8578",fontSize:13,padding:12}}>Kontrol ediliyor...</div>}
           {linkPreview&&(
-            <div style={{background:"rgba(59,130,246,0.08)",border:"1px solid rgba(59,130,246,0.2)",borderRadius:14,padding:14,marginBottom:12}}>
-              <div style={{fontSize:11,color:"#9CA3AF",marginBottom:4}}>{linkPreview.icon} {linkPreview.platform}</div>
+            <div style={{background:"rgba(59,130,246,0.08)",border:"1px solid rgba(24,95,165,0.12)",borderRadius:14,padding:14,marginBottom:12}}>
+              <div style={{fontSize:11,color:"#8B8578",marginBottom:4}}>{linkPreview.icon} {linkPreview.platform}</div>
               <div style={{fontSize:14,fontWeight:700}}>{linkPreview.title}</div>
             </div>
           )}
@@ -464,18 +464,18 @@ export default function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
             style={inp}
             placeholder={T("trackNameOpt")}
             value={linkPreview?.title||""}
-            onChange={e=>setLinkPreview(lp=>lp?{...lp,title:e.target.value}:{title:e.target.value,url:linkInput,platform:"Müzik",color:"#9CA3AF"})}
+            onChange={e=>setLinkPreview(lp=>lp?{...lp,title:e.target.value}:{title:e.target.value,url:linkInput,platform:"Müzik",color:"#8B8578"})}
           />
 
           <button onClick={addFromLink} disabled={!linkInput.trim()} style={{
             ...btnPrimary,marginTop:0,
-            background:linkInput.trim()?"#3b82f6":"#333",
+            background:linkInput.trim()?"#185FA5":"#333",
             opacity:linkInput.trim()?1:.5,
           }}>Koleksiyona Ekle</button>
 
-          <div style={{marginTop:16,background:"#ffffff",borderRadius:12,padding:12}}>
-            <div style={{fontSize:11,fontWeight:700,color:"#9CA3AF",marginBottom:6,textTransform:"uppercase",letterSpacing:".05em"}}>Nasıl kullanılır?</div>
-            <div style={{fontSize:11,color:"#9CA3AF",lineHeight:1.7}}>
+          <div style={{marginTop:16,background:"#FFFFFF",borderRadius:12,padding:12}}>
+            <div style={{fontSize:11,fontWeight:700,color:"#8B8578",marginBottom:6,textTransform:"uppercase",letterSpacing:".05em"}}>Nasıl kullanılır?</div>
+            <div style={{fontSize:11,color:"#8B8578",lineHeight:1.7}}>
               1. Spotify'dan bir parça aç → 3 nokta → "Paylaş" → "Linki kopyala"<br/>
               2. Yukarıdaki kutuya yapıştır<br/>
               3. "Koleksiyona Ekle" ye bas
@@ -494,7 +494,7 @@ export default function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
                 flex:1,padding:"9px 4px",borderRadius:12,border:"none",cursor:"pointer",
                 fontSize:12,fontWeight:chartSource===k?700:500,
                 background:chartSource===k?"rgba(162,56,255,0.25)":"rgba(0,0,0,0.06)",
-                color:chartSource===k?"#c084fc":"#9CA3AF",
+                color:chartSource===k?"#c084fc":"#8B8578",
                 transition:"all .2s",
               }}>{v}</button>
             ))}
@@ -508,14 +508,14 @@ export default function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
                   padding:"6px 14px",borderRadius:20,border:"none",cursor:"pointer",whiteSpace:"nowrap",
                   fontSize:12,fontWeight:chartGenre===k?700:400,
                   background:chartGenre===k?"rgba(162,56,255,0.25)":"rgba(0,0,0,0.06)",
-                  color:chartGenre===k?"#c084fc":"#9CA3AF",
+                  color:chartGenre===k?"#c084fc":"#8B8578",
                 }}>{v}</button>
               ))}
             </div>
           )}
 
           {/* Source label */}
-          <div style={{fontSize:11,color:"#9CA3AF",marginBottom:10,display:"flex",alignItems:"center",gap:6}}>
+          <div style={{fontSize:11,color:"#8B8578",marginBottom:10,display:"flex",alignItems:"center",gap:6}}>
             <span>
               {chartSource==="tr"&&"● Apple Music Türkiye · Güncel Top 25"}
               {chartSource==="global"&&"● Deezer Global · Top 25 · 30sn önizleme"}
@@ -527,7 +527,7 @@ export default function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
           {chartLoading&&(
             <div style={{textAlign:"center",padding:"30px 0"}}>
               <div style={{fontSize:32,marginBottom:8,animation:"pulse 1.5s ease-in-out infinite"}}>♪</div>
-              <div style={{fontSize:13,color:"#9CA3AF"}}>Liste yükleniyor...</div>
+              <div style={{fontSize:13,color:"#8B8578"}}>Liste yükleniyor...</div>
             </div>
           )}
 
@@ -536,16 +536,16 @@ export default function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
             const inColl = items.some(it=>(track.link&&it.link===track.link)||(track.title&&track.artist&&it.title===track.title&&it.artist===track.artist));
             return (
               <div key={track.id||i} style={{
-                background:"#ffffff",borderRadius:16,padding:"10px 12px",marginBottom:6,
+                background:"#FFFFFF",borderRadius:16,padding:"10px 12px",marginBottom:6,
                 display:"flex",alignItems:"center",gap:10,minHeight:60,
               }}>
                 {/* Rank */}
                 <div style={{
                   width:26,height:26,borderRadius:8,flexShrink:0,
-                  background:i<3?"rgba(162,56,255,0.2)":"#f0f0f5",
+                  background:i<3?"rgba(162,56,255,0.2)":"#F5F0E8",
                   display:"flex",alignItems:"center",justifyContent:"center",
                   fontSize:11,fontWeight:700,
-                  color:i<3?"#c084fc":"#9CA3AF",
+                  color:i<3?"#c084fc":"#8B8578",
                 }}>{i+1}</div>
                 {/* Album art */}
                 <div style={{width:42,height:42,borderRadius:8,overflow:"hidden",flexShrink:0,background:"#111"}}>
@@ -557,7 +557,7 @@ export default function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
                 {/* Info */}
                 <div style={{flex:1,minWidth:0}}>
                   <div style={{fontSize:13,fontWeight:700,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{track.title}</div>
-                  <div style={{fontSize:11,color:"#9CA3AF",marginTop:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{track.artist}</div>
+                  <div style={{fontSize:11,color:"#8B8578",marginTop:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{track.artist}</div>
                   {track.preview&&<div style={{fontSize:10,color:"#a238ff",opacity:.7,marginTop:1}}>▶ önizleme</div>}
                 </div>
                 {/* Preview button */}
@@ -575,11 +575,11 @@ export default function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
                 {track.link&&!track.preview&&(
                   <button onClick={()=>window.open(track.link,"_blank","noopener")} style={{
                     width:32,height:32,borderRadius:"50%",flexShrink:0,
-                    background:"rgba(59,130,246,0.15)",border:"1px solid rgba(59,130,246,0.25)",
-                    color:"#3b82f6",fontSize:12,cursor:"pointer",
+                    background:"rgba(24,95,165,0.08)",border:"1px solid rgba(59,130,246,0.25)",
+                    color:"#185FA5",fontSize:12,cursor:"pointer",
                     display:"flex",alignItems:"center",justifyContent:"center",
                   }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" stroke="#185FA5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                   </button>
                 )}
                 {/* Add to collection */}
@@ -598,7 +598,7 @@ export default function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
                   width:32,height:32,borderRadius:"50%",flexShrink:0,
                   background:inColl?"rgba(34,197,94,0.15)":"rgba(162,56,255,0.15)",
                   border:inColl?"1px solid rgba(34,197,94,0.3)":"1px solid rgba(162,56,255,0.3)",
-                  color:inColl?"#22c55e":"#a238ff",
+                  color:inColl?"#1D9E75":"#a238ff",
                   fontSize:inColl?13:18,cursor:inColl?"default":"pointer",
                   display:"flex",alignItems:"center",justifyContent:"center",
                 }}>{inColl?"✓":"+"}</button>
@@ -608,8 +608,8 @@ export default function MusicRoom({ room, items, onBack, onAdd, onDel, data }) {
 
           {!chartLoading&&chartTracks.length===0&&(
             <div style={{textAlign:"center",padding:"30px 0"}}>
-              <div style={{marginBottom:8}}><svg width="32" height="32" viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="4" fill="#9CA3AF"/><path d="M10 26A13 13 0 0126 10" stroke="#9CA3AF" strokeWidth="1.5" fill="none" opacity=".4"/><path d="M6 30A19 19 0 0130 6" stroke="#9CA3AF" strokeWidth="1.5" fill="none" opacity=".2"/></svg></div>
-              <div style={{fontSize:13,color:"#9CA3AF"}}>Liste yüklenemedi</div>
+              <div style={{marginBottom:8}}><svg width="32" height="32" viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="4" fill="#8B8578"/><path d="M10 26A13 13 0 0126 10" stroke="#8B8578" strokeWidth="1.5" fill="none" opacity=".4"/><path d="M6 30A19 19 0 0130 6" stroke="#8B8578" strokeWidth="1.5" fill="none" opacity=".2"/></svg></div>
+              <div style={{fontSize:13,color:"#8B8578"}}>Liste yüklenemedi</div>
               <div style={{fontSize:11,opacity:.25,marginTop:4}}>İnternet bağlantını kontrol et</div>
               <button onClick={()=>{setChartLoaded("");fetchCharts(chartSource,chartGenre);}} style={{
                 marginTop:12,background:"rgba(162,56,255,0.15)",color:"#a238ff",
