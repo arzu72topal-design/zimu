@@ -25,7 +25,7 @@ export default function TasksHub({ data, update, initialSubTab, onSubTabConsumed
     <div>
       <div style={{
         display:"flex",gap:6,marginBottom:2,
-        background:"rgba(13,13,18,0.92)",
+        background:"rgba(245,245,247,0.95)",
         
         padding:"10px 4px 8px",
         borderRadius:14,
@@ -34,9 +34,9 @@ export default function TasksHub({ data, update, initialSubTab, onSubTabConsumed
         {[["tasks",T("tasks"),"✓"],["calendar",T("calendar"),"◫"],["notes",T("notes"),"☰"]].map(([k,v,icon])=>(
           <button key={k} className="nav-item" onClick={()=>setSubTab(k)} style={{
             flex:1,
-            background:subTab===k?"rgba(59,130,246,0.15)":"#2A2A35",
+            background:subTab===k?"rgba(59,130,246,0.15)":"#f0f0f5",
             color:subTab===k?"#3b82f6":"#9CA3AF",
-            border:subTab===k?"1px solid rgba(59,130,246,0.3)":"1px solid rgba(255,255,255,0.05)",
+            border:subTab===k?"1px solid rgba(59,130,246,0.3)":"1px solid rgba(0,0,0,0.06)",
             padding:"10px 4px",borderRadius:10,fontSize:12,fontWeight:subTab===k?700:500,
             cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:3,
           }}>
