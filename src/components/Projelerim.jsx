@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { saveFile, getFile, deleteFile, downloadFile, createBlobUrl } from "../fileStore";
 
 // ─── Constants ───────────────────────────────────────────────────────
 const STORAGE_KEY = "projelerim-hub-v8";
@@ -414,22 +415,55 @@ export default function Projelerim() {
     save(np);
   };
 
-  // ─── File helpers ──────────────────────────────────────────────
-  const addFiles = (fileList) => {
-    const newFiles = Array.from(fileList).map(f => ({
-      name: f.name, icon: fileIcon(f.name), size: fileSizeFmt(f.size), type: f.type || "bilinmiyor", note: "", date: now()
-    }));
-    const np = projects.map(p => p.id === selId ? { ...p, lastActivity: Date.now(), files: [...newFiles, ...p.files] } : p);
+  // ─── File helpers (IndexedDB backed) ────────────────────────────
+  const addFiles = async (fileList) => {
+    const files = Array.from(fileList);
+    const newMeta = [];
+    for (const f of files) {
+      const fid = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      try {
+        await saveFile(selId, fid, f);
+        newMeta.push({ id: fid, name: f.name, icon: fileIcon(f.name), size: fileSizeFmt(f.size), type: f.type || "bilinmiyor", note: "", date: now(), stored: true });
+      } catch {
+        newMeta.push({ id: fid, name: f.name, icon: fileIcon(f.name), size: fileSizeFmt(f.size), type: f.type || "bilinmiyor", note: "", date: now(), stored: false });
+      }
+    }
+    const np = projects.map(p => p.id === selId ? { ...p, lastActivity: Date.now(), files: [...newMeta, ...p.files] } : p);
     save(np);
-    showToast(`📎 ${newFiles.length} dosya eklendi`);
+    showToast(`📎 ${newMeta.length} dosya eklendi`);
   };
   const addManualFile = (name) => {
     if (!name.trim()) return;
-    const np = projects.map(p => p.id === selId ? { ...p, lastActivity: Date.now(), files: [{ name: name.trim(), icon: fileIcon(name.trim()), size: "-", type: "-", note: "", date: now() }, ...p.files] } : p);
+    const fid = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    const np = projects.map(p => p.id === selId ? { ...p, lastActivity: Date.now(), files: [{ id: fid, name: name.trim(), icon: fileIcon(name.trim()), size: "-", type: "-", note: "", date: now(), stored: false }, ...p.files] } : p);
     save(np);
   };
-  const delFile = (i) => {
+  const delFile = async (i) => {
+    const file = proj?.files?.[i];
+    if (file?.stored && file?.id) {
+      try { await deleteFile(selId, file.id); } catch {}
+    }
     const np = projects.map(p => p.id === selId ? { ...p, files: p.files.filter((_, j) => j !== i) } : p);
+    save(np);
+  };
+  const handleDownload = async (file) => {
+    if (!file?.stored || !file?.id) return;
+    try { await downloadFile(selId, file.id, file.name); } catch { showToast("İndirme başarısız"); }
+  };
+
+  // ─── Journal helpers ──────────────────────────────────────────
+  const addJournal = (title, content) => {
+    if (!title.trim() && !content.trim()) return;
+    const entry = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), title: title.trim(), content: content.trim(), date: now(), ts: Date.now() };
+    const np = projects.map(p => p.id === selId ? { ...p, lastActivity: Date.now(), journal: [entry, ...(p.journal || [])] } : p);
+    save(np);
+  };
+  const delJournal = (id) => {
+    const np = projects.map(p => p.id === selId ? { ...p, journal: (p.journal || []).filter(j => j.id !== id) } : p);
+    save(np);
+  };
+  const updateJournal = (id, title, content) => {
+    const np = projects.map(p => p.id === selId ? { ...p, journal: (p.journal || []).map(j => j.id === id ? { ...j, title, content, date: now() } : j) } : p);
     save(np);
   };
 
@@ -574,7 +608,7 @@ export default function Projelerim() {
 
             {/* Tabs */}
             <div className="tabs">
-              {[["overview","📊 Genel"],["tasks","📋 Görevler"],["notes","📝 Notlar"],["files","📎 Dosyalar"],["sessions","💬 Oturumlar"],["modules","🧩 Modüller"]].map(([k, l]) => (
+              {[["overview","📊 Genel"],["journal","📓 Günlük"],["tasks","📋 Görevler"],["notes","📝 Notlar"],["files","📎 Dosyalar"],["sessions","💬 Oturumlar"],["modules","🧩 Modüller"]].map(([k, l]) => (
                 <button key={k} className={`tab ${tab === k ? "active" : ""}`} onClick={() => setTab(k)}>{l}</button>
               ))}
             </div>
@@ -582,9 +616,10 @@ export default function Projelerim() {
             {/* Tab Content */}
             <div className="slide-up" key={tab}>
               {tab === "overview" && <OverviewTab project={proj} modules={MODULES} onOpenModule={(m) => { setSelModule(m); setTab("modules"); }} sessions={proj.sessions} onOpenClaude={openClaude} />}
+              {tab === "journal" && <JournalTab journal={proj.journal || []} onAdd={addJournal} onDel={delJournal} onUpdate={updateJournal} />}
               {tab === "tasks" && <TasksTab tasks={proj.tasks} onToggle={toggleTask} onAdd={addTask} onDel={delTask} />}
               {tab === "notes" && <NotesTab notes={proj.notes} onAdd={addNote} onDel={delNote} />}
-              {tab === "files" && <FilesTab files={proj.files} onAddFiles={addFiles} onAddManual={addManualFile} onDel={delFile} />}
+              {tab === "files" && <FilesTab files={proj.files} projectId={selId} onAddFiles={addFiles} onAddManual={addManualFile} onDel={delFile} onDownload={handleDownload} />}
               {tab === "sessions" && <SessionsTab sessions={proj.sessions} onReopen={openClaude} />}
               {tab === "modules" && <ModulesTab modules={MODULES} selected={selModule} onSelect={setSelModule} onPrompt={(prompt) => openClaude(prompt)} project={proj} />}
             </div>
@@ -768,12 +803,115 @@ function NotesTab({ notes, onAdd, onDel }) {
   );
 }
 
-function FilesTab({ files, onAddFiles, onAddManual, onDel }) {
+function JournalTab({ journal, onAdd, onDel, onUpdate }) {
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [editing, setEditing] = useState(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editContent, setEditContent] = useState("");
+  const [expanded, setExpanded] = useState(null);
+
+  const handleSave = () => {
+    if (editing) {
+      onUpdate(editing, editTitle, editContent);
+      setEditing(null);
+    } else {
+      onAdd(title, content);
+      setTitle(""); setContent("");
+    }
+  };
+
+  const startEdit = (entry) => {
+    setEditing(entry.id); setEditTitle(entry.title); setEditContent(entry.content);
+  };
+
+  return (
+    <div>
+      {/* Add new entry */}
+      <div style={{ background: "#F5F0E8", borderRadius: 14, padding: 16, marginBottom: 16, borderLeft: "3px solid #BA7517", borderRadius: "0 14px 14px 0" }}>
+        <input placeholder="Başlık (ör: Bugün yapılanlar)" value={title} onChange={e => setTitle(e.target.value)}
+          style={{ width: "100%", background: "#fff", border: "1px solid rgba(0,0,0,0.06)", borderRadius: 10, padding: "10px 14px", fontSize: 14, color: "#2C2A26", outline: "none", marginBottom: 8, boxSizing: "border-box" }} />
+        <textarea placeholder="Çalışma detayları, kararlar, notlar..." value={content} onChange={e => setContent(e.target.value)}
+          style={{ width: "100%", background: "#fff", border: "1px solid rgba(0,0,0,0.06)", borderRadius: 10, padding: "10px 14px", fontSize: 13, color: "#2C2A26", outline: "none", minHeight: 100, resize: "vertical", fontFamily: "inherit", lineHeight: 1.6, boxSizing: "border-box" }} />
+        <button className="btn btn-primary" style={{ marginTop: 8, width: "100%" }} onClick={handleSave} disabled={!title.trim() && !content.trim()}>
+          📓 Günlük Kaydı Ekle
+        </button>
+      </div>
+
+      {/* Entries */}
+      {journal.length === 0 && <div style={{ textAlign: "center", padding: 30, color: "#8B8578", fontSize: 13 }}>Henüz günlük kaydı yok. İlk çalışma notunuzu ekleyin!</div>}
+
+      {journal.map(entry => {
+        const isExp = expanded === entry.id;
+        const isEdit = editing === entry.id;
+
+        return (
+          <div key={entry.id} style={{ background: "#fff", borderRadius: 14, borderLeft: "3px solid #BA7517", borderRadius: "0 14px 14px 0", padding: "14px 16px", marginBottom: 8, border: "1px solid rgba(0,0,0,0.05)", borderLeft: "3px solid #BA7517" }}>
+            {isEdit ? (
+              <div>
+                <input value={editTitle} onChange={e => setEditTitle(e.target.value)}
+                  style={{ width: "100%", background: "#F5F0E8", border: "1px solid rgba(0,0,0,0.06)", borderRadius: 8, padding: "8px 12px", fontSize: 14, color: "#2C2A26", outline: "none", marginBottom: 6, boxSizing: "border-box" }} />
+                <textarea value={editContent} onChange={e => setEditContent(e.target.value)}
+                  style={{ width: "100%", background: "#F5F0E8", border: "1px solid rgba(0,0,0,0.06)", borderRadius: 8, padding: "8px 12px", fontSize: 13, color: "#2C2A26", outline: "none", minHeight: 80, resize: "vertical", fontFamily: "inherit", lineHeight: 1.5, boxSizing: "border-box" }} />
+                <div style={{ display: "flex", gap: 6, marginTop: 6 }}>
+                  <button className="btn btn-primary btn-sm" onClick={handleSave}>Kaydet</button>
+                  <button className="btn btn-sm" onClick={() => setEditing(null)}>İptal</button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <div onClick={() => setExpanded(isExp ? null : entry.id)} style={{ cursor: "pointer" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: "#2C2A26" }}>{entry.title || "Başlıksız"}</div>
+                    <span style={{ fontSize: 10, color: "#8B8578" }}>{entry.date}</span>
+                  </div>
+                  {!isExp && entry.content && <div style={{ fontSize: 12, color: "#8B8578", marginTop: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{entry.content.slice(0, 80)}...</div>}
+                </div>
+                {isExp && (
+                  <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid rgba(0,0,0,0.05)" }}>
+                    <div style={{ fontSize: 13, color: "#2C2A26", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{entry.content}</div>
+                    <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
+                      <button className="btn btn-sm" onClick={() => startEdit(entry)}>✏️ Düzenle</button>
+                      <button className="btn btn-sm btn-danger" onClick={() => { if (confirm("Bu kaydı silmek istiyor musunuz?")) onDel(entry.id); }}>🗑 Sil</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function FilesTab({ files, projectId, onAddFiles, onAddManual, onDel, onDownload }) {
   const [over, setOver] = useState(false);
   const [manualName, setManualName] = useState("");
+  const [preview, setPreview] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
   const inputRef = useRef(null);
 
   const handleDrop = (e) => { e.preventDefault(); setOver(false); if (e.dataTransfer.files.length) onAddFiles(e.dataTransfer.files); };
+
+  const openPreview = async (file) => {
+    if (!file.stored || !file.id) return;
+    try {
+      const record = await getFile(projectId, file.id);
+      if (!record) return;
+      const url = createBlobUrl(record);
+      setPreviewUrl(url);
+      setPreview(file);
+    } catch {}
+  };
+
+  const closePreview = () => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setPreview(null); setPreviewUrl(null);
+  };
+
+  const isImage = (type) => type && type.startsWith("image/");
+  const isPdf = (type) => type && type.includes("pdf");
 
   return (
     <div>
@@ -784,7 +922,8 @@ function FilesTab({ files, onAddFiles, onAddManual, onDel }) {
         onClick={() => inputRef.current?.click()}>
         <div style={{ fontSize: 32, marginBottom: 8 }}>📎</div>
         <div>Dosyaları sürükle-bırak veya tıkla</div>
-        <input ref={inputRef} type="file" multiple hidden onChange={e => { if (e.target.files.length) onAddFiles(e.target.files); }} />
+        <div style={{ fontSize: 11, color: "#8B8578", marginTop: 4 }}>Dosyalar cihazınızda kalıcı olarak saklanır</div>
+        <input ref={inputRef} type="file" multiple hidden onChange={e => { if (e.target.files.length) onAddFiles(e.target.files); e.target.value = ""; }} />
       </div>
 
       <details>
@@ -798,16 +937,47 @@ function FilesTab({ files, onAddFiles, onAddManual, onDel }) {
 
       <div style={{ marginTop: 16 }}>
         {files.map((f, i) => (
-          <div className="file-item" key={i}>
-            <div className="file-icon">{f.icon}</div>
-            <div className="file-info">
+          <div className="file-item" key={i} style={{ borderLeft: f.stored ? "3px solid #1D9E75" : "3px solid #8B8578", borderRadius: "0 10px 10px 0" }}>
+            <div className="file-icon" style={{ cursor: f.stored ? "pointer" : "default" }} onClick={() => f.stored && openPreview(f)}>{f.icon}</div>
+            <div className="file-info" style={{ cursor: f.stored ? "pointer" : "default" }} onClick={() => f.stored && openPreview(f)}>
               <div className="file-name">{f.name}</div>
-              <div className="file-meta">{f.size} · {f.date}</div>
+              <div className="file-meta">
+                {f.size} · {f.date}
+                {f.stored && <span style={{ color: "#1D9E75", marginLeft: 6, fontSize: 10 }}>● Kayıtlı</span>}
+                {!f.stored && f.size !== "-" && <span style={{ color: "#8B8578", marginLeft: 6, fontSize: 10 }}>○ Sadece bilgi</span>}
+              </div>
             </div>
-            <button className="del" style={{ background: "none", border: "none", color: "#555", cursor: "pointer" }} onClick={() => onDel(i)}>×</button>
+            <div style={{ display: "flex", gap: 4 }}>
+              {f.stored && <button className="btn btn-sm" onClick={() => onDownload(f)} title="İndir">⬇</button>}
+              <button className="del" style={{ background: "none", border: "none", color: "#8B8578", cursor: "pointer" }} onClick={() => onDel(i)}>×</button>
+            </div>
           </div>
         ))}
       </div>
+
+      {/* Preview overlay */}
+      {preview && previewUrl && (
+        <div className="overlay" onClick={closePreview}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 700, maxHeight: "90vh" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+              <h2 style={{ fontSize: 16 }}>{preview.icon} {preview.name}</h2>
+              <div style={{ display: "flex", gap: 6 }}>
+                <button className="btn btn-sm" onClick={() => onDownload(preview)}>⬇ İndir</button>
+                <button className="btn btn-sm" onClick={closePreview}>✕</button>
+              </div>
+            </div>
+            {isImage(preview.type) && <img src={previewUrl} alt={preview.name} style={{ width: "100%", borderRadius: 10, maxHeight: "70vh", objectFit: "contain" }} />}
+            {isPdf(preview.type) && <iframe src={previewUrl} style={{ width: "100%", height: "70vh", border: "none", borderRadius: 10 }} />}
+            {!isImage(preview.type) && !isPdf(preview.type) && (
+              <div style={{ textAlign: "center", padding: 40, color: "#8B8578" }}>
+                <div style={{ fontSize: 48, marginBottom: 12 }}>{preview.icon}</div>
+                <div>Bu dosya türü önizlenemez</div>
+                <button className="btn btn-primary" style={{ marginTop: 12, width: "auto" }} onClick={() => onDownload(preview)}>⬇ İndir</button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
