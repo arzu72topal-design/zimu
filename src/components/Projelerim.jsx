@@ -468,7 +468,7 @@ export default function Projelerim() {
   };
 
   // ─── Claude ────────────────────────────────────────────────────
-  const openClaude = (prompt) => {
+  const prepClaude = (prompt) => {
     if (!proj) return;
     const full = `[Proje: ${proj.name}] ${proj.desc}\n\nMevcut görevler:\n${proj.tasks.map(t => `${t.d ? "✅" : "⬜"} [${t.p}] ${t.t}`).join("\n")}\n\n${prompt}`;
     navigator.clipboard?.writeText(full).catch(() => {});
@@ -478,15 +478,7 @@ export default function Projelerim() {
       return { ...p, sessions, lastActivity: Date.now() };
     });
     save(np);
-    // Anchor tag ile aç — popup blocker engellemez
-    const a = document.createElement("a");
-    a.href = "https://claude.ai/new";
-    a.target = "_blank";
-    a.rel = "noopener noreferrer";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    showToast("📋 Prompt kopyalandı, Claude açılıyor...");
+    showToast("📋 Prompt kopyalandı!");
   };
 
   // ─── Stats ─────────────────────────────────────────────────────
@@ -604,7 +596,7 @@ export default function Projelerim() {
             </div>
 
             {/* Claude Box */}
-            <ClaudeBox onSend={openClaude} color={proj.color} />
+            <ClaudeBox onSend={prepClaude} color={proj.color} />
 
             {/* Tabs */}
             <div className="tabs">
@@ -615,13 +607,13 @@ export default function Projelerim() {
 
             {/* Tab Content */}
             <div className="slide-up" key={tab}>
-              {tab === "overview" && <OverviewTab project={proj} modules={MODULES} onOpenModule={(m) => { setSelModule(m); setTab("modules"); }} sessions={proj.sessions} onOpenClaude={openClaude} />}
+              {tab === "overview" && <OverviewTab project={proj} modules={MODULES} onOpenModule={(m) => { setSelModule(m); setTab("modules"); }} sessions={proj.sessions} onOpenClaude={prepClaude} />}
               {tab === "journal" && <JournalTab journal={proj.journal || []} onAdd={addJournal} onDel={delJournal} onUpdate={updateJournal} />}
               {tab === "tasks" && <TasksTab tasks={proj.tasks} onToggle={toggleTask} onAdd={addTask} onDel={delTask} />}
               {tab === "notes" && <NotesTab notes={proj.notes} onAdd={addNote} onDel={delNote} />}
               {tab === "files" && <FilesTab files={proj.files} projectId={selId} onAddFiles={addFiles} onAddManual={addManualFile} onDel={delFile} onDownload={handleDownload} />}
-              {tab === "sessions" && <SessionsTab sessions={proj.sessions} onReopen={openClaude} />}
-              {tab === "modules" && <ModulesTab modules={MODULES} selected={selModule} onSelect={setSelModule} onPrompt={(prompt) => openClaude(prompt)} project={proj} />}
+              {tab === "sessions" && <SessionsTab sessions={proj.sessions} onReopen={prepClaude} />}
+              {tab === "modules" && <ModulesTab modules={MODULES} selected={selModule} onSelect={setSelModule} onPrompt={(prompt) => prepClaude(prompt)} project={proj} />}
             </div>
           </div>
         )}
@@ -662,11 +654,15 @@ export default function Projelerim() {
 
 function ClaudeBox({ onSend, color }) {
   const [val, setVal] = useState("");
+  const handleClick = () => { if (val.trim()) { onSend(val.trim()); setVal(""); } };
   return (
     <div className="claude-box" style={{ borderColor: color + "44" }}>
       <input placeholder="Claude'a ne sormak istiyorsun?" value={val} onChange={e => setVal(e.target.value)}
-        onKeyDown={e => { if (e.key === "Enter" && val.trim()) { onSend(val.trim()); setVal(""); } }} />
-      <button className="btn btn-primary" onClick={() => { if (val.trim()) { onSend(val.trim()); setVal(""); } }}>Claude Aç →</button>
+        onKeyDown={e => { if (e.key === "Enter" && val.trim()) { handleClick(); } }} />
+      <a href="https://claude.ai/new" target="_blank" rel="noopener noreferrer"
+        className="btn btn-primary"
+        style={{ textDecoration: "none", display: "inline-flex", alignItems: "center" }}
+        onClick={handleClick}>Claude Aç →</a>
     </div>
   );
 }
@@ -985,13 +981,15 @@ function FilesTab({ files, projectId, onAddFiles, onAddManual, onDel, onDownload
 function SessionsTab({ sessions, onReopen }) {
   return (
     <div>
-      {sessions.length === 0 && <div style={{ color: "#666", textAlign: "center", padding: 40 }}>Henüz oturum yok. Claude ile çalışmaya başlayın!</div>}
+      {sessions.length === 0 && <div style={{ color: "#8B8578", textAlign: "center", padding: 40 }}>Henüz oturum yok. Claude ile çalışmaya başlayın!</div>}
       {sessions.map((s, i) => (
         <div className="session-item" key={i}>
           <div className="s-prompt">🤖 {s.prompt}</div>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 6 }}>
             <span className="s-date">{s.date}</span>
-            <button className="btn btn-sm" onClick={() => onReopen(s.prompt)}>Tekrar Aç</button>
+            <a href="https://claude.ai/new" target="_blank" rel="noopener noreferrer"
+              className="btn btn-sm" style={{ textDecoration: "none" }}
+              onClick={() => onReopen(s.prompt)}>Tekrar Aç</a>
           </div>
         </div>
       ))}
@@ -1015,15 +1013,19 @@ function ModulesTab({ modules, selected, onSelect, onPrompt, project }) {
         </div>
         <div className="mod-prompts">
           {selected.prompts.map((pr, i) => (
-            <button key={i} className="mod-prompt-btn" style={{ borderColor: selected.color + "44" }} onClick={() => onPrompt(`[${selected.name}] ${pr}`)}>
+            <a key={i} href="https://claude.ai/new" target="_blank" rel="noopener noreferrer"
+              className="mod-prompt-btn" style={{ borderColor: selected.color + "44", textDecoration: "none" }}
+              onClick={() => onPrompt(`[${selected.name}] ${pr}`)}>
               {pr}
-            </button>
+            </a>
           ))}
         </div>
         <div className="claude-box" style={{ marginTop: 16, borderColor: selected.color + "44" }}>
           <input placeholder={`${selected.name} için özel istek...`} value={custom} onChange={e => setCustom(e.target.value)}
             onKeyDown={e => { if (e.key === "Enter" && custom.trim()) { onPrompt(`[${selected.name}] ${custom.trim()}`); setCustom(""); } }} />
-          <button className="btn btn-primary" onClick={() => { if (custom.trim()) { onPrompt(`[${selected.name}] ${custom.trim()}`); setCustom(""); } }}>Gönder</button>
+          <a href="https://claude.ai/new" target="_blank" rel="noopener noreferrer"
+            className="btn btn-primary" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center" }}
+            onClick={() => { if (custom.trim()) { onPrompt(`[${selected.name}] ${custom.trim()}`); setCustom(""); } }}>Gönder</a>
         </div>
       </div>
     );
